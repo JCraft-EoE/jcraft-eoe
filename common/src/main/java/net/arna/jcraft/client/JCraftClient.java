@@ -78,6 +78,7 @@ public class JCraftClient {
             .put(special3Key, MoveInputType.SPECIAL3)
             .put(ultKey, MoveInputType.ULTIMATE)
             .put(utility, MoveInputType.UTILITY)
+            .put(TrackedKeyBinding.wrap(Minecraft.getInstance().options.keyPickItem), MoveInputType.TOSS)
             .build();
     @Getter(lazy = true)
     private static final Map<TrackedKeyBinding, MovementInputType> movementBindings = createMovementBindingsMap();
@@ -183,6 +184,7 @@ public class JCraftClient {
                 .put(TrackedKeyBinding.wrap(options.keyJump), MovementInputType.JUMP)
                 .put(TrackedKeyBinding.wrap(options.keyShift), MovementInputType.CROUCH)
                 .put(dash, MovementInputType.DASH)
+                .put(TrackedKeyBinding.wrap(options.keyPickItem), MovementInputType.THROW)
                 .build();
     }
 
@@ -236,7 +238,7 @@ public class JCraftClient {
     }
 
     public static void registerParticleSpriteSets() {
-        // TODO Forge version is currently handled separately cuz Forge is ass.
+        // TODO: merge Forge version handling with this somehow. until then _KEEP THEM IN SYNC_
         // See JCraftForgeClient#onParticleFactoryRegistration(RegisterParticleProvidersEvent)
 
         ParticleProviderRegistry.register(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new);

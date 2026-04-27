@@ -17,6 +17,8 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.common.attack.moves.killerqueen.*;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.minecraft.network.chat.Component;
@@ -89,6 +91,12 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                     Component.literal("grabs opponent by the face, then detonates them, launching them upwards")
             );
     public static final CoinTossMove COIN_TOSS = new CoinTossMove(240);
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<KillerQueenEntity> TOSS = new TossMove<KillerQueenEntity>(0, 1, 1, 0.75f)
+            .withAnim(KillerQueenEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<KillerQueenEntity> TOSS_CHARGE = new TossChargeMove<KillerQueenEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     // Light chain implementation
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = AbstractKillerQueenEntity.LOW.copy().withAnim(KQBTDEntity.State.LOW);
@@ -117,6 +125,8 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         moves.register(MoveClass.SPECIAL2, GRAB, State.GRAB);
         moves.register(MoveClass.SPECIAL3, COIN_TOSS); // No special state
         moves.register(MoveClass.ULTIMATE, SHEER_HEART_ATTACK, State.SHA);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     // Move-set
@@ -150,7 +160,9 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
         LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         LOW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.low", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

@@ -245,6 +245,12 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withInfo(
                     Component.literal("Destroy"),
                     Component.literal("Cream quickly transforms into a black hole and charges in a downward curve"));
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<CreamEntity> TOSS = new TossMove<CreamEntity>(0, 1, 1, 0.75f)
+            .withAnim(CreamEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<CreamEntity> TOSS_CHARGE = new TossChargeMove<CreamEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Integer> VOID_TIME = SynchedEntityData.defineId(CreamEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> HALF_BALL = SynchedEntityData.defineId(CreamEntity.class, EntityDataSerializers.BOOLEAN);
@@ -345,6 +351,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         moves.register(MoveClass.UTILITY, ENTER, State.ENTER);
 
         moves.register(MoveClass.ULTIMATE, CONSUME, State.CONSUME);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -715,6 +723,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         VOID_IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cream.voididle", AzPlayBehaviors.LOOP)),
         HALF_BALL_IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cream.ballidle", AzPlayBehaviors.LOOP)),
 
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
 
         private final AzCommand animator;

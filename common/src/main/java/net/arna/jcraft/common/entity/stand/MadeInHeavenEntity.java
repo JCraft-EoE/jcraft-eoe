@@ -25,6 +25,8 @@ import net.arna.jcraft.common.attack.moves.madeinheaven.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.util.CooldownType;
@@ -209,6 +211,13 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     Component.literal("Divine Severance"),
                     Component.literal("Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<MadeInHeavenEntity> TOSS = new TossMove<MadeInHeavenEntity>(0, 1, 1, 0.75f)
+            .withAnim(MadeInHeavenEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<MadeInHeavenEntity> TOSS_CHARGE = new TossChargeMove<MadeInHeavenEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
+
     private static final EntityDataAccessor<Integer> ACCEL_TIME = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SPEEDOMETER = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> AFTER_IMAGE = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.BOOLEAN);
@@ -241,6 +250,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         moves.register(MoveClass.ULTIMATE, TIME_ACCELERATION, State.TIME_ACCELERATION);
 
         moves.register(MoveClass.UTILITY, SPEED_SLICE, State.SPEED_SLICE);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -435,7 +446,9 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         CIRCLE_STARTUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.circlestartup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         SPEED_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.speedchop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LOW_KICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.lowkick", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        LOW_KICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.lowkick", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

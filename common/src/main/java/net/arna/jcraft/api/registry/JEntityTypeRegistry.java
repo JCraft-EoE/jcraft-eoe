@@ -21,9 +21,7 @@ import net.arna.jcraft.common.entity.spec.VampireSpecUser;
 import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.entity.vehicle.RoadRollerEntity;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -731,9 +729,9 @@ public interface JEntityTypeRegistry {
             () -> createSpecUser(AnubisSpecUser::new, "anubis_spec_user")
     );
 
-    RegistrySupplier<EntityType<Entity>> RANDOM_SPEC_USER = ENTITY_TYPE_REGISTRY.register(
+    RegistrySupplier<EntityType<LivingEntity>> RANDOM_SPEC_USER = ENTITY_TYPE_REGISTRY.register(
             JCraft.id("random_spec_user"),
-            () -> EntityType.Builder.of(
+            () -> EntityType.Builder.<LivingEntity>of(
                     (type, world) -> switch (world.getRandom().nextInt(2)) {
                         case (0) -> new BrawlerSpecUser(world);
                         case (1) -> new VampireSpecUser(world);
@@ -832,6 +830,7 @@ public interface JEntityTypeRegistry {
         EntityAttributeRegistry.register(HAMON_SPEC_USER, HamonSpecUser::createUserAttributes);
         EntityAttributeRegistry.register(VAMPIRE_SPEC_USER, VampireSpecUser::createUserAttributes);
         EntityAttributeRegistry.register(ANUBIS_SPEC_USER, AnubisSpecUser::createUserAttributes);
+        EntityAttributeRegistry.register(RANDOM_SPEC_USER, Mob::createMobAttributes);
     }
 
     static void init() {

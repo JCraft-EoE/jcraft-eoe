@@ -30,15 +30,17 @@ public abstract class CommonSpecComponentImpl implements CommonSpecComponent {
 
     @Override
     public void setType(final SpecType type) {
-        setTypeRaw(type);
+        setTypeRaw(type, false);
         sync(user);
     }
 
-    private void setTypeRaw(final SpecType type) {
+    private void setTypeRaw(final SpecType type, final boolean loading) {
         this.type = type;
         spec = type == null ? null : type.createSpec(user);
         if (!SpecTypeUtil.isNone(type) && user instanceof ServerPlayer player) {
-            JUtils.maySendSpecAboutInfo(player);
+            if (!loading) {
+                JUtils.maySendSpecAboutInfo(player);
+            }
             JAdvancementTriggerRegistry.OBTAINED_SPEC.trigger(player, type);
         }
     }
@@ -55,7 +57,7 @@ public abstract class CommonSpecComponentImpl implements CommonSpecComponent {
     public void readFromNbt(final @NonNull CompoundTag tag) {
         SpecType type = SpecTypeUtil.readFromNBT(tag, "Type");
         if (type != null) {
-            setTypeRaw(type);
+            setTypeRaw(type, true);
         }
     }
 

@@ -25,6 +25,8 @@ import net.arna.jcraft.common.attack.moves.dirtydeedsdonedirtcheap.*;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleMultiHitAttack;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.minecraft.network.chat.Component;
@@ -173,6 +175,12 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withInfo(
                     Component.literal("Dimensional Phase"),
                     Component.literal("hides in a flag in an un-stunnable, floating state"));
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<D4CEntity> TOSS = new TossMove<D4CEntity>(0, 1, 1, 0.75f)
+            .withAnim(D4CEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<D4CEntity> TOSS_CHARGE = new TossChargeMove<D4CEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public D4CEntity(Level worldIn) {
         super(JStandTypeRegistry.D4C.get(), worldIn);
@@ -197,6 +205,8 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         moves.register(MoveClass.ULTIMATE, DIM_HOP, State.DIM_HOP);
 
         moves.register(MoveClass.UTILITY, FLAG, State.FLAG);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     public void equipRevolver() {
@@ -270,7 +280,9 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
         GIVE_GUN(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.d4c.givegun", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         FLAG(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.d4c.flag", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ITEM_PLACE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.d4c.itemplace", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.d4c.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.d4c.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

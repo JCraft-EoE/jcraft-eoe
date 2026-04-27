@@ -31,7 +31,7 @@ public class CommonStandComponentImpl implements CommonStandComponent {
     }
 
     @Override
-    public void setTypeAndSkin(final @Nullable StandType type, final int skin) {
+    public void setTypeAndSkin(final @Nullable StandType type, final int skin, final boolean loading) {
         // Exclusive stand check
         if (!entity.level().isClientSide && entity instanceof Player &&
                 !JCraft.getExclusiveStandsData().switchStand(this.type, type)) {
@@ -39,7 +39,9 @@ public class CommonStandComponentImpl implements CommonStandComponent {
         }
 
         if (!StandTypeUtil.isNone(type) && entity instanceof ServerPlayer player) {
-            JUtils.maySendStandAboutInfo(player);
+            if (!loading) {
+                JUtils.maySendStandAboutInfo(player);
+            }
             JAdvancementTriggerRegistry.OBTAINED_STAND.trigger(player, type);
         }
         this.type = type;

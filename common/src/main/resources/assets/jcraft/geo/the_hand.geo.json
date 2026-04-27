@@ -234,7 +234,7 @@
 					]
 				},
 				{
-					"name": "erase",
+					"name": "prop",
 					"parent": "base",
 					"pivot": [0, 0, 0],
 					"cubes": [
@@ -268,7 +268,7 @@
 				},
 				{
 					"name": "erase2",
-					"parent": "erase",
+					"parent": "prop",
 					"pivot": [0, -4, 0],
 					"cubes": [
 						{

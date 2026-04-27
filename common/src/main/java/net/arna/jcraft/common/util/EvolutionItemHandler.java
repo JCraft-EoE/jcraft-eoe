@@ -90,7 +90,7 @@ public class EvolutionItemHandler {
 
         if (!player.isCreative()) handStack.shrink(1);
 
-        standData.setTypeAndSkin(evolution.target(), standData.getSkin());
+        standData.setTypeAndSkin(evolution.target(), standData.getSkin(), false);
         player.awardStat(JStatRegistry.STAND_EVOLVED.get());
 
         // Re-summon users stand

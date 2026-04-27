@@ -159,7 +159,7 @@
 					]
 				},
 				{
-					"name": "stray",
+					"name": "prop2",
 					"parent": "body",
 					"pivot": [0, -13, 0],
 					"cubes": [
@@ -179,7 +179,7 @@
 				},
 				{
 					"name": "stray_head",
-					"parent": "stray",
+					"parent": "prop2",
 					"pivot": [-0.00183, -11.03924, -0.25],
 					"cubes": [
 						{
@@ -290,7 +290,7 @@
 				},
 				{
 					"name": "leaves",
-					"parent": "stray",
+					"parent": "prop2",
 					"pivot": [-2.76642, -12.9964, -0.83083],
 					"cubes": [
 						{
@@ -360,7 +360,7 @@
 					]
 				},
 				{
-					"name": "bubble",
+					"name": "prop",
 					"parent": "torso",
 					"pivot": [0, -9, 0],
 					"cubes": [

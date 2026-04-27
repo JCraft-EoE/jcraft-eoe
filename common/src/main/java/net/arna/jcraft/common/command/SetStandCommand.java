@@ -98,7 +98,7 @@ public class SetStandCommand {
                 }
                 final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(livingEntity);
                 if (type != null) {
-                    standData.setTypeAndSkin(type, skin);
+                    standData.setTypeAndSkin(type, skin, false);
                 }
                 else { // i.e. rng != null
                     standData.setType(StandTypeUtil.getRandom(rng));

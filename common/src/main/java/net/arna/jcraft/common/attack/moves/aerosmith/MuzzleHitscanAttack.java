@@ -7,10 +7,15 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractHitscanAttack;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
@@ -19,8 +24,8 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
 
     private static final float HALF_PI = (float)Math.PI/2;
 
-    private float originalBreakChance;
-    private float originalSpread;
+    private final float originalBreakChance;
+    private final float originalSpread;
     private int shootCount;
 
     public MuzzleHitscanAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun, final float knockback, final float range, final float hardness, final float breakChance, final float spread) {
@@ -34,22 +39,32 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
         attacker.addOverheat(0.225f);
         withBreakChance(Mth.clamp(originalBreakChance - attacker.getOverheat() / 100, 0f, 1f));
         withSpread(Mth.clamp(originalSpread + attacker.getOverheat() / 100, 0f, HALF_PI));
-        final Set<LivingEntity> targets = super.perform(attacker, user);
-        if (user == null) {
-            return targets;
+
+        if (attacker.isRemote()) {
+            fire(attacker, user, attacker.position(), attacker.getLookAngle());
+
+            final Vec3 start = user.position().add(GravityChangerAPI.getEyeOffset(user));
+            final HitResult goal = JUtils.raycastAll(user, start, start.add(user.getLookAngle().scale(30.0)), ClipContext.Fluid.NONE);
+            final Vec3 target = goal.getLocation();
+            attacker.setFlyState(AerosmithEntity.FlyState.FLYBY);
+            attacker.setFlyTarget(target);
+        } else {
+            fire(attacker, user, user.position().add(GravityChangerAPI.getEyeOffset(user)), user.getLookAngle());
         }
+
         final Vec3 eyes = attacker.getEyePosition();
         final float rot = attacker.getYRot(); // in degrees
         final double x = Math.cos(Math.toRadians(rot));
         final double z = Math.sin(Math.toRadians(rot));
-        int side = (shootCount++ % 2) * 2 - 1;
+        final int side = (shootCount++ % 2) * 2 - 1;
         JCraft.createParticle((ServerLevel)user.level(),
                 // second summand moves it to the left/right (or up/down in case of y), third summand moves it forwards/backwards
                 eyes.x() + 0.6 * side * x - 0.2 * z,
                 eyes.y() - 0.8,
                 eyes.z() + 0.6 * side * z + 0.2 * x,
                 JParticleType.HIT_SPARK_1);
-        return targets;
+
+        return Set.of();
     }
 
     @Override

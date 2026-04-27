@@ -238,6 +238,13 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                     Component.literal("Timeskip"),
                     Component.literal("14m range")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<TheWorldOverHeavenEntity> TOSS = new TossMove<TheWorldOverHeavenEntity>(0, 1, 1, 0.75f)
+            .withAnim(TheWorldOverHeavenEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<TheWorldOverHeavenEntity> TOSS_CHARGE = new TossChargeMove<TheWorldOverHeavenEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
+
     private static final EntityDataAccessor<Integer> OVERWRITE_TYPE = SynchedEntityData.defineId(TheWorldOverHeavenEntity.class, EntityDataSerializers.INT);
 
     public TheWorldOverHeavenEntity(Level worldIn) {
@@ -288,6 +295,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         moves.register(MoveClass.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
         moves.register(MoveClass.UTILITY, TIME_SKIP, State.TIME_SKIP);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -355,6 +364,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
         LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         SINGULARITY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.singularity", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         AIR_HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.twoh.air_heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
 
         private final AzCommand animator;

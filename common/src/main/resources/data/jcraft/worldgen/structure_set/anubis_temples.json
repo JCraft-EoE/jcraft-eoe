@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "jcraft:anubis_temple",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 34,
+    "separation": 8,
+    "salt": 765390025
+  }
+}

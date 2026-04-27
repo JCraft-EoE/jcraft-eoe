@@ -173,6 +173,12 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                     Component.translatable("jcraft.generic.tp"),
                     Component.literal("14m range")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<SPTWEntity> TOSS = new TossMove<SPTWEntity>(0, 1, 1, 0.75f)
+            .withAnim(SPTWEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<SPTWEntity> TOSS_CHARGE = new TossChargeMove<SPTWEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public SPTWEntity(Level worldIn) {
         super(JStandTypeRegistry.STAR_PLATINUM_THE_WORLD.get(), worldIn);
@@ -197,6 +203,8 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
         moves.register(MoveClass.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
         moves.register(MoveClass.UTILITY, TIME_SKIP, State.TIME_SKIP);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -235,7 +243,9 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
         GRAB_HIT2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grabhit2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         TIME_SKIP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.idle", AzPlayBehaviors.LOOP)),
         GROUND_SLAM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.ground_slam", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

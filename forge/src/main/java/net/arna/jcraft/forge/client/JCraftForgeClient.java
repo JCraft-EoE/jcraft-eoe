@@ -20,7 +20,6 @@ import net.arna.jcraft.forge.capability.impl.entity.GravityCapability;
 import net.arna.jcraft.forge.capability.impl.entity.TimeStopCapability;
 import net.arna.jcraft.forge.capability.impl.living.*;
 import net.arna.jcraft.forge.capability.impl.player.PhCapability;
-import net.arna.jcraft.forge.capability.impl.living.SpecCapability;
 import net.arna.jcraft.forge.capability.impl.world.ShockwaveHandlerCapability;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -47,10 +46,10 @@ import static net.arna.jcraft.forge.capability.impl.living.CooldownsCapability.C
 import static net.arna.jcraft.forge.capability.impl.living.GravityShiftCapability.GS_S2C;
 import static net.arna.jcraft.forge.capability.impl.living.HitPropertyCapability.HIT_S2C;
 import static net.arna.jcraft.forge.capability.impl.living.MiscCapability.MISC_S2C;
+import static net.arna.jcraft.forge.capability.impl.living.SpecCapability.SPEC_S2C;
 import static net.arna.jcraft.forge.capability.impl.living.StandCapability.STAND_S2C;
 import static net.arna.jcraft.forge.capability.impl.living.VampireCapability.VAMP_S2C;
 import static net.arna.jcraft.forge.capability.impl.player.PhCapability.PH_S2C;
-import static net.arna.jcraft.forge.capability.impl.living.SpecCapability.SPEC_S2C;
 import static net.arna.jcraft.forge.capability.impl.world.ShockwaveHandlerCapability.SHOCK_S2C;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD, modid = JCraft.MOD_ID)
@@ -102,6 +101,12 @@ public class JCraftForgeClient {
         event.registerSpriteSet(JParticleTypeRegistry.DAMAGE_NUMBER.get(), DamageNumberParticle.Factory::new);
         DamageIndicatorManager.setDamageNumberParticle(JParticleTypeRegistry.DAMAGE_NUMBER.get());
         event.registerSpriteSet(JParticleTypeRegistry.HAMON_SPARK.get(), provider -> new HitsparkParticle.Factory(provider, 0.2f, 4));
+        event.registerSpriteSet(JParticleTypeRegistry.LEMON.get(), LemonParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_1.get(), MoshParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_2.get(), MoshParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_3.get(), MoshParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_4.get(), MoshParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_5.get(), MoshParticle.Factory::new);
     }
 
     private static void registerClientCapabilityReceivers() {
@@ -132,7 +137,7 @@ public class JCraftForgeClient {
 
             if (Minecraft.getInstance().level != null && Minecraft.getInstance().level.getEntity(id) instanceof LivingEntity livingEntity) {
                 StandCapability.getCapabilityOptional(livingEntity).ifPresent(c -> {
-                    c.setTypeAndSkin(standType, skin);
+                    c.setTypeAndSkin(standType, skin, true);
                     c.applySyncPacket(buf);
                 });
             }

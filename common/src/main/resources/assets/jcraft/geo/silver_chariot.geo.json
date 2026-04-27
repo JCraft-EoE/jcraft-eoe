@@ -207,7 +207,7 @@
 					]
 				},
 				{
-					"name": "rapier",
+					"name": "prop",
 					"parent": "lower_armRight",
 					"pivot": [-5.5, 12, 0],
 					"cubes": [
@@ -216,7 +216,7 @@
 				},
 				{
 					"name": "BladeBase",
-					"parent": "rapier",
+					"parent": "prop",
 					"pivot": [-5.5, 10.8, 0],
 					"cubes": [
 						{
@@ -350,7 +350,7 @@
 					"pivot": [5, 12, -1]
 				},
 				{
-					"name": "anubis",
+					"name": "prop2",
 					"parent": "bipedHandLeft",
 					"pivot": [6.15909, 12.11111, 0.22181],
 					"rotation": [90, 0, 0],

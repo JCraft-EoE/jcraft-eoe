@@ -526,7 +526,7 @@ public class JServerEvents {
                 final GameRules gameRules = serverWorld.getGameRules();
 
                 if (!gameRules.getBoolean(JCraft.KEEP_STAND)) {
-                    JComponentPlatformUtils.getStandComponent(living).setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0);
+                    JComponentPlatformUtils.getStandComponent(living).setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0, false);
                 }
 
                 if (!gameRules.getBoolean(JCraft.KEEP_SPEC)) {
