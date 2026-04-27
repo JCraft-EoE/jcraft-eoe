@@ -327,7 +327,7 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .save(exporter);
 
         // gas can
-        ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, JItemRegistry.GAS_CAN.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.GAS_CAN.get())
                 .pattern("AAA")
                 .pattern("ABA")
                 .pattern("CDE")
@@ -340,7 +340,7 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .save(exporter);
 
         // matchbox
-        ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, JItemRegistry.MATCHBOX.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.MATCHBOX.get())
                 .pattern("ABC")
                 .pattern("ABD")
                 .pattern("ABC")
