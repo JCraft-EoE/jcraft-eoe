@@ -107,14 +107,15 @@ public class GasolineSplatter extends Splatter {
             // All directions false is down, there's no separate down prop on fire.
             if (d != Direction.DOWN) {
                 BooleanProperty dirProp = PipeBlock.PROPERTY_BY_DIRECTION.get(d);
-                newState.setValue(dirProp, true);
+                newState = newState.setValue(dirProp, true);
             }
 
             // We place the fire after all splatters have been ticked so
             // a new fire block placed by this splatter won't cause another splatter
             // to light on fire in the same tick.
+            final BlockState finalNewState = newState;
             toRunAfterTick.add(() -> {
-                getWorld().setBlockAndUpdate(posToLight, newState);
+                getWorld().setBlockAndUpdate(posToLight, finalNewState);
                 if (!litBefore) {
                     getWorld().playSound(null, posToLight, SoundEvents.FIRECHARGE_USE, SoundSource.NEUTRAL, 1f, 1f);
                     litBefore = true;

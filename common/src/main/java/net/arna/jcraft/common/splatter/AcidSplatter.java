@@ -42,14 +42,18 @@ public class AcidSplatter extends Splatter {
         if (getAge() % 4 != 0) return;
 
         for (LivingEntity hit : getWorld().getEntitiesOfClass(LivingEntity.class, getMainBox(), EntitySelector.LIVING_ENTITY_STILL_ALIVE)) {
-            if (intersects(hit.getBoundingBox())) {
-                if (getWorld() != null && (hit.isPassengerOfSameVehicle(Objects.requireNonNull(getCreator())) ||
-                        (hit instanceof StandEntity<?, ?> stand && stand.getUser() == getCreator()))) {
-                    continue;
-                }
-                hit.addEffect(new MobEffectInstance(JStatusRegistry.WSPOISON.get(), 20, 0, true, false));
-                hit.hurt(JDamageSources.whitesnakePoison(getCreator()), 2f);
+            if (!intersects(hit.getBoundingBox())) {
+                continue;
             }
+
+            if (getWorld() != null && getCreator() != null &&
+                    (hit.isPassengerOfSameVehicle(Objects.requireNonNull(getCreator())) ||
+                    (hit instanceof StandEntity<?, ?> stand && stand.getUser() == getCreator()))) {
+                continue;
+            }
+
+            hit.addEffect(new MobEffectInstance(JStatusRegistry.WSPOISON.get(), 20, 0, true, false));
+            hit.hurt(JDamageSources.create(getWorld(), JDamageSources.WHITE_SNAKE_POISON, getCreator()), 2f);
         }
     }
 }
