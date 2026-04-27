@@ -69,3 +69,5 @@ accessible field net/minecraft/world/food/FoodData tickTimer I
 
 accessible class net/minecraft/world/item/crafting/SingleItemRecipe$Serializer$SingleItemMaker
 extendable method net/minecraft/world/entity/Entity discard ()V
+
+mutable field net/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool rawTemplates Ljava/util/List;
