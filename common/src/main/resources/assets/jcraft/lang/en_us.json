@@ -684,6 +684,8 @@
   "key.jcraft.utility": "Utility",
   "move.jcraft.aerosmith.default.bomb_drop.description": "Orders Aerosmith to drop a bomb above a given location.",
   "move.jcraft.aerosmith.default.bomb_drop.name": "Bomb Drop",
+  "move.jcraft.aerosmith.default.breath_detection.description": "Aerosmith scans the surroundings for the breath of living things.",
+  "move.jcraft.aerosmith.default.breath_detection.name": "Breath Detection",
   "move.jcraft.aerosmith.default.dive_charge.description": "Non-remote: a straight charge, rising at the end. Carries enemies with Aerosmith.",
   "move.jcraft.aerosmith.default.dive_charge.name": "Dive Charge",
   "move.jcraft.aerosmith.default.fire_autocannons.description": "Shoots supersonic bullets in front of Aerosmith. Prolonged use overheats the guns, making them far less accurate.",
