@@ -15,7 +15,6 @@ import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
@@ -71,6 +70,11 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
         }
 
         return Set.of();
+    }
+
+    @Override
+    public boolean conditionsMet(AerosmithEntity attacker) {
+        return super.conditionsMet(attacker) && JUtils.isHoldingSomething(attacker);
     }
 
     @Override

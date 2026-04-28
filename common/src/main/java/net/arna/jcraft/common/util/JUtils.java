@@ -1009,4 +1009,14 @@ public final class JUtils {
         BlockState state = level.getBlockState(pos);
         return pred.test(state);
     }
+
+    public static boolean isHoldingSomething(LivingEntity user) {
+        if (user == null) return false;
+
+        ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!mainHandStack.isEmpty()) return true;
+
+        ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
+        return !offHandStack.isEmpty();
+    }
 }

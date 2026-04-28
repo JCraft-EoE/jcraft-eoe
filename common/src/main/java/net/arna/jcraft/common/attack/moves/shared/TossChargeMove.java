@@ -8,6 +8,7 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractHoldableMove;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -50,17 +51,7 @@ public final class TossChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
 
     @Override
     public boolean conditionsMet(A attacker) {
-        return super.conditionsMet(attacker) && isHoldingSomething(attacker.getUser());
-    }
-
-    private static boolean isHoldingSomething(LivingEntity user) {
-        if (user == null) return false;
-
-        ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
-        if (!mainHandStack.isEmpty()) return true;
-
-        ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
-        return !offHandStack.isEmpty();
+        return super.conditionsMet(attacker) && JUtils.isHoldingSomething(attacker.getUser());
     }
 
     @Override
