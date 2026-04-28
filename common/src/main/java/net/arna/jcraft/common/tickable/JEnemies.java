@@ -49,9 +49,11 @@ public class JEnemies {
             if (mob.isAlive()) {
                 if (mob.isNoAi()) return;
 
+                final var info = enemyData.getValue();
+                if (info.getAiLevel() <= 0) return;
+
                 final var standType = JComponentPlatformUtils.getStandComponent(mob).getType();
                 final var specType = JComponentPlatformUtils.getSpecData(mob).getType();
-                final var info = enemyData.getValue();
 
                 final boolean hasSpec = !SpecTypeUtil.isNone(specType);
                 final boolean hasStand = !StandTypeUtil.isNone(standType);

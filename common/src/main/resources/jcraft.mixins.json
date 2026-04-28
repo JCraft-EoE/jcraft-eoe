@@ -84,6 +84,7 @@
     "ServerPlayNetworkHandlerMixin",
     "ServerWorldMixin",
     "StructureMixin",
+    "StructureTemplatePoolAccessor",
     "TimestopBlockEntityMixin",
     "VillagerEntityMixin",
     "WorldMixin",

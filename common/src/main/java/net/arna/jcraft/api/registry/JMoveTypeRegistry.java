@@ -5,10 +5,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.attack.MoveType;
-import net.arna.jcraft.common.attack.moves.aerosmith.BombDropAttack;
-import net.arna.jcraft.common.attack.moves.aerosmith.ItemDropAttack;
-import net.arna.jcraft.common.attack.moves.aerosmith.MuzzleHitscanAttack;
-import net.arna.jcraft.common.attack.moves.aerosmith.PatrolMove;
+import net.arna.jcraft.common.attack.moves.aerosmith.*;
 import net.arna.jcraft.common.attack.moves.anubis.*;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.cream.*;
@@ -262,7 +259,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> HAMON_SENDO_ATTACK = register("hamon_sendo_attack", SendoAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HAMON_ZOOM_PUNCH_ATTACK = register("hamon_zoom_punch_attack", ZoomPunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_ATTACK = register("hamon_improviser_attack", ImproviserAttack.Type.INSTANCE);
-    //RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_MOVE = register("hamon_improviser_move", ImproviserMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_MOVE = register("hamon_improviser_move", ImproviserMove.Type.INSTANCE);
 
 
     RegistrySupplier<MoveType<?>> WHITESNAKE_CHARGED_SPEW_ATTACK = register("whitesnake_charged_spew_attack", ChargedSpewAttack.Type.INSTANCE);
@@ -290,6 +287,8 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_ITEM_DROP_ATTACK = register("aerosmith_item_drop_attack", ItemDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_PATROL_MOVE = register("aerosmith_patrol_move", PatrolMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_CHARGE_ATTACK = register("aerosmith_charge_attack", AerosmithChargeAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> BREATH_XRAY_MOVE = register("breath_xray_move", BreathXrayMove.Type.INSTANCE);
 
 
 

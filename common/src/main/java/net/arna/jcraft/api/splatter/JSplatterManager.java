@@ -1,30 +1,48 @@
-package net.arna.jcraft.common.splatter;
+package net.arna.jcraft.api.splatter;
 
 import dev.architectury.networking.NetworkManager;
+import dev.architectury.registry.registries.RegistrySupplier;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.Pair;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.registry.JPacketRegistry;
+import net.arna.jcraft.common.splatter.SplatterSplitter;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.Predicate;
 
 public class JSplatterManager {
     private final Level world;
     private final Set<Splatter> splatters = ConcurrentHashMap.newKeySet();
 
+    @ApiStatus.Internal
     public JSplatterManager(Level world) {
         this.world = world;
+    }
+
+    /**
+     * Acquires the instance of {@link JSplatterManager} for the given world.
+     * @param world The world to get the splatter manager for.
+     * @return The splatter manager for the given world.
+     */
+    public static JSplatterManager get(Level world) {
+        return JUtils.getSplatterManager(world);
     }
 
     /**
@@ -33,8 +51,8 @@ public class JSplatterManager {
      * @param pos  The position of this splatter
      * @param type The type of this splatter
      */
-    public Splatter addSplatter(Vec3 pos, SplatterType type) {
-        return addSplatter(pos, type, .5f, null);
+    public Splatter addSplatter(Vec3 pos, RegistrySupplier<SplatterFactory> type, int duration) {
+        return addSplatter(pos, type, .5f, duration, null);
     }
 
     /**
@@ -44,8 +62,9 @@ public class JSplatterManager {
      * @param type  The type of this splatter
      * @param range The range of this splatter in both directions
      */
-    public Splatter addSplatter(Vec3 pos, SplatterType type, float range, @Nullable Entity creator) {
-        return addSplatter(pos, type, range, range, creator);
+    public Splatter addSplatter(Vec3 pos, RegistrySupplier<SplatterFactory> type, float range, int duration,
+                                @Nullable LivingEntity creator) {
+        return addSplatter(pos, type, range, range, duration, creator);
     }
 
     /**
@@ -56,12 +75,12 @@ public class JSplatterManager {
      * @param xRange The range of this splatter on the x-axis
      * @param zRange The range of this splatter on the z-axis
      */
-    public Splatter addSplatter(Vec3 pos, final SplatterType type, final float xRange, final float zRange,
-                                @Nullable final Entity creator) {
+    public Splatter addSplatter(Vec3 pos, final RegistrySupplier<SplatterFactory> type, final float xRange,
+                                final float zRange, int duration, @Nullable final LivingEntity creator) {
         final Pair<Vec3, Direction> anchoredPos = anchorPos(pos);
         pos = anchoredPos.left();
 
-        final Splatter splatter = new Splatter(world, pos, anchoredPos.right().getOpposite(), type, xRange, zRange, creator);
+        final Splatter splatter = type.get().create(world, pos, anchoredPos.right().getOpposite(), xRange, zRange, duration, creator);
         splatters.add(splatter);
         if (world.isClientSide) {
             return splatter;
@@ -113,9 +132,11 @@ public class JSplatterManager {
         buf.writeDouble(pos.y());
         buf.writeDouble(pos.z());
         buf.writeEnum(splatter.getDirection());
-        buf.writeEnum(splatter.getType());
+        buf.writeResourceLocation(splatter.getType().getId());
         buf.writeFloat(splatter.getXRange());
         buf.writeFloat(splatter.getZRange());
+        buf.writeVarInt(splatter.getMaxAge());
+        buf.writeVarInt(splatter.getCreator() == null ? -1 : splatter.getCreator().getId());
     }
 
     public Splatter readSplatter(FriendlyByteBuf buf) {
@@ -123,21 +144,54 @@ public class JSplatterManager {
         double y = buf.readDouble();
         double z = buf.readDouble();
         Direction direction = buf.readEnum(Direction.class);
-        SplatterType type = buf.readEnum(SplatterType.class);
+        ResourceLocation typeRl = buf.readResourceLocation();
+        RegistrySupplier<SplatterFactory> type = JRegistries.SPLATTER_TYPE_REGISTRY.delegate(typeRl);
+        if (!type.isPresent()) {
+            throw new IllegalArgumentException("Received splatter with unknown type: " + typeRl);
+        }
+
         float xRange = buf.readFloat();
         float zRange = buf.readFloat();
+        int maxAge = buf.readVarInt();
+        int creatorId = buf.readVarInt();
+        LivingEntity creator = creatorId < 0 ? null : world.getEntity(creatorId) instanceof LivingEntity le ? le : null;
 
-        Splatter splatter = new Splatter(world, new Vec3(x, y, z), direction, type, xRange, zRange, null); // At the moment, clients do not need to know who made a splatter
+        Splatter splatter = type.get().create(world, new Vec3(x, y, z), direction, xRange, zRange, maxAge, creator);
         splatters.add(splatter);
         return splatter;
     }
 
     public void tick() {
-        splatters.forEach(Splatter::tick);
+        splatters.stream()
+                .flatMap(s -> s.tick().stream())
+                .toList()
+                .forEach(Runnable::run);
         splatters.removeIf(Splatter::isRemoved);
     }
 
     public void iterateSplatters(Consumer<Splatter> consumer) {
         splatters.forEach(consumer);
+    }
+
+    public List<Splatter> getHit(Vec3 pos, @Nullable Predicate<Splatter> pred) {
+        pred = pred == null ? s -> true : pred;
+
+        return splatters.stream()
+                .filter(s -> !s.isRemoved())
+                .filter(s -> s.getMainBox().contains(pos) &&
+                        s.getSections().stream().anyMatch(ss -> ss.getHitBox().contains(pos)))
+                .filter(pred)
+                .toList();
+    }
+
+    public List<Splatter> getIntersections(AABB box, @Nullable Predicate<Splatter> pred) {
+        pred = pred == null ? s -> true : pred;
+
+        return splatters.stream()
+                .filter(s -> !s.isRemoved())
+                .filter(s -> s.getMainBox().intersects(box) &&
+                        s.getSections().stream().anyMatch(ss -> ss.getHitBox().intersects(box)))
+                .filter(pred)
+                .toList();
     }
 }

@@ -80,7 +80,7 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.ICE_BRANCH, IceBranchRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.CRAZY_DIAMOND, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.CRAZY_DIAMOND.get())),
-            new RendererData<>(JEntityTypeRegistry.AEROSMITH, AerosmithRenderer::new),
+            new RendererData<>(JEntityTypeRegistry.AEROSMITH, AerosmithRenderer::of),
 
             new RendererData<>(JEntityTypeRegistry.CINDERELLA, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.CINDERELLA.get())),
             new RendererData<>(JEntityTypeRegistry.OSIRIS, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.OSIRIS.get())),
@@ -114,6 +114,8 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.STAND_ARROW_PROJECTILE, context -> new ProjectileRenderer<>(context, "stand_arrow")),
             new RendererData<>(JEntityTypeRegistry.AEROBOMB, context -> new ProjectileRenderer<>(context, "aerobomb")),
             new RendererData<>(JEntityTypeRegistry.HAMON_WAVE, JEntityRendererRegister::createEmpty),
+            new RendererData<>(JEntityTypeRegistry.GAS_CAN_PROJECTILE, GasCanRenderer::new),
+            new RendererData<>(JEntityTypeRegistry.MATCH_PROJECTILE, MatchRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.ROAD_ROLLER, RoadRollerRenderer::new),
 

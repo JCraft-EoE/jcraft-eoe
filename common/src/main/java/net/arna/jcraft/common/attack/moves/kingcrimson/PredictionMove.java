@@ -9,6 +9,7 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -153,7 +154,7 @@ public final class PredictionMove extends AbstractMove<PredictionMove, KingCrims
         }
 
         return world.getEntitiesOfClass(Entity.class, stand.getBoundingBox().inflate(64),
-                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> e != stand && e != player));
+                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> e != stand && e != player && !e.getType().is(JTagRegistry.UNAFFECTED_BY_EPITAPH)));
     }
 
     public static void updatePredictions(final Map<Entity, Vec3> predictions, final int ticksLeft) {

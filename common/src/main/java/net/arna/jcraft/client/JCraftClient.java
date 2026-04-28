@@ -12,10 +12,12 @@ import lombok.Getter;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
+import mod.azure.azurelib.render.item.AzItemRendererRegistry;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.pose.PoseModifiers;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.client.renderer.armor.ArmorRenderer;
+import net.arna.jcraft.client.renderer.item.GasCanItemRenderer;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.particle.DamageNumberParticle;
 import net.arna.jcraft.client.rendering.StandUserPoseLoader;
@@ -109,6 +111,8 @@ public class JCraftClient {
 
         AzArmorRendererRegistry.register(ArmorRenderer.simple("stone_mask"), JItemRegistry.STONE_MASK.get());
         AzArmorRendererRegistry.register(ArmorRenderer.simple("red_hat"), JItemRegistry.RED_HAT.get());
+
+        AzItemRendererRegistry.register(JItemRegistry.GAS_CAN.get(), GasCanItemRenderer::new);
 
         SpecialParticleShaderHandler.INSTANCE.init();
         ZaWarudoShaderHandler.INSTANCE.init();
@@ -239,7 +243,7 @@ public class JCraftClient {
     }
 
     public static void registerParticleSpriteSets() {
-        // TODO Forge version is currently handled separately cuz Forge is ass.
+        // TODO: merge Forge version handling with this somehow. until then _KEEP THEM IN SYNC_
         // See JCraftForgeClient#onParticleFactoryRegistration(RegisterParticleProvidersEvent)
 
         ParticleProviderRegistry.register(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new);

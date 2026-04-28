@@ -1243,5 +1243,25 @@
     "sounds": [
       "jcraft:generic/whoosh"
     ]
+  },
+  "gas_can_toss": {
+    "sounds": [
+      "jcraft:projectiles/gas_can/toss"
+    ]
+  },
+  "gas_can_spill": {
+    "sounds": [
+      "jcraft:projectiles/gas_can/spill"
+    ]
+  },
+  "gas_can_crash": {
+    "sounds": [
+      "jcraft:projectiles/gas_can/crash"
+    ]
+  },
+  "matchbox_use": {
+    "sounds": [
+      "jcraft:projectiles/matchbox/use"
+    ]
   }
 }

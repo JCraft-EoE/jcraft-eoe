@@ -10,6 +10,7 @@ import dev.architectury.registry.registries.RegistrarManager;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.spec.SpecType;
+import net.arna.jcraft.api.splatter.SplatterFactory;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.attack.core.MoveAction;
 import net.arna.jcraft.api.attack.core.MoveCondition;
@@ -61,6 +62,9 @@ public class JRegistries {
     public static final Registrar<TriConsumer<ResourceLocation,Entity,CompoundTag>> INJECTOR_REGISTRY = MANAGER.<TriConsumer<ResourceLocation,Entity,CompoundTag>>builder(JCraft.id("injector"))
             .syncToClients()
             .build();
+    public static final Registrar<SplatterFactory> SPLATTER_TYPE_REGISTRY = MANAGER.<SplatterFactory>builder(JCraft.id("splatter_type"))
+            .syncToClients()
+            .build();
 
     // Registry keys
     public static final ResourceKey<Registry<StandType>> STAND_TYPE_REGISTRY_KEY = createKey(STAND_TYPE_REGISTRY);
@@ -70,6 +74,7 @@ public class JRegistries {
     public static final ResourceKey<Registry<MoveActionType<?>>> MOVE_ACTION_TYPE_REGISTRY_KEY = createKey(MOVE_ACTION_TYPE_REGISTRY);
     public static final ResourceKey<Registry<TriConsumer<ResourceLocation,Entity,CompoundTag>>> EXTRACTOR_REGISTRY_KEY = createKey(EXTRACTOR_REGISTRY);
     public static final ResourceKey<Registry<TriConsumer<ResourceLocation,Entity,CompoundTag>>> INJECTOR_REGISTRY_KEY = createKey(INJECTOR_REGISTRY);
+    public static final ResourceKey<Registry<SplatterFactory>> SPLATTER_TYPE_REGISTRY_KEY = createKey(SPLATTER_TYPE_REGISTRY);
 
     // Registry codecs
     public static final Codec<StandType> STAND_TYPE_CODEC = createCodec(STAND_TYPE_REGISTRY);
@@ -85,6 +90,7 @@ public class JRegistries {
             .dispatch("type", MoveAction::getType, MoveActionType::getCodec);
     public static final Codec<TriConsumer<ResourceLocation,Entity,CompoundTag>> EXTRACTOR_CODEC = createCodec(EXTRACTOR_REGISTRY);
     public static final Codec<TriConsumer<ResourceLocation,Entity,CompoundTag>> INJECTOR_CODEC = createCodec(INJECTOR_REGISTRY);
+    public static final Codec<SplatterFactory> SPLATTER_TYPE_CODEC = createCodec(SPLATTER_TYPE_REGISTRY);
 
     public static void init() {
         // Left empty on purpose. Static initializers will register the registries.

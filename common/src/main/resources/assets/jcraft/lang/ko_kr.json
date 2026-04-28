@@ -843,8 +843,6 @@
   "move.jcraft.hamon.default.charge_hamon.name": "파문 충전",
   "move.jcraft.hamon.default.focus_strike.description": "파문을 둘러하여 줌 펀치를 사용한다. 느리지만 사거리가 긴 강력한 공격. 한 번의 공격을 버텨낼 수 있다.",
   "move.jcraft.hamon.default.focus_strike.name": "집중 공격",
-  "move.jcraft.hamon.default.improviser.description": "상황에 따른 파문 적용\n무기를 사용할 때, 파문이 주입된 공격을 가한다. (현재 유일한 선택지)",
-  "move.jcraft.hamon.default.improviser.name": "파문 응용",
   "move.jcraft.hamon.default.knee_thrust.air.description": "파문을 충전하여 선도 웨이브 킥을 사용하면 적을 넘어뜨린 다음, 파문의 여진으로 다시 일으켜 세울 수 있다.",
   "move.jcraft.hamon.default.knee_thrust.air.name": "무릎 돌진",
   "move.jcraft.hamon.default.stomp.description": "파문을 띤 잔물결, 강력한 짓밟기 공격으로 파문의 파도를 발생시킨다.",

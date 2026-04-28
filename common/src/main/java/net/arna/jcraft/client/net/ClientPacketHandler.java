@@ -30,7 +30,7 @@ import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.common.splatter.Splatter;
+import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.minecraft.client.Minecraft;
@@ -696,7 +696,7 @@ public class ClientPacketHandler {
 
         final Splatter splatter = JUtils.getSplatterManager(world).readSplatter(buf);
 
-        long ageMs = splatter.getType().getMaxAge() * 50L;
+        long ageMs = splatter.getMaxAge() * 50L;
         AttackHitboxEffectRenderer.addHitbox(splatter.getMainBox(), ageMs, true);
         splatter.getSections().stream()
                 .filter(section -> !section.isRemoved())

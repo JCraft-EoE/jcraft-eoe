@@ -193,11 +193,22 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withCondition(HamonChargeCondition.atLeast(SendoAttack.CHARGE_COST))
             .withCondition(HamonSendoWaveKickGroundedCondition.of(-1)) // in ticks
             .withInfo(
-                    Component.literal("Improviser"),
+                    Component.literal("Improviser Attack"),
                     Component.literal("""
                             Situational hamon application.
                             When using a weapon, does a Hamon-infused strike with it. (CURRENTLY ONLY OPTION)""")
             );
+
+    public static final ImproviserMove IMPROVISER_MOVE = new ImproviserMove(60 * 20, 0.25f, 1)
+            .withCondition(HamonChargeCondition.atLeast(0.25f)) // same as charge per tick in the line above
+            .withCrouchingVariant(IMPROVISER)
+            .withInfo(
+                    Component.literal("Improviser Move"),
+                    Component.literal("""
+                            Situational hamon application.
+                            Using Hamon, you gain different abilities.""")
+            );
+
     // These aren't stored in any movemap and have fields that must be unique to them, so we make copies.
     private final ZoomPunchAttack zoomPunchAttack = ZOOM_PUNCH.copy();
     private final RippleAttack rippleAttack = RIPPLE_ATTACK.copy();
@@ -210,7 +221,8 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
         moves.register(MoveClass.SPECIAL1, STOMP, CooldownType.SPECIAL1, State.STOMP);
         moves.register(MoveClass.SPECIAL2, UPPERCUT, CooldownType.SPECIAL2, State.UPPERCUT)
                 .withAerialVariant(State.SENDO);
-        moves.register(MoveClass.SPECIAL3, IMPROVISER, CooldownType.SPECIAL3, State.IMPROVISER);
+        moves.register(MoveClass.SPECIAL3, IMPROVISER_MOVE, CooldownType.SPECIAL3, null)
+                .withCrouchingVariant(State.IMPROVISER);
 
         moves.register(MoveClass.ULTIMATE, CHARGE_HAMON, CooldownType.ULTIMATE, null);
     }

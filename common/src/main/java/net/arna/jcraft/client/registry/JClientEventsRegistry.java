@@ -25,6 +25,6 @@ public interface JClientEventsRegistry {
 
         MenuRegistry.registerScreenFactory(JMenuRegistry.MAIN_MENU_TYPE.get(), MainMenuScreen::new);
 
-        ClientCommandRegistrationEvent.EVENT.register(JClientCommandRegistry::registerCommands);
+        ClientCommandRegistrationEvent.EVENT.register((dispatcher, ctx) -> JClientCommandRegistry.registerCommands(dispatcher));
     }
 }

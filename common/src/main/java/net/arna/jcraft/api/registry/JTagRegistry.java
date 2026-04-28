@@ -15,6 +15,7 @@ public interface JTagRegistry {
     TagKey<Item> EQUIPABLES = TagKey.create(Registries.ITEM, new ResourceLocation("c", "equipables"));
     TagKey<Item> PROTECTS_FROM_SUN = TagKey.create(Registries.ITEM, JCraft.id("protects_from_sun"));
     TagKey<Item> SAND_BLOCKS = TagKey.create(Registries.ITEM, new ResourceLocation("c", "sand_blocks"));
+    TagKey<Item> UNTHROWABLE = TagKey.create(Registries.ITEM, JCraft.id("unthrowable"));
     TagKey<Item> BLINDS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("blinds_on_impact"));
     TagKey<Item> SLOWS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("slows_on_impact"));
     TagKey<Item> BURNS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("burns_on_impact"));
@@ -48,6 +49,7 @@ public interface JTagRegistry {
     TagKey<EntityType<?>> NO_STAND_USER_AI = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("no_stand_user_ai"));
     TagKey<EntityType<?>> SPEC_USER = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("spec_user"));
     TagKey<EntityType<?>> CANNOT_TAKE_STAND_FROM = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cannot_take_stand_from"));
+    TagKey<EntityType<?>> UNAFFECTED_BY_EPITAPH = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("unaffected_by_epitaph"));
 
     TagKey<Biome> METEORS_CAN_FALL = TagKey.create(Registries.BIOME, JCraft.id("meteors_can_fall"));
 

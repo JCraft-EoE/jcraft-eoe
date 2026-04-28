@@ -8,6 +8,7 @@ import net.arna.jcraft.common.events.JEntityEvents;
 import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
+import net.arna.jcraft.common.worldgen.VillageStructureInjector;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ public interface JEventsRegistry {
         });
 
         LifecycleEvent.SERVER_BEFORE_START.register(JServerConfig::load);
+        LifecycleEvent.SERVER_BEFORE_START.register(VillageStructureInjector::onServerBeforeStart);
         LifecycleEvent.SERVER_STARTED.register(JServerEvents::finishLoading);
         LifecycleEvent.SERVER_STOPPED.register(JServerEvents::saveExclusives);
     }
