@@ -41,9 +41,10 @@ public class AerosmithRenderer {
 
         return StandEntityRenderer.of(
                 AzEntityRendererConfig
-                        .<AerosmithEntity>builder(model, texture)
+                        .<AerosmithEntity>builder(e -> model, StandEntityRenderer::getTextureLocation)
                         .setAnimatorProvider(() -> new AerosmithAnimator(animation))
-                        .setModelRenderer((ctx, layerRenderer) -> new AerosmithModelRenderer(ctx, layerRenderer, context.getItemRenderer()))
+                        .setModelRenderer((ctx, layerRenderer) ->
+                                new AerosmithModelRenderer(ctx, layerRenderer, context.getItemRenderer()))
                         .setRenderType(renderType())
                         .setPrerenderEntry(preRenderEntry())
                         .build(),
