@@ -99,6 +99,14 @@ public class AerosmithRenderer {
                                 entity.getId()
                         );
                         poseStack.popPose();
+
+                        // Force MultiBufferSource to flush the item's batch with the item's RenderType
+                        // (and its TextureStateShard) and switch the shared BufferBuilder back to the
+                        // stand's RenderType. Without this, items that go through AzureLib's pipeline
+                        // (e.g. the gas can via AzItemRenderer) leave lastState pointing at the item's
+                        // RT, and the bone vertices we append below get drawn with the item's texture.
+                        // See AzBlockAndItemLayer.renderForBone for the same pattern.
+                        ctx.setVertexConsumer(ctx.multiBufferSource().getBuffer(ctx.renderType()));
                     }
                 }
             }
