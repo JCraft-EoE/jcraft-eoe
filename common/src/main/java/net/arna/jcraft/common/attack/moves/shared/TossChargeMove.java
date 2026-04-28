@@ -27,25 +27,40 @@ public final class TossChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
     @Override
     public void onInitiate(A attacker) {
         super.onInitiate(attacker);
-        if (attacker instanceof StandEntity<?,?> stand && !stand.level().isClientSide()) {
-            final LivingEntity user = stand.getUser();
-            if (user == null) {
-                return;
-            }
-            ItemStack projectileSource = user.getItemInHand(InteractionHand.MAIN_HAND);
-            if (projectileSource.isEmpty() || projectileSource.is(JTagRegistry.UNTHROWABLE)) {
-                projectileSource = user.getItemInHand(InteractionHand.OFF_HAND);
-            }
-            if (!projectileSource.isEmpty() && !projectileSource.is(JTagRegistry.UNTHROWABLE)) {
-                final ItemStack oldProjectile = stand.getItemInHand(InteractionHand.MAIN_HAND);
-                if (oldProjectile.isEmpty()) {
-                    stand.setItemInHand(InteractionHand.MAIN_HAND, projectileSource.copyWithCount(1));
-                    if (!(user instanceof Player player) || !player.isCreative()) {
-                        projectileSource.shrink(1);
-                    }
-                }
-            }
+        if (!(attacker instanceof StandEntity<?, ?> stand) || stand.level().isClientSide()) return;
+
+        final LivingEntity user = stand.getUser();
+        if (user == null) return;
+
+        ItemStack projectileSource = user.getItemInHand(InteractionHand.MAIN_HAND);
+        if (projectileSource.isEmpty() || projectileSource.is(JTagRegistry.UNTHROWABLE)) {
+            projectileSource = user.getItemInHand(InteractionHand.OFF_HAND);
         }
+
+        if (projectileSource.isEmpty() || projectileSource.is(JTagRegistry.UNTHROWABLE)) return;
+
+        final ItemStack oldProjectile = stand.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!oldProjectile.isEmpty()) return;
+
+        stand.setItemInHand(InteractionHand.MAIN_HAND, projectileSource.copyWithCount(1));
+        if (!(user instanceof Player player) || !player.isCreative()) {
+            projectileSource.shrink(1);
+        }
+    }
+
+    @Override
+    public boolean conditionsMet(A attacker) {
+        return super.conditionsMet(attacker) && isHoldingSomething(attacker.getUser());
+    }
+
+    private static boolean isHoldingSomething(LivingEntity user) {
+        if (user == null) return false;
+
+        ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!mainHandStack.isEmpty()) return true;
+
+        ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
+        return !offHandStack.isEmpty();
     }
 
     @Override
