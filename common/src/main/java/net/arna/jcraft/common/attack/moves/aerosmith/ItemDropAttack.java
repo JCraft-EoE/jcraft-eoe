@@ -74,7 +74,7 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
 
     @Override
     public boolean conditionsMet(AerosmithEntity attacker) {
-        return super.conditionsMet(attacker) && JUtils.isHoldingSomething(attacker);
+        return super.conditionsMet(attacker) && JUtils.isHoldingSomething(attacker.getUser());
     }
 
     @Override
