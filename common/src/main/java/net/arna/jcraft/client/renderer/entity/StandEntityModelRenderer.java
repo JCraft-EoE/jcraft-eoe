@@ -7,7 +7,6 @@ import mod.azure.azurelib.render.AzRendererPipelineContext;
 import mod.azure.azurelib.render.entity.AzEntityModelRenderer;
 import mod.azure.azurelib.render.entity.AzEntityRendererPipeline;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.client.model.entity.stand.StandEntityModel;
 import net.arna.jcraft.client.renderer.entity.stands.StandEntityRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -83,7 +82,7 @@ public class StandEntityModelRenderer<T extends StandEntity<?, ?>> extends AzEnt
         poseStack.popPose();
     }
 
-    private static <T extends StandEntity<?, ?>> float getStandLerpRot(final @NonNull T animatable, final float partialTick) {
+    protected static <T extends StandEntity<?, ?>> float getStandLerpRot(final @NonNull T animatable, final float partialTick) {
         final LivingEntity user = animatable.getUser();
         final boolean hasUser = user != null;
         if (hasUser && !animatable.isRemote()) {

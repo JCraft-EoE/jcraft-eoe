@@ -36,9 +36,9 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
     }
 
     @Inject(method = "createResult()V", at = @At("RETURN"))
-    private void jcraft$injectCinderella(final CallbackInfo ci) {
-        ItemStack item1 = inputSlots.getItem(0); // Stand disc or unenchanted Cindarella mask
-        ItemStack item2 = inputSlots.getItem(1); // enchanted Cinderella mask or enchantment
+    private void jcraft$injectAnvil(final CallbackInfo ci) {
+        ItemStack item1 = inputSlots.getItem(0);
+        ItemStack item2 = inputSlots.getItem(1);
         if (item1.is(JItemRegistry.CINDERELLA_MASK.get()) && item2.is(Items.ENCHANTED_BOOK)) {
             jcraft$enchantMask(item1, item2);
         }
@@ -88,7 +88,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
     }
 
     @Unique
-    private void jcraft$switchSkin(ItemStack disc, ItemStack mask) {
+    private void jcraft$switchSkin(final ItemStack disc, final ItemStack mask) {
         // If the disc is empty, return.
         StandType standType = StandDiscItem.getStandType(disc);
         if (standType == null)

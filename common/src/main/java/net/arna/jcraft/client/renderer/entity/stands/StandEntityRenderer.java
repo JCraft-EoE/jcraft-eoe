@@ -17,9 +17,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +53,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
             final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
         return new StandEntityRenderer<>(config, context, model, texture);
     }
-    private StandEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context,
+    protected StandEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context,
                                 final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
         super(config, context, model, texture);
     }
@@ -72,7 +74,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
     protected StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs, final @NonNull StandType type, final boolean flipBody, final boolean flipHead, final float torsoPitchOffset, final float headPitchOffset, final float velInfluence) {
         this(context, additionalConfigs,
                 entity -> type.getId().withPath(MODEL_STR_TEMPLATE.formatted(type.getId().getPath())),
-                entity -> getTextureLocation(type),
+                StandEntityRenderer::getTextureLocation,
                 type, flipBody, flipHead, torsoPitchOffset, headPitchOffset, velInfluence);
     }
 
@@ -94,6 +96,11 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
 
     public StandEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull StandType type) {
         this(context, UnaryOperator.identity(), type, 0f, 0f);
+    }
+
+    @Override
+    public boolean shouldRender(@NotNull T livingEntity, @NotNull Frustum camera, double camX, double camY, double camZ) {
+        return JClientUtils.shouldRenderStands() && super.shouldRender(livingEntity, camera, camX, camY, camZ);
     }
 
     protected static @NonNull <T extends StandEntity<?,?>> Function<T, RenderType> renderType() {
@@ -152,7 +159,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
                     // this is also probably what stops the summon from working as intended.
                     animatable.playStateAnimation();
                 }
-            } else if (animatable.tickCount > 20) { // average summon anim duration
+            } else if (animatable.tickCount > animatable.getStandData().getSummonData().getAnimDuration()) { // average summon anim duration
                 if (animatable.isIdle()) {
                     animatable.playStateAnimation();
                 }

@@ -40,23 +40,14 @@ public final class JCraftFabricClient implements ClientModInitializer {
             JClientEvents.onLast(context.matrixStack(), context.camera().getPosition());
         });
 
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            AttackHitboxEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.worldRenderer(), context.consumers());
-        });
-
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            ShockwaveEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.consumers());
-        });
-
         WorldRenderEvents.START.register(context -> {
             TimeAccelerationEffectRenderer.render(context.world());
         });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            SplatterEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.tickDelta());
-        });
-
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+            AttackHitboxEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.worldRenderer(), context.consumers());
+            ShockwaveEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.consumers());
+            SplatterEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.tickDelta(), context.consumers());
             TimeErasePredictionEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.tickDelta(), context.consumers());
         });
 

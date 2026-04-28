@@ -51,6 +51,7 @@ public final class GiveStandAttack extends AbstractSimpleAttack<GiveStandAttack,
     @Override
     public @NonNull Set<LivingEntity> perform(final WhiteSnakeEntity attacker, final LivingEntity user) {
         final ItemStack itemStack = attacker.getOffhandItem();
+        final boolean[] consumed = {false};
 
         super.perform(attacker, user).stream().findFirst().ifPresent((target) -> {
             if (target.getType().is(JTagRegistry.CAN_NEVER_HAVE_STAND) || !itemStack.is(JItemRegistry.STAND_DISC.get())) {
@@ -76,18 +77,17 @@ public final class GiveStandAttack extends AbstractSimpleAttack<GiveStandAttack,
                 itemSkin = data.getInt("Skin");
             }
 
-            standData.setTypeAndSkin(itemStand, itemSkin);
-            data.remove("StandID");
-            data.remove("Skin");
+            standData.setTypeAndSkin(itemStand, itemSkin, false);
 
             StandEntity<?, ?> stand = standData.getStand();
             if (stand != null) {
                 stand.discard();
             }
             JCraft.summon(target.level(), target);
+            consumed[0] = true;
         });
 
-        attacker.getUserOrThrow().setItemSlot(EquipmentSlot.OFFHAND, itemStack);
+        attacker.getUserOrThrow().setItemSlot(EquipmentSlot.OFFHAND, consumed[0] ? ItemStack.EMPTY : itemStack);
         attacker.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
         return Set.of();
     }

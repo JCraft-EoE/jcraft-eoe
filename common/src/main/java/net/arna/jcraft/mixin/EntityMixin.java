@@ -16,7 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = Entity.class)
 public abstract class EntityMixin implements EntityAddon {
-    private @Unique boolean fromSpawner = false;
+
+    @Unique
+    private boolean fromSpawner = false;
 
     /**
      * Stand positioning mixin function

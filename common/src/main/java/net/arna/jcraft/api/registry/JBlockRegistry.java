@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
 
 
 public interface JBlockRegistry {
@@ -32,25 +33,30 @@ public interface JBlockRegistry {
             .requiresCorrectToolForDrops()
             .strength(6.0f, 1200f)
             .sound(SoundType.ANCIENT_DEBRIS)
+            .mapColor(MapColor.COLOR_BLACK)
     ));
     RegistrySupplier<Block> POLISHED_METEORITE_BLOCK = BLOCK_REGISTRY.register("polished_meteorite_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
             .requiresCorrectToolForDrops()
             .strength(6.0f, 1200f)
             .sound(SoundType.ANCIENT_DEBRIS)
+            .mapColor(MapColor.COLOR_BLACK)
     ));
     RegistrySupplier<Block> METEORITE_IRON_ORE_BLOCK = BLOCK_REGISTRY.register("meteorite_iron_ore_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_ORE)
             .requiresCorrectToolForDrops()
             .strength(9.0f, 1200f)
             .sound(SoundType.ANCIENT_DEBRIS)
+            .mapColor(MapColor.COLOR_BLACK)
     ));
     RegistrySupplier<Block> STELLAR_IRON_BLOCK = BLOCK_REGISTRY.register("stellar_iron_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
             .requiresCorrectToolForDrops()
             .strength(7.5f, 1000f)
             .sound(SoundType.NETHERITE_BLOCK)
+            .mapColor(MapColor.COLOR_YELLOW)
     ));
     RegistrySupplier<Block> HOT_SAND_BLOCK = BLOCK_REGISTRY.register("hot_sand_block", () -> new HotSandBlock(BlockBehaviour.Properties.of()
             .strength(0.5f)
             .sound(SoundType.SAND)
+            .mapColor(MapColor.COLOR_ORANGE)
     ));
     RegistrySupplier<Block> CINDERELLA_GREEN_BLOCK = BLOCK_REGISTRY.register("cinderella_green_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.GREEN_TERRACOTTA)
     ));

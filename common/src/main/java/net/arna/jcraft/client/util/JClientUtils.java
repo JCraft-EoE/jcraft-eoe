@@ -101,7 +101,7 @@ public class JClientUtils {
             final var torso = model.getBoneOrNull("torso");
             if (torso != null) {
                 //model.prevTorsoPitch = torso.getRotX();
-                float pitch = (180f + overVel * velInfluence) * 3.1415f / 180f;
+                float pitch = (180f + overVel * velInfluence) * Mth.DEG_TO_RAD;
                 if (!flipBody) {
                     pitch += 3.1415f;
                     pitch = -pitch;
@@ -115,7 +115,7 @@ public class JClientUtils {
             final var head = model.getBoneOrNull("head");
             if (head != null) {
                 //model.prevHeadPitch = head.getRotX();
-                float headPitch = (user.getXRot() - overVel * velInfluence) * 3.1415f / 180f;
+                float headPitch = (user.getXRot() - overVel * velInfluence) * Mth.DEG_TO_RAD;
                 if (!flipHead) {
                     headPitch = -headPitch;
                 }
@@ -127,7 +127,7 @@ public class JClientUtils {
                 final var base = model.getBoneOrNull("base");
                 if (base != null) {
                     //model.prevBasePitch = base.getRotX();
-                    float torsoPitch = (user.getXRot() * 0.9f) * 3.1415f / 180f;
+                    float torsoPitch = (user.getXRot() * 0.9f) * Mth.DEG_TO_RAD;
                     base.setRotX(base.getRotX() - torsoPitch);
                 }
             }

@@ -32,9 +32,9 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public abstract class AbstractEntityRenderer<T extends Entity> extends AzEntityRenderer<T> {
 
-    protected static final String MODEL_STR_TEMPLATE = "geo/%s.geo.json";
-    protected static final String TEXTURE_STR_TEMPLATE = "textures/entity/%s.png";
-    protected static final String ANIMATION_STR_TEMPLATE = "animations/%s.animation.json";
+    public static final String MODEL_STR_TEMPLATE = "geo/%s.geo.json";
+    public static final String TEXTURE_STR_TEMPLATE = "textures/entity/%s.png";
+    public static final String ANIMATION_STR_TEMPLATE = "animations/%s.animation.json";
 
     /**
      * Path to the model to be used for this entity.

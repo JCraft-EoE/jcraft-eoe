@@ -6,6 +6,12 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.spec.SpecType;
+import net.arna.jcraft.common.advancements.Hamon1Trigger;
+import net.arna.jcraft.common.advancements.Hamon2Trigger;
+import net.arna.jcraft.common.advancements.Hamon3Trigger;
+import net.arna.jcraft.common.advancements.Hamon4Trigger;
+import net.arna.jcraft.common.advancements.Hamon5Trigger;
+import net.arna.jcraft.common.advancements.Hamon6Trigger;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
@@ -52,13 +58,17 @@ public class ResetSpecCommand {
                         hamon.resetLastSendoAired();
                         hamon.resetLastStomped();
                         if (living instanceof final ServerPlayer player) {
-                            revoke(player, JCraft.id("hamon1"));
-                            revoke(player, JCraft.id("hamon2"));
-                            revoke(player, JCraft.id("hamon3"));
-                            revoke(player, JCraft.id("hamon4"));
-                            revoke(player, JCraft.id("hamon5"));
-                            revoke(player, JCraft.id("hamon6"));
+                            revoke(player, Hamon1Trigger.ID);
+                            revoke(player, Hamon2Trigger.ID);
+                            revoke(player, Hamon3Trigger.ID);
+                            revoke(player, Hamon4Trigger.ID);
+                            revoke(player, Hamon5Trigger.ID);
+                            revoke(player, Hamon6Trigger.ID);
                         }
+                        for (int i = 1; i <= 6; i++) {
+                            hamon.resetLessonTicks(i);
+                        }
+                        hamon.setActiveLesson(0);
                     }
                     else if (specType == JSpecTypeRegistry.ANUBIS.get()) {
                         JComponentPlatformUtils.getMiscData(living).setAttackSpeedMult(1f);

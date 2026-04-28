@@ -1,11 +1,14 @@
 package net.arna.jcraft.common.events;
 
+import com.jcraft_eoe.jjbacosplay.CosplayItem;
 import dev.architectury.event.CompoundEventResult;
 import dev.architectury.event.EventResult;
+import dev.architectury.platform.Platform;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
+import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.registry.*;
@@ -17,7 +20,8 @@ import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
 import net.arna.jcraft.common.entity.StandMeteorEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.item.MockItem;
+import net.arna.jcraft.common.item.AuMockItem;
+import net.arna.jcraft.common.item.RewindMockItem;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
@@ -49,6 +53,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -59,6 +66,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.phys.AABB;
@@ -72,6 +80,7 @@ import static net.arna.jcraft.common.util.EntityInterest.blockAttractionInterest
 import static net.arna.jcraft.common.util.EntityInterest.itemAttractionInterest;
 
 public class JServerEvents {
+
     private static final List<Enchantment> JCRAFT_ARMOR_ENCHANTS = List.of(
             Enchantments.ALL_DAMAGE_PROTECTION, Enchantments.PROJECTILE_PROTECTION, Enchantments.BLAST_PROTECTION, Enchantments.FIRE_PROTECTION, Enchantments.UNBREAKING);
 
@@ -82,13 +91,29 @@ public class JServerEvents {
             List.of(Items.AIR, Items.GOLDEN_HELMET,     Items.CHAINMAIL_HELMET,     Items.IRON_HELMET,     Items.DIAMOND_HELMET,     Items.NETHERITE_HELMET     )
     );
 
+    private static final List<ArmorMaterial> VANILLA_MATERIAL = Arrays.asList(ArmorMaterials.values());
+
+    private static final List<List<CosplayItem<?>>> COSPLAY = List.of(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+
     public static void finishLoading(final MinecraftServer server) {
         JCraft.auWorld = server.getLevel(JDimensionRegistry.AU_DIMENSION_KEY);
         JCraft.setExclusiveStandsData(ExclusiveStandsData.fromDefaultFile(server));
+        if (Platform.isModLoaded("jjbacosplay")) {
+            for (final CosplayItem<?> cosplay : CosplayItem.all()) {
+                switch (cosplay.getSlot()) {
+                    case HELMET -> COSPLAY.get(3).add(cosplay);
+                    case CHESTPLATE -> COSPLAY.get(2).add(cosplay);
+                    case LEGGINGS -> COSPLAY.get(1).add(cosplay);
+                    case BOOTS -> COSPLAY.get(0).add(cosplay);
+                }
+            }
+        }
     }
 
     public static void saveExclusives(final MinecraftServer server) {
-        JCraft.getExclusiveStandsData().saveToDefaultFile(server);
+        if (JCraft.getExclusiveStandsData() != null) {
+            JCraft.getExclusiveStandsData().saveToDefaultFile(server);
+        }
     }
 
     public static AABB createBurstHitbox(final Vec3 pPos) {
@@ -315,18 +340,18 @@ public class JServerEvents {
 
             // ... in the AU
             if (world.dimension().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
-                if (item.getOwner() != null || MockItem.isMockItem(stack)) {
+                if (item.getOwner() != null || stack.getItem() instanceof AuMockItem) {
                     return EventResult.pass();
                 }
 
-                ItemStack mockStack = MockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
+                ItemStack mockStack = AuMockItem.createMockStack(stack); // Convert it to a mock item (incompatible and useless)
                 if (stack.getItem() instanceof BlockItem) // ... and mark down all relevant data
                 {
                     mockStack.getOrCreateTag().putIntArray("AttractPos", new int[]{item.getBlockX(), item.getBlockY(), item.getBlockZ()});
                 }
                 item.setItem(mockStack);
             } else { // ... outside the AU
-                if (MockItem.isMockItem(stack)) {
+                if (stack.getItem() instanceof AuMockItem) {
                     // Mark it as an item of interest, and save relevant data
                     CompoundTag stackData = stack.getOrCreateTag();
                     if (stackData.contains("AttractPos")) { // if attracted to a specific position
@@ -422,20 +447,39 @@ public class JServerEvents {
         final NonNullList<ItemStack> armorItems = (NonNullList<ItemStack>) mob.getArmorSlots();
 
         Enchantment enchantment;
-        ItemStack itemStack;
+        ItemStack itemStack = null;
         int baseArmorLevel = random.nextInt(1, 6);
         int enchantsSize = JCRAFT_ARMOR_ENCHANTS.size();
-        for (int i = 0; i < 4; i++) {
-            final int armorLevel = baseArmorLevel + random.nextInt(-1, 1);
-
-            itemStack = new ItemStack(EQUIPMENT.get(i).get(armorLevel));
-            enchantment = JCRAFT_ARMOR_ENCHANTS.get(random.nextInt(enchantsSize));
-            itemStack.enchant(enchantment, enchantment.getMaxLevel());
-            armorItems.set(i, itemStack);
-
+        for (int slot = 0; slot < 4; slot++) {
+            int armorLevel = 0;
             final int diamondLevel = 4; // Check above
-            if (armorLevel >= diamondLevel) {
-                mob.setDropChance(EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, i), 0f);
+
+            if (Platform.isModLoaded("jjbacosplay")) {
+                List<CosplayItem<?>> slottedCosplay = COSPLAY.get(slot);
+                if (!slottedCosplay.isEmpty()) {
+                    ArmorItem selected = JUtils.chooseRandom(random,
+                            slottedCosplay.get(random.nextInt(slottedCosplay.size())).getAll()
+                    ).get();
+                    itemStack = new ItemStack(selected);
+                    if (VANILLA_MATERIAL.contains(selected.getMaterial())) {
+                        armorLevel = ((ArmorMaterials) selected.getMaterial()).ordinal();
+                    } else {
+                        armorLevel = diamondLevel;
+                    }
+                }
+            }
+            else {
+                armorLevel = baseArmorLevel + random.nextInt(-1, 1);
+                itemStack = new ItemStack(EQUIPMENT.get(slot).get(armorLevel));
+            }
+            if (itemStack != null) {
+                enchantment = JCRAFT_ARMOR_ENCHANTS.get(random.nextInt(enchantsSize));
+                itemStack.enchant(enchantment, enchantment.getMaxLevel());
+                armorItems.set(slot, itemStack);
+
+                if (armorLevel >= diamondLevel) {
+                    mob.setDropChance(EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, slot), 0f);
+                }
             }
         }
     }
@@ -482,7 +526,7 @@ public class JServerEvents {
                 final GameRules gameRules = serverWorld.getGameRules();
 
                 if (!gameRules.getBoolean(JCraft.KEEP_STAND)) {
-                    JComponentPlatformUtils.getStandComponent(living).setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0);
+                    JComponentPlatformUtils.getStandComponent(living).setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0, false);
                 }
 
                 if (!gameRules.getBoolean(JCraft.KEEP_SPEC)) {
@@ -642,14 +686,38 @@ public class JServerEvents {
         }
     }
 
-    public static EventResult beforeBlockSet(BlockPos blockPos, BlockState oldBlockState, BlockState newBlockState) {
+    public static EventResult beforeBlockSet(final @NonNull BlockPos blockPos, final @NonNull BlockState oldBlockState, final @NonNull BlockState newBlockState, final @NonNull Level level) {
         if (oldBlockState.is(BlockTags.LEAVES) && newBlockState.is(BlockTags.LEAVES)) {
             return EventResult.pass();
         }
 
         BlockMarkerMoves.mergeQueues();
-        BlockMarkerMoves.forEach(move -> move.addBlock(blockPos, oldBlockState));
+        BlockMarkerMoves.forEach(move -> move.addBlock(blockPos, oldBlockState, level));
 
         return EventResult.pass();
     }
+
+    public static EventResult processBlockLoot(final @NonNull List<ItemStack> loot, final @NonNull BlockState state, final @NonNull ServerLevel serverLevel, final @NonNull BlockPos pos, final @Nullable BlockEntity blockEntity) {
+        if (!JServerConfig.MANDOM_AFFECTS_BLOCKS.getValue()) {
+            return EventResult.pass();
+        }
+
+        final Optional<BlockMarkerMove> move = BlockMarkerMoves.findFirst(m -> m.isRecording() && m.isInRange(pos, serverLevel));
+        if (move.isEmpty()) {
+            return EventResult.pass();
+        }
+
+        final List<ItemStack> modifiedList = new LinkedList<>();
+        for (ItemStack stack : loot) {
+            if (stack.getItem() instanceof RewindMockItem) {
+                modifiedList.add(stack);
+            } else {
+                modifiedList.add(RewindMockItem.createMockStack(stack, move.get()));
+            }
+        }
+        loot.clear();
+        loot.addAll(modifiedList);
+        return EventResult.pass();
+    }
+
 }

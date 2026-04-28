@@ -221,6 +221,12 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
                             If the second hit makes contact, The Hand will beat the opponent down.
                             """)
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<TheHandEntity> TOSS = new TossMove<TheHandEntity>(0, 1, 1, 0.75f)
+            .withAnim(TheHandEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<TheHandEntity> TOSS_CHARGE = new TossChargeMove<TheHandEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public TheHandEntity(final Level world) {
         super(JStandTypeRegistry.THE_HAND.get(), world);
@@ -247,6 +253,8 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
         moves.register(MoveClass.ULTIMATE, RAGE, State.RAGE);
 
         moves.register(MoveClass.UTILITY, ERASE_SPACE, State.ERASE_SPACE);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -305,6 +313,8 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
         STOMP_BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.stomp_barrage", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         RAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.rage", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         RAGE_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.rage_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
 
         private final AzCommand animator;

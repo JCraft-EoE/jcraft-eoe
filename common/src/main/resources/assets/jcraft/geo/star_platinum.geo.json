@@ -527,7 +527,7 @@
 					]
 				},
 				{
-					"name": "star_finger",
+					"name": "prop",
 					"parent": "lower_armRight",
 					"pivot": [-12.5, 19.5, 0],
 					"cubes": [

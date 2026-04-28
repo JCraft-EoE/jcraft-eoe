@@ -228,6 +228,12 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Timeskip"),
                     Component.literal("16m range")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<KingCrimsonEntity> TOSS = new TossMove<KingCrimsonEntity>(0, 1, 1, 0.75f)
+            .withAnim(KingCrimsonEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<KingCrimsonEntity> TOSS_CHARGE = new TossChargeMove<KingCrimsonEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Integer> TIME_ERASE_TIME;
 
@@ -265,6 +271,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         moves.register(MoveClass.ULTIMATE, TIME_ERASE, State.TIME_ERASE);
 
         moves.register(MoveClass.UTILITY, TIME_SKIP, State.TIME_SKIP);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -404,7 +412,9 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         PREDICT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.predict", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         COUNTER_MISS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.counter_miss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         SWEEP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.sweep", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        TIME_SKIP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.idle", AzPlayBehaviors.LOOP));
+        TIME_SKIP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.idle", AzPlayBehaviors.LOOP)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

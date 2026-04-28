@@ -12,10 +12,12 @@ import lombok.Getter;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
+import mod.azure.azurelib.render.item.AzItemRendererRegistry;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.pose.PoseModifiers;
 import net.arna.jcraft.api.registry.JItemRegistry;
-import net.arna.jcraft.client.renderer.armor.*;
+import net.arna.jcraft.client.renderer.armor.ArmorRenderer;
+import net.arna.jcraft.client.renderer.item.GasCanItemRenderer;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.particle.DamageNumberParticle;
 import net.arna.jcraft.client.rendering.StandUserPoseLoader;
@@ -78,6 +80,7 @@ public class JCraftClient {
             .put(special3Key, MoveInputType.SPECIAL3)
             .put(ultKey, MoveInputType.ULTIMATE)
             .put(utility, MoveInputType.UTILITY)
+            .put(TrackedKeyBinding.wrap(Minecraft.getInstance().options.keyPickItem), MoveInputType.TOSS)
             .build();
     @Getter(lazy = true)
     private static final Map<TrackedKeyBinding, MovementInputType> movementBindings = createMovementBindingsMap();
@@ -108,136 +111,14 @@ public class JCraftClient {
         PoseModifiers.register();
         JShaderRegistry.init();
 
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.simple("diavoloclothes"),
-                JItemRegistry.DIAVOLO_WIG.get(),
-                JItemRegistry.DIAVOLO_PANTS.get(),
-                JItemRegistry.DIAVOLO_BOOTS.get());
-        AzArmorRendererRegistry.register(ArmorRenderer.flutter("diavoloshirt"), JItemRegistry.DIAVOLO_SHIRT.get());
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.simple("diegooutfit"),
-                JItemRegistry.DIEGO_HAT.get(),
-                JItemRegistry.DIEGO_SHIRT.get(),
-                JItemRegistry.DIEGO_PANTS.get(),
-                JItemRegistry.DIEGO_BOOTS.get());
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.flutter("diojacket"),
-                JItemRegistry.DIO_HEADBAND.get(),
-                JItemRegistry.DIO_JACKET.get());
-        AzArmorRendererRegistry.register(
-                DIOtardRenderer::new,
-                JItemRegistry.DIO_PANTS.get(),
-                JItemRegistry.DIO_BOOTS.get());
-        AzArmorRendererRegistry.register(DIOCapeRenderer::new, JItemRegistry.DIO_CAPE.get());
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.simple("diooutfit"),
-                JItemRegistry.DIO_P1_WIG.get(),
-                JItemRegistry.DIO_P1_JACKET.get(),
-                JItemRegistry.DIO_P1_PANTS.get(),
-                JItemRegistry.DIO_P1_BOOTS.get());
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.simple("doppiotop"),
-                JItemRegistry.DOPPIO_WIG.get(),
-                JItemRegistry.DOPPIO_SHIRT.get());
-        AzArmorRendererRegistry.register(
-                FinalKiraArmorRenderer::new,
-                JItemRegistry.FINAL_KIRA_WIG.get(),
-                JItemRegistry.FINAL_KIRA_PANTS.get(),
-                JItemRegistry.FINAL_KIRA_BOOTS.get());
-        AzArmorRendererRegistry.register(FinalKiraJacketRenderer::new, JItemRegistry.FINAL_KIRA_JACKET.get());
-        AzArmorRendererRegistry.register(
-                GiornoArmorRenderer::new,
-                JItemRegistry.GIORNO_WIG.get(),
-                JItemRegistry.GIORNO_PANTS.get(),
-                JItemRegistry.GIORNO_BOOTS.get());
-        AzArmorRendererRegistry.register(GiornoJacketRenderer::new, JItemRegistry.GIORNO_JACKET.get());
-        AzArmorRendererRegistry.register(
-                GyroBottomRenderer::new,
-                JItemRegistry.GYRO_PANTS.get(),
-                JItemRegistry.GYRO_BOOTS.get());
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.simple("gyrotop"),
-                JItemRegistry.GYRO_HAT.get(),
-                JItemRegistry.GYRO_SHIRT.get());
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.simple("heavenattainedoutfit"),
-                JItemRegistry.HEAVEN_ATTAINED_WIG.get(),
-                JItemRegistry.HEAVEN_ATTAINED_SHIRT.get(),
-                JItemRegistry.HEAVEN_ATTAINED_PANTS.get(),
-                JItemRegistry.HEAVEN_ATTAINED_BOOTS.get());
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.simple("johnnyclothes"),
-                JItemRegistry.JOHNNY_CAP.get(),
-                JItemRegistry.JOHNNY_JACKET.get(),
-                JItemRegistry.JOHNNY_PANTS.get(),
-                JItemRegistry.JOHNNY_BOOTS.get());
-        AzArmorRendererRegistry.register(JotaroCoatRenderer::new, JItemRegistry.JOTARO_JACKET.get());
-        AzArmorRendererRegistry.register(
-                JotaroArmorRenderer::new,
-                JItemRegistry.JOTARO_CAP.get(),
-                JItemRegistry.JOTARO_PANTS.get(),
-                JItemRegistry.JOTARO_BOOTS.get());
-        AzArmorRendererRegistry.register(JotaroCoatP4Renderer::new, JItemRegistry.JOTARO_P4_JACKET.get());
-        AzArmorRendererRegistry.register(
-                JotaroArmorP4Renderer::new,
-                JItemRegistry.JOTARO_P4_CAP.get(),
-                JItemRegistry.JOTARO_P4_PANTS.get(),
-                JItemRegistry.JOTARO_P4_BOOTS.get());
-        AzArmorRendererRegistry.register(JotaroCoatP6Renderer::new, JItemRegistry.JOTARO_P6_JACKET.get());
-        AzArmorRendererRegistry.register(
-                JotaroArmorP6Renderer::new,
-                JItemRegistry.JOTARO_P6_CAP.get(),
-                JItemRegistry.JOTARO_P6_PANTS.get(),
-                JItemRegistry.JOTARO_P6_BOOTS.get());
-        AzArmorRendererRegistry.register(KakyoinCoatRenderer::new, JItemRegistry.KAKYOIN_COAT.get());
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.simple("kakyoinclothes"),
-                JItemRegistry.KAKYOIN_WIG.get(),
-                JItemRegistry.KAKYOIN_PANTS.get(),
-                JItemRegistry.KAKYOIN_BOOTS.get());
-        AzArmorRendererRegistry.register(ArmorRenderer.simple("karsoutfit"), JItemRegistry.KARS_HEADWRAP.get());
-        AzArmorRendererRegistry.register(ArmorRenderer.simple("kirajacket"), JItemRegistry.KIRA_JACKET.get());
-        AzArmorRendererRegistry.register(
-                KiraArmorRenderer::new,
-                JItemRegistry.KIRA_WIG.get(),
-                JItemRegistry.KIRA_PANTS.get(),
-                JItemRegistry.KIRA_BOOTS.get());
-        AzArmorRendererRegistry.register(KosakuJacketRenderer::new, JItemRegistry.KOSAKU_JACKET.get());
-        AzArmorRendererRegistry.register(
-                KosakuArmorRenderer::new,
-                JItemRegistry.KOSAKU_WIG.get(),
-                JItemRegistry.KOSAKU_PANTS.get(),
-                JItemRegistry.KOSAKU_BOOTS.get());
-        AzArmorRendererRegistry.register(ArmorRenderer.simple("puccis_hat"), JItemRegistry.PUCCIS_HAT.get());
-        AzArmorRendererRegistry.register(PucciRobeRenderer::new, JItemRegistry.PUCCI_ROBE.get());
-        AzArmorRendererRegistry.register(
-                ArmorRenderer.simple("puccibottom"),
-                JItemRegistry.PUCCI_PANTS.get(),
-                JItemRegistry.PUCCI_BOOTS.get());
-        AzArmorRendererRegistry.register(ArmorRenderer.simple("red_hat"), JItemRegistry.RED_HAT.get());
-        AzArmorRendererRegistry.register(
-                RingoOutfitRenderer::new,
-                JItemRegistry.RINGO_OUTFIT.get(),
-                JItemRegistry.RINGO_BOOTS.get());
-        AzArmorRendererRegistry.register(RisottoCapRenderer::new, JItemRegistry.RISOTTO_CAP.get());
-        AzArmorRendererRegistry.register(ArmorRenderer.simple("risottotop"), JItemRegistry.RISOTTO_JACKET.get());
-        AzArmorRendererRegistry.register(
-                RisottoBottomRenderer::new,
-                JItemRegistry.RISOTTO_PANTS.get(),
-                JItemRegistry.RISOTTO_BOOTS.get());
         AzArmorRendererRegistry.register(ArmorRenderer.simple("stone_mask"), JItemRegistry.STONE_MASK.get());
-        AzArmorRendererRegistry.register(ArmorRenderer.simple("straizoponcho"), JItemRegistry.STRAIZO_PONCHO.get());
-        AzArmorRendererRegistry.register(
-                ValentineTopRenderer::new,
-                JItemRegistry.VALENTINE_WIG.get(),
-                JItemRegistry.VALENTINE_JACKET.get());
-        AzArmorRendererRegistry.register(
-                ValentineBottomRenderer::new,
-                JItemRegistry.VALENTINE_PANTS.get(),
-                JItemRegistry.VALENTINE_BOOTS.get());
+        AzArmorRendererRegistry.register(ArmorRenderer.simple("red_hat"), JItemRegistry.RED_HAT.get());
+
+        AzItemRendererRegistry.register(JItemRegistry.GAS_CAN.get(), GasCanItemRenderer::new);
+
+        MandomRewindShaderHandler.INSTANCE.init();
 
         // Renderer registration
-        // JArmorRendererRegistry.registerArmorRenderers();
 
         ClientPacketHandler.init();
 
@@ -305,6 +186,7 @@ public class JCraftClient {
                 .put(TrackedKeyBinding.wrap(options.keyJump), MovementInputType.JUMP)
                 .put(TrackedKeyBinding.wrap(options.keyShift), MovementInputType.CROUCH)
                 .put(dash, MovementInputType.DASH)
+                .put(TrackedKeyBinding.wrap(options.keyPickItem), MovementInputType.THROW)
                 .build();
     }
 
@@ -358,7 +240,7 @@ public class JCraftClient {
     }
 
     public static void registerParticleSpriteSets() {
-        // TODO Forge version is currently handled separately cuz Forge is ass.
+        // TODO: merge Forge version handling with this somehow. until then _KEEP THEM IN SYNC_
         // See JCraftForgeClient#onParticleFactoryRegistration(RegisterParticleProvidersEvent)
 
         ParticleProviderRegistry.register(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new);
@@ -377,6 +259,7 @@ public class JCraftClient {
         ParticleProviderRegistry.register(JParticleTypeRegistry.PIXEL, PixelParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.BLOCKSPARK, provider -> new BlocksparkParticle.Factory(provider, 0.15f));
         ParticleProviderRegistry.register(JParticleTypeRegistry.GO, GoParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.DO, GoParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.AURA_ARC, AuraArcParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.AURA_BLOB, AuraBlobParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new);
@@ -387,6 +270,12 @@ public class JCraftClient {
         ParticleProviderRegistry.register(JParticleTypeRegistry.DAMAGE_NUMBER, DamageNumberParticle.Factory::new);
         DamageIndicatorManager.setDamageNumberParticle(JParticleTypeRegistry.DAMAGE_NUMBER.get());
         ParticleProviderRegistry.register(JParticleTypeRegistry.HAMON_SPARK, provider -> new HitsparkParticle.Factory(provider, 0.2f, 6));
+        ParticleProviderRegistry.register(JParticleTypeRegistry.LEMON, LemonParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_1, MoshParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_2, MoshParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_3, MoshParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_4, MoshParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_5, MoshParticle.Factory::new);
     }
 
     @Getter

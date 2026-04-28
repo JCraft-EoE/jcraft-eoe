@@ -3,41 +3,54 @@ package net.arna.jcraft.client.events;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.networking.NetworkManager;
+import dev.architectury.registry.registries.RegistrySupplier;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
+import net.arna.jcraft.api.registry.JPacketRegistry;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.rendering.RenderHandler;
+import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
-import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static net.arna.jcraft.client.JCraftClient.*;
 import static net.arna.jcraft.client.gui.hud.JCraftAbilityHud.cooldownTypeToKeybind;
@@ -46,6 +59,12 @@ import static net.arna.jcraft.client.util.JClientUtils.activeTimestops;
 
 @Environment(EnvType.CLIENT)
 public class JClientEvents {
+
+    // Tracks the game-time tick for each stand user (by UUID)
+    // the 100-block menacing radius. Cleared when they leave range.
+    private static final Map<UUID, Integer> menacingEntryTimes = new HashMap<>();
+    // tracks which entities were last seen, cleared after a certain time only
+    private static final Map<UUID, Integer> menacingCheckTimes = new HashMap<>();
 
     public static void onLast(final PoseStack matrixStack, final Vec3 cameraPos) {
         matrixStack.pushPose();
@@ -285,5 +304,110 @@ public class JClientEvents {
             }
         }
         TrackedKeyBinding.resetValues(client.screen != null);
+
+        // Menacing (ゴ/ド) particles — 4-second burst when a stand user enters 100-block radius.
+        // Works regardless of whether the local player or target has their stand summoned.
+        tickMenacing(client, player);
+    }
+
+    private static void tickMenacing(final Minecraft client, final LocalPlayer player) {
+        final ClientLevel level = client.level;
+        final boolean playerWarning = JClientConfig.getInstance().isShowStandUserWarningPlayer();
+        final boolean mobWarning = JClientConfig.getInstance().isShowStandUserWarningMob();
+        if (level == null || (!playerWarning && !mobWarning)) {
+            return;
+        }
+
+        // Local player must be a stand user themselves
+        final StandType type = JComponentPlatformUtils.getStandComponent(player).getType();
+        if (StandTypeUtil.isNone(type)) {
+            menacingEntryTimes.clear();
+            menacingCheckTimes.clear();
+            return;
+        }
+
+        if (!JClientUtils.shouldRenderStands()) {
+            menacingEntryTimes.clear();
+            menacingCheckTimes.clear();
+            return;
+        }
+
+        final double radius = 100.0;
+        final double radiusSq = radius * radius;
+        final AABB searchBox = AABB.ofSize(player.position(), radius * 2, radius * 2, radius * 2);
+        final Set<UUID> inRangeIds = new HashSet<>();
+
+        // find all stand users nearby, for each do
+        if (playerWarning) {
+            int count = 0;
+            for (final Player p : level.getEntitiesOfClass(Player.class, searchBox,
+                    p -> {
+                        var pType = JComponentPlatformUtils.getStandComponent(p).getType();
+                        return p != player && !p.isSpectator() && !p.isCreative()
+                                && p.distanceToSqr(player) <= radiusSq
+                                && !p.isInvisible() && !JClientUtils.shouldNotRender(p)
+                                && !StandTypeUtil.isNone(pType);
+                    }
+            )) {
+                tickMenacing(p, inRangeIds, level, JParticleTypeRegistry.DO, count++ < 15);
+            }
+        }
+
+        // get all other stand users via their stands
+        if (mobWarning) {
+            int count = 0;
+            for (final StandEntity<?, ?> stand : level.getEntitiesOfClass(
+                    StandEntity.class, searchBox,
+                    stand -> stand.hasUser() && stand.distanceToSqr(player) <= radiusSq && !stand.isInvisible())
+            ) {
+                final LivingEntity user = stand.getUserOrThrow();
+                if (user instanceof Player) { // handled before
+                    continue;
+                }
+                if (JClientUtils.shouldNotRender(user)) {
+                    continue;
+                }
+                tickMenacing(user, inRangeIds, level, JParticleTypeRegistry.GO, count++ < 15);
+            }
+        }
+
+        // Remove entries for stand users who left range
+        menacingEntryTimes.keySet().removeIf(id -> !inRangeIds.contains(id));
+        // remove entries for stand users who have been checked for a long time
+        menacingCheckTimes.entrySet().removeIf(entry -> entry.getValue() > 600);
+    }
+
+    private static void tickMenacing(final LivingEntity living, final Set<UUID> inRangeIds, final ClientLevel level, final RegistrySupplier<SimpleParticleType> particle, boolean limited) {
+        final UUID uuid = living.getUUID();
+        inRangeIds.add(uuid);
+        menacingEntryTimes.putIfAbsent(uuid, -1);
+        menacingEntryTimes.put(uuid, menacingEntryTimes.get(uuid) + 1);
+        menacingCheckTimes.putIfAbsent(uuid, -1);
+        menacingCheckTimes.put(uuid, menacingCheckTimes.get(uuid) + 1);
+        if (menacingEntryTimes.get(uuid) >= 80 || menacingCheckTimes.get(uuid) >= 80) {
+            return;
+        }
+        final RandomSource rng = level.getRandom();
+        if (limited || rng.nextDouble() > 1d/8) {
+            return;
+        }
+        spawnMenacingParticle(level, rng, particle.get());
+    }
+
+    private static void spawnMenacingParticle(final ClientLevel level, final RandomSource rng,
+                                              final SimpleParticleType type) {
+        LivingEntity entity = Minecraft.getInstance().player;
+        if (entity == null) {
+            return;
+        }
+        final Vec3 pos = entity.position();
+        final float spread = entity.getBbWidth() * 2.0f;
+        final double minY = pos.y + entity.getBbHeight() * 0.7;
+        final double maxY = pos.y + entity.getBbHeight() * 1.4;
+        level.addParticle(type, false,
+                pos.x + rng.triangle(0, spread),
+                minY + rng.nextDouble() * (maxY - minY),
+                pos.z + rng.triangle(0, spread),
+                0, 0, 0);
     }
 }

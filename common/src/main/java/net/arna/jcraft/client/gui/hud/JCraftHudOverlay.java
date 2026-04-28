@@ -2,6 +2,7 @@ package net.arna.jcraft.client.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -41,7 +42,8 @@ public class JCraftHudOverlay {
             TIME_ACCEL_GAUGE = new Gauge(1.0f, 0.8f, 0.0f, MadeInHeavenEntity.MAXIMUM_SPEEDOMETER),
             BLOODLUST_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, 5),
             HAMON_GAUGE = new Gauge(0.8f, 0.5f, 0.2f, (int) HamonSpec.MAX_CHARGE),
-            IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX);
+            IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX),
+            OVERHEAT_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, (int) AerosmithEntity.OVERHEAT_MAX);
 
     public static void render(final GuiGraphics ctx) {
         final Minecraft client = Minecraft.getInstance();
@@ -99,6 +101,9 @@ public class JCraftHudOverlay {
             }
             if (stand instanceof MetallicaEntity metallica) {
                 IRON_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) metallica.getIron());
+            }
+            if (stand instanceof AerosmithEntity aerosmith) {
+                OVERHEAT_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) aerosmith.getOverheat());
             }
         }
 

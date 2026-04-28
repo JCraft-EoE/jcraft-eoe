@@ -7,9 +7,11 @@ import lombok.experimental.UtilityClass;
 import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.stand.StandEntity;
 
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 @UtilityClass
 public class BlockMarkerMoves {
@@ -31,6 +33,13 @@ public class BlockMarkerMoves {
         iterating = true;
         MOVES.forEach((stand, move) -> consumer.accept(move));
         iterating = false;
+    }
+
+    public Optional<BlockMarkerMove> findFirst(Predicate<BlockMarkerMove> predicate) {
+        iterating = true;
+        var result = MOVES.values().stream().filter(predicate).findFirst();
+        iterating = false;
+        return result;
     }
 
     public void add(StandEntity<?,?> stand, BlockMarkerMove move) {

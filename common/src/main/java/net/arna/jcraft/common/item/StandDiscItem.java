@@ -7,7 +7,6 @@ import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -15,7 +14,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -84,7 +82,7 @@ public class StandDiscItem extends Item {
             return InteractionResultHolder.fail(itemStack);
         }
 
-        standData.setTypeAndSkin(itemStand, itemSkin);
+        standData.setTypeAndSkin(itemStand, itemSkin, false);
         if (userStand == null) {
             data.remove("StandID");
             data.remove("Skin");
@@ -104,7 +102,6 @@ public class StandDiscItem extends Item {
 
             standData.setStand(null);
         }
-        JUtils.maySendStandAboutInfo((ServerPlayer)user);
 
         JCraft.summon(world, user);
 

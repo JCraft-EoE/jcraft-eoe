@@ -168,6 +168,13 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
                                             during this, you may not use your spec or move
                                             """)
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<ShadowTheWorldEntity> TOSS = new TossMove<ShadowTheWorldEntity>(0, 1, 1, 0.75f)
+            .withAnim(ShadowTheWorldEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<ShadowTheWorldEntity> TOSS_CHARGE = new TossChargeMove<ShadowTheWorldEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
+
     private int desummonTime = 6;
     private static final EntityDataAccessor<Boolean> DESUMMONING = SynchedEntityData.defineId(ShadowTheWorldEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -211,6 +218,8 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
         moves.register(MoveClass.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
         moves.register(MoveClass.UTILITY, TIME_SKIP, State.IDLE);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     private final AzCommand DESUMMON = AzCommand.create(DESUMMON_CONTROLLER, "animation.shadow_the_world.desummon");
@@ -293,6 +302,8 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
         UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         COUNTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.counter", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         TIME_STOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.timestop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
         
         private final AzCommand animator;

@@ -61,7 +61,7 @@ public final class CGroundSlamAttack extends AbstractSimpleAttack<CGroundSlamAtt
                     for (int z = min.getZ(); z < max.getZ(); z++) {
                         final BlockPos curPos = bPos.offset(x, y, z);
 
-                        if (mayBreak(user, curPos, s -> s.getBlock().getExplosionResistance() <= 10 && !s.isAir())) {
+                        if (!mayBreak(user, curPos, s -> s.getBlock().getExplosionResistance() <= 10 && !s.isAir())) {
                             continue;
                         }
 

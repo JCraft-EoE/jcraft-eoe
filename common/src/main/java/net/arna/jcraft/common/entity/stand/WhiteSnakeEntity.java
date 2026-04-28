@@ -19,10 +19,13 @@ import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.PilotModeMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleUppercutAttack;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.GiveStandAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
+import net.arna.jcraft.common.attack.moves.whitesnake.StealStandAttack;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -136,7 +139,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                     Component.literal("Give Stand Disk"),
                     Component.literal("gives a single hit target a stand, provided they do not have one already, from a disk in the user's off hand")
             );
-    public static final SimpleAttack<WhiteSnakeEntity> STAND_DISC = new SimpleAttack<WhiteSnakeEntity>(480,
+    public static final StealStandAttack STAND_DISC = new StealStandAttack(480,
             22, 34, 1, 8f, 20, 2, 0.5f, 0)
             .withSound(JSoundRegistry.WS_STAND_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -207,6 +210,12 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                     Component.literal("Pilot Mode"),
                     Component.empty()
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<WhiteSnakeEntity> TOSS = new TossMove<WhiteSnakeEntity>(0, 1, 1, 0.75f)
+            .withAnim(WhiteSnakeEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<WhiteSnakeEntity> TOSS_CHARGE = new TossChargeMove<WhiteSnakeEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public WhiteSnakeEntity(Level worldIn) {
         super(JStandTypeRegistry.WHITE_SNAKE.get(), worldIn);
@@ -243,6 +252,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         }
 
         moves.register(MoveClass.UTILITY, PILOT_MODE);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -394,7 +405,9 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         RIGHT_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.rdash", AzPlayBehaviors.LOOP)),
 
         MELT_YOUR_HEART(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.meltyourheart", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME));
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;
 

@@ -28,7 +28,6 @@ public class JExplosionModifier {
     private final Function<RandomSource, Float> volumeGetter, pitchGetter;
 
     public void write(FriendlyByteBuf buf, RandomSource random) {
-        write(createFire, buf, FriendlyByteBuf::writeBoolean);
         write(blockInteraction, buf, (b, dt) -> b.writeVarInt(dt.ordinal()));
         write(particle, buf, (b, p) -> b.writeResourceKey(BuiltInRegistries.PARTICLE_TYPE.getResourceKey(p).orElseThrow()));
         write(particleVelocity, buf, (b, v) -> {
@@ -52,7 +51,6 @@ public class JExplosionModifier {
 
     public static JExplosionModifier read(FriendlyByteBuf buf) {
         JExplosionModifier.Builder builder = JExplosionModifier.builder()
-                .createFire(read(buf, FriendlyByteBuf::readBoolean))
                 .blockInteraction(read(buf, b -> Explosion.BlockInteraction.values()[b.readVarInt()]))
                 .particle(read(buf, b -> (SimpleParticleType) BuiltInRegistries.PARTICLE_TYPE.get(b.readResourceKey(Registries.PARTICLE_TYPE))))
                 .particleVelocity(read(buf, b -> new Vec3(b.readDouble(), b.readDouble(), b.readDouble())))

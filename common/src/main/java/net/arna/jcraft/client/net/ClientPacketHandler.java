@@ -22,6 +22,7 @@ import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.rendering.shader.TimeEraseShaderEffect;
+import net.arna.jcraft.client.rendering.handler.MandomRewindShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.data.AttackerDataLoader;
@@ -29,7 +30,7 @@ import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.common.splatter.Splatter;
+import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.minecraft.client.Minecraft;
@@ -469,12 +470,29 @@ public class ClientPacketHandler {
                     }
                 });
             }
+
+            // hitscan trace particle
+            case (14) -> {
+                final double x = buf.readDouble();
+                final double y = buf.readDouble();
+                final double z = buf.readDouble();
+                final double velX = buf.readDouble();
+                final double velY = buf.readDouble();
+                final double velZ = buf.readDouble();
+                final JParticleType particleType = buf.readEnum(JParticleType.class);
+
+                client.execute(() -> client.level.addParticle(particleType.getParticleType(), true, x, y, z,
+                        velX, velY, velZ));
+            }
         }
     }
 
     public static void handleMandomData(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
         final int entID = buf.readInt();
         final Vec3 originalPos = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+        final float r = buf.readFloat();
+        final float g = buf.readFloat();
+        final float b = buf.readFloat();
 
         client.execute(() -> {
             final Entity ent = client.level.getEntity(entID);
@@ -485,7 +503,7 @@ public class ClientPacketHandler {
             final Vec3 originalToCurrent = currentPos.subtract(originalPos).normalize();
             for (double h = 0; h < currentPos.distanceTo(originalPos); ++h) {
                 client.level.addParticle(
-                        new DustParticleOptions(new Vector3f(1.0f, 0.2f, 0.6f), 1.0f), // Pink color
+                        new DustParticleOptions(new Vector3f(r, g, b), 1.0f),
                         originalPos.x + originalToCurrent.x * h,
                         originalPos.y + originalToCurrent.y * h,
                         originalPos.z + originalToCurrent.z * h,
@@ -527,6 +545,17 @@ public class ClientPacketHandler {
                 TimeEraseShaderEffect effect = JShaderRegistry.TIME_ERASE;
                 if (effect != null) { effect.enabled = true; }
             });
+            case MANDOM_REWIND -> {
+                final float r = buf.readFloat();
+                final float g = buf.readFloat();
+                final float b = buf.readFloat();
+                client.execute(() -> {
+                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
+                    mandomHandler.duration = duration;
+                    mandomHandler.shaderColor = new Vector3f(r, g, b);
+                    mandomHandler.shouldRender = true;
+                });
+            }
         }
     }
 
@@ -634,7 +663,7 @@ public class ClientPacketHandler {
 
         final Splatter splatter = JUtils.getSplatterManager(world).readSplatter(buf);
 
-        long ageMs = splatter.getType().getMaxAge() * 50L;
+        long ageMs = splatter.getMaxAge() * 50L;
         AttackHitboxEffectRenderer.addHitbox(splatter.getMainBox(), ageMs, true);
         splatter.getSections().stream()
                 .filter(section -> !section.isRemoved())

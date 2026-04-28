@@ -64,4 +64,12 @@ public interface CommonHamonComponent extends JComponent {
 
     void resetLastStomped();
 
+    int getActiveLesson();
+
+    void setActiveLesson(final int lesson);
+
+    int getLessonTicks(final int lesson);
+
+    void resetLessonTicks(final int lesson);
+
 }

@@ -1,6 +1,5 @@
 package net.arna.jcraft.api.registry;
 
-import dev.architectury.registry.CreativeTabRegistry;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.spec.SpecTypeUtil;
@@ -8,12 +7,10 @@ import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.item.SpecDiscItem;
 import net.arna.jcraft.common.item.StandDiscItem;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -26,10 +23,9 @@ public interface JCreativeMenuTabRegistry {
     @SuppressWarnings("UnstableApiUsage") // we do not care :)
     static void init() {
         JCraft.CREATIVE_TAB_REGISTRY.register("general", JCreativeMenuTabRegistry::createJcraftItemGroup);
-        JCraft.CREATIVE_TAB_REGISTRY.register("cosplay", JCreativeMenuTabRegistry::createJcraftCosplayGroup);
         JCraft.CREATIVE_TAB_REGISTRY.register("stand_discs", JCreativeMenuTabRegistry::createStandDiscItemGroup);
         // building blocks
-        CreativeTabRegistry.modifyBuiltin(BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.BUILDING_BLOCKS.location()), (flags, output, canUseGameMasterBlocks) -> {
+        /*CreativeTabRegistry.modifyBuiltin(BuiltInRegistries.CREATIVE_MODE_TAB.get(CreativeModeTabs.BUILDING_BLOCKS.location()), (flags, output, canUseGameMasterBlocks) -> {
             output.acceptBefore(Items.BRICKS, JItemRegistry.METEORITE_BLOCK.get());
             output.acceptBefore(Items.BRICKS, JItemRegistry.POLISHED_METEORITE_BLOCK.get());
             output.acceptBefore(Items.GOLD_BLOCK, JItemRegistry.STELLAR_IRON_BLOCK.get());
@@ -180,7 +176,7 @@ public interface JCreativeMenuTabRegistry {
             output.acceptAfter(JItemRegistry.DARBY_OLDER_SPAWN_EGG.get(), JItemRegistry.DARBY_YOUNGER_SPAWN_EGG.get());
             output.acceptAfter(Items.PARROT_SPAWN_EGG, JItemRegistry.PETSHOP_SPAWN_EGG.get());
             output.acceptAfter(Items.TURTLE_SPAWN_EGG, JItemRegistry.VAMPIRE_SPAWN_EGG.get());
-        });
+        });*/
     }
 
     static CreativeModeTab createJcraftItemGroup() {
@@ -189,56 +185,59 @@ public interface JCreativeMenuTabRegistry {
                 .icon(() -> JItemRegistry.STAND_ARROW.get().getDefaultInstance())
                 // order of the creative tab
                 .displayItems((displayContext, entries) -> {
-                            // everything up to arrows
-                            entries.accept(JItemRegistry.METEORITE_BLOCK.get());
-                            entries.accept(JItemRegistry.POLISHED_METEORITE_BLOCK.get());
-                            entries.accept(JItemRegistry.METEORITE_IRON_ORE_BLOCK.get());
-                            entries.accept(JItemRegistry.STELLAR_IRON_INGOT.get());
-                            entries.accept(JItemRegistry.STELLAR_IRON_BLOCK.get());
-                            entries.accept(JItemRegistry.STAND_ARROWHEAD.get());
-                            entries.accept(JItemRegistry.STAND_ARROW.get());
-                            entries.accept(JItemRegistry.LIVING_ARROW.get());
-                            entries.accept(JItemRegistry.REQUIEM_RUBY.get());
-                            entries.accept(JItemRegistry.REQUIEM_ARROW.get());
-                            // other evolution items
-                            entries.accept(JItemRegistry.GREEN_BABY.get());
-                            entries.accept(JItemRegistry.DIARY_PAGE.get());
-                            entries.accept(JItemRegistry.DIOS_DIARY.get());
-                            // stand drops
-                            entries.accept(JItemRegistry.FV_REVOLVER.get());
-                            entries.accept(JItemRegistry.BULLET.get());
-                            entries.accept(JItemRegistry.SCALPEL.get());
-                            entries.accept(JItemRegistry.KQ_COIN.get());
-                            entries.accept(JItemRegistry.FOOLISH_SAND_BLOCK.get());
-                            // misc
-                            //entries.accept(JItemRegistry.HOT_SAND_BLOCK.get());
-                            entries.accept(JItemRegistry.TRAINING_DUMMY.get());
-                            entries.accept(JItemRegistry.CINDERELLA_GREEN_BLOCK.get());
-                            entries.accept(JItemRegistry.SINNERS_SOUL.get());
-                            entries.accept(JItemRegistry.SOUL_BLOCK.get());
-                            // entries.accept(JItemRegistry.SOUL_WOOD_BLOCK.get());
-                            entries.accept(JItemRegistry.KNIFE.get());
-                            entries.accept(JItemRegistry.KNIFEBUNDLE.get());
-                            // entries.accept(JItemRegistry.PRISON_KEY.get());
-                            // entries.accept(JItemRegistry.PLANKTON_VIAL.get());
-                            // entries.accept(JItemRegistry.SHIV.get());
-                            // entries.accept(JItemRegistry.STEEL_BALL.get());
-                            // spec items + related except blood bottles
-                            entries.accept(JItemRegistry.ANUBIS_SHEATHED.get());
-                            entries.accept(JItemRegistry.ANUBIS.get());
-                            entries.accept(JItemRegistry.BOXING_GLOVES.get());
-                            entries.accept(JItemRegistry.STONE_MASK.get());
-                            entries.accept(JItemRegistry.COFFIN_BLOCK.get());
-                            entries.accept(JItemRegistry.PEACEMAKER.get());
+                    // everything up to arrows
+                    entries.accept(JItemRegistry.METEORITE_BLOCK.get());
+                    entries.accept(JItemRegistry.POLISHED_METEORITE_BLOCK.get());
+                    entries.accept(JItemRegistry.METEORITE_IRON_ORE_BLOCK.get());
+                    entries.accept(JItemRegistry.STELLAR_IRON_INGOT.get());
+                    entries.accept(JItemRegistry.STELLAR_IRON_BLOCK.get());
+                    entries.accept(JItemRegistry.STAND_ARROWHEAD.get());
+                    entries.accept(JItemRegistry.STAND_ARROW.get());
+                    entries.accept(JItemRegistry.LIVING_ARROW.get());
+                    entries.accept(JItemRegistry.REQUIEM_RUBY.get());
+                    entries.accept(JItemRegistry.REQUIEM_ARROW.get());
+                    // other evolution items
+                    entries.accept(JItemRegistry.GREEN_BABY.get());
+                    entries.accept(JItemRegistry.DIARY_PAGE.get());
+                    entries.accept(JItemRegistry.DIOS_DIARY.get());
+                    // stand drops
+                    entries.accept(JItemRegistry.FV_REVOLVER.get());
+                    entries.accept(JItemRegistry.BULLET.get());
+                    entries.accept(JItemRegistry.SCALPEL.get());
+                    entries.accept(JItemRegistry.KQ_COIN.get());
+                    entries.accept(JItemRegistry.FOOLISH_SAND_BLOCK.get());
+                    // misc
+                    //entries.accept(JItemRegistry.HOT_SAND_BLOCK.get());
+                    entries.accept(JItemRegistry.TRAINING_DUMMY.get());
+                    entries.accept(JItemRegistry.CINDERELLA_GREEN_BLOCK.get());
+                    entries.accept(JItemRegistry.SINNERS_SOUL.get());
+                    entries.accept(JItemRegistry.SOUL_BLOCK.get());
+                    // entries.accept(JItemRegistry.SOUL_WOOD_BLOCK.get());
+                    entries.accept(JItemRegistry.KNIFE.get());
+                    entries.accept(JItemRegistry.KNIFEBUNDLE.get());
+                    // entries.accept(JItemRegistry.PRISON_KEY.get());
+                    // entries.accept(JItemRegistry.PLANKTON_VIAL.get());
+                    // entries.accept(JItemRegistry.SHIV.get());
+                    // entries.accept(JItemRegistry.STEEL_BALL.get());
+                    entries.accept(JItemRegistry.GAS_CAN.get());
+                    entries.accept(JItemRegistry.MATCHBOX.get());
+                    // spec items + related except blood bottles
+                    entries.accept(JItemRegistry.ANUBIS_SHEATHED.get());
+                    entries.accept(JItemRegistry.ANUBIS.get());
+                    entries.accept(JItemRegistry.BOXING_GLOVES.get());
+                    entries.accept(JItemRegistry.STONE_MASK.get());
+                    entries.accept(JItemRegistry.RED_HAT.get());
+                    entries.accept(JItemRegistry.COFFIN_BLOCK.get());
+                    entries.accept(JItemRegistry.PEACEMAKER.get());
 
-                            // vehicles
-                            entries.accept(JItemRegistry.ROAD_ROLLER.get());
-                            // blood bottles
-                            {
-                                final ItemStack stack = new ItemStack(JItemRegistry.BLOOD_BOTTLE.get());
-                                stack.getOrCreateTag().putFloat("Blood", 16f);
-                                entries.accept(stack);
-                            }
+                    // vehicles
+                    entries.accept(JItemRegistry.ROAD_ROLLER.get());
+                    // blood bottles
+                    {
+                        final ItemStack stack = new ItemStack(JItemRegistry.BLOOD_BOTTLE.get());
+                        stack.getOrCreateTag().putFloat("Blood", 16f);
+                        entries.accept(stack);
+                    }
 /*                    for (int i = 16; i >= 0; i--) {
                         final ItemStack stack = new ItemStack(JItemRegistry.BLOOD_BOTTLE.get());
                         stack.getOrCreateTag().putFloat("Blood", i);
@@ -275,97 +274,6 @@ public interface JCreativeMenuTabRegistry {
                     if (JItemRegistry.DEBUG_WAND != null) {
                         entries.accept(JItemRegistry.DEBUG_WAND.get());
                     }
-                })
-                .build();
-    }
-
-    static CreativeModeTab createJcraftCosplayGroup() {
-        return CreativeModeTab.builder(CreativeModeTab.Row.TOP, 2)
-                .title(Component.translatable("itemGroup.jcraft.cosplay"))
-                .icon(() -> JItemRegistry.DIO_CAPE.get().getDefaultInstance())
-                // order of the creative tab
-                .displayItems((displayContext, entries) -> {
-                    // cosplay
-                    entries.accept(JItemRegistry.RED_HAT.get());
-                    entries.accept(JItemRegistry.DIO_P1_WIG.get());
-                    entries.accept(JItemRegistry.DIO_P1_JACKET.get());
-                    entries.accept(JItemRegistry.DIO_P1_PANTS.get());
-                    entries.accept(JItemRegistry.DIO_P1_BOOTS.get());
-                    entries.accept(JItemRegistry.STRAIZO_PONCHO.get());
-                    entries.accept(JItemRegistry.KARS_HEADWRAP.get());
-                    entries.accept(JItemRegistry.JOTARO_CAP.get());
-                    entries.accept(JItemRegistry.JOTARO_JACKET.get());
-                    entries.accept(JItemRegistry.JOTARO_PANTS.get());
-                    entries.accept(JItemRegistry.JOTARO_BOOTS.get());
-                    entries.accept(JItemRegistry.DIO_HEADBAND.get());
-                    entries.accept(JItemRegistry.DIO_JACKET.get());
-                    entries.accept(JItemRegistry.DIO_CAPE.get());
-                    entries.accept(JItemRegistry.DIO_PANTS.get());
-                    entries.accept(JItemRegistry.DIO_BOOTS.get());
-                    entries.accept(JItemRegistry.KAKYOIN_WIG.get());
-                    entries.accept(JItemRegistry.KAKYOIN_COAT.get());
-                    entries.accept(JItemRegistry.KAKYOIN_PANTS.get());
-                    entries.accept(JItemRegistry.KAKYOIN_BOOTS.get());
-                    entries.accept(JItemRegistry.HEAVEN_ATTAINED_WIG.get());
-                    entries.accept(JItemRegistry.HEAVEN_ATTAINED_SHIRT.get());
-                    entries.accept(JItemRegistry.HEAVEN_ATTAINED_PANTS.get());
-                    entries.accept(JItemRegistry.HEAVEN_ATTAINED_BOOTS.get());
-                    entries.accept(JItemRegistry.JOTARO_P4_CAP.get());
-                    entries.accept(JItemRegistry.JOTARO_P4_JACKET.get());
-                    entries.accept(JItemRegistry.JOTARO_P4_PANTS.get());
-                    entries.accept(JItemRegistry.JOTARO_P4_BOOTS.get());
-                    entries.accept(JItemRegistry.KIRA_WIG.get());
-                    entries.accept(JItemRegistry.KIRA_JACKET.get());
-                    entries.accept(JItemRegistry.KIRA_PANTS.get());
-                    entries.accept(JItemRegistry.KIRA_BOOTS.get());
-                    entries.accept(JItemRegistry.KOSAKU_WIG.get());
-                    entries.accept(JItemRegistry.KOSAKU_JACKET.get());
-                    entries.accept(JItemRegistry.KOSAKU_PANTS.get());
-                    entries.accept(JItemRegistry.KOSAKU_BOOTS.get());
-                    entries.accept(JItemRegistry.FINAL_KIRA_WIG.get());
-                    entries.accept(JItemRegistry.FINAL_KIRA_JACKET.get());
-                    entries.accept(JItemRegistry.FINAL_KIRA_PANTS.get());
-                    entries.accept(JItemRegistry.FINAL_KIRA_BOOTS.get());
-                    entries.accept(JItemRegistry.GIORNO_WIG.get());
-                    entries.accept(JItemRegistry.GIORNO_JACKET.get());
-                    entries.accept(JItemRegistry.GIORNO_PANTS.get());
-                    entries.accept(JItemRegistry.GIORNO_BOOTS.get());
-                    entries.accept(JItemRegistry.RISOTTO_CAP.get());
-                    entries.accept(JItemRegistry.RISOTTO_JACKET.get());
-                    entries.accept(JItemRegistry.RISOTTO_PANTS.get());
-                    entries.accept(JItemRegistry.RISOTTO_BOOTS.get());
-                    entries.accept(JItemRegistry.DOPPIO_WIG.get());
-                    entries.accept(JItemRegistry.DOPPIO_SHIRT.get());
-                    entries.accept(JItemRegistry.DIAVOLO_WIG.get());
-                    entries.accept(JItemRegistry.DIAVOLO_SHIRT.get());
-                    entries.accept(JItemRegistry.DIAVOLO_PANTS.get());
-                    entries.accept(JItemRegistry.DIAVOLO_BOOTS.get());
-                    entries.accept(JItemRegistry.JOTARO_P6_CAP.get());
-                    entries.accept(JItemRegistry.JOTARO_P6_JACKET.get());
-                    entries.accept(JItemRegistry.JOTARO_P6_PANTS.get());
-                    entries.accept(JItemRegistry.JOTARO_P6_BOOTS.get());
-                    entries.accept(JItemRegistry.PUCCIS_HAT.get());
-                    entries.accept(JItemRegistry.PUCCI_ROBE.get());
-                    entries.accept(JItemRegistry.PUCCI_PANTS.get());
-                    entries.accept(JItemRegistry.PUCCI_BOOTS.get());
-                    entries.accept(JItemRegistry.JOHNNY_CAP.get());
-                    entries.accept(JItemRegistry.JOHNNY_JACKET.get());
-                    entries.accept(JItemRegistry.JOHNNY_PANTS.get());
-                    entries.accept(JItemRegistry.JOHNNY_BOOTS.get());
-                    entries.accept(JItemRegistry.GYRO_HAT.get());
-                    entries.accept(JItemRegistry.GYRO_SHIRT.get());
-                    entries.accept(JItemRegistry.GYRO_PANTS.get());
-                    entries.accept(JItemRegistry.GYRO_BOOTS.get());
-                    entries.accept(JItemRegistry.DIEGO_HAT.get());
-                    entries.accept(JItemRegistry.DIEGO_SHIRT.get());
-                    entries.accept(JItemRegistry.DIEGO_PANTS.get());
-                    entries.accept(JItemRegistry.DIEGO_BOOTS.get());
-                    entries.accept(JItemRegistry.RINGO_OUTFIT.get());
-                    entries.accept(JItemRegistry.RINGO_BOOTS.get());
-                    entries.accept(JItemRegistry.VALENTINE_WIG.get());
-                    entries.accept(JItemRegistry.VALENTINE_JACKET.get());
-                    entries.accept(JItemRegistry.VALENTINE_PANTS.get());
-                    entries.accept(JItemRegistry.VALENTINE_BOOTS.get());
                 })
                 .build();
     }

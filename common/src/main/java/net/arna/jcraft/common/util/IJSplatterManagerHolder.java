@@ -1,6 +1,6 @@
 package net.arna.jcraft.common.util;
 
-import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 
 public interface IJSplatterManagerHolder {
     JSplatterManager jcraft$getSplatterManager();

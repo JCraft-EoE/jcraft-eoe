@@ -2,6 +2,7 @@ package net.arna.jcraft.common.component.impl.living;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.arna.jcraft.api.component.living.CommonHamonComponent;
 import net.arna.jcraft.common.spec.HamonSpec;
 import net.arna.jcraft.common.util.JUtils;
@@ -42,6 +43,10 @@ public class CommonHamonComponentImpl implements CommonHamonComponent {
     private UUID lastStomped;
     @Getter
     private int lastStompedTick = Integer.MIN_VALUE;
+    @Getter
+    @Setter
+    private int activeLesson;
+    private final int[] lessonTicks = new int[6];
 
     public CommonHamonComponentImpl(final LivingEntity entity) {
         this.entity = entity;
@@ -123,6 +128,19 @@ public class CommonHamonComponentImpl implements CommonHamonComponent {
         lastStompedTick = Integer.MIN_VALUE;
     }
 
+    public int getLessonTicks(int lesson) {
+        if (lesson > 0 && lesson <= 6) {
+            return lessonTicks[lesson-1];
+        }
+        return 0;
+    }
+
+    public void resetLessonTicks(int lesson) {
+        if (lesson > 0 && lesson <= 6) {
+            lessonTicks[lesson-1] = 0;
+        }
+    }
+
     public void sync(final Entity entity) {
     }
 
@@ -158,6 +176,9 @@ public class CommonHamonComponentImpl implements CommonHamonComponent {
                 hamonizeReady = false;
                 sync(entity);
             }
+        }
+        if (activeLesson > 0 && activeLesson <= 6) {
+            lessonTicks[activeLesson-1]++;
         }
     }
 

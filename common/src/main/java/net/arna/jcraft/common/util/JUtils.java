@@ -9,7 +9,6 @@ import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStatRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
@@ -17,19 +16,23 @@ import net.arna.jcraft.api.spec.JSpecHolder;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.compat.FtbChunksCompat;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.entity.projectile.GasCanProjectile;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.projectile.ScalpelProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
+import net.arna.jcraft.common.item.GasCanItem;
 import net.arna.jcraft.common.item.KnifeBundleItem;
 import net.arna.jcraft.common.item.KnifeItem;
 import net.arna.jcraft.common.item.ScalpelItem;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.common.splatter.JSplatterManager;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
@@ -48,7 +51,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -66,6 +68,7 @@ import net.minecraft.world.entity.projectile.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SupportType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -819,7 +822,7 @@ public final class JUtils {
         }
 
         else if (itemStack.getItem() instanceof TridentItem) {
-            final ThrownTrident thrownTrident = new ThrownTrident(level, shooter, itemStack);
+            final ThrownTrident thrownTrident = new ThrownTrident(level, getUserIfStand(shooter), itemStack);
             thrownTrident.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
             level.addFreshEntity(thrownTrident);
         }
@@ -856,6 +859,18 @@ public final class JUtils {
             final KnifeProjectile knifeProjectile = new KnifeProjectile(level, shooter);
             knifeProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
             level.addFreshEntity(knifeProjectile);
+        }
+        else if (itemStack.getItem() instanceof EnderpearlItem) {
+            final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
+            enderpearlProjectile.setItem(itemStack);
+            enderpearlProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1.5F, 1.0F);
+            level.addFreshEntity(enderpearlProjectile);
+        }
+        else if (itemStack.getItem() instanceof GasCanItem) {
+            final GasCanProjectile gasCan = new GasCanProjectile(JUtils.getUserIfStand(shooter), level);
+            gasCan.setItem(itemStack);
+            gasCan.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, velocity, 1.0F);
+            level.addFreshEntity(gasCan);
         }
         else {
             final AbstractArrow projectile = new ItemTossProjectile(shooter, level, itemStack);
@@ -895,8 +910,42 @@ public final class JUtils {
      */
     @SafeVarargs
     public static <T> @NonNull T chooseRandom(@NonNull RandomSource rng, T... items) {
-        if (items == null || items.length == 0) throw new IllegalArgumentException("At least one item must be provided.");
+        if (items == null || items.length == 0) {
+            throw new IllegalArgumentException("At least one item must be provided.");
+        }
         return items[rng.nextInt(items.length)];
+    }
+
+    /**
+     * Selects a random element from the given collection using the provided {@link RandomSource}.
+     *
+     * @throws IllegalArgumentException If no items are provided.
+     */
+    public static <T> @NonNull T chooseRandom(@NonNull RandomSource rng, Collection<T> items) {
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("At least one item must be provided.");
+        }
+        final Iterator<T> it = items.iterator();
+        int selection = rng.nextInt(items.size());
+        while (selection > 0) {
+            it.next();
+            selection--;
+        }
+        return it.next();
+    }
+
+    public static void awardAdvancement(final ServerPlayer player, final ResourceLocation advancementLoc) {
+        final MinecraftServer server = player.getServer();
+        if (server == null) {
+            return;
+        }
+        final Advancement advancement = server.getAdvancements().getAdvancement(advancementLoc);
+        if (advancement == null) {
+            return;
+        }
+        for (final String criterion : advancement.getCriteria().keySet()) {
+            player.getAdvancements().award(advancement, criterion);
+        }
     }
 
     public static boolean hasAdvancement(final ServerPlayer player, final ResourceLocation advancementLoc) {
@@ -912,8 +961,62 @@ public final class JUtils {
     }
 
     public static void maySendStandAboutInfo(final ServerPlayer player) {
-        if (player.getStats().getValue(Stats.CUSTOM.get(JStatRegistry.STAND_SUMMONED.get())) == 0) {
+        if (!hasAdvancement(player, JCraft.id("obtain_stand"))) {
             player.sendSystemMessage(Component.translatable("info.jcraft.first_stand"));
         }
+    }
+
+    public static void maySendSpecAboutInfo(final ServerPlayer player) {
+        if (!hasAdvancement(player, JCraft.id("obtain_any_spec"))) {
+            player.sendSystemMessage(Component.translatable("info.jcraft.first_spec"));
+        }
+    }
+
+    /**
+     * @return Whether the player is 'mortal', i.e. vulnerable, not in creative or spectator.
+     */
+    public static boolean isMortal(@Nullable final ServerPlayer player) {
+        if (player == null) return false;
+        return !player.isSpectator() && !player.isCreative() && !player.isInvulnerable();
+    }
+
+    @NonNull
+    public static Vec3 getLocalUp(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, 1.0d, 0, GravityChangerAPI.getGravityDirection(ent));
+    }
+
+    @NonNull
+    public static Vec3 getLocalDown(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, -1.0d, 0, GravityChangerAPI.getGravityDirection(ent));
+    }
+
+    public static boolean mayAlter(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
+                                   @Nullable Predicate<BlockState> pred) {
+        ServerLevel serverLevel = level instanceof ServerLevel sl ? sl : null;
+        ServerPlayer player = user instanceof ServerPlayer p ? p : null;
+
+        boolean isPlayer = player != null;
+        boolean mobGriefing = level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        boolean isSpawnProtected = serverLevel != null && player != null && pos != null &&
+                serverLevel.getServer().isUnderSpawnProtection(serverLevel, pos, player);
+        boolean mayBuild = !isPlayer || pos == null ||
+                player.mayBuild() && FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
+
+        boolean mayAttempt = (isPlayer || mobGriefing) && !isSpawnProtected && mayBuild;
+        if (!mayAttempt || pos == null || pred == null) return mayAttempt;
+
+        // The move may attempt to destroy this block, check if it should be possible to.
+        BlockState state = level.getBlockState(pos);
+        return pred.test(state);
+    }
+
+    public static boolean isHoldingSomething(LivingEntity user) {
+        if (user == null) return false;
+
+        ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!mainHandStack.isEmpty()) return true;
+
+        ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
+        return !offHandStack.isEmpty();
     }
 }

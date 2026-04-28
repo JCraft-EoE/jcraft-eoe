@@ -15,7 +15,7 @@
 					"name": "helmet",
 					"pivot": [0, 24, 0],
 					"cubes": [
-						{"origin": [-4, 24, -4], "size": [8, 9, 8], "inflate": 0.7, "uv": [0, 0]},
+						{"origin": [-4, 29.8, -4], "size": [8, 3, 8], "inflate": 0.7, "uv": [0, 0]},
 						{"origin": [-12, 29.1, -12], "size": [24, 0, 24], "inflate": 0.01, "pivot": [0, 29.1, 0], "rotation": [0, -45, 0], "uv": [-24, 40]}
 					]
 				},
