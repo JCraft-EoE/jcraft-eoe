@@ -20,9 +20,8 @@ import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
-import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
-import net.arna.jcraft.client.rendering.handler.MandomRewindShaderHandler;
-import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
+import net.arna.jcraft.client.rendering.shader.TimeEraseShaderEffect;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.data.AttackerDataLoader;
@@ -551,12 +550,10 @@ public class ClientPacketHandler {
                 client.execute(() -> {
                     final Entity sourceShader = world.getEntity(id);
                     if (sourceShader instanceof final LivingEntity livingEntity) {
-
-                        ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
-                        zaWarudoShaderHandler.shaderSourceEntity = Optional.of(livingEntity).orElse(client.player);
-                        zaWarudoShaderHandler.effectLength = duration;
-                        zaWarudoShaderHandler.shouldRender = true;
-
+                        if (JShaderRegistry.TIMESTOP_EFFECT != null)
+                        {
+                            JShaderRegistry.TIMESTOP_EFFECT.queueBubble(Optional.of(livingEntity).orElse(client.player), duration);
+                        }
                     }
                 });
             }
@@ -565,22 +562,19 @@ public class ClientPacketHandler {
                     return;
                 }
 
-                final CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
-                crimsonShaderHandler.effectLength = duration;
-                crimsonShaderHandler.shouldRender = true;
-
-
+                TimeEraseShaderEffect effect = JShaderRegistry.TIME_ERASE;
+                if (effect != null) { effect.enabled = true; }
             });
             case MANDOM_REWIND -> {
-                final float r = buf.readFloat();
-                final float g = buf.readFloat();
-                final float b = buf.readFloat();
-                client.execute(() -> {
-                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
-                    mandomHandler.duration = duration;
-                    mandomHandler.shaderColor = new Vector3f(r, g, b);
-                    mandomHandler.shouldRender = true;
-                });
+//                final float r = buf.readFloat();
+//                final float g = buf.readFloat();
+//                final float b = buf.readFloat();
+//                client.execute(() -> {
+//                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
+//                    mandomHandler.duration = duration;
+//                    mandomHandler.shaderColor = new Vector3f(r, g, b);
+//                    mandomHandler.shouldRender = true;
+//                });
             }
         }
     }
@@ -594,17 +588,10 @@ public class ClientPacketHandler {
                 }
                 case ZA_WARUDO -> client.execute(() -> {
 
-                    ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
-                    zaWarudoShaderHandler.shouldRender = false;
-                    zaWarudoShaderHandler.renderingEffect = false;
-
                 });
                 case CRIMSON -> client.execute(() -> {
-
-                    CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
-                    crimsonShaderHandler.shouldRender = false;
-                    crimsonShaderHandler.renderingEffect = false;
-
+                    TimeEraseShaderEffect effect = JShaderRegistry.TIME_ERASE;
+                    if (effect != null) { effect.enabled = false; }
                 });
             }
         }

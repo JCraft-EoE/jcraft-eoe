@@ -14,6 +14,7 @@ import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.renderer.block.CoffinTileRenderer;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.forge.JCraftForge;
 import net.arna.jcraft.forge.capability.impl.entity.GrabCapability;
 import net.arna.jcraft.forge.capability.impl.entity.GravityCapability;
@@ -32,6 +33,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -70,6 +72,11 @@ public class JCraftForgeClient {
 
         // Run when the MinecraftClient instance is fully initialized.
         Minecraft.getInstance().tell(EpitaphOverlay::preload);
+    }
+
+    @SubscribeEvent
+    public static void onClientReload(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(JShaderRegistry::onReload);
     }
 
     @SubscribeEvent

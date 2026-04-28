@@ -2,8 +2,10 @@ package net.arna.jcraft.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.rendering.api.callbacks.PostWorldRenderCallback;
-import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
+import net.arna.jcraft.client.rendering.shader.TimestopShaderEffect;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.mixin_logic.StillDepthHolder;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -47,6 +49,18 @@ public class LevelRendererMixin {
     private void hookPostWorldRender(PoseStack matrices, float tickDelta, long nanoTime, boolean renderBlockOutline,
                                      Camera camera, GameRenderer renderer, LightTexture lmTexManager, Matrix4f matrix4f, CallbackInfo ci) {
         ((StillDepthHolder) Minecraft.getInstance().getMainRenderTarget()).jcraft$freezeDepth();
+
+        TimestopShaderEffect.freezeInvTransformMat();
+        if (JShaderRegistry.TIMESTOP_EFFECT != null) JShaderRegistry.TIMESTOP_EFFECT.update(tickDelta);
+
+        if (EpitaphOverlay.shouldRenderVignette() && JShaderRegistry.EPITAPH_VIGNETTE != null)
+        {
+            JShaderRegistry.EPITAPH_VIGNETTE.renderVignette(
+                    EpitaphOverlay.getVignetteIntensity(),
+                    EpitaphOverlay.getVignetteExtend()
+            );
+        }
+
         PostWorldRenderCallback.EVENT.invoker().onWorldRendered(matrices, camera, tickDelta, nanoTime);
     }
 
@@ -73,16 +87,6 @@ public class LevelRendererMixin {
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void cancelTickInTS(CallbackInfo ci) {
         if (JClientUtils.isInTSRange(Minecraft.getInstance().cameraEntity)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderSky", at = @At("HEAD"), cancellable = true)
-    private void renderSky(PoseStack matrices, Matrix4f matrix4f, float tickDelta, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci) {
-        SkyBoxManager skyboxManager = SkyBoxManager.getInstance();
-        if (skyboxManager.isEnabled() && skyboxManager.getCurrentSkybox() != null) {
-            runnable.run();
-            skyboxManager.renderSkyBox(matrices, matrix4f, tickDelta, camera, bl);
             ci.cancel();
         }
     }
