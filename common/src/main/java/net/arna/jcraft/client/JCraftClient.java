@@ -116,8 +116,6 @@ public class JCraftClient {
 
         AzItemRendererRegistry.register(JItemRegistry.GAS_CAN.get(), GasCanItemRenderer::new);
 
-        MandomRewindShaderHandler.INSTANCE.init();
-
         // Renderer registration
 
         ClientPacketHandler.init();

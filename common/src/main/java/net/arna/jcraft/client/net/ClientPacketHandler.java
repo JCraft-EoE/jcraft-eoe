@@ -22,7 +22,6 @@ import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.rendering.shader.TimeEraseShaderEffect;
-import net.arna.jcraft.client.rendering.handler.MandomRewindShaderHandler;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.data.AttackerDataLoader;
@@ -546,15 +545,15 @@ public class ClientPacketHandler {
                 if (effect != null) { effect.enabled = true; }
             });
             case MANDOM_REWIND -> {
-                final float r = buf.readFloat();
-                final float g = buf.readFloat();
-                final float b = buf.readFloat();
-                client.execute(() -> {
-                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
-                    mandomHandler.duration = duration;
-                    mandomHandler.shaderColor = new Vector3f(r, g, b);
-                    mandomHandler.shouldRender = true;
-                });
+//                final float r = buf.readFloat();
+//                final float g = buf.readFloat();
+//                final float b = buf.readFloat();
+//                client.execute(() -> {
+//                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
+//                    mandomHandler.duration = duration;
+//                    mandomHandler.shaderColor = new Vector3f(r, g, b);
+//                    mandomHandler.shouldRender = true;
+//                });
             }
         }
     }
