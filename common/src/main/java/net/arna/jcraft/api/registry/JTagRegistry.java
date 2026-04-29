@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
@@ -54,6 +55,8 @@ public interface JTagRegistry {
     TagKey<Biome> METEORS_CAN_FALL = TagKey.create(Registries.BIOME, JCraft.id("meteors_can_fall"));
 
     TagKey<StructureTemplatePool> STONE_BASE = TagKey.create(Registries.TEMPLATE_POOL, JCraft.id("stone_base"));
+
+    TagKey<DamageType> STAND_IMMUNE = TagKey.create(Registries.DAMAGE_TYPE, JCraft.id("stand_immune"));
 
     static void init() {
         // intentionally left empty
