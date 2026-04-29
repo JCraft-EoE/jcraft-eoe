@@ -15,4 +15,5 @@ void main() {
         fragColor = vec4(1.-source.rgb, 1.0);
         return;
     }
+    discard;
 }

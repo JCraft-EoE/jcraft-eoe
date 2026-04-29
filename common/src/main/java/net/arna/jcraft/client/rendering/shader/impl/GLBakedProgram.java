@@ -39,7 +39,17 @@ public class GLBakedProgram extends BakedProgram {
 
     @Override
     protected void unbindProgram() {
-        glUseProgram(0);
+        // NOTE: this is not modified because we do not use the Minecraft shader instance
+        ShaderInstance previousShader = RenderSystem.getShader();
+        if (previousShader != null)
+        {
+            glUseProgram(previousShader.getId());
+            // restore the previous render state
+            previousShader.apply();
+        }
+        else {
+            glUseProgram(0);
+        }
     }
 
     @Override
@@ -64,26 +74,19 @@ public class GLBakedProgram extends BakedProgram {
         buffer.bind();
         buffer.upload(rendered);
 
-
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-        RenderSystem.disableBlend();
+//        RenderSystem.disableDepthTest();
+//        RenderSystem.depthMask(false);
+//        RenderSystem.disableBlend();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
 
         Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
         buffer.draw();
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(true);
-
-        // NOTE: this is not modified because we do not use the Minecraft shader instance
-        ShaderInstance previousShader = RenderSystem.getShader();
-        if (previousShader != null)
-        {
-            // restore the previous render state
-            previousShader.apply();
-        }
+//        RenderSystem.enableBlend();
+//        RenderSystem.defaultBlendFunc();
+//        RenderSystem.enableDepthTest();
+//        RenderSystem.depthMask(true);
 
         VertexBuffer.unbind();
         buffer.close();
