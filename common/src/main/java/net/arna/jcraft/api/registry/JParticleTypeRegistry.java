@@ -45,6 +45,8 @@ public interface JParticleTypeRegistry {
     RegistrySupplier<SimpleParticleType> METALLICA_MOSH_5 = PARTICLES.register("metallica_mosh_5", () -> new SimpleParticleType(false));
     List<RegistrySupplier<SimpleParticleType>> MOSH_TYPES = List.of(METALLICA_MOSH_1, METALLICA_MOSH_2, METALLICA_MOSH_3, METALLICA_MOSH_4, METALLICA_MOSH_5);
 
+    RegistrySupplier<SimpleParticleType> NAIL_TRAIL = PARTICLES.register("nail_trail", () -> new SimpleParticleType(false));
+
     static void init() {
         // intentionally left empty
     }

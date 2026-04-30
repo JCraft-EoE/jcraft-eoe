@@ -274,6 +274,7 @@ public class JCraftClient {
         ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_3, MoshParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_4, MoshParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH_5, MoshParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.NAIL_TRAIL, NailTrailParticle.Factory::new);
     }
 
     @Getter

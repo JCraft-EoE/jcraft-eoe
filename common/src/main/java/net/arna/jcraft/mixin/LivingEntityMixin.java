@@ -10,6 +10,8 @@ import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
+import net.arna.jcraft.common.entity.stand.TCBEntity;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.arna.jcraft.common.network.s2c.IPSTriggeredPacket;
 import net.arna.jcraft.common.util.IJCraftComboTracker;
 import net.arna.jcraft.common.util.JUtils;
@@ -161,6 +163,19 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
         LivingEntity entity = ((LivingEntity) (Object) this);
         if (!JUtils.canJump(entity)) {
             ci.cancel();
+        }
+    }
+
+    // Absolute Defense - block hurt() entirely so knockback is also prevented
+    @Inject(cancellable = true, at = @At("HEAD"), method = "hurt")
+    protected void jcraft$absoluteDefenseHurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        if (JUtils.getStand(entity) instanceof TCBEntity tcb && tcb.isAbsoluteDefenseActive()
+                && !source.is(DamageTypes.FELL_OUT_OF_WORLD)
+                && !source.is(DamageTypes.GENERIC_KILL)) {
+            tcb.onUserHurt(source, amount);
+            cir.setReturnValue(false);
+            cir.cancel();
         }
     }
 

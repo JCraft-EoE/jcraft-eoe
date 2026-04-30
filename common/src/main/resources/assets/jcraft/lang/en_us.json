@@ -1227,6 +1227,8 @@
   "move.jcraft.star_platinum_the_world.default.timestop.description": "1.75 seconds, extremely low windup",
   "move.jcraft.star_platinum_the_world.default.what_an_ugly_watch.cr.description": "grab, high damage combo-finishing knockdown",
   "move.jcraft.star_platinum_the_world.default.what_an_ugly_watch.description": "grab, combo-starting uppercut",
+  "move.jcraft.tcb.default.absolute_defense.description": "Hold ULTIMATE to activate an impenetrable barrier. Any damage received is reflected back at 75% power.",
+  "move.jcraft.tcb.default.absolute_defense.name": "Absolute Defense",
   "move.jcraft.the_fool.default.3hit_combo.description": "fast knockdown provider",
   "move.jcraft.the_fool.default.3hit_combo.name": "3-hit Combo",
   "move.jcraft.the_fool.default.burn_rubber.air.description": "slows down all movement, combo starter/extender",

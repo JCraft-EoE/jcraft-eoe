@@ -88,8 +88,8 @@ public class StandEntityModelRenderer<T extends StandEntity<?, ?>> extends AzEnt
         if (hasUser && !animatable.isRemote()) {
             return Mth.rotLerp(
                     partialTick,
-                    user.yHeadRotO,
-                    user.yHeadRot
+                    user.yBodyRotO,
+                    user.yBodyRot
             );
         }
         return Mth.rotLerp(

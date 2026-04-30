@@ -696,7 +696,18 @@ public interface JEntityTypeRegistry {
             () -> EntityType.Builder.of(
                     WorldOnlyEntityFactory.from(TCBEntity::new),
                     MobCategory.CREATURE
-            ).sized(0.3f, 0.9f).build("tcb")
+            ).sized(0.3f, 0.9f).build("tcb"));
+
+    RegistrySupplier<EntityType<EnergyCounterProjectile>> ENERGY_COUNTER = ENTITY_TYPE_REGISTRY.register(JCraft.id("energy_counter"),
+            () -> EntityType.Builder.of(
+                            WorldOnlyEntityFactory.from(EnergyCounterProjectile::new),
+                            MobCategory.MISC
+                    ).sized(0.3f, 0.3f)
+                    .clientTrackingRange(6)
+                    .updateInterval(3)
+                    .build("energy_counter")
+    );
+
     RegistrySupplier<EntityType<TrainingDummyEntity>> TRAINING_DUMMY = ENTITY_TYPE_REGISTRY.register(JCraft.id("training_dummy"),
             () -> EntityType.Builder.of(
                     (EntityType<TrainingDummyEntity> entityType, Level world) -> new TrainingDummyEntity(entityType, world),

@@ -52,6 +52,7 @@ import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.GiveStandAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
+import net.arna.jcraft.common.attack.moves.tcb.AbsoluteDefenseMove;
 import net.arna.jcraft.common.attack.moves.whitesnake.StealStandAttack;
 
 public interface JMoveTypeRegistry {
@@ -269,6 +270,8 @@ public interface JMoveTypeRegistry {
 
     RegistrySupplier<MoveType<?>> MANDOM_COUNTDOWN_MOVE = register("mandom_countdown_move", CountdownMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MANDOM_REWIND_MOVE = register("mandom_rewind_move", RewindMove.Type.INSTANCE);
+
+    RegistrySupplier<MoveType<?>> TCB_ABSOLUTE_DEFENSE_MOVE = register("tcb_absolute_defense_move", AbsoluteDefenseMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> AEROSMITH_BULLET_ATTACK = register("aerosmith_bullet_attack", MuzzleHitscanAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);

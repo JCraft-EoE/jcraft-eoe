@@ -1065,6 +1065,11 @@
       "jcraft:stands/mandom/countdown"
     ]
   },
+  "tcbpop": {
+    "sounds": [
+      "jcraft:generic/pop"
+    ]
+  },
   "mandomrewind": {
     "sounds": [
       "jcraft:stands/mandom/rewind"

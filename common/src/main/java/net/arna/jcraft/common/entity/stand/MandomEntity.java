@@ -73,6 +73,8 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
 
     public MandomEntity(Level worldIn) {
         super(JStandTypeRegistry.MANDOM.get(), worldIn);
+        this.setDistanceOffset(0.0f);
+        this.setRotationOffset(0.0f);
 
         auraColors = new Vector3f[]{
                 new Vector3f(1.0f, 0.2f, 0.6f),
@@ -97,7 +99,6 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
 
     @Override
     public void tryBlock() {
-        // Do nothing - Mandom cannot block
     }
 
     @Override
@@ -106,16 +107,6 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
 
         MoveClass moveClass = type.getMoveClass(standby);
         if (moveClass == null) return;
-
-        // Special check for ULTIMATE (Rewind) - only allow if countdown is active
-        if (moveClass == MoveClass.ULTIMATE) {
-            CountdownMove countdownMove = getMove(CountdownMove.class);
-
-            if (countdownMove == null || !countdownMove.isCountdownActive()) {
-                // Countdown is not active, don't allow the ultimate
-                return;
-            }
-        }
 
         if (moveClass == MoveClass.ULTIMATE || moveClass == MoveClass.UTILITY) {
             if (canAttack()) {
@@ -129,9 +120,7 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
         if (hasUser() && getUser() instanceof Player player) {
             JSpec<?, ?> spec = JUtils.getSpec(player);
             if (spec != null && spec.canAttack()) {
-                if (spec.initMove(moveClass)) {
-                    // Move was successful
-                } else if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT) {
+                if (!spec.initMove(moveClass) && spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT) {
                     spec.queuedMove = type;
                 }
             }

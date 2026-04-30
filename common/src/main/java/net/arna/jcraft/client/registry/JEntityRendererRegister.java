@@ -126,6 +126,7 @@ public interface JEntityRendererRegister {
 
             new RendererData<>(JEntityTypeRegistry.MANDOM, MandomRenderer::new),
             new RendererData<>(JEntityTypeRegistry.TCB, TCBRenderer::new),
+            new RendererData<>(JEntityTypeRegistry.ENERGY_COUNTER, JEntityRendererRegister::createEmpty),
 
             new RendererData<>(JEntityTypeRegistry.STAND_METEOR, StandMeteorRenderer::new),
             new RendererData<>(JEntityTypeRegistry.TRAINING_DUMMY, TrainingDummyRenderer::new),

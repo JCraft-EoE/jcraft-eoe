@@ -18,12 +18,12 @@
 				{
 					"name": "mandom",
 					"parent": "base",
-					"pivot": [0, 23.05654, -0.23929]
+					"pivot": [0, 24, 0]
 				},
 				{
 					"name": "body",
 					"parent": "mandom",
-					"pivot": [0, 23.05654, -0.23929],
+					"pivot": [0, 24, 0],
 					"cubes": [
 						{"origin": [-1.6, 23.65, -2.675], "size": [3, 5, 3], "uv": [19, 44]},
 						{"origin": [-4.5, 22.7, -3.5], "size": [9, 1, 7], "uv": [2, 12]},
@@ -40,12 +40,12 @@
 				{
 					"name": "upperbody",
 					"parent": "body",
-					"pivot": [0, 23.05654, -0.23929]
+					"pivot": [0, 24, 0]
 				},
 				{
 					"name": "head",
 					"parent": "upperbody",
-					"pivot": [0, 27.05654, -1.23929]
+					"pivot": [0, 24, 0]
 				},
 				{
 					"name": "swivel",
@@ -81,7 +81,7 @@
 				{
 					"name": "tentaclese",
 					"parent": "mandom",
-					"pivot": [0, 23.05654, -0.23929]
+					"pivot": [0, 24, 0]
 				},
 				{
 					"name": "tube",
@@ -726,7 +726,7 @@
 				{
 					"name": "clock",
 					"parent": "base",
-					"pivot": [0, 23.05654, -0.23929],
+					"pivot": [0, 24, 0],
 					"cubes": [
 						{"origin": [-1, 30.55654, -1.23929], "size": [11, 4, 0], "uv": [0, 106]}
 					]

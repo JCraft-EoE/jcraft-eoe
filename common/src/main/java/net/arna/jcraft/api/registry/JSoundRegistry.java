@@ -278,6 +278,9 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> METALLICA_RAZOR_VOMIT_PREPARE = register("mrazorvomitprepare");
     RegistrySupplier<SoundEvent> METALLICA_BLADE_SWIPE = register("mbladeswipe");
 
+    // 20th Century Boy
+    RegistrySupplier<SoundEvent> TCB_POP = register("tcbpop");
+
     // Mandom
     RegistrySupplier<SoundEvent> MANDOM_REWIND = register("mandomrewind");
     RegistrySupplier<SoundEvent> MANDOM_SUMMON = register("mandomsummon");
