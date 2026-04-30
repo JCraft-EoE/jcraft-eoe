@@ -421,6 +421,8 @@
   "entity.jcraft.the_sun.info.skin1": ":D",
   "entity.jcraft.the_sun.info.skin2": "Neutron Star",
   "entity.jcraft.the_sun.info.skin3": "Dark",
+  "entity.jcraft.the_sun.passive": "PASSIVE",
+  "entity.jcraft.the_sun.active": "ACTIVE",
   "entity.jcraft.thefool": "The Fool",
   "entity.jcraft.thefool.info.con1": "overall slow",
   "entity.jcraft.thefool.info.con2": "extremely susceptible to rushdown",
