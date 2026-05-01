@@ -11,12 +11,14 @@ import net.arna.jcraft.client.rendering.shader.texture.api.ShaderSampler;
 import net.arna.jcraft.client.rendering.shader.texture.impl.GLShaderTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import org.lwjgl.opengl.GL33C;
 
 public class SpecialParticleShaderEffect extends ShaderEffect implements DisplayResizeCallback, PostShaderRenderCallback {
     private ShaderSampler colorSampler, effectSampler;
     private RenderTarget effectTarget;
+    private final boolean usesDepth;
 
-    public SpecialParticleShaderEffect(ResourceLocation fragmentPath)
+    public SpecialParticleShaderEffect(ResourceLocation fragmentPath, boolean usesDepth)
     {
         super(
                 new ShaderEffect.LinkData(
@@ -30,8 +32,10 @@ public class SpecialParticleShaderEffect extends ShaderEffect implements Display
 
         linkData.freeze();
 
-//        DisplayResizeCallback.EVENT.register(this);
-//        PostShaderRenderCallback.EVENT.register(this);
+        this.usesDepth = false;
+
+        DisplayResizeCallback.EVENT.register(this);
+        PostShaderRenderCallback.EVENT.register(this);
     }
 
     @Override
@@ -40,14 +44,23 @@ public class SpecialParticleShaderEffect extends ShaderEffect implements Display
 
         this.colorSampler = getSampler("DiffuseSampler");
         this.effectSampler = getSampler("EffectSampler");
+
+        Minecraft minecraft = Minecraft.getInstance();
+
+        this.effectTarget = new TextureTarget(minecraft.getMainRenderTarget().width, minecraft.getMainRenderTarget().height, usesDepth, Minecraft.ON_OSX);
     }
 
     @Override
     public void update(float tickProgress) { }
 
-    public void prepare(boolean copyDepth)
+    int oldFramebuffer = 0;
+
+    public void prepare()
     {
-        if (copyDepth) this.effectTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+        oldFramebuffer = GL33C.glGetInteger(GL33C.GL_DRAW_FRAMEBUFFER_BINDING);
+        if (this.effectTarget == null || this.effectTarget.getColorTextureId() == 0) return;
+
+//        if (usesDepth) this.effectTarget.copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
         this.effectTarget.bindWrite(true);
     }
 
@@ -58,11 +71,13 @@ public class SpecialParticleShaderEffect extends ShaderEffect implements Display
             this.effectTarget.resize(width, height, Minecraft.ON_OSX);
             return;
         }
-        this.effectTarget = new TextureTarget(width, height, false, Minecraft.ON_OSX);
+        this.effectTarget = new TextureTarget(width, height, usesDepth, Minecraft.ON_OSX);
     }
 
     @Override
     public void renderEffect(float tickDelta) {
+        if (this.effectTarget == null || this.effectTarget.getColorTextureId() == 0) return;
+
         this.program.pass(()->{
             this.colorSampler.bindTexture(GLShaderTexture.fromGlHandle(Minecraft.getInstance().getMainRenderTarget().getColorTextureId()));
             this.effectSampler.bindTexture(GLShaderTexture.fromGlHandle(this.effectTarget.getColorTextureId()));
@@ -71,5 +86,8 @@ public class SpecialParticleShaderEffect extends ShaderEffect implements Display
         });
 
         this.effectTarget.clear(Minecraft.ON_OSX);
+        this.effectTarget.unbindWrite();
+
+        GL33C.glBindFramebuffer(GL33C.GL_DRAW_FRAMEBUFFER, oldFramebuffer);
     }
 }

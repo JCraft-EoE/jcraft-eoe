@@ -36,8 +36,8 @@ public class JShaderRegistry {
         TIMESTOP_EFFECT  = register("Timestop", new TimestopShaderEffect());
         TIME_ERASE       = register("Time Erase", new TimeEraseShaderEffect());
         EPITAPH_VIGNETTE = register("Epitaph Vignette", new EpitaphVignetteShaderEffect());
-        INVERSION        = register("Inversion", new SpecialParticleShaderEffect(JCraft.id("shaders/program/invert.fsh")));
-        OVERLAP          = register("Overlap", new SpecialParticleShaderEffect(JCraft.id("shaders/program/overlap.fsh")));
+        INVERSION        = register("Inversion", new SpecialParticleShaderEffect(JCraft.id("shaders/program/invert.fsh"), true));
+        OVERLAP          = register("Overlap", new SpecialParticleShaderEffect(JCraft.id("shaders/program/overlap.fsh"), false));
 
         freezeRegistry();
 
