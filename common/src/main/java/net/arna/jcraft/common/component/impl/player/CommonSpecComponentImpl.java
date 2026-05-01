@@ -56,9 +56,7 @@ public abstract class CommonSpecComponentImpl implements CommonSpecComponent {
 
     public void readFromNbt(final @NonNull CompoundTag tag) {
         SpecType type = SpecTypeUtil.readFromNBT(tag, "Type");
-        if (type != null) {
-            setTypeRaw(type, true);
-        }
+        setTypeRaw(type, true);
     }
 
     public void writeToNbt(final @NonNull CompoundTag tag) {
