@@ -10,16 +10,18 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.ai.AttackerBrainInfo;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.ShaderDeactivationPacket;
+import net.arna.jcraft.common.tickable.JEnemies;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -80,6 +82,7 @@ public final class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimson
             clone.setShouldRenderForMaster(false);
             clone.disableDrops();
             clone.disableItemExchange();
+            clone.setKind(PlayerCloneEntity.CloneKind.KING_CRIMSON);
 
             // Copy properties
             clone.setMaster(player);
@@ -116,6 +119,8 @@ public final class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimson
 
         // Look at enemy
         doppelganger.setTarget(user.getLastHurtByMob());
+
+        JEnemies.add(doppelganger, new AttackerBrainInfo(0));
 
         attacker.level().addFreshEntity(doppelganger);
 

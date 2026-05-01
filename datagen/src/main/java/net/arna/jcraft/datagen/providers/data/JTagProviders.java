@@ -13,6 +13,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.*;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -29,41 +31,47 @@ public class JTagProviders {
 
         @Override
         protected void addTags(HolderLookup.Provider arg) {
-            getOrCreateRawBuilder(BlockTags.MINEABLE_WITH_PICKAXE).addElement(JBlockRegistry.METEORITE_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.MINEABLE_WITH_PICKAXE).addElement(JBlockRegistry.POLISHED_METEORITE_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.MINEABLE_WITH_PICKAXE).addElement(JBlockRegistry.METEORITE_IRON_ORE_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.MINEABLE_WITH_PICKAXE).addElement(JBlockRegistry.STELLAR_IRON_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.MINEABLE_WITH_PICKAXE).addElement(JBlockRegistry.CINDERELLA_GREEN_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.NEEDS_DIAMOND_TOOL).addElement(JBlockRegistry.METEORITE_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.NEEDS_DIAMOND_TOOL).addElement(JBlockRegistry.POLISHED_METEORITE_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.NEEDS_DIAMOND_TOOL).addElement(JBlockRegistry.METEORITE_IRON_ORE_BLOCK.getId());
+            getOrCreateRawBuilder(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .addElement(JBlockRegistry.METEORITE_BLOCK.getId())
+                    .addElement(JBlockRegistry.POLISHED_METEORITE_BLOCK.getId())
+                    .addElement(JBlockRegistry.METEORITE_IRON_ORE_BLOCK.getId())
+                    .addElement(JBlockRegistry.STELLAR_IRON_BLOCK.getId())
+                    .addElement(JBlockRegistry.CINDERELLA_GREEN_BLOCK.getId());
+            getOrCreateRawBuilder(BlockTags.NEEDS_DIAMOND_TOOL)
+                    .addElement(JBlockRegistry.METEORITE_BLOCK.getId())
+                    .addElement(JBlockRegistry.POLISHED_METEORITE_BLOCK.getId())
+                    .addElement(JBlockRegistry.METEORITE_IRON_ORE_BLOCK.getId());
             getOrCreateRawBuilder(BlockTags.NEEDS_IRON_TOOL).addElement(JBlockRegistry.STELLAR_IRON_BLOCK.getId());
             getOrCreateRawBuilder(BlockTags.MINEABLE_WITH_SHOVEL).addElement(JBlockRegistry.HOT_SAND_BLOCK.getId());
             getOrCreateRawBuilder(BlockTags.MINEABLE_WITH_AXE).addElement(JBlockRegistry.SOUL_WOOD_BLOCK.getId());
 
             getOrCreateRawBuilder(BlockTags.LOGS_THAT_BURN).addTag(JTagRegistry.SOUL_LOG_BLOCKS.location());
-            getOrCreateRawBuilder(BlockTags.SOUL_SPEED_BLOCKS).addElement(JBlockRegistry.SOUL_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.SOUL_SPEED_BLOCKS).addElement(JBlockRegistry.SOUL_WOOD_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.SOUL_FIRE_BASE_BLOCKS).addElement(JBlockRegistry.SOUL_BLOCK.getId());
-            getOrCreateRawBuilder(BlockTags.SOUL_FIRE_BASE_BLOCKS).addElement(JBlockRegistry.SOUL_WOOD_BLOCK.getId());
+            getOrCreateRawBuilder(BlockTags.SOUL_SPEED_BLOCKS)
+                    .addElement(JBlockRegistry.SOUL_BLOCK.getId())
+                    .addElement(JBlockRegistry.SOUL_WOOD_BLOCK.getId());
+            getOrCreateRawBuilder(BlockTags.SOUL_FIRE_BASE_BLOCKS)
+                    .addElement(JBlockRegistry.SOUL_BLOCK.getId())
+                    .addElement(JBlockRegistry.SOUL_WOOD_BLOCK.getId());
             getOrCreateRawBuilder(BlockTags.BEACON_BASE_BLOCKS).addElement(JBlockRegistry.STELLAR_IRON_BLOCK.getId());
             // we do not want bamboo on hot sand, hence we do not add hot sand to the sand tag
             getOrCreateRawBuilder(BlockTags.SNOW_LAYER_CANNOT_SURVIVE_ON).addElement(JBlockRegistry.HOT_SAND_BLOCK.getId());
 
             getOrCreateRawBuilder(JTagRegistry.SOUL_LOG_BLOCKS).addElement(JBlockRegistry.SOUL_WOOD_BLOCK.getId());
 
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_BLOCK));
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_BARS));
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_DOOR));
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_TRAPDOOR));
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_ORE));
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.DEEPSLATE_IRON_ORE));
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.RAW_IRON_BLOCK));
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.ANVIL));
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.CHIPPED_ANVIL));
-            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.DAMAGED_ANVIL));
+            getOrCreateRawBuilder(JTagRegistry.IRON_BLOCKS)
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_BLOCK))
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_BARS))
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_DOOR))
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_TRAPDOOR))
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.IRON_ORE))
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.DEEPSLATE_IRON_ORE))
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.RAW_IRON_BLOCK))
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.ANVIL))
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.CHIPPED_ANVIL))
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.DAMAGED_ANVIL));
 
-            getOrCreateRawBuilder(JTagRegistry.DUMMY_KNOCKBACK_BLOCKING).addElement(BuiltInRegistries.BLOCK.getKey(Blocks.CUT_RED_SANDSTONE_SLAB));
+            getOrCreateRawBuilder(JTagRegistry.DUMMY_KNOCKBACK_BLOCKING)
+                    .addElement(BuiltInRegistries.BLOCK.getKey(Blocks.CUT_RED_SANDSTONE_SLAB));
 
             final var auReplacedWithAir = getOrCreateTagBuilder(JTagRegistry.AU_REPLACED_WITH_AIR);
             auReplacedWithAir.add(Blocks.NETHER_PORTAL);
@@ -635,6 +643,12 @@ public class JTagProviders {
             gravityForbiddenEntitiesRendering.add(EntityType.GLOW_ITEM_FRAME);
             gravityForbiddenEntitiesRendering.add(EntityType.PAINTING);
 
+            final var unaffectedByEpitaph = getOrCreateTagBuilder(JTagRegistry.UNAFFECTED_BY_EPITAPH);
+            unaffectedByEpitaph.add(EntityType.ITEM_FRAME);
+            unaffectedByEpitaph.add(EntityType.GLOW_ITEM_FRAME);
+            unaffectedByEpitaph.add(EntityType.PAINTING);
+            unaffectedByEpitaph.add(EntityType.ARMOR_STAND);
+
             addTagsForCompatibilities(arg);
         }
 
@@ -678,4 +692,19 @@ public class JTagProviders {
         }
     }
 
+    public static class JDamageTypeTags extends FabricTagProvider<DamageType> {
+        public JDamageTypeTags(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+            super(output, Registries.DAMAGE_TYPE, registriesFuture);
+        }
+
+        @Override
+        protected void addTags(HolderLookup.Provider provider) {
+            getOrCreateTagBuilder(JTagRegistry.STAND_IMMUNE)
+                    .add(DamageTypes.ON_FIRE)
+                    .add(DamageTypes.IN_FIRE)
+                    .add(DamageTypes.LAVA)
+                    .add(DamageTypes.FALLING_BLOCK)
+                    .add(DamageTypes.DROWN);
+        }
+    }
 }

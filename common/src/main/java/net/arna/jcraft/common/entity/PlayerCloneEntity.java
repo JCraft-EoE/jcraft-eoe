@@ -1,10 +1,14 @@
 package net.arna.jcraft.common.entity;
 
 import com.mojang.authlib.GameProfile;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.arna.jcraft.common.entity.ai.goal.CloneAttackGoal;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -49,6 +53,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class PlayerCloneEntity extends Monster implements RangedAttackMob, IOwnable {
+    public enum CloneKind {
+        NORMAL,
+        KING_CRIMSON,
+    }
+
     private static final EntityDataAccessor<Optional<UUID>> MASTER;
     private static final EntityDataAccessor<String> MASTER_NAME;
     private static final EntityDataAccessor<Boolean> SAND, RENDER_FOR_MASTER;
@@ -65,6 +74,8 @@ public class PlayerCloneEntity extends Monster implements RangedAttackMob, IOwna
             PlayerCloneEntity.this.setAggressive(true);
         }
     };
+    @Getter
+    @Setter
     private boolean allowItemExchange = true;
 
     private GameProfile gameProfile;
@@ -74,6 +85,8 @@ public class PlayerCloneEntity extends Monster implements RangedAttackMob, IOwna
     private int cooldown, maxCooldown;
     private final PathNavigation navigation;
     private int disabledSlots;
+    @Getter @Setter
+    private CloneKind kind = CloneKind.NORMAL;
 
     static {
         MASTER = SynchedEntityData.defineId(PlayerCloneEntity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -350,6 +363,11 @@ public class PlayerCloneEntity extends Monster implements RangedAttackMob, IOwna
 
             //JCraft.getClientEntityHandler().playerCloneEntityClientTick(this);
         } else if (master == null) {
+            if (kind == CloneKind.KING_CRIMSON) {
+                discard();
+                return;
+            }
+
             // Run every 2 seconds (player lists are rather expensive)
             if (tickCount % 40 == 0) {
                 // If the master id is set, but the master isn't (when loaded via NBT data), find master
@@ -393,6 +411,22 @@ public class PlayerCloneEntity extends Monster implements RangedAttackMob, IOwna
                 if (!navigation.isDone()) {
                     navigation.stop();
                 }
+            }
+        }
+
+        if (kind == CloneKind.KING_CRIMSON) {
+            final var stand = JUtils.getStand(master);
+            if (stand == null) {
+                discard();
+                return;
+            }
+
+            if (stand instanceof KingCrimsonEntity kc) {
+                if (kc.getTETime() <= 0) {
+                    discard();
+                }
+            } else {
+                discard();
             }
         }
     }

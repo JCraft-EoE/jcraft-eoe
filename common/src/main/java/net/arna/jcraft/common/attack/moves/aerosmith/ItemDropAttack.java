@@ -9,13 +9,13 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,7 +50,7 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
     public @NonNull Set<LivingEntity> perform(final AerosmithEntity attacker, final LivingEntity user) {
         if (user != null) {
             final ItemStack itemStack = user.getItemInHand(InteractionHand.MAIN_HAND);
-            if (itemStack.isEmpty()) {
+            if (itemStack.isEmpty() && !itemStack.is(JTagRegistry.UNTHROWABLE)) {
                 return Set.of();
             }
             attacker.setHeldItem(itemStack.copyWithCount(1));
@@ -71,6 +71,11 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
         }
 
         return Set.of();
+    }
+
+    @Override
+    public boolean conditionsMet(AerosmithEntity attacker) {
+        return super.conditionsMet(attacker) && JUtils.isHoldingSomethingThrowable(attacker.getUser());
     }
 
     @Override

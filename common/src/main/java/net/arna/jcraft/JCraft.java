@@ -95,6 +95,7 @@ import static net.arna.jcraft.api.registry.JMoveActionTypeRegistry.MOVE_ACTION_T
 import static net.arna.jcraft.api.registry.JMoveConditionTypeRegistry.MOVE_CONDITION_TYPE_REGISTRY;
 import static net.arna.jcraft.api.registry.JMoveTypeRegistry.MOVE_TYPE_REGISTRY;
 import static net.arna.jcraft.api.registry.JSpecTypeRegistry.SPEC_TYPE_REGISTRY;
+import static net.arna.jcraft.api.registry.JSplatterTypeRegistry.SPLATTER_TYPE_REGISTRY;
 import static net.arna.jcraft.api.registry.JStandTypeRegistry.STAND_TYPE_REGISTRY;
 import static net.minecraft.world.level.GameRules.*;
 
@@ -195,6 +196,7 @@ public final class JCraft {
         MOVE_TYPE_REGISTRY.register();
         EXTRACTOR_REGISTRY.register();
         INJECTOR_REGISTRY.register();
+        SPLATTER_TYPE_REGISTRY.register();
 
         JTagRegistry.init();
         JAdvancementTriggerRegistry.init();

@@ -24,10 +24,8 @@ import net.arna.jcraft.common.attack.moves.aerosmith.*;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -35,7 +33,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -117,6 +114,12 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Non-remote: a straight charge, rising at the end. Carries enemies with Aerosmith.")
             );
 
+    public static final BreathXrayMove<AerosmithEntity> XRAY = new BreathXrayMove<AerosmithEntity>(0, 0, 64)
+            .withInfo(
+                    Component.literal("Breath Detection"),
+                    Component.literal("Aerosmith scans the surroundings for the breath of living things.")
+            );
+
     public static final StandData DATA = StandData.builder()
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.aerosmith"))
@@ -135,6 +138,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         // setYDistanceOffset(10f); // TODO for patrol mode
         setYDistanceOffset(1.2f);
         setNoGravity(true);
+        noPhysics = true;
     }
 
     @NonNull
@@ -163,15 +167,30 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         moves.registerImmediate(MoveClass.HEAVY, BOMB_DROP, State.ACTIVE);
         moves.registerImmediate(MoveClass.UTILITY, PATROL, State.ACTIVE);
         moves.registerImmediate(MoveClass.BARRAGE, CHARGE, State.CHARGE);
+        moves.register(MoveClass.SPECIAL3, XRAY);
     }
 
-    private float xRotPersist = 0.0f;
+    boolean xRotChangeAllowed = false;
+
+    @Override
+    public void setXRot(float xRot) {
+        if (!xRotChangeAllowed) return;
+        super.setXRot(xRot);
+    }
+
+    @Override
+    public boolean canBlock() {
+        if (isRemote()) return false;
+        return super.canBlock();
+    }
 
     @Override
     public void tick() {
-        setXRot(xRotPersist);
+        xRotChangeAllowed = false;
 
         super.tick();
+
+        xRotChangeAllowed = true;
 
         resetFallDistance();
 
@@ -187,8 +206,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         if (currentMove == null) {
             switch (flyState) {
                 case PATROL -> {
+                    final float theta = tickCount / patrolRadius / 2.0f;
                     final Vec3 offset = RotationUtil.vecPlayerToWorld(
-                            Mth.sin(tickCount / 100.0f) * patrolRadius, 1.0, Mth.cos(tickCount / 100.0f) * patrolRadius,
+                            Mth.sin(theta) * patrolRadius, 1.0, Mth.cos(theta) * patrolRadius,
                             GravityChangerAPI.getGravityDirection(this)
                     );
 
@@ -225,7 +245,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             }
         }
 
-        xRotPersist = getXRot();
+        xRotChangeAllowed = false;
     }
 
     @Override

@@ -325,6 +325,10 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> BULLET_RICOCHET = register("bulletricochet");
     RegistrySupplier<SoundEvent> BULLET_PENETRATE = register("bulletpenetrate");
     RegistrySupplier<SoundEvent> LOAD = register("reload");
+    RegistrySupplier<SoundEvent> GAS_CAN_TOSS = register("gas_can_toss");
+    RegistrySupplier<SoundEvent> GAS_CAN_SPILL = register("gas_can_spill");
+    RegistrySupplier<SoundEvent> GAS_CAN_CRASH = register("gas_can_crash");
+    RegistrySupplier<SoundEvent> MATCHBOX_USE = register("matchbox_use");
 
     // ROAD ROLLER
     RegistrySupplier<SoundEvent> ROAD_ROLLER_HIT = register("rrhit");

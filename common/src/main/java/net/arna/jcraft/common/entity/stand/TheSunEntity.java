@@ -5,16 +5,18 @@ import lombok.NonNull;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.Attacks;
-import net.arna.jcraft.api.stand.StandData;
-import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.api.stand.StandInfo;
-import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.api.stand.StandData;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.api.stand.StandInfo;
+import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.client.renderer.entity.stands.TheSunRenderer;
 import net.arna.jcraft.common.attack.moves.shared.NoOpMove;
 import net.arna.jcraft.common.attack.moves.thesun.FireMeteorAttack;
@@ -24,9 +26,6 @@ import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -47,6 +46,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -306,7 +306,9 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     private void togglePassive() {
         boolean newPassive = !entityData.get(PASSIVE);
         entityData.set(PASSIVE, newPassive);
-        getUserOrThrow().sendSystemMessage(Component.nullToEmpty(newPassive ? "PASSIVE" : "ACTIVE"));
+        if (getUserOrThrow() instanceof Player player)
+            player.displayClientMessage(Component.translatable("entity.jcraft.the_sun." +
+                    (newPassive ? "passive" : "active")), true);
     }
 
     public boolean isPassive() {
