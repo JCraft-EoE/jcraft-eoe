@@ -46,6 +46,8 @@ public class JCraftHelpCommand {
                         Displays information about moves your stand or spec did after starting the command
                         §c/jgravity§r
                         Sets your gravity direction
+                        §c/jwiki§r
+                        Sends a link to the OFFICIAL Jcraft:EoE Wiki
                         """), false
         );
         // https://trello.com/b/B5Q7ZthB/jcraft-eyes-of-ender-community-trello
