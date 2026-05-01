@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
@@ -49,7 +50,7 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
     public @NonNull Set<LivingEntity> perform(final AerosmithEntity attacker, final LivingEntity user) {
         if (user != null) {
             final ItemStack itemStack = user.getItemInHand(InteractionHand.MAIN_HAND);
-            if (itemStack.isEmpty()) {
+            if (itemStack.isEmpty() && !itemStack.is(JTagRegistry.UNTHROWABLE)) {
                 return Set.of();
             }
             attacker.setHeldItem(itemStack.copyWithCount(1));
@@ -74,7 +75,7 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
 
     @Override
     public boolean conditionsMet(AerosmithEntity attacker) {
-        return super.conditionsMet(attacker) && JUtils.isHoldingSomething(attacker.getUser());
+        return super.conditionsMet(attacker) && JUtils.isHoldingSomethingThrowable(attacker.getUser());
     }
 
     @Override

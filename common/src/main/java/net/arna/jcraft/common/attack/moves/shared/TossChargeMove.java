@@ -51,7 +51,7 @@ public final class TossChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
 
     @Override
     public boolean conditionsMet(A attacker) {
-        return super.conditionsMet(attacker) && JUtils.isHoldingSomething(attacker.getUser());
+        return super.conditionsMet(attacker) && JUtils.isHoldingSomethingThrowable(attacker.getUser());
     }
 
     @Override

@@ -1015,13 +1015,15 @@ public final class JUtils {
         return pred.test(state);
     }
 
-    public static boolean isHoldingSomething(LivingEntity user) {
+    public static boolean isHoldingSomethingThrowable(LivingEntity user) {
         if (user == null) return false;
 
-        ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
-        if (!mainHandStack.isEmpty()) return true;
+        final ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!mainHandStack.isEmpty() && !mainHandStack.is(JTagRegistry.UNTHROWABLE)) {
+            return true;
+        }
 
-        ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
-        return !offHandStack.isEmpty();
+        final ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
+        return !offHandStack.isEmpty() && !offHandStack.is(JTagRegistry.UNTHROWABLE);
     }
 }
