@@ -1,15 +1,16 @@
 package net.arna.jcraft.fabric.client;
 
 import dev.architectury.registry.client.level.entity.EntityModelLayerRegistry;
-import net.arna.jcraft.api.registry.JBlockEntityTypeRegistry;
-import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.client.JCraftClient;
+import net.arna.jcraft.client.events.JClientEvents;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.registry.JEntityModelLayerRegistry;
 import net.arna.jcraft.client.registry.JEntityRendererRegister;
 import net.arna.jcraft.client.registry.JItemPropertiesRegistry;
 import net.arna.jcraft.client.renderer.block.CoffinTileRenderer;
-import net.arna.jcraft.client.renderer.effects.ShockwaveEffectRenderer;
+import net.arna.jcraft.client.renderer.effects.*;
+import net.arna.jcraft.api.registry.JBlockEntityTypeRegistry;
+import net.arna.jcraft.api.registry.JItemRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -31,23 +32,23 @@ public final class JCraftFabricClient implements ClientModInitializer {
 
         JCraftClient.registerParticleSpriteSets();
 
-//        WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
-//            JClientEvents.afterTranslucent(context.matrixStack(), context.camera().getPosition(), context.worldRenderer());
-//        });
-//
-//        WorldRenderEvents.LAST.register(context -> {
-//            JClientEvents.onLast(context.matrixStack(), context.camera().getPosition());
-//        });
-//
-//        WorldRenderEvents.START.register(context -> {
-//            TimeAccelerationEffectRenderer.render(context.world());
-//        });
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
+            JClientEvents.afterTranslucent(context.matrixStack(), context.camera().getPosition(), context.worldRenderer());
+        });
+
+        WorldRenderEvents.LAST.register(context -> {
+            JClientEvents.onLast(context.matrixStack(), context.camera().getPosition());
+        });
+
+        WorldRenderEvents.START.register(context -> {
+            TimeAccelerationEffectRenderer.render(context.world());
+        });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-//            AttackHitboxEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.worldRenderer(), context.consumers());
+            AttackHitboxEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.worldRenderer(), context.consumers());
             ShockwaveEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.consumers());
-//            SplatterEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.tickDelta(), context.consumers());
-//            TimeErasePredictionEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.tickDelta(), context.consumers());
+            SplatterEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.tickDelta(), context.consumers());
+            TimeErasePredictionEffectRenderer.render(context.matrixStack(), context.camera().getPosition(), context.world(), context.tickDelta(), context.consumers());
         });
 
         if (JItemRegistry.DEBUG_WAND != null) {
