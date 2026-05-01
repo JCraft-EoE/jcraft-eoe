@@ -666,10 +666,14 @@ public final class JUtils {
 
     public static boolean canHoldMove(ServerPlayer player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
-        JSpec<?, ?> spec;
-        return stand != null && stand.canHoldMove(type) ||
-                (spec = JUtils.getSpec(player)) != null && spec.canHoldMove(type) ||
-                type.isHoldable(stand != null && stand.isStandby());
+        if (stand != null && stand.allowMoveHandling()) {
+            return stand.canHoldMove(type) || type.isHoldable(stand.isStandby());
+        }
+        JSpec<?, ?> spec = JUtils.getSpec(player);
+        if (spec != null && spec.canHoldMove(type)) {
+            return true;
+        }
+        return type.isHoldable(stand != null && stand.isStandby());
     }
 
     /**
