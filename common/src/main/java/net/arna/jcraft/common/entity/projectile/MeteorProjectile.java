@@ -1,9 +1,11 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
+import lombok.Setter;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
@@ -46,6 +48,7 @@ public class MeteorProjectile extends AbstractArrow {
     private int ticksInAir = 0;
     private int ticksInGround = 0;
     private final @Nullable TheSunEntity sun;
+    @Setter
     private boolean explosive = false;
 
     static {
@@ -92,10 +95,6 @@ public class MeteorProjectile extends AbstractArrow {
         return SoundEvents.FIRECHARGE_USE;
     }
 
-    public void setExplosive(boolean explosive) {
-        this.explosive = explosive;
-    }
-
     @Override
     protected void onHitEntity(@NonNull EntityHitResult entityHitResult) {
         Entity owner = getOwner();
@@ -131,7 +130,8 @@ public class MeteorProjectile extends AbstractArrow {
         if (!level().isClientSide()) {
             final Direction movementDirection = getMotionDirection();
             final BlockPos blockPos2 = blockPosition(); //.offset(movementDirection);
-            if (BaseFireBlock.canBePlacedAt(level(), blockPos2, movementDirection)) {
+            final boolean mayBreak = getOwner() instanceof LivingEntity le && AbstractMove.mayBreak(le, blockPos2);
+            if (BaseFireBlock.canBePlacedAt(level(), blockPos2, movementDirection) && mayBreak) {
                 //world.playSound(null, blockPos2, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, world.getRandom().nextFloat() * 0.4F + 0.8F);
                 BlockState blockState2 = BaseFireBlock.getState(level(), blockPos2);
                 level().setBlock(blockPos2, blockState2, 11);

@@ -992,6 +992,11 @@ public final class JUtils {
 
     public static boolean mayAlter(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
                                    @Nullable Predicate<BlockState> pred) {
+        return mayAlter(level, user, pos, pred, true);
+    }
+
+    public static boolean mayAlter(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
+                                   @Nullable Predicate<BlockState> pred, boolean checkMayBuild) {
         ServerLevel serverLevel = level instanceof ServerLevel sl ? sl : null;
         ServerPlayer player = user instanceof ServerPlayer p ? p : null;
 
@@ -999,8 +1004,8 @@ public final class JUtils {
         boolean mobGriefing = level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
         boolean isSpawnProtected = serverLevel != null && player != null && pos != null &&
                 serverLevel.getServer().isUnderSpawnProtection(serverLevel, pos, player);
-        boolean mayBuild = !isPlayer || pos == null ||
-                player.mayBuild() && FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
+        boolean mayBuild = !isPlayer || pos == null || (!checkMayBuild || player.mayBuild()) &&
+                FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
 
         boolean mayAttempt = (isPlayer || mobGriefing) && !isSpawnProtected && mayBuild;
         if (!mayAttempt || pos == null || pred == null) return mayAttempt;
@@ -1010,13 +1015,15 @@ public final class JUtils {
         return pred.test(state);
     }
 
-    public static boolean isHoldingSomething(LivingEntity user) {
+    public static boolean isHoldingSomethingThrowable(LivingEntity user) {
         if (user == null) return false;
 
-        ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
-        if (!mainHandStack.isEmpty()) return true;
+        final ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!mainHandStack.isEmpty() && !mainHandStack.is(JTagRegistry.UNTHROWABLE)) {
+            return true;
+        }
 
-        ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
-        return !offHandStack.isEmpty();
+        final ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
+        return !offHandStack.isEmpty() && !offHandStack.is(JTagRegistry.UNTHROWABLE);
     }
 }

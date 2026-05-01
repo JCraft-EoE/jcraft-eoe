@@ -94,7 +94,7 @@ public class GasolineSplatter extends Splatter {
                 // Ensure we can place fire here
                 .filter(p -> FireBlock.canBePlacedAt(getWorld(), p, d))
                 // Ensure we're allowed to place fire here
-                .filter(p -> getCreator() != null && JUtils.mayAlter(getWorld(), getCreator(), p, null))
+                .filter(p -> getCreator() != null && JUtils.mayAlter(getWorld(), getCreator(), p, null, false))
                 .map(BlockPos::new) // They're re-using a mutable object
                 .toList();
 
