@@ -18,7 +18,8 @@ public class SheerHeartAttackRenderer extends AbstractEntityRenderer<SheerHeartA
 
     public SheerHeartAttackRenderer(final EntityRendererProvider.Context context) {
         super(context, () -> new EntityAnimator<>(ID), b -> b
-                .setRenderType(RENDER_TYPE),
+                        .setRenderType(RENDER_TYPE)
+                        .setScale(0.5f),
                 ID);
     }
 

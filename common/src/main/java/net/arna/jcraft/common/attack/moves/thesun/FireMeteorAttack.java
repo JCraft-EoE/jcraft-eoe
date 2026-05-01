@@ -66,8 +66,8 @@ public class FireMeteorAttack extends AbstractMove<FireMeteorAttack, TheSunEntit
     public @NonNull Set<LivingEntity> perform(TheSunEntity attacker, LivingEntity user) {
         Vec3 pos = attacker.randomPos();
         for (int i = 0; i < meteors; i++) {
-            MeteorProjectile meteor = fireMeteor(attacker, user, pos, JUtils.getLookVector(pos, targetPosition).scale(meteorVelocity),
-                    meteorSpeed, meteorDivergence);
+            Vec3 velocity = JUtils.getLookVector(pos, targetPosition).scale(meteorVelocity);
+            MeteorProjectile meteor = fireMeteor(attacker, user, pos, velocity, meteorSpeed, meteorDivergence);
             meteor.setNoGravity(true);
 
             if (explosiveIfMax && attacker.getRawScale() == TheSunEntity.MAX_SCALE) {

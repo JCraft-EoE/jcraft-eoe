@@ -89,6 +89,8 @@ public interface JItemRegistry {
     RegistrySupplier<Item> PRISON_KEY = register("prison_key", () -> new Item(settings()));
     RegistrySupplier<Item> PLANKTON_VIAL = register("plankton_vial", () -> new Item(settings()));
     RegistrySupplier<Item> STEEL_BALL = register("steel_ball", () -> new Item(settings()));
+    RegistrySupplier<Item> GAS_CAN = register("gas_can", () -> new GasCanItem(settings().stacksTo(1)));
+    RegistrySupplier<Item> MATCHBOX = register("matchbox", () -> new MatchboxItem(settings().stacksTo(1)));
 
     int BASE_COLOR = 0xe8cc23;
     int PART_1_COLOR = 0xca7218;

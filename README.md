@@ -3,6 +3,8 @@ JCraft: Eyes of Ender is a sophisticated Minecraft mod for Minecraft 1.20.1 that
 While the mod has a heavy focus on PvP, many stands also add survival features such as barrage mining and they're also great for PvE.
 On top of that, it also adds several structures, specs (like brawler and vampirism) and much more.
 
+You can download the mod on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/jcraft-eyes-of-ender) or [Modrinth](https://modrinth.com/mod/jojo-eyes-of-ender).
+
 ## Addons
 JCraft: Eyes of Ender has support for addons that allow you to add your own stands, moves, specs and more. If you're interested in developing such an addon yourself, we've created an example addon
 you can use as a template to create your own. You can find the [Example Addon here](https://github.com/JCraft-EoE/Example-Addon).

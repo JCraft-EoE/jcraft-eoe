@@ -8,6 +8,7 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractHoldableMove;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -27,25 +28,30 @@ public final class TossChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
     @Override
     public void onInitiate(A attacker) {
         super.onInitiate(attacker);
-        if (attacker instanceof StandEntity<?,?> stand && !stand.level().isClientSide()) {
-            final LivingEntity user = stand.getUser();
-            if (user == null) {
-                return;
-            }
-            ItemStack projectileSource = user.getItemInHand(InteractionHand.MAIN_HAND);
-            if (projectileSource.isEmpty() || projectileSource.is(JTagRegistry.UNTHROWABLE)) {
-                projectileSource = user.getItemInHand(InteractionHand.OFF_HAND);
-            }
-            if (!projectileSource.isEmpty() && !projectileSource.is(JTagRegistry.UNTHROWABLE)) {
-                final ItemStack oldProjectile = stand.getItemInHand(InteractionHand.MAIN_HAND);
-                if (oldProjectile.isEmpty()) {
-                    stand.setItemInHand(InteractionHand.MAIN_HAND, projectileSource.copyWithCount(1));
-                    if (!(user instanceof Player player) || !player.isCreative()) {
-                        projectileSource.shrink(1);
-                    }
-                }
-            }
+        if (!(attacker instanceof StandEntity<?, ?> stand) || stand.level().isClientSide()) return;
+
+        final LivingEntity user = stand.getUser();
+        if (user == null) return;
+
+        ItemStack projectileSource = user.getItemInHand(InteractionHand.MAIN_HAND);
+        if (projectileSource.isEmpty() || projectileSource.is(JTagRegistry.UNTHROWABLE)) {
+            projectileSource = user.getItemInHand(InteractionHand.OFF_HAND);
         }
+
+        if (projectileSource.isEmpty() || projectileSource.is(JTagRegistry.UNTHROWABLE)) return;
+
+        final ItemStack oldProjectile = stand.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!oldProjectile.isEmpty()) return;
+
+        stand.setItemInHand(InteractionHand.MAIN_HAND, projectileSource.copyWithCount(1));
+        if (!(user instanceof Player player) || !player.isCreative()) {
+            projectileSource.shrink(1);
+        }
+    }
+
+    @Override
+    public boolean conditionsMet(A attacker) {
+        return super.conditionsMet(attacker) && JUtils.isHoldingSomethingThrowable(attacker.getUser());
     }
 
     @Override

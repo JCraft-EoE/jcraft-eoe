@@ -74,6 +74,8 @@ public class PlayerCloneEntity extends Monster implements RangedAttackMob, IOwna
             PlayerCloneEntity.this.setAggressive(true);
         }
     };
+    @Getter
+    @Setter
     private boolean allowItemExchange = true;
 
     private GameProfile gameProfile;

@@ -249,7 +249,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         if (!JClientConfig.getInstance().isStandAuras()) {
             return;
         }
-        if (!JUtils.shouldRenderStandsFor(Minecraft.getInstance().player)) {
+        if (!JClientUtils.shouldRenderStands()) {
             return;
         }
 
