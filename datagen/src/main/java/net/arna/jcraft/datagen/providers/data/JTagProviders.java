@@ -678,7 +678,8 @@ public class JTagProviders {
                     .addTag(JTagRegistry.STANDS);
             getOrCreateTagBuilder(TagKey.create(Registries.ENTITY_TYPE,
                     new ResourceLocation("carryon", "entity_blacklist")))
-                    .addTag(JTagRegistry.STANDS);
+                    .addTag(JTagRegistry.STANDS)
+                    .add(JEntityTypeRegistry.PLAYER_CLONE.get());
             getOrCreateTagBuilder(TagKey.create(Registries.ENTITY_TYPE,
                     new ResourceLocation("irons_spellbooks", "cant_root")))
                     .addTag(JTagRegistry.STANDS);
