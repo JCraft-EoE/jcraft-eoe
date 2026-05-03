@@ -91,7 +91,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("Stray Cat Counter"),
                     Component.literal("0.25s windup counter, turns opponent into your primary bomb")
             );
-    public static final BubbleAttack BUBBLE = new BubbleAttack(60, 15, 18, 0.75f)
+    public static final BubbleAttack BUBBLE = new BubbleAttack(120, 15, 18, 0.75f)
             .withCrouchingVariant(BUBBLE_COUNTER)
             .withSound(JSoundRegistry.KQ_UPPERCUT)
             .withInfo(
