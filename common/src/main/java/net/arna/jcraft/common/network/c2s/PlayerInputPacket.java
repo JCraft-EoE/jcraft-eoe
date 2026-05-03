@@ -41,82 +41,7 @@ public class PlayerInputPacket {
 
     static {
         MOVEMENT_INPUT_TYPES = MovementInputType.values().length;
-        TickEvent.SERVER_PRE.register(instance -> {
-            for (ServerPlayer player : instance.getPlayerList().getPlayers()) {
-                InputStateManager sm = getInputStateManager(player);
-
-                // Handle held inputs
-                if (!sm.heldInputs.isEmpty()) {
-                    sm.heldInputs.forEach(
-                            (type, integer) -> {
-                                //JCraft.LOGGER.info("Holding: " + type + ", with remaining heartbeat time: " + integer);
-
-                                if (integer == 0) { // Marked for instant removal by handleMoveInput(), which shouldn't mutate heldInputs.keySet()
-                                    sm.heldInputs.remove(type);
-                                    JSpec<?, ?> spec = JUtils.getSpec(player);
-                                    if (spec != null) {
-                                        spec.onUserMoveInput(type, false, false);
-                                    }
-                                } else {
-                                    Integer newValue = integer - 1;
-                                    // JUtils.canHoldMove() may change after a holdable button was pressed if the player swaps their abilities
-                                    if (newValue <= 0 || !JUtils.canHoldMove(player, type)) {
-                                        instance.execute(() -> {
-                                            boolean success = true;
-                                            JServerPlayerInputEvent.EVENT.invoker().onPlayerInput(player, type, false, success);
-
-                                            StandEntity<?, ?> stand = JUtils.getStand(player);
-                                            if (stand != null && stand.allowMoveHandling()) {
-                                                stand.onUserMoveInput(type, false, success);
-                                                success = false; // If a stand is out, the move input success belongs to it.
-                                            }
-
-                                            JSpec<?, ?> spec = JUtils.getSpec(player);
-                                            if (spec != null) {
-                                                spec.onUserMoveInput(type, false, success);
-                                            }
-                                        });
-                                        sm.heldInputs.remove(type);
-                                    } else {
-                                        sm.heldInputs.put(type, newValue);
-                                    }
-                                }
-                            }
-                    );
-
-                    sm.heldInputs.keySet().forEach(type -> handleMoveInput(instance, player, type));
-                }
-
-                int forward = sm.calcForward();
-                int side = sm.calcSide();
-                JComponentPlatformUtils.getMiscData(player).updateRemoteInputs(forward, side, sm.jumping);
-
-                StandEntity<?, ?> stand = JUtils.getStand(player);
-                if (stand != null) {
-                    stand.updateRemoteInputs(forward, side, sm.jumping, sm.sneaking);
-                }
-
-                if (player.getVehicle() instanceof AbstractGroundVehicleEntity groundVehicle) {
-                    groundVehicle.updateInputs(forward, side, sm.jumping, sm.sneaking);
-                }
-
-                if (sm.dashing) {
-                    DashData.tryDash(forward, side, player);
-                }
-
-                if (!sm.jumping) {
-                    continue;
-                }
-
-                if (DashData.isDashing(player))
-                // 5s cooldown for superjumping
-                {
-                    JComponentPlatformUtils.getCooldowns(player).setCooldown(CooldownType.DASH, 100);
-                }
-
-                checkComboBreak(player);
-            }
-        });
+        TickEvent.SERVER_PRE.register(PlayerInputPacket::tick);
     }
 
     public static FriendlyByteBuf write(Object2BooleanMap<MovementInputType> movementInput, Object2BooleanMap<MoveInputType> moveInput) {
@@ -410,5 +335,83 @@ public class PlayerInputPacket {
 
     public static InputStateManager getInputStateManager(ServerPlayer player) {
         return ((IJInputStateManagerHolder) player).jcraft$getJInputStateManager();
+    }
+
+    private static void tick(MinecraftServer instance) {
+        for (ServerPlayer player : instance.getPlayerList().getPlayers()) {
+            InputStateManager sm = getInputStateManager(player);
+
+            // Handle held inputs
+            if (!sm.heldInputs.isEmpty()) {
+                sm.heldInputs.forEach((type, integer) ->
+                        handleHeldInput(instance, player, type, integer, sm));
+
+                sm.heldInputs.keySet().forEach(type -> handleMoveInput(instance, player, type));
+            }
+
+            int forward = sm.calcForward();
+            int side = sm.calcSide();
+            JComponentPlatformUtils.getMiscData(player).updateRemoteInputs(forward, side, sm.jumping);
+
+            StandEntity<?, ?> stand = JUtils.getStand(player);
+            if (stand != null) {
+                stand.updateRemoteInputs(forward, side, sm.jumping, sm.sneaking);
+            }
+
+            if (player.getVehicle() instanceof AbstractGroundVehicleEntity groundVehicle) {
+                groundVehicle.updateInputs(forward, side, sm.jumping, sm.sneaking);
+            }
+
+            if (sm.dashing) {
+                DashData.tryDash(forward, side, player);
+            }
+
+            if (!sm.jumping) {
+                continue;
+            }
+
+            if (DashData.isDashing(player))
+            // 5s cooldown for superjumping
+            {
+                JComponentPlatformUtils.getCooldowns(player).setCooldown(CooldownType.DASH, 100);
+            }
+
+            checkComboBreak(player);
+        }
+    }
+
+    private static void handleHeldInput(MinecraftServer instance, ServerPlayer player, MoveInputType type, Integer integer, InputStateManager sm) {
+        //JCraft.LOGGER.info("Holding: " + type + ", with remaining heartbeat time: " + integer);
+
+        if (integer == 0) { // Marked for instant removal by handleMoveInput(), which shouldn't mutate heldInputs.keySet()
+            sm.heldInputs.remove(type);
+            JSpec<?, ?> spec = JUtils.getSpec(player);
+            if (spec != null) {
+                spec.onUserMoveInput(type, false, false);
+            }
+        } else {
+            Integer newValue = integer - 1;
+            // JUtils.canHoldMove() may change after a holdable button was pressed if the player swaps their abilities
+            if (newValue <= 0 || !JUtils.canHoldMove(player, type)) {
+                instance.execute(() -> {
+                    boolean success = true;
+                    JServerPlayerInputEvent.EVENT.invoker().onPlayerInput(player, type, false, success);
+
+                    StandEntity<?, ?> stand = JUtils.getStand(player);
+                    if (stand != null && stand.allowMoveHandling()) {
+                        stand.onUserMoveInput(type, false, success);
+                        success = false; // If a stand is out, the move input success belongs to it.
+                    }
+
+                    JSpec<?, ?> spec = JUtils.getSpec(player);
+                    if (spec != null) {
+                        spec.onUserMoveInput(type, false, success);
+                    }
+                });
+                sm.heldInputs.remove(type);
+            } else {
+                sm.heldInputs.put(type, newValue);
+            }
+        }
     }
 }

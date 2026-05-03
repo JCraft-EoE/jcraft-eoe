@@ -23,6 +23,7 @@ import net.arna.jcraft.common.entity.projectile.GasCanProjectile;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.projectile.ScalpelProjectile;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.GasCanItem;
@@ -666,10 +667,14 @@ public final class JUtils {
 
     public static boolean canHoldMove(ServerPlayer player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
-        JSpec<?, ?> spec;
-        return stand != null && stand.canHoldMove(type) ||
-                (spec = JUtils.getSpec(player)) != null && spec.canHoldMove(type) ||
-                type.isHoldable(stand != null && stand.isStandby());
+        if (stand != null && stand.allowMoveHandling()) {
+            return stand.canHoldMove(type) || type.isHoldable(stand.isStandby());
+        }
+        JSpec<?, ?> spec = JUtils.getSpec(player);
+        if (spec != null && spec.canHoldMove(type)) {
+            return true;
+        }
+        return type.isHoldable(stand != null && stand.isStandby());
     }
 
     /**
@@ -1025,5 +1030,20 @@ public final class JUtils {
 
         final ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
         return !offHandStack.isEmpty() && !offHandStack.is(JTagRegistry.UNTHROWABLE);
+    }
+
+    /**
+     * Checks if the given entity is currently using KC for Time Erase
+     * @param entity the entity to check, can be <code>null</code>
+     * @return <code>true</code> if the entity is using KC and in Time Erase, else false
+     */
+    public static boolean inTimeErase(Entity entity) {
+        if (!(entity instanceof LivingEntity living)) {
+            return false;
+        }
+        if (!(getStand(living) instanceof KingCrimsonEntity kc)) {
+            return false;
+        }
+        return kc.getTETime() > 0;
     }
 }

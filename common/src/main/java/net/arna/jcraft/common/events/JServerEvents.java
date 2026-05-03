@@ -457,9 +457,11 @@ public class JServerEvents {
             if (Platform.isModLoaded("jjbacosplay")) {
                 List<CosplayItem<?>> slottedCosplay = COSPLAY.get(slot);
                 if (!slottedCosplay.isEmpty()) {
-                    ArmorItem selected = JUtils.chooseRandom(random,
-                            slottedCosplay.get(random.nextInt(slottedCosplay.size())).getAll()
-                    ).get();
+                    final boolean goldPreferred = mob.getType().is(JTagRegistry.PREFERS_GOLD_DRIP);
+                    final CosplayItem<?> randomCosplay = slottedCosplay.get(random.nextInt(slottedCosplay.size()));
+                    ArmorItem selected = goldPreferred && randomCosplay.get(ArmorMaterials.GOLD) != null
+                        ? randomCosplay.get(ArmorMaterials.GOLD).get()
+                        : JUtils.chooseRandom(random, randomCosplay.getAll()).get();
                     itemStack = new ItemStack(selected);
                     if (VANILLA_MATERIAL.contains(selected.getMaterial())) {
                         armorLevel = ((ArmorMaterials) selected.getMaterial()).ordinal();
