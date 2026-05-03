@@ -1,5 +1,7 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.events.EntityTickEvent;
 import net.arna.jcraft.common.util.JUtils;
@@ -44,6 +46,25 @@ public abstract class EntityMixin implements EntityAddon {
     @Inject(method = "tick", at = @At("HEAD"))
     private void preTick(CallbackInfo ci) {
         EntityTickEvent.ENTITY_PRE.invoker().tick((Entity) (Object) this);
+    }
+
+    @Inject(method = "isInvulnerable", at = @At("HEAD"), cancellable = true)
+    private void invulnerableIfCreaming(CallbackInfoReturnable<Boolean> cir) {
+        if (jcraft$isCreaming())
+            cir.setReturnValue(true);
+    }
+
+    @ModifyExpressionValue(method = "isInvulnerableTo", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/Entity;invulnerable:Z"))
+    private boolean invulnerableIfCreaming(boolean original) {
+        return original || jcraft$isCreaming();
+    }
+
+    private @Unique boolean jcraft$isCreaming() {
+        // Mark user invulnerable if they're using Cream and are voiding.
+        Entity thiz = (Entity) (Object) this;
+        return thiz instanceof LivingEntity le &&
+                JUtils.getStand(le) instanceof CreamEntity cream &&
+                cream.getVoidTime() > 0;
     }
 
     @Override
