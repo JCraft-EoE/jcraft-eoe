@@ -3,9 +3,7 @@ package net.arna.jcraft.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.arna.jcraft.api.registry.JEventsRegistry;
 import net.arna.jcraft.common.events.JBlockEvents;
-import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.util.IJExplosion;
 import net.arna.jcraft.common.util.JExplosionModifier;
 import net.minecraft.core.BlockPos;
@@ -13,12 +11,14 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import java.util.List;
 
-@Mixin(value = Explosion.class)
+@Mixin(Explosion.class)
 public class ExplosionMixin implements IJExplosion {
     @Shadow
     @Final
@@ -45,13 +45,13 @@ public class ExplosionMixin implements IJExplosion {
     // Functionality
     @WrapOperation(
             method = { "finalizeExplosion", "interactsWithBlocks" },
-            at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Explosion;blockInteraction:Lnet/minecraft/world/level/Explosion$BlockInteraction;")
+            at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Explosion;blockInteraction:Lnet/minecraft/world/level/Explosion$BlockInteraction;", opcode = Opcodes.GETFIELD)
     )
     private Explosion.BlockInteraction overrideBlockInteraction(Explosion instance, Operation<Explosion.BlockInteraction> original) {
         return modifier == null || modifier.getBlockInteraction() == null ? original.call(instance) : modifier.getBlockInteraction();
     }
 
-    @ModifyExpressionValue(method = "finalizeExplosion", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Explosion;fire:Z"))
+    @ModifyExpressionValue(method = "finalizeExplosion", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Explosion;fire:Z", opcode = Opcodes.GETFIELD))
     private boolean overrideCreateFire(boolean original) {
         if (modifier == null || modifier.getCreateFire() == null) {
             return original;
@@ -117,5 +117,11 @@ public class ExplosionMixin implements IJExplosion {
                 BlockPos.containing(builder.getParameter(LootContextParams.ORIGIN)),
                 builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY));
         return loot;
+    }
+
+    @WrapOperation(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;ignoreExplosion()Z"))
+    private boolean checkHurtPredicate(Entity instance, Operation<Boolean> original) {
+        return original.call(instance) && (modifier == null || modifier.getHurtFilter() == null ||
+                !modifier.getHurtFilter().test(instance));
     }
 }

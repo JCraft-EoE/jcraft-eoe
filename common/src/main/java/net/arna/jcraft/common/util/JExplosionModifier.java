@@ -10,15 +10,18 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.phys.Vec3;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @With
 @Data
 @Builder(builderClassName = "Builder")
 public class JExplosionModifier {
+    private final Predicate<Entity> hurtFilter;
     private final Boolean createFire; // Has to be nullable to indicate no change.
     private final Explosion.BlockInteraction blockInteraction;
     private final SimpleParticleType particle;
@@ -73,14 +76,16 @@ public class JExplosionModifier {
 
     public static class Builder {
 
+        public JExplosionModifier.Builder noDamage() {
+            return hurtFilter(e -> false);
+        }
+
         public JExplosionModifier.Builder volume(float volume) {
-            volumeGetter(random -> volume);
-            return this;
+            return volumeGetter(random -> volume);
         }
 
         public JExplosionModifier.Builder pitch(float pitch) {
-            pitchGetter(random -> pitch);
-            return this;
+            return pitchGetter(random -> pitch);
         }
     }
 }
