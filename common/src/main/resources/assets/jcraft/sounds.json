@@ -1249,6 +1249,11 @@
       "jcraft:stands/aerosmith/bombland"
     ]
   },
+  "asradarping": {
+    "sounds": [
+      "jcraft:stands/aerosmith/radarping"
+    ]
+  },
   "gas_can_toss": {
     "sounds": [
       "jcraft:projectiles/gas_can/toss"
