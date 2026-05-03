@@ -1239,6 +1239,16 @@
       "jcraft:stands/aerosmith/summon"
     ]
   },
+  "asbombdrop": {
+    "sounds": [
+      "jcraft:stands/aerosmith/bombdrop"
+    ]
+  },
+  "asbombland": {
+    "sounds": [
+      "jcraft:stands/aerosmith/bombland"
+    ]
+  },
   "gas_can_toss": {
     "sounds": [
       "jcraft:projectiles/gas_can/toss"

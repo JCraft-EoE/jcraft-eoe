@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
@@ -83,6 +84,7 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
         if (dropLocation != null) {
             if (attacker.position().distanceTo(dropLocation) <= 2.25) {
                 // TODO play the animation
+                attacker.playSound(JSoundRegistry.AS_BOMB_DROP.get());
                 dropItem(attacker);
                 dropLocation = null;
                 attacker.setFlyState(AerosmithEntity.FlyState.RETURN);

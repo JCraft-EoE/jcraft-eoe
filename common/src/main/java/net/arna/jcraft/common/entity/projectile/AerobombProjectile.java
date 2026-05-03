@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.compat.FtbChunksCompat;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,7 +17,6 @@ public class AerobombProjectile extends AbstractArrow {
 
     public AerobombProjectile(final Level level) {
         super(JEntityTypeRegistry.AEROBOMB.get(), level);
-//        setSoundEvent(???); // TODO record
     }
 
     @Override
@@ -41,6 +41,7 @@ public class AerobombProjectile extends AbstractArrow {
 
     protected void mayExplode() {
         if (level() instanceof ServerLevel serverLevel) {
+            playSound(JSoundRegistry.AS_BOMB_LAND.get());
             if (getDeltaMovement().length() >= 0.5) { // base speed for boom
                 final boolean chunkAccess = !(getOwner() instanceof ServerPlayer player) || FtbChunksCompat.get().mayEdit(player, serverLevel, blockPosition());
                 final boolean griefing = serverLevel.getGameRules().getRule(JCraft.STAND_GRIEFING).get();
