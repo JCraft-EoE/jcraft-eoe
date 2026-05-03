@@ -107,8 +107,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             IntSet.of(10, 15, 20, 25, 30, 35, 40, 45, 50))
             .withStaticY()
             .withStunType(StunType.LAUNCH)
-            .withSound(JSoundRegistry.AS_SUMMON)
-            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withSound(JSoundRegistry.AS_BARRAGE)
+            .withImpactSound(JSoundRegistry.AS_BARRAGE_HIT)
             .withInfo(
                     Component.literal("Dive Charge"),
                     Component.literal("Non-remote: a straight charge, rising at the end. Carries enemies with Aerosmith.")

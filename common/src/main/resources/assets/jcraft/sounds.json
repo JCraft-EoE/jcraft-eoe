@@ -1254,6 +1254,16 @@
       "jcraft:stands/aerosmith/radarping"
     ]
   },
+  "asbarrage": {
+    "sounds": [
+      "jcraft:stands/aerosmith/standcry"
+    ]
+  },
+  "asbarragehit": {
+    "sounds": [
+      "jcraft:stands/aerosmith/slices"
+    ]
+  },
   "gas_can_toss": {
     "sounds": [
       "jcraft:projectiles/gas_can/toss"
