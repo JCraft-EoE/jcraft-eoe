@@ -38,6 +38,10 @@ public class JCraftHelpCommand {
                         Makes the target block or unblock with their stand
                         §c/spec about§r
                         Displays all relevant Spec information
+                        §c/spec clear§r
+                        Clears your current spec
+                        §c/spec reset§r
+                        Resets spec data
                         §c/spec set§r
                         Sets your spec
                         §c/attack§r
