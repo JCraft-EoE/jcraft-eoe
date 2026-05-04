@@ -117,6 +117,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_GRAB_ATTACK = register("killerqueen_kq_grab_attack", KQGrabAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_GRAB_HIT_ATTACK = register("killerqueen_kq_grab_hit_attack", KQGrabHitAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_SHEER_HEART_ATTACK_ATTACK = register("killerqueen_sheer_heart_attack_attack", SheerHeartAttackAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_TOSS_MOVE = register("killerqueen_kq_toss_move", KQTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> KILLERQUEEN_BITESTHEDUST_BTD_DETONATE_ATTACK = register("killerqueen_bitesthedust_btd_detonate_attack", BTDDetonateAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_BITESTHEDUST_BTD_GRAB_HIT_ATTACK = register("killerqueen_bitesthedust_btd_grab_hit_attack", BTDGrabHitAttack.Type.INSTANCE);

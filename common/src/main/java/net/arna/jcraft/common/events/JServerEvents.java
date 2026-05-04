@@ -22,6 +22,7 @@ import net.arna.jcraft.common.entity.StandMeteorEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.item.AuMockItem;
 import net.arna.jcraft.common.item.RewindMockItem;
+import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
@@ -43,6 +44,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -527,7 +529,16 @@ public class JServerEvents {
             if (living instanceof final ServerPlayer serverPlayer) {
                 final GameRules gameRules = serverWorld.getGameRules();
 
-                if (!gameRules.getBoolean(JCraft.KEEP_STAND)) {
+                if (gameRules.getBoolean(JCraft.DROP_STAND_AS_DISC)) {
+                    final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(living);
+                    final StandType standType = standData.getType();
+                    if (standType != null && standType != JStandTypeRegistry.NONE.get()) {
+                        final int skin = Math.max(0, Math.min(standData.getSkin(), standType.getData().getInfo().getSkinCount() - 1));
+                        final ItemStack disc = StandDiscItem.createDiscStack(standType, skin);
+                        Containers.dropItemStack(serverWorld, living.getX(), living.getY(), living.getZ(), disc);
+                    }
+                    standData.setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0, false);
+                } else if (!gameRules.getBoolean(JCraft.KEEP_STAND)) {
                     JComponentPlatformUtils.getStandComponent(living).setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0, false);
                 }
 
