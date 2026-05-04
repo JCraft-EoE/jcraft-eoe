@@ -595,6 +595,7 @@
   "jcraft.movetype.special1": "Special 1",
   "jcraft.movetype.special2": "Special 2",
   "jcraft.movetype.special3": "Special 3",
+  "jcraft.movetype.toss": "Toss",
   "jcraft.movetype.ultimate": "Ultimate",
   "jcraft.movetype.utility": "Utility",
   "jcraft.requiemarrow.desc": "§eAble to grant immense power to those worthy.",

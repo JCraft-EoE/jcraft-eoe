@@ -402,9 +402,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         // Stop voiding if voiding
         if (getVoidTime() > 0) {
             setVoidTime(0);
-            if (hasUser()) {
-                getUser().setInvulnerable(false);
-            }
             return;
         }
 
@@ -471,8 +468,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                 }
                 idleOverride = getVoidTime() > 0;
             }
-
-            user.setInvulnerable(getVoidTime() > 0);
         }
 
         if (voiding) {
