@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JSoundRegistry;
@@ -28,7 +29,7 @@ import java.util.Set;
 public class BombDropAttack extends AbstractMove<BombDropAttack, AerosmithEntity> {
 
     private float range;
-    @Nullable
+    @Nullable @Getter @Setter
     private Vec3 dropLocation;
 
     public BombDropAttack(final int cooldown, final float range) {
@@ -63,7 +64,7 @@ public class BombDropAttack extends AbstractMove<BombDropAttack, AerosmithEntity
     @Override
     public void tick(final AerosmithEntity attacker) {
         if (dropLocation != null) {
-            if (attacker.position().distanceTo(dropLocation) <= 2.25) {
+            if (attacker.position().distanceToSqr(dropLocation) <= 1.0) {
                 // TODO play the animation
                 attacker.playSound(JSoundRegistry.AS_BOMB_DROP.get());
                 dropBomb(attacker);

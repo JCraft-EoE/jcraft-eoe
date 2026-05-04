@@ -28,6 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -91,16 +92,34 @@ public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A
         return Set.of();
     }
 
-    protected Vec3 fire(final A attacker, final LivingEntity user, final Vec3 start, final Vec3 direction) {
+    public Vec3 fire(final A attacker, final LivingEntity user, final Vec3 start, final Vec3 direction) {
+        final Vec3 hitPos = fire(this, attacker, user, start, direction,
+                getRange(), getSpread(), getKnockback(), getHardness(), getBreakChance(),
+                hitSpark);
+
+        JCraft.createHitscanTraceParticle(
+                (ServerLevel)user.level(),
+                hitscanTraceParticleOrigin(attacker),
+                hitscanTraceParticleVelocity(attacker, hitPos),
+                shootSpark
+        );
+
+        return hitPos;
+    }
+
+    public static <A extends IAttacker<? extends A, ?>> Vec3 fire(final AbstractSimpleAttack<?, A> attack,
+                            final A attacker, final LivingEntity user, final Vec3 start, final Vec3 direction,
+                            final float range, final float spread, final float knockback, final float hardness, final float breakChance,
+                            @Nullable final JParticleType hitSpark) {
         final RandomSource random = user.getRandom();
         final LivingEntity base = attacker.getBaseEntity();
         // finding target
-        final HitResult goal = JUtils.raycastAll(attacker.isRemote() ? base : user, start, start.add(direction.scale(getRange())), ClipContext.Fluid.NONE,
+        final HitResult goal = JUtils.raycastAll(attacker.isRemote() ? base : user, start, start.add(direction.scale(range)), ClipContext.Fluid.NONE,
                 EntitySelector.LIVING_ENTITY_STILL_ALIVE
                         .and(EntitySelector.NO_SPECTATORS)
         );
-        final Vec3 hitPos = goal.getLocation();
-        final Vec3 goalLocation = hitPos.add(direction);
+        final Vec3 rawGoalLocation = goal.getLocation();
+        final Vec3 goalLocation = rawGoalLocation.add(direction);
         final Vec3 attackerEyePos = base.position().add(GravityChangerAPI.getEyeOffset(base));
         final Vec3 attackVector = goalLocation.subtract(attackerEyePos)
                 .xRot((float)random.nextGaussian() * spread)
@@ -112,37 +131,31 @@ public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A
                         .and(EntitySelector.NO_SPECTATORS)
         );
 
+        final Vec3 hitPos = hitResult.getLocation();
+
         // entity hit
         if (hitResult.getType() == HitResult.Type.ENTITY) {
             final Entity hitEntity = ((EntityHitResult)hitResult).getEntity();
             if (hitEntity instanceof LivingEntity living) { // should always happen
-                final Vec3 kbVec = direction.scale(getKnockback()).add(new Vec3(0.0, Math.abs(getKnockback()) / 4, 0.0));
-                processTarget(attacker, living, kbVec, attacker.getDamageSource());
+                final Vec3 kbVec = direction.scale(knockback).add(new Vec3(0.0, Math.abs(knockback) / 4, 0.0));
+                attack.processTarget(attacker, living, kbVec, attacker.getDamageSource());
             }
         }
         // block mining
-        else if (hitResult.getType() == HitResult.Type.BLOCK && user.level().getGameRules().getBoolean(JCraft.STAND_GRIEFING) && getBreakChance() > 0f) {
+        else if (hitResult.getType() == HitResult.Type.BLOCK && user.level().getGameRules().getBoolean(JCraft.STAND_GRIEFING) && breakChance > 0f) {
             final BlockPos pos = ((BlockHitResult)hitResult).getBlockPos();
             final BlockState state = user.level().getBlockState(pos);
             if (state.getFluidState().isEmpty()) {
-                double hardness = state.getBlock().defaultDestroyTime();
-                if (hardness < 0) {
-                    hardness = Double.POSITIVE_INFINITY;
+                double blockHardness = state.getBlock().defaultDestroyTime();
+                if (blockHardness < 0) {
+                    blockHardness = Double.POSITIVE_INFINITY;
                 }
                 boolean chunkAccess = !(user instanceof ServerPlayer player) || FtbChunksCompat.get().mayEdit(player, (ServerLevel) player.level(), pos);
-                if (getHardness() >= hardness && chunkAccess && random.nextDouble() >= getBreakChance()) {
+                if (hardness >= blockHardness && chunkAccess && random.nextDouble() >= breakChance) {
                     user.level().destroyBlock(pos, true, user);
                 }
             }
         }
-
-        // create particles
-        JCraft.createHitscanTraceParticle(
-                (ServerLevel)user.level(),
-                hitscanTraceParticleOrigin(attacker),
-                hitscanTraceParticleVelocity(attacker, hitResult.getLocation()),
-                shootSpark
-        );
 
         // TODO Arna add hit/block particles?
         if (hitResult.getType() != HitResult.Type.MISS) {
