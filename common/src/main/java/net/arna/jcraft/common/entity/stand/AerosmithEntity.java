@@ -146,7 +146,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         // setYDistanceOffset(10f); // TODO for patrol mode
         setYDistanceOffset(1.2f);
         setNoGravity(true);
-        noPhysics = true;
     }
 
     @NonNull
@@ -197,9 +196,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Override
     public void tick() {
         xRotChangeAllowed = false;
-
+        noPhysics = true;
         super.tick();
-
+        noPhysics = false;
         xRotChangeAllowed = true;
 
         resetFallDistance();
@@ -231,7 +230,11 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                 case FLYBY -> {
                     lookAt(flyTarget, 6f, 6f);
 
-                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(CRUISE_SPEED)));
+                    final double distanceSqr = distanceToSqr(flyTarget);
+
+                    final double cruiseSpeed = distanceSqr <= 49.0 ? SLOW_CRUISE_SPEED : CRUISE_SPEED;
+
+                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(cruiseSpeed)));
 
                     if (distanceToSqr(flyTarget) <= 4.0) {
                         flyState = FlyState.RETURN;
@@ -265,10 +268,11 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         if (user != null) {
             if (isRemote()) {
                 if (flyState != FlyState.RETURN) {
-                    getMove(BombDropAttack.class).clearDropLocation();
                     flyState = FlyState.RETURN;
                 }
             }
+
+            getMove(BombDropAttack.class).clearDropLocation();
 
             getMove(AerosmithAttackOrderMove.class).clearCurrentTarget();
 

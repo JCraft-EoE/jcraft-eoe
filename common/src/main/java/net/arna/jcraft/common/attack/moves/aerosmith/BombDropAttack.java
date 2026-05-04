@@ -64,7 +64,7 @@ public class BombDropAttack extends AbstractMove<BombDropAttack, AerosmithEntity
     @Override
     public void tick(final AerosmithEntity attacker) {
         if (dropLocation != null) {
-            if (attacker.position().distanceToSqr(dropLocation) <= 1.0) {
+            if (attacker.position().distanceToSqr(dropLocation) <= 2.25) {
                 // TODO play the animation
                 attacker.playSound(JSoundRegistry.AS_BOMB_DROP.get());
                 dropBomb(attacker);

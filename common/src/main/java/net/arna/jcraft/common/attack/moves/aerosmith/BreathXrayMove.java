@@ -142,7 +142,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         serverPlayer.connection.send(
                 new ClientboundLevelParticlesPacket(
                         JParticleTypeRegistry.OVERLAP.get(),
-                        false,
+                        true,
                         target.x, target.y, target.z,
                         0, 0, 0,
                         0,

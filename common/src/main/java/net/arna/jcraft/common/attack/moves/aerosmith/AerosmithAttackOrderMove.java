@@ -85,7 +85,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
                 }
             }
 
-            currentTarget = closest;
+            currentTarget = JUtils.getUserIfStand(closest);
         }
     }
 
@@ -99,6 +99,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
         if (!currentTarget.isAlive()) {
             currentTarget = null;
+            attacker.setFlyState(AerosmithEntity.FlyState.RETURN);
             return;
         }
 
@@ -106,7 +107,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
         final var cds = JComponentPlatformUtils.getCooldowns(user);
 
-        if (cds.getCooldown(CooldownType.HEAVY) <= 0.0) {
+        if (cds.getCooldown(CooldownType.HEAVY) <= 0.0 && currentTarget.onGround()) {
             final var targetPos = currentTarget.position();
 
             attacker.setFlyState(AerosmithEntity.FlyState.FLYBY);
