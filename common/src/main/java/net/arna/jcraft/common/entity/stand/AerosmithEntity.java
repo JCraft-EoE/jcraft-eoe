@@ -120,9 +120,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Orders Aerosmith to attack the entity at a detected location.")
             );
 
-
-    public static final BreathXrayMove<AerosmithEntity> XRAY = new BreathXrayMove<AerosmithEntity>(0, 0, 64)
-            .withSound(JSoundRegistry.AS_RADAR_PING)
+    public static final BreathXrayMove<AerosmithEntity> XRAY = new BreathXrayMove<AerosmithEntity>(0, 0, 128)
             .withInfo(
                     Component.literal("Breath Detection"),
                     Component.literal("Aerosmith scans the surroundings for the breath of living things.")

@@ -97,7 +97,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
                 if (entity instanceof LivingEntity living) {
                     final Vec3 target = living.position().add(GravityChangerAPI.getEyeOffset(living));
 
-                    if (!living.hasLineOfSight(base)) continue;
+                    // if (!living.hasLineOfSight(base)) continue;
 
                     if (!withinScanArc(pos, base.getLookAngle(), target, scanAngle, Mth.DEG_TO_RAD * 30.0)) continue;
 
