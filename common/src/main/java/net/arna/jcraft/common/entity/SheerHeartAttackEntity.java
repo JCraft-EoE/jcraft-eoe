@@ -1,7 +1,6 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
@@ -198,10 +197,10 @@ public class SheerHeartAttackEntity extends Mob implements IOwnable {
     }
 
     public void explode() {
+        final boolean griefing = level().getGameRules().getBoolean(JCraft.STAND_GRIEFING);
         JUtils.explode(level(), this, getX(), getY(), getZ(), 1.8f,
                 JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1.get())
-                        .blockInteraction(AbstractMove.mayBreak(level(), master, blockPosition(), null)
-                                ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP)
+                        .blockInteraction(griefing ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP)
                         .particleVelocity(Vec3.ZERO)
                         .build());
     }

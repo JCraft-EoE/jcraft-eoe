@@ -39,7 +39,7 @@
 			}
 		},
 		"animation.sandbag.hit": {
-			"loop": true,
+			"loop": false,
 			"animation_length": 0.3333,
 			"bones": {
 				"sandbag": {

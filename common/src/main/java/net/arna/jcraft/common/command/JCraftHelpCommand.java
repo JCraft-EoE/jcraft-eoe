@@ -44,6 +44,8 @@ public class JCraftHelpCommand {
                         Resets spec data
                         §c/spec set§r
                         Sets your spec
+                        §c/spec unlock§r
+                        Fully progresses your current spec (only if it has a progression system)
                         §c/attack§r
                         Causes targets to start a spec/stand attack, which IGNORES COOLDOWNS
                         §c/framedata§r

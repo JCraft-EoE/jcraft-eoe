@@ -506,6 +506,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     }
 
     public static void dryOut(ServerLevel serverWorld, BlockPos pos) {
+        if (!serverWorld.getGameRules().getBoolean(net.arna.jcraft.JCraft.STAND_GRIEFING)) return;
         BlockState blockState;
         blockState = serverWorld.getBlockState(pos);
         if (blockState.getBlock() instanceof BucketPickup fluidDrainable) {

@@ -18,7 +18,6 @@ import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.common.attack.moves.killerqueen.*;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
-import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.minecraft.network.chat.Component;
@@ -93,7 +92,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     public static final CoinTossMove COIN_TOSS = new CoinTossMove(240);
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<KillerQueenEntity> TOSS = new TossMove<KillerQueenEntity>(0, 1, 1, 0.75f)
+    public static final KQTossMove TOSS = new KQTossMove(0, 1, 1, 0.75f)
             .withAnim(KillerQueenEntity.State.ITEM_TOSS);
     public static final TossChargeMove<KillerQueenEntity> TOSS_CHARGE = new TossChargeMove<KillerQueenEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);

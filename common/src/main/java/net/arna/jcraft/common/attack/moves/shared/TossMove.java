@@ -10,7 +10,9 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
@@ -29,7 +31,20 @@ public final class TossMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user) {
         if (attacker instanceof StandEntity<?,?> stand && !stand.level().isClientSide()) {
             final ItemStack projectile = stand.getItemInHand(InteractionHand.MAIN_HAND);
-            JUtils.tossItem(stand, stand.level(), projectile, getChargeTime() / 40f, true);
+            if (!projectile.isEmpty()) {
+                final Vec3 lookAngle = user.getLookAngle();
+                final Vec3 lookVec = lookAngle.scale(0.75f * (getChargeTime() / 40f));
+                final Vec3 throwPos = new Vec3(
+                        user.getX() + lookAngle.x,
+                        user.getY() + user.getBbHeight(),
+                        user.getZ() + lookAngle.z
+                ); //TODO: fix item position
+                final ItemEntity thrown = new ItemEntity(stand.level(), throwPos.x, throwPos.y, throwPos.z,
+                        projectile.copyWithCount(1), lookVec.x, lookVec.y, lookVec.z);
+                thrown.setNeverPickUp();
+                stand.level().addFreshEntity(thrown);
+                projectile.shrink(1);
+            }
         }
         return Set.of();
     }

@@ -595,6 +595,7 @@
   "jcraft.movetype.special1": "必殺技1",
   "jcraft.movetype.special2": "必殺技2",
   "jcraft.movetype.special3": "必殺技3",
+  "jcraft.movetype.toss": "トス",
   "jcraft.movetype.ultimate": "アルティメット",
   "jcraft.movetype.utility": "ユーティリティ",
   "jcraft.requiemarrow.desc": "§eふさわしい者に絶大な力を与えることができる。",
