@@ -173,9 +173,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
         moveSet.registerListener(this);
 
-        noPhysics = true;
         standType = type;
-        this.noCulling = true;
+        noCulling = true;
 
         assert getThis() == this;
     }

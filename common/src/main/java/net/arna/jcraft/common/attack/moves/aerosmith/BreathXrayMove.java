@@ -87,7 +87,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         if (user instanceof ServerPlayer serverPlayer) {
             final Vec3 pos = base.position();
 
-            boolean newTargets = false;
+            boolean doPing = false;
 
             for (Entity entity : base.level().getEntities().getAll()) {
                 if (entity.distanceToSqr(pos) > range * range) continue;
@@ -97,12 +97,11 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
                 if (entity instanceof LivingEntity living) {
                     final Vec3 target = living.position().add(GravityChangerAPI.getEyeOffset(living));
 
-                    // if (!living.hasLineOfSight(base)) continue;
-
                     if (!withinScanArc(pos, base.getLookAngle(), target, scanAngle, Mth.DEG_TO_RAD * 30.0)) continue;
 
                     if (!detected.containsKey(living))
-                        newTargets = true;
+                        if (living.hasLineOfSight(base))
+                            doPing = true;
 
                     detected.put(living, 20);
 
@@ -110,7 +109,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
                 }
             }
 
-            if (newTargets) playPingSound(serverPlayer);
+            if (doPing) playPingSound(serverPlayer);
         }
     }
 

@@ -264,23 +264,22 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         final LivingEntity user = getUser();
 
         if (user != null) {
+            getMove(BombDropAttack.class).clearDropLocation();
+            getMove(AerosmithAttackOrderMove.class).clearCurrentTarget();
+
             if (isRemote()) {
                 if (flyState != FlyState.RETURN) {
                     flyState = FlyState.RETURN;
                 }
+
+                if (distanceToSqr(user) >= 4.0) return;
             }
-
-            getMove(BombDropAttack.class).clearDropLocation();
-
-            getMove(AerosmithAttackOrderMove.class).clearCurrentTarget();
-
-            if (distanceToSqr(user) >= 4.0) return;
         }
 
         super.desummon(playSound);
     }
 
-    private void lookAt(final Vec3 target, final float maxYRotIncrease, final float maxXRotIncrease) {
+    public void lookAt(final Vec3 target, final float maxYRotIncrease, final float maxXRotIncrease) {
         double d = target.x - getX();
         double e = target.z - getZ();
         double f = target.y - getY();
