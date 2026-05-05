@@ -26,7 +26,6 @@ import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -234,10 +233,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
         if (!isAlive()) return;
 
-        if (level() instanceof ClientLevel clientLevel) {
+        if (level().isClientSide()) {
             if (tickCount % 26 == 0) {
                 final Vec3 pos = position();
-                clientLevel.playLocalSound(pos.x, pos.y, pos.z,
+                level().playLocalSound(pos.x, pos.y, pos.z,
                         JSoundRegistry.AS_IDLE.get(), SoundSource.PLAYERS,
                         isRemote() ? 0.2f : 1.0f, 1.0f, true);
             }
