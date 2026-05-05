@@ -5,8 +5,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractBarrageAttack;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
+import net.arna.jcraft.common.splatter.GasolineSplatter;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
 import java.util.Set;
 
 public final class FlamethrowerAttack extends AbstractBarrageAttack<FlamethrowerAttack, MagiciansRedEntity> {
@@ -30,6 +36,19 @@ public final class FlamethrowerAttack extends AbstractBarrageAttack<Flamethrower
             }
         }
         return targets;
+    }
+
+    @Override
+    protected void performHook(final MagiciansRedEntity attacker, final Set<LivingEntity> targets,
+                               final Set<AABB> boxes, final DamageSource damageSource,
+                               final Vec3 forwardPos, final Vec3 rotationVector) {
+        if (attacker.level().isClientSide()) return;
+
+        JSplatterManager splatterManager = JSplatterManager.get(attacker.level());
+        for (AABB box : boxes) {
+            splatterManager.getIntersections(box, s -> s instanceof GasolineSplatter)
+                    .forEach(s -> ((GasolineSplatter) s).lightOnFire());
+        }
     }
 
     @Override

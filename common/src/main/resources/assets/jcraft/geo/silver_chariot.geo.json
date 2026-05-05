@@ -536,7 +536,7 @@
 					]
 				},
 				{
-					"name": "blur",
+					"name": "prop4",
 					"parent": "Stand",
 					"pivot": [0, 18, 0],
 					"cubes": [
@@ -555,13 +555,13 @@
 					]
 				},
 				{
-					"name": "exploding_armor",
+					"name": "prop3",
 					"parent": "Stand",
 					"pivot": [13, 28, -1]
 				},
 				{
 					"name": "armor1",
-					"parent": "exploding_armor",
+					"parent": "prop3",
 					"pivot": [11.375, 29.375, 0.125],
 					"cubes": [
 						{
@@ -620,7 +620,7 @@
 				},
 				{
 					"name": "armor2",
-					"parent": "exploding_armor",
+					"parent": "prop3",
 					"pivot": [14.625, 29.375, 0.125],
 					"cubes": [
 						{
@@ -679,7 +679,7 @@
 				},
 				{
 					"name": "armor3",
-					"parent": "exploding_armor",
+					"parent": "prop3",
 					"pivot": [11.375, 29.375, -2.125],
 					"cubes": [
 						{
@@ -738,7 +738,7 @@
 				},
 				{
 					"name": "armor4",
-					"parent": "exploding_armor",
+					"parent": "prop3",
 					"pivot": [14.625, 29.375, -2.125],
 					"cubes": [
 						{

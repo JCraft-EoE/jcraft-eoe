@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.projectile;
 
 import com.mojang.datafixers.util.Pair;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
@@ -140,8 +141,7 @@ public class ItemTossProjectile extends AbstractArrow {
     }
 
     protected boolean maybeExplode() {
-        if (!level().isClientSide && (getItem().is(JTagRegistry.EXPLODES_ON_IMPACT) ||
-                (getOwner() instanceof AbstractKillerQueenEntity<?,?>))) {
+        if (!level().isClientSide && getItem().is(JTagRegistry.EXPLODES_ON_IMPACT)) {
             final boolean grief = level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
             final boolean standGrief = !(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING);
             level().explode(this, getX(), getY(), getZ(), 1, grief && standGrief, Level.ExplosionInteraction.MOB);
@@ -211,6 +211,16 @@ public class ItemTossProjectile extends AbstractArrow {
 
         if (maybeExplode()) {
             return;
+        }
+
+        // transfer KQ bomb to hit entity
+        if (getOwner() instanceof AbstractKillerQueenEntity<?, ?> kq && kq.hasUser()) {
+            final CommonBombTrackerComponent.BombData bombData = JComponentPlatformUtils.getBombTracker(kq.getUserOrThrow()).getMainBomb();
+            if (bombData.isEntity && bombData.bombEntityID == this.getId()) {
+                bombData.setBomb(entity);
+                this.discard();
+                return;
+            }
         }
 
         // force stand on target

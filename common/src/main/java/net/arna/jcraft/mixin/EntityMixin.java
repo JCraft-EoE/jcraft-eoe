@@ -1,6 +1,7 @@
 package net.arna.jcraft.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.arna.jcraft.common.effects.FlammableEffect;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.events.EntityTickEvent;
@@ -30,6 +31,13 @@ public abstract class EntityMixin implements EntityAddon {
     @Inject(method = "positionRider(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity$MoveFunction;)V", at = @At("HEAD"), cancellable = true)
     private void jcraft$updatePassengerPosition(Entity passenger, Entity.MoveFunction positionUpdater, CallbackInfo info) {
         EntityMixinLogic.jcraft$updatePassengerPosition((Entity)(Object)this, passenger, positionUpdater, info);
+    }
+
+    @Inject(method = "setRemainingFireTicks", at = @At("HEAD"), cancellable = true)
+    private void jcraft$preventExtinguish(int ticks, CallbackInfo ci) {
+        if (ticks <= 0 && (Object) this instanceof LivingEntity living && FlammableEffect.isFlammable(living) && living.isOnFire()) {
+            ci.cancel();
+        }
     }
 
     /**
