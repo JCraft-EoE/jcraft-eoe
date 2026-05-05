@@ -214,9 +214,7 @@ public class SheerHeartAttackEntity extends Mob implements IOwnable {
                         .build());
 
         final DamageSource damageSource = JUtils.getStand(getMaster()) != null ? JDamageSources.stand(JUtils.getStand(getMaster())) : level().damageSources().explosion(getMaster(), this);
-        final Set<? extends LivingEntity> toExplode = AbstractSimpleAttack.findHits(
-                JUtils.getStand(getMaster()),
-                position(), 4f, damageSource);
+        final Set<? extends LivingEntity> toExplode = JUtils.generateHitbox(level(), position(), 4d, Set.of(this, getMaster()));
         for (final LivingEntity living : toExplode) {
             final Vec3 kbVec = living.getEyePosition().subtract(position()).normalize();
             damageLogic(level(), living, kbVec, 2, 3, true, 13f, false, 4, damageSource, getMaster(), null);
