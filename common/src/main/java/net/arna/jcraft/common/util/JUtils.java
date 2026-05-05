@@ -527,8 +527,8 @@ public final class JUtils {
         // set gasoline on fire (always, independent of fire modifier)
         JSplatterManager splatterManager = JSplatterManager.get(world);
         Set<Splatter> gasSplatters = new HashSet<>();
-        for (int i = -Math.round(power); i < Math.round(power); i++) {
-            for (int j = -Math.round(power); j < Math.round(power); j++) {
+        for (int i = -Math.round(power); i <= Math.round(power); i++) {
+            for (int j = -Math.round(power); j <= Math.round(power); j++) {
                 gasSplatters.addAll(splatterManager.getHit(new Vec3(x+i, y, z+j), s -> s instanceof GasolineSplatter));
             }
         }
