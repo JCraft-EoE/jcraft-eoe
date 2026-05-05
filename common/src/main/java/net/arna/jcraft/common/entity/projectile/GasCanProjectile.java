@@ -14,7 +14,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
@@ -93,7 +92,7 @@ public class GasCanProjectile extends ThrowableItemProjectile {
 
         if (level().isClientSide()) return;
 
-        if (lastSplatterPos == null || lastSplatterPos.distanceToSqr(position()) >= 0.5) {
+        if ((lastSplatterPos == null || lastSplatterPos.distanceToSqr(position()) >= 0.5) && tickCount > 5) {
             dropSplatter();
             lastSplatterPos = position();
         }
