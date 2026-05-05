@@ -1,10 +1,13 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.entity.ai.goal.SHAAttackGoal;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JExplosionModifier;
 import net.arna.jcraft.common.util.JUtils;
@@ -15,6 +18,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -31,7 +35,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+
+import static net.arna.jcraft.api.Attacks.damageLogic;
 
 public class SheerHeartAttackEntity extends Mob implements IOwnable {
     private static final EntityDataAccessor<Optional<UUID>> OWNER_ID = SynchedEntityData.defineId(SheerHeartAttackEntity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -203,7 +210,18 @@ public class SheerHeartAttackEntity extends Mob implements IOwnable {
                 JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1.get())
                         .blockInteraction(griefing && mayAlter ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP)
                         .particleVelocity(Vec3.ZERO)
+                        .noDamage()
                         .build());
+
+        final DamageSource damageSource = JUtils.getStand(getMaster()) != null ? JDamageSources.stand(JUtils.getStand(getMaster())) : level().damageSources().explosion(getMaster(), this);
+        final Set<? extends LivingEntity> toExplode = AbstractSimpleAttack.findHits(
+                JUtils.getStand(getMaster()),
+                position(), 4f, damageSource);
+        for (final LivingEntity living : toExplode) {
+            final Vec3 kbVec = living.getEyePosition().subtract(position()).normalize();
+            damageLogic(level(), living, kbVec, 2, 3, true, 13f, false, 4, damageSource, getMaster(), null);
+            living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
+        }
     }
 
     // Animations
