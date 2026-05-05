@@ -4,6 +4,7 @@ import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JSplatterTypeRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.api.splatter.SplatterFactory;
 import net.arna.jcraft.common.util.JUtils;
@@ -13,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -66,6 +68,14 @@ public class GasolineSplatter extends Splatter {
                 }
             }
             return;
+        }
+
+        // Apply flammable effect to any living entity standing in the splatter
+        if (!getWorld().isClientSide()) {
+            getWorld().getEntitiesOfClass(LivingEntity.class, getMainBox(),
+                            e -> !e.hasEffect(JStatusRegistry.FLAMMABLE.get()))
+                    .forEach(e -> e.addEffect(new MobEffectInstance(
+                            JStatusRegistry.FLAMMABLE.get(), 80, 0, false, true)));
         }
 
         if (gasolineTickCount % 2 != 0) return;

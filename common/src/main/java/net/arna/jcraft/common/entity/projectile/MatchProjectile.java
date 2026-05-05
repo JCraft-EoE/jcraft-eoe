@@ -3,6 +3,7 @@ package net.arna.jcraft.common.entity.projectile;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.api.splatter.Splatter;
+import net.arna.jcraft.common.effects.FlammableEffect;
 import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -127,6 +128,16 @@ public class MatchProjectile extends Projectile {
                 discard();
                 return;
             }
+        }
+
+        if (!level().isClientSide()) {
+            checkGas(position());
+            checkBlocks(blockPosition());
+
+            // Light flammable players on fire
+            level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(0.25),
+                            e -> FlammableEffect.isFlammable(e) && !e.isOnFire())
+                    .forEach(e -> e.setSecondsOnFire(5));
         }
 
         for (Direction dir : Direction.Plane.HORIZONTAL) {
