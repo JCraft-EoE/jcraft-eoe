@@ -23,6 +23,7 @@ import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
 import net.arna.jcraft.common.ai.CombatEntityContext;
@@ -172,9 +173,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
         moveSet.registerListener(this);
 
-        noPhysics = true;
         standType = type;
-        this.noCulling = true;
+        noCulling = true;
 
         assert getThis() == this;
     }
@@ -1016,6 +1016,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Tick moves
         moveMap.tickMoves(getThis());
+        moveStun = getMoveStun();
 
         // Block break / Guard crush check
         if (getStandGauge() < 1) {
@@ -1231,14 +1232,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
     public boolean hurt(@NonNull final DamageSource source, float amount) {
         if (user == null ||
                 source.getEntity() == user ||
                 user.isInvulnerableTo(source) ||
-                source.is(DamageTypes.FALLING_BLOCK) ||
-                source.is(DamageTypes.DROWN)) {
+                source.is(JTagRegistry.STAND_IMMUNE))
             return false;
-        }
 
         // Perfectly block projectiles
         if (blocking && (source.is(DamageTypes.MOB_PROJECTILE) || source.is(DamageTypes.ARROW))) {

@@ -293,13 +293,13 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -560,7 +560,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -614,7 +614,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -835,7 +835,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -913,7 +913,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1158,7 +1158,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"position": {
 						"vector": [-23, -3, 0],
 						"easing": "linear"
@@ -1168,7 +1168,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1485,7 +1485,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"position": {
 						"vector": [-23, -3, 0],
 						"easing": "linear"
@@ -1495,7 +1495,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1638,7 +1638,7 @@
 						"easing": "linear"
 					}
 				},
-				"stray": {
+				"prop2": {
 					"position": {
 						"vector": [-23, -3, 0],
 						"easing": "linear"
@@ -1648,7 +1648,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2488,7 +2488,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2718,7 +2718,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -3902,7 +3902,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"position": {
 						"vector": [-23, -3, 0],
 						"easing": "linear"
@@ -3912,7 +3912,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4116,7 +4116,7 @@
 						"easing": "linear"
 					}
 				},
-				"stray": {
+				"prop2": {
 					"position": {
 						"vector": [-23, -3, 0],
 						"easing": "linear"
@@ -4126,7 +4126,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4363,7 +4363,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4419,7 +4419,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4648,7 +4648,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"rotation": {
 						"0.0": {
 							"vector": [-12.5, 0, 0],
@@ -4708,7 +4708,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"rotation": {
 						"vector": [0, 0, 45],
 						"easing": "linear"
@@ -5004,7 +5004,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"rotation": {
 						"0.0": {
 							"vector": [-12.5, 0, 0],
@@ -5064,7 +5064,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"rotation": {
 						"vector": [0, 0, 45],
 						"easing": "linear"
@@ -5349,7 +5349,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"rotation": {
 						"0.2": {
 							"vector": [15, 0, 0],
@@ -5409,7 +5409,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"rotation": {
 						"vector": [0, 0, 45],
 						"easing": "linear"
@@ -5720,13 +5720,13 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -5917,7 +5917,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -5978,7 +5978,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6320,7 +6320,7 @@
 						}
 					}
 				},
-				"stray": {
+				"prop2": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6457,7 +6457,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"

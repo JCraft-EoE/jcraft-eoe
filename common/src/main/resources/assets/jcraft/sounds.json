@@ -1239,6 +1239,56 @@
       "jcraft:stands/aerosmith/summon"
     ]
   },
+  "asbombdrop": {
+    "sounds": [
+      "jcraft:stands/aerosmith/bombdrop"
+    ]
+  },
+  "asbombland": {
+    "sounds": [
+      "jcraft:stands/aerosmith/bombland"
+    ]
+  },
+  "asradarping": {
+    "sounds": [
+      "jcraft:stands/aerosmith/radarping"
+    ]
+  },
+  "asradarscan": {
+    "sounds": [
+      "jcraft:stands/aerosmith/radarscan"
+    ]
+  },
+  "asbarrage": {
+    "sounds": [
+      "jcraft:stands/aerosmith/standcry"
+    ]
+  },
+  "asbarragehit": {
+    "sounds": [
+      "jcraft:stands/aerosmith/slices"
+    ]
+  },
+  "asflyby": {
+    "sounds": [
+      "jcraft:stands/aerosmith/flyby"
+    ]
+  },
+  "asidle": {
+    "sounds": [
+      "jcraft:stands/aerosmith/idle"
+    ]
+  },
+  "asmaneuver": {
+    "sounds": [
+      "jcraft:stands/aerosmith/maneuver"
+    ]
+  },
+  "aslanding": {
+    "sounds": [
+      "jcraft:stands/aerosmith/landing"
+    ]
+  },
   "whoosh": {
     "sounds": [
       "jcraft:generic/whoosh"

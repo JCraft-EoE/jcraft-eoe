@@ -1,22 +1,35 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
-import net.arna.jcraft.common.compat.FtbChunksCompat;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.util.JExplosionModifier;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.Set;
+
+import static net.arna.jcraft.api.Attacks.damageLogic;
 
 public class AerobombProjectile extends AbstractArrow {
 
     public AerobombProjectile(final Level level) {
         super(JEntityTypeRegistry.AEROBOMB.get(), level);
-//        setSoundEvent(???); // TODO record
     }
 
     @Override
@@ -41,11 +54,29 @@ public class AerobombProjectile extends AbstractArrow {
 
     protected void mayExplode() {
         if (level() instanceof ServerLevel serverLevel) {
-            if (getDeltaMovement().length() >= 0.5) { // base speed for boom
-                final boolean chunkAccess = !(getOwner() instanceof ServerPlayer player) || FtbChunksCompat.get().mayEdit(player, serverLevel, blockPosition());
-                final boolean griefing = serverLevel.getGameRules().getRule(JCraft.STAND_GRIEFING).get();
-                Level.ExplosionInteraction interaction = chunkAccess && griefing ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.NONE;
-                serverLevel.explode(this, getX(), getY(), getZ(), 4f, interaction);
+            playSound(JSoundRegistry.AS_BOMB_LAND.get());
+
+            final boolean mayAlter = JUtils.mayAlter(serverLevel, getOwner() instanceof LivingEntity ? (LivingEntity)getOwner() : null, getOnPos(), null);
+            final boolean griefing = serverLevel.getGameRules().getRule(JCraft.STAND_GRIEFING).get();
+            JUtils.explode(level(), this, getX(), getY(), getZ(), 4f,
+                    JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1.get())
+                            .blockInteraction(griefing && mayAlter ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP)
+                            .particleVelocity(Vec3.ZERO)
+                            .noDamage()
+                            .build());
+
+            final DamageSource damageSource = getOwner() instanceof LivingEntity living  && JUtils.getStand(living) != null ? JDamageSources.stand(JUtils.getStand(living)) : level().damageSources().explosion(getOwner(), this);
+            final Set<? extends LivingEntity> toExplode = AbstractSimpleAttack.findHits(
+                    getOwner() instanceof LivingEntity living ? JUtils.getStand(living) : null,
+                    position(), 4f, damageSource);
+
+            for (final LivingEntity living : toExplode) {
+                if (living == getOwner()) {
+                    continue;
+                }
+                final Vec3 kbVec = living.getEyePosition().subtract(position()).normalize();
+                damageLogic(level(), living, kbVec, 2, 3, true, 11f, false, 4, damageSource, getOwner(), null);
+                living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
             }
 
             discard();

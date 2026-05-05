@@ -167,7 +167,7 @@ public class TimeAccelStatePacket {
         }
 
         public boolean isValid(Level world) {
-            return world.getEntity(entityId) instanceof MadeInHeavenEntity;
+            return world.isClientSide() || world.getEntity(entityId) instanceof MadeInHeavenEntity;
         }
 
         public void decrementDuration() {

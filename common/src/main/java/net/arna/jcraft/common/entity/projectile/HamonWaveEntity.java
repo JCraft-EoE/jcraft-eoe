@@ -14,7 +14,6 @@ import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.spec.HamonSpec;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -32,11 +31,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class HamonWaveEntity extends JAttackEntity {
     public final int LIFETIME = 30;
@@ -84,7 +79,7 @@ public class HamonWaveEntity extends JAttackEntity {
                 JCraft.LOGGER.warn("HamonWaveEntity exists for owner without Hamon!");
             }
 
-            if (tickCount % 3 == 0) tryHit(size, position, gravity, serverLevel, hamonSpec);
+            if (tickCount % 2 == 0) tryHit(size, position, gravity, serverLevel, hamonSpec);
         } else if (level() instanceof ClientLevel clientLevel) {
             final float numParticles = size * 10;
 
@@ -175,7 +170,7 @@ public class HamonWaveEntity extends JAttackEntity {
 
                 Attacks.damageLogic(serverLevel, living, new AttackData(
                         living.position().subtract(position).scale(0.25),
-                        13, StunType.LAUNCH.ordinal(), false, 3f, true, 6,
+                        13, StunType.LAUNCH.ordinal(), false, 2f, true, 6,
                         damageSource, master, CommonHitPropertyComponent.HitAnimation.LAUNCH,
                         null, false, false
                 ));

@@ -2,6 +2,8 @@ package net.arna.jcraft.common.entity;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.MoveUsage;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent.HitAnimation;
@@ -44,7 +46,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
-    public static final int HIT_ANIMATION_LENGTH = 20; // Length of hit animation in ticks
+    public static final int HIT_ANIMATION_LENGTH = (int) 6.7; // Length of hit animation in ticks (0.3333 seconds)
 
     // Data watchers
     private static final EntityDataAccessor<Boolean> HAS_KNOCKDOWN = SynchedEntityData.defineId(TrainingDummyEntity.class, EntityDataSerializers.BOOLEAN);
@@ -52,6 +54,14 @@ public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
     private static final EntityDataAccessor<Long> HIT_START_TIME = SynchedEntityData.defineId(TrainingDummyEntity.class, EntityDataSerializers.LONG);
 
     private boolean invisible;
+
+    private static final AzCommand DUMMY_HIT = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandbag.hit", AzPlayBehaviors.PLAY_ONCE);
+    private static final AzCommand DUMMY_IDLE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandbag.idle", AzPlayBehaviors.LOOP);
+    private static final AzCommand DUMMY_KNOCKDOWN = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandbag.knockdown", AzPlayBehaviors.HOLD_ON_LAST_FRAME);
+    private static final AzCommand DUMMY_KNOCKDOWN_IDLE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandbag.knockdownidle", AzPlayBehaviors.LOOP);
+
+    private int lastHitCounter = -1;
+    private boolean lastKnockdownState = false;
 
     public TrainingDummyEntity(EntityType<? extends TrainingDummyEntity> entityType, Level level) {
         super(entityType, level);
@@ -265,12 +275,44 @@ public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
     @Override
     public void tick() {
         super.tick();
+
         // Update knockdown sync on server side
         if (!level().isClientSide()) {
             boolean hasKnockdown = hasEffect(JStatusRegistry.KNOCKDOWN.get());
             boolean currentSyncValue = entityData.get(HAS_KNOCKDOWN);
             if (currentSyncValue != hasKnockdown) {
                 entityData.set(HAS_KNOCKDOWN, hasKnockdown);
+            }
+        } else {
+            // Client-side animation handling
+            boolean hasKnockdown = entityData.get(HAS_KNOCKDOWN);
+
+            // Knockdown takes priority
+            if (hasKnockdown) {
+                if (!lastKnockdownState) {
+                    lastKnockdownState = true;
+                    DUMMY_KNOCKDOWN.sendForEntity(this);
+                } else {
+                    DUMMY_KNOCKDOWN_IDLE.sendForEntity(this);
+                }
+            } else {
+                lastKnockdownState = false;
+
+                int currentHitCounter = entityData.get(HIT_COUNTER);
+                long hitStartTime = entityData.get(HIT_START_TIME);
+                long currentTime = level().getGameTime();
+
+                // Check if this is a new hit
+                if (currentHitCounter != lastHitCounter && currentHitCounter > 0) {
+                    lastHitCounter = currentHitCounter;
+                    DUMMY_HIT.sendForEntity(this);
+                }
+
+                // Send idle when not in hit animation (default state)
+                boolean stillInHitAnimation = (currentTime - hitStartTime) < HIT_ANIMATION_LENGTH && hitStartTime > 0;
+                if (!stillInHitAnimation) {
+                    DUMMY_IDLE.sendForEntity(this);
+                }
             }
         }
 

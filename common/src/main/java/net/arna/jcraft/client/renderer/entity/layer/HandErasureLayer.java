@@ -28,7 +28,7 @@ public class HandErasureLayer extends AbstractRenderLayer<TheHandEntity> {
         pc.setRenderType(cameo);
         pc.setVertexConsumer(pc.multiBufferSource().getBuffer(cameo));
         pc.rendererPipeline().reRender(pc);
-        cameo = RenderType.dragonExplosionAlpha(SKINS_OUTER.get(skin));
+        cameo = RenderType.eyes(SKINS_OUTER.get(skin));
         pc.setRenderType(cameo);
         pc.setVertexConsumer(pc.multiBufferSource().getBuffer(cameo));
         pc.rendererPipeline().reRender(pc);

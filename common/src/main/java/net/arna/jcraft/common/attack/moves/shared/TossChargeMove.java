@@ -51,7 +51,9 @@ public final class TossChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
 
     @Override
     public boolean conditionsMet(A attacker) {
-        return super.conditionsMet(attacker) && JUtils.isHoldingSomething(attacker.getUser());
+        final ItemStack holdItem = attacker.getBaseEntity().getItemInHand(InteractionHand.MAIN_HAND);
+        return super.conditionsMet(attacker) &&
+                (JUtils.isHoldingSomethingThrowable(attacker.getUser()) || !holdItem.isEmpty());
     }
 
     @Override

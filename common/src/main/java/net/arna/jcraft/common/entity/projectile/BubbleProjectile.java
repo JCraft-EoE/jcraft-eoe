@@ -4,8 +4,10 @@ import lombok.NonNull;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.Nullable;
 
 
 public class BubbleProjectile extends AbstractArrow {
@@ -25,6 +28,11 @@ public class BubbleProjectile extends AbstractArrow {
     public BubbleProjectile(final Level world, final LivingEntity owner) {
         super(JEntityTypeRegistry.BUBBLE.get(), owner, world);
         this.setOwner(owner);
+    }
+
+    @Override
+    public void setOwner(@Nullable final Entity owner) {
+        super.setOwner(owner);
     }
 
     @Override

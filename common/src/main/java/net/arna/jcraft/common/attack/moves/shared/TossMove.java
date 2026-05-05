@@ -11,6 +11,7 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
@@ -29,7 +30,13 @@ public final class TossMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user) {
         if (attacker instanceof StandEntity<?,?> stand && !stand.level().isClientSide()) {
             final ItemStack projectile = stand.getItemInHand(InteractionHand.MAIN_HAND);
-            JUtils.tossItem(stand, stand.level(), projectile, getChargeTime() / 40f, true);
+            final Vec3 lookAngle = user.getLookAngle();
+            final Vec3 throwPos = new Vec3(
+                    user.getX() + lookAngle.x * 0.3,
+                    user.getY() + user.getBbHeight() * 0.5,
+                    user.getZ() + lookAngle.z * 0.3
+            );
+            JUtils.tossItem(stand, stand.level(), projectile, getChargeTime() / 40f, true, throwPos);
         }
         return Set.of();
     }

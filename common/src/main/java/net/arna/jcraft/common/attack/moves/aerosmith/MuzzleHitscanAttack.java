@@ -6,8 +6,10 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractHitscanAttack;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerLevel;
@@ -40,8 +42,10 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
         withBreakChance(Mth.clamp(originalBreakChance - attacker.getOverheat() / 100, 0f, 1f));
         withSpread(Mth.clamp(originalSpread + attacker.getOverheat() / 100, 0f, HALF_PI));
 
+        Vec3 hitPos;
+
         if (attacker.isRemote()) {
-            fire(attacker, user, attacker.position(), attacker.getLookAngle());
+            hitPos = fire(attacker, user, attacker.position(), attacker.getLookAngle());
 
             final Vec3 start = user.position().add(GravityChangerAPI.getEyeOffset(user));
             final HitResult goal = JUtils.raycastAll(user, start, start.add(user.getLookAngle().scale(30.0)), ClipContext.Fluid.NONE);
@@ -49,8 +53,13 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
             attacker.setFlyState(AerosmithEntity.FlyState.FLYBY);
             attacker.setFlyTarget(target);
         } else {
-            fire(attacker, user, user.position().add(GravityChangerAPI.getEyeOffset(user)), user.getLookAngle());
+            hitPos = fire(attacker, user, user.position().add(GravityChangerAPI.getEyeOffset(user)), user.getLookAngle());
         }
+
+        // Ignite any gasoline splatters at the bullet's hit position, but with a slight delay
+        JSplatterManager.get(user.level())
+                .getHit(hitPos, s -> s instanceof GasolineSplatter)
+                .forEach(s -> ((GasolineSplatter) s).lightOnFireDelayed(3));
 
         final Vec3 eyes = attacker.getEyePosition();
         final float rot = attacker.getYRot(); // in degrees
@@ -58,7 +67,6 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
         final double z = Math.sin(Math.toRadians(rot));
         final int side = (shootCount++ % 2) * 2 - 1;
         JCraft.createParticle((ServerLevel)user.level(),
-                // second summand moves it to the left/right (or up/down in case of y), third summand moves it forwards/backwards
                 eyes.x() + 0.6 * side * x - 0.2 * z,
                 eyes.y() - 0.8,
                 eyes.z() + 0.6 * side * z + 0.2 * x,
@@ -75,7 +83,6 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
         final double z = Math.sin(Math.toRadians(rot));
         int side = (shootCount % 2) * 2 - 1;
         return new Vec3(
-                // second summand moves it to the left/right (or up/down in case of y), third summand moves it forwards/backwards
                 eyes.x() + 0.6 * side * x - 0.2 * z,
                 eyes.y() - 0.8,
                 eyes.z() + 0.6 * side * z + 0.2 * x);

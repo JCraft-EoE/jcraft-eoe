@@ -286,6 +286,13 @@ public interface JSoundRegistry {
     // Aerosmith
     RegistrySupplier<SoundEvent> AS_SHOOT = register("asshoot");
     RegistrySupplier<SoundEvent> AS_SUMMON = register("assummon");
+    RegistrySupplier<SoundEvent> AS_BOMB_DROP = register("asbombdrop");
+    RegistrySupplier<SoundEvent> AS_BOMB_LAND = register("asbombland");
+    RegistrySupplier<SoundEvent> AS_RADAR_PING = register("asradarping");
+    RegistrySupplier<SoundEvent> AS_BARRAGE = register("asbarrage");
+    RegistrySupplier<SoundEvent> AS_BARRAGE_HIT = register("asbarragehit");
+    RegistrySupplier<SoundEvent> AS_IDLE = register("asidle");
+    RegistrySupplier<SoundEvent> AS_LANDING = register("aslanding");
 
     //// SPECS
     // Brawler

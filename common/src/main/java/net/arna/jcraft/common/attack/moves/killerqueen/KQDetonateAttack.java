@@ -13,7 +13,6 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
-import net.arna.jcraft.common.entity.projectile.BubbleProjectile;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
@@ -23,7 +22,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +47,7 @@ public final class KQDetonateAttack extends AbstractMove<KQDetonateAttack, Abstr
         final Vec3 bombPos = bombData.getBombPos();
 
         if (bombPos != null) {
-            if (bombEntity instanceof ItemEntity || bombEntity instanceof BubbleProjectile) {
+            if (bombEntity != null && !(bombEntity instanceof LivingEntity)) {
                 bombEntity.discard();
             }
             explode(attacker, user, bombPos);

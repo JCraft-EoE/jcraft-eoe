@@ -1,6 +1,5 @@
 package net.arna.jcraft.common.util;
 
-import com.google.common.base.MoreObjects;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import lombok.NonNull;
@@ -23,6 +22,7 @@ import net.arna.jcraft.common.entity.projectile.GasCanProjectile;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.projectile.ScalpelProjectile;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.GasCanItem;
@@ -114,6 +114,14 @@ public final class JUtils {
     public static void setVelocity(Entity entity, double x, double y, double z) {
         entity.setDeltaMovement(x, y, z);
         syncVelocityUpdate(entity);
+    }
+
+    public static double angleBetween(@NonNull final Vec3 a, @NonNull final Vec3 b) {
+        final double aLength = a.length(), bLength = b.length();
+
+        if (aLength == 0 || bLength == 0) return 0.0;
+
+        return a.dot(b) / (aLength * bLength);
     }
 
     public static void syncVelocityUpdate(Entity entity) {
@@ -503,8 +511,9 @@ public final class JUtils {
             return;
         }
 
+        final boolean fire = modifier.getCreateFire() != null && modifier.getCreateFire();
         Explosion explosion = new Explosion(world, entity, x, y, z, power,
-                MoreObjects.firstNonNull(modifier.getCreateFire(), false), modifier.getBlockInteraction());
+                fire, modifier.getBlockInteraction());
         ((IJExplosion) explosion).jcraft$setModifier(modifier);
         explosion.explode();
         explosion.finalizeExplosion(true);
@@ -512,6 +521,18 @@ public final class JUtils {
         if (world.isClientSide) {
             return;
         }
+
+        // set gasoline on fire (always, independent of fire modifier)
+        /*JSplatterManager splatterManager = JSplatterManager.get(world);
+        Set<Splatter> gasSplatters = new HashSet<>();
+        for (int i = -Math.round(power)-2; i <= Math.round(power)+2; i++) {
+            for (int j = -Math.round(power)-2; j <= Math.round(power)+2; j++) {
+                for (int k = -1; k <= 1; k++)
+                    gasSplatters.addAll(splatterManager.getHit(new Vec3(x+i, y+k, z+j), s -> s instanceof GasolineSplatter));
+            }
+        }
+        gasSplatters.forEach(s -> ((GasolineSplatter) s).lightOnFire());*/
+
         for (ServerPlayer player : around((ServerLevel) world, new Vec3(x, y, z), 64)) {
             JExplosionPacket.send(player, x, y, z, power, explosion, modifier);
         }
@@ -666,10 +687,14 @@ public final class JUtils {
 
     public static boolean canHoldMove(ServerPlayer player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
-        JSpec<?, ?> spec;
-        return stand != null && stand.canHoldMove(type) ||
-                (spec = JUtils.getSpec(player)) != null && spec.canHoldMove(type) ||
-                type.isHoldable(stand != null && stand.isStandby());
+        if (stand != null && stand.allowMoveHandling()) {
+            return stand.canHoldMove(type) || type.isHoldable(stand.isStandby());
+        }
+        JSpec<?, ?> spec = JUtils.getSpec(player);
+        if (spec != null && spec.canHoldMove(type)) {
+            return true;
+        }
+        return type.isHoldable(stand != null && stand.isStandby());
     }
 
     /**
@@ -883,6 +908,112 @@ public final class JUtils {
         }
     }
 
+    /**
+     * Tosses or shoots the specified item from a custom world position.
+     * @return The spawned projectile entity, or null if nothing was spawned.
+     */
+    @Nullable
+    public static Entity tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, boolean decrement, Vec3 spawnPos) {
+        if (level.isClientSide() || itemStack.isEmpty()) {
+            return null;
+        }
+        Entity spawned = null;
+        if (itemStack.getItem() instanceof final ArrowItem arrow) {
+            final AbstractArrow arrowEntity = arrow.createArrow(level, itemStack, shooter);
+            arrowEntity.setPos(spawnPos);
+            arrowEntity.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            level.addFreshEntity(arrowEntity);
+            spawned = arrowEntity;
+        }
+        else if (itemStack.getItem() instanceof SnowballItem) {
+            final Snowball snowballEntity = new Snowball(level, shooter);
+            snowballEntity.setItem(itemStack);
+            snowballEntity.setPos(spawnPos);
+            snowballEntity.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            level.addFreshEntity(snowballEntity);
+            spawned = snowballEntity;
+        }
+        else if (itemStack.getItem() instanceof TridentItem) {
+            final ThrownTrident thrownTrident = new ThrownTrident(level, getUserIfStand(shooter), itemStack);
+            thrownTrident.setPos(spawnPos);
+            thrownTrident.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            level.addFreshEntity(thrownTrident);
+            spawned = thrownTrident;
+        }
+        else if (itemStack.getItem() instanceof ThrowablePotionItem) {
+            final ThrownPotion thrownPotion = new ThrownPotion(level, shooter);
+            thrownPotion.setItem(itemStack);
+            thrownPotion.setPos(spawnPos);
+            thrownPotion.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            level.addFreshEntity(thrownPotion);
+            spawned = thrownPotion;
+        }
+        else if (itemStack.getItem() instanceof EggItem) {
+            final ThrownEgg thrownEgg = new ThrownEgg(level, shooter);
+            thrownEgg.setItem(itemStack);
+            thrownEgg.setPos(spawnPos);
+            thrownEgg.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            level.addFreshEntity(thrownEgg);
+            spawned = thrownEgg;
+        }
+        else if (itemStack.getItem() instanceof ScalpelItem) {
+            final ScalpelProjectile scalpelProjectile = new ScalpelProjectile(level, shooter);
+            scalpelProjectile.setPos(spawnPos);
+            scalpelProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            level.addFreshEntity(scalpelProjectile);
+            spawned = scalpelProjectile;
+        }
+        else if (itemStack.getItem() instanceof KnifeBundleItem) {
+            final int bombKnifeIndex = level.random.nextInt(9);
+            for (int i = 0; i < 9; i++) {
+                KnifeProjectile knife = new KnifeProjectile(level, shooter);
+                knife.setPos(spawnPos.add(
+                        level.random.triangle(0, 0.5),
+                        level.random.triangle(0, 0.5),
+                        level.random.triangle(0, 0.5)
+                ));
+                knife.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 5f);
+                level.addFreshEntity(knife);
+                if (i == bombKnifeIndex) spawned = knife;
+            }
+        }
+        else if (itemStack.getItem() instanceof KnifeItem) {
+            final KnifeProjectile knifeProjectile = new KnifeProjectile(level, shooter);
+            knifeProjectile.setPos(spawnPos);
+            knifeProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            level.addFreshEntity(knifeProjectile);
+            spawned = knifeProjectile;
+        }
+        else if (itemStack.getItem() instanceof EnderpearlItem) {
+            final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
+            enderpearlProjectile.setItem(itemStack);
+            enderpearlProjectile.setPos(spawnPos);
+            enderpearlProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1.5F, 1.0F);
+            level.addFreshEntity(enderpearlProjectile);
+            spawned = enderpearlProjectile;
+        }
+        else if (itemStack.getItem() instanceof GasCanItem) {
+            final GasCanProjectile gasCan = new GasCanProjectile(JUtils.getUserIfStand(shooter), level);
+            gasCan.setItem(itemStack);
+            gasCan.setPos(spawnPos);
+            gasCan.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, velocity, 1.0F);
+            level.addFreshEntity(gasCan);
+            spawned = gasCan;
+        }
+        else {
+            final AbstractArrow projectile = new ItemTossProjectile(shooter, level, itemStack);
+            projectile.setPos(spawnPos);
+            projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            level.addFreshEntity(projectile);
+            shooter.playSound(JSoundRegistry.TOSS.get());
+            spawned = projectile;
+        }
+        if (decrement) {
+            itemStack.shrink(1);
+        }
+        return spawned;
+    }
+
     public static void tossItem(final Player player) {
         tossItem(player, player.level(), player.getItemInHand(InteractionHand.MAIN_HAND), 1f, !player.getAbilities().instabuild);
     }
@@ -981,6 +1112,11 @@ public final class JUtils {
     }
 
     @NonNull
+    public static Vec3 getEyePos(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, (double)ent.getEyeHeight(), 0, GravityChangerAPI.getGravityDirection(ent));
+    }
+
+    @NonNull
     public static Vec3 getLocalUp(@NonNull final LivingEntity ent) {
         return RotationUtil.vecPlayerToWorld(0, 1.0d, 0, GravityChangerAPI.getGravityDirection(ent));
     }
@@ -992,6 +1128,11 @@ public final class JUtils {
 
     public static boolean mayAlter(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
                                    @Nullable Predicate<BlockState> pred) {
+        return mayAlter(level, user, pos, pred, true);
+    }
+
+    public static boolean mayAlter(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
+                                   @Nullable Predicate<BlockState> pred, boolean checkMayBuild) {
         ServerLevel serverLevel = level instanceof ServerLevel sl ? sl : null;
         ServerPlayer player = user instanceof ServerPlayer p ? p : null;
 
@@ -999,8 +1140,8 @@ public final class JUtils {
         boolean mobGriefing = level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
         boolean isSpawnProtected = serverLevel != null && player != null && pos != null &&
                 serverLevel.getServer().isUnderSpawnProtection(serverLevel, pos, player);
-        boolean mayBuild = !isPlayer || pos == null ||
-                player.mayBuild() && FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
+        boolean mayBuild = !isPlayer || pos == null || (!checkMayBuild || player.mayBuild()) &&
+                FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
 
         boolean mayAttempt = (isPlayer || mobGriefing) && !isSpawnProtected && mayBuild;
         if (!mayAttempt || pos == null || pred == null) return mayAttempt;
@@ -1010,13 +1151,30 @@ public final class JUtils {
         return pred.test(state);
     }
 
-    public static boolean isHoldingSomething(LivingEntity user) {
+    public static boolean isHoldingSomethingThrowable(LivingEntity user) {
         if (user == null) return false;
 
-        ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
-        if (!mainHandStack.isEmpty()) return true;
+        final ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!mainHandStack.isEmpty() && !mainHandStack.is(JTagRegistry.UNTHROWABLE)) {
+            return true;
+        }
 
-        ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
-        return !offHandStack.isEmpty();
+        final ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
+        return !offHandStack.isEmpty() && !offHandStack.is(JTagRegistry.UNTHROWABLE);
+    }
+
+    /**
+     * Checks if the given entity is currently using KC for Time Erase
+     * @param entity the entity to check, can be <code>null</code>
+     * @return <code>true</code> if the entity is using KC and in Time Erase, else false
+     */
+    public static boolean inTimeErase(Entity entity) {
+        if (!(entity instanceof LivingEntity living)) {
+            return false;
+        }
+        if (!(getStand(living) instanceof KingCrimsonEntity kc)) {
+            return false;
+        }
+        return kc.getTETime() > 0;
     }
 }

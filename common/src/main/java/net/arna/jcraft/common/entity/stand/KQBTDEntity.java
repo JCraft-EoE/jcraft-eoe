@@ -23,6 +23,7 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.common.attack.moves.killerqueen.KQTossMove;
 import net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust.*;
 import net.arna.jcraft.common.attack.moves.shared.GrabAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -91,7 +92,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("Stray Cat Counter"),
                     Component.literal("0.25s windup counter, turns opponent into your primary bomb")
             );
-    public static final BubbleAttack BUBBLE = new BubbleAttack(60, 15, 18, 0.75f)
+    public static final BubbleAttack BUBBLE = new BubbleAttack(120, 15, 18, 0.75f)
             .withCrouchingVariant(BUBBLE_COUNTER)
             .withSound(JSoundRegistry.KQ_UPPERCUT)
             .withInfo(
@@ -129,7 +130,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<KQBTDEntity> TOSS = new TossMove<KQBTDEntity>(0, 1, 1, 0.75f)
+    public static final KQTossMove TOSS = new KQTossMove(0, 1, 1, 0.75f)
             .withAnim(KQBTDEntity.State.ITEM_TOSS);
     public static final TossChargeMove<KQBTDEntity> TOSS_CHARGE = new TossChargeMove<KQBTDEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);

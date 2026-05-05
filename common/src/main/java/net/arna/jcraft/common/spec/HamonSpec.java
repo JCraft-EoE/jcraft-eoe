@@ -61,7 +61,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .details(Component.translatable("spec.jcraft.hamon.info.details"))
             .build();
 
-    public static final float MAX_CHARGE = 20.0f;
+    public static final float MAX_CHARGE = 20.0F;
 
     private boolean useHamonNext = false;
     @Getter
@@ -86,7 +86,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             );
 
     public static final SimpleAttack<HamonSpec> FOCUS_STRIKE = new SimpleAttack<HamonSpec>(0, 8,
-            14, 1.5f, 5f, 9, 1.5f, 1.0f, 0f)
+            14, 1.5f, 5f, 11, 1.5f, 1.0f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             // Because Zoom Punch plays its own animations, the entry must have a null state. This is how we animate despite that.
@@ -107,6 +107,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withCondition(HamonZoomPunchCondition.of(1800)) // in ticks
             .withExtraHitBox(1.5)
             .withExtraHitBox(-0.5, 0.0, 1.5)
+            .withHyperArmor()
             .withMobilityType(MobilityType.DASH)
             .withInfo(
                     Component.literal("Zoom Punch"),
@@ -114,7 +115,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             );
 
     public static final SimpleAttack<HamonSpec> STOMP = new SimpleAttack<HamonSpec>(0, 7,
-            13, 1.0f, 3f, 8, 1.25f, 0.5f, 0.4f)
+            13, 1.0f, 3f, 9, 1.25f, 0.5f, 0.4f)
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withHitSpark(JParticleType.HIT_SPARK_1)
             .withStaticY()

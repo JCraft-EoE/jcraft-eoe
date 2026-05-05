@@ -118,6 +118,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_GRAB_ATTACK = register("killerqueen_kq_grab_attack", KQGrabAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_GRAB_HIT_ATTACK = register("killerqueen_kq_grab_hit_attack", KQGrabHitAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_SHEER_HEART_ATTACK_ATTACK = register("killerqueen_sheer_heart_attack_attack", SheerHeartAttackAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_TOSS_MOVE = register("killerqueen_kq_toss_move", KQTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> KILLERQUEEN_BITESTHEDUST_BTD_DETONATE_ATTACK = register("killerqueen_bitesthedust_btd_detonate_attack", BTDDetonateAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_BITESTHEDUST_BTD_GRAB_HIT_ATTACK = register("killerqueen_bitesthedust_btd_grab_hit_attack", BTDGrabHitAttack.Type.INSTANCE);
@@ -287,6 +288,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_ITEM_DROP_ATTACK = register("aerosmith_item_drop_attack", ItemDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_PATROL_MOVE = register("aerosmith_patrol_move", PatrolMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_ATTACK_ORDER_MOVE = register("aerosmith_attack_order_move", AerosmithAttackOrderMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_CHARGE_ATTACK = register("aerosmith_charge_attack", AerosmithChargeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> BREATH_XRAY_MOVE = register("breath_xray_move", BreathXrayMove.Type.INSTANCE);
 

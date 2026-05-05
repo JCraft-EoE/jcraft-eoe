@@ -128,6 +128,7 @@ public final class JCraft {
     public static final GameRules.Key<BooleanValue> ALLOW_MOB_EVOLVED_STANDS = register("allowMobEvolvedStands", Category.MOBS, BooleanValue.create(false));
     public static final GameRules.Key<BooleanValue> STAND_GRIEFING = register("standGriefing", Category.MISC, BooleanValue.create(true));
     public static final GameRules.Key<BooleanValue> KEEP_STAND = register("keepStand", Category.MISC, BooleanValue.create(true));
+    public static final GameRules.Key<BooleanValue> DROP_STAND_AS_DISC = register("dropStandAsDisc", Category.MISC, BooleanValue.create(false));
     public static final GameRules.Key<BooleanValue> KEEP_SPEC = register("keepSpec", Category.MISC, BooleanValue.create(true));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
     public static final GameRules.Key<IntegerValue> STAND_ARROW_BASE_DAMAGE = register("standArrowBaseDamage", Category.MISC, IntegerValue.create(2));
