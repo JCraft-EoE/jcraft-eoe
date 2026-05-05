@@ -175,6 +175,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         standType = type;
         noCulling = true;
+        noPhysics = true; // immune to suffocation
 
         assert getThis() == this;
     }
