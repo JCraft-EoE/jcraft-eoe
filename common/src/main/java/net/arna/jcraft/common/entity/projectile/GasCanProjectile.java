@@ -5,6 +5,7 @@ import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JSplatterTypeRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.util.JExplosionModifier;
 import net.arna.jcraft.common.util.JUtils;
@@ -12,6 +13,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
@@ -19,6 +22,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -48,6 +52,15 @@ public class GasCanProjectile extends ThrowableItemProjectile {
     @Override
     protected @NotNull Item getDefaultItem() {
         return JItemRegistry.GAS_CAN.get();
+    }
+
+    @Override
+    protected void onHitEntity(@NotNull EntityHitResult result) {
+        super.onHitEntity(result);
+        if (!level().isClientSide() && result.getEntity() instanceof LivingEntity living) {
+            // Direct hit — 7 seconds
+            living.addEffect(new MobEffectInstance(JStatusRegistry.FLAMMABLE.get(), 140, 0, false, true));
+        }
     }
 
     @Override
@@ -91,12 +104,10 @@ public class GasCanProjectile extends ThrowableItemProjectile {
         if (!level().getBlockState(BlockPos.containing(pos)).is(BlockTags.FIRE))
             return false;
 
-        // Only destroy blocks if we're allowed to.
         Explosion.BlockInteraction blockInteraction = getOwner() instanceof LivingEntity owner &&
                 JUtils.mayAlter(level(), owner, BlockPos.containing(pos), null)
                 ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.KEEP;
 
-        // We hit fire, explode into a fireball
         JUtils.explode(level(), pos.x, pos.y, pos.z, 2f, JExplosionModifier.builder()
                 .createFire(true)
                 .blockInteraction(blockInteraction)
