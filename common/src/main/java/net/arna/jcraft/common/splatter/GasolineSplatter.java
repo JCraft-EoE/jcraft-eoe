@@ -17,6 +17,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,6 +33,9 @@ public class GasolineSplatter extends Splatter {
     private static final ResourceLocation texture = JCraft.id("textures/effect/splatter/gasoline.png");
     private static long gasolineTickCount;
     private boolean litBefore = false;
+
+    // Ticks remaining before a pending delayed ignition fires. -1 means no pending ignition.
+    private int ignitionDelayTicks = -1;
 
     static {
         TickEvent.SERVER_POST.register(s -> gasolineTickCount++);
@@ -53,39 +57,61 @@ public class GasolineSplatter extends Splatter {
 
     @Override
     protected void baseTick(List<Runnable> toRunAfterTick) {
+        if (ignitionDelayTicks > 0) {
+            ignitionDelayTicks--;
+            if (ignitionDelayTicks == 0) {
+                ignitionDelayTicks = -1;
+                for (SplatterSection section : getSections()) {
+                    lightSection(toRunAfterTick, section);
+                }
+            }
+            return;
+        }
+
         if (gasolineTickCount % 2 != 0) return;
 
         List<BlockPos> posList = BlockPos.betweenClosedStream(getMainBox().inflate(1)).map(BlockPos::new).toList();
         boolean light = false;
         for (BlockPos pos : posList) {
             BlockState state = getWorld().getBlockState(pos);
-            if (!state.is(BlockTags.FIRE)) continue;
 
-            light = true;
-            break;
+            if (state.is(BlockTags.FIRE)) { light = true; break; }
+            if ((state.is(Blocks.CAMPFIRE) || state.is(Blocks.SOUL_CAMPFIRE))
+                    && state.getValue(CampfireBlock.LIT)) { light = true; break; }
+            if (state.is(Blocks.LAVA) || state.is(Blocks.LAVA)) { light = true; break; }
+            if (state.is(Blocks.MAGMA_BLOCK)) { light = true; break; }
         }
 
         if (!light) {
-            // Found no fire, check whether there's an entity that's on fire in the vicinity.
             light = !getWorld().getEntities(EntityTypeTest.forClass(Entity.class),
                     getMainBox(), Entity::isOnFire).isEmpty();
         }
 
         if (!light) return;
 
-        // We're lighting this baby up.
         for (SplatterSection section : getSections()) {
             lightSection(toRunAfterTick, section);
         }
     }
 
+
+    // Ignites immediately, used when something physically touches the splatter
+    // (match projectile, ankh hit, hurricane, etc.)
     public void lightOnFire() {
         List<Runnable> toRun = new ArrayList<>();
         for (SplatterSection section : getSections()) {
             lightSection(toRun, section);
         }
-
         toRun.forEach(Runnable::run);
+    }
+
+
+    // Schedules ignition after delayTicks ticks.
+    // If an ignition is already pending, the shorter delay wins.
+    public void lightOnFireDelayed(int delayTicks) {
+        if (ignitionDelayTicks < 0 || delayTicks < ignitionDelayTicks) {
+            ignitionDelayTicks = Math.max(1, delayTicks);
+        }
     }
 
     private void lightSection(List<Runnable> toRunAfterTick, SplatterSection section) {
@@ -94,7 +120,7 @@ public class GasolineSplatter extends Splatter {
                 // Ensure we can place fire here
                 .filter(p -> FireBlock.canBePlacedAt(getWorld(), p, d))
                 // Ensure we're allowed to place fire here
-                .filter(p -> getCreator() != null && JUtils.mayAlter(getWorld(), getCreator(), p, null, false))
+                .filter(p -> getCreator() != null && JUtils.mayAlter(getWorld(), getCreator(), p, null))
                 .map(BlockPos::new) // They're re-using a mutable object
                 .toList();
 

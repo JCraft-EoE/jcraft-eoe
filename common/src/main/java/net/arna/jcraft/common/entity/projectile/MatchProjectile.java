@@ -8,13 +8,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.vehicle.MinecartTNT;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -76,11 +80,28 @@ public class MatchProjectile extends Projectile {
     private void checkBlocks(BlockPos pos) {
         Level level = level();
 
-        // The block the match is physically resting on
         BlockPos below = pos.below();
         BlockState belowState = level.getBlockState(below);
+        BlockState state = level.getBlockState(pos);
 
-        // Unlit campfire — also check the block AT pos in case match lands inside it
+        // TNT minecart — only prime once, guard with isPrimed()
+        level.getEntitiesOfClass(MinecartTNT.class, new AABB(pos).inflate(1))
+                .stream()
+                .filter(minecart -> !minecart.isPrimed())
+                .forEach(MinecartTNT::primeFuse);
+
+        // TNT block — check in a small radius around the match
+        BlockPos.betweenClosedStream(new AABB(pos).inflate(0.075))
+                .map(BlockPos::immutable)
+                .filter(p -> level.getBlockState(p).is(Blocks.TNT))
+                .findFirst()
+                .ifPresent(p -> {
+                    TntBlock.explode(level, p);
+                    level.removeBlock(p, false);
+                    discard();
+                });
+
+        // Unlit campfire
         for (BlockPos target : new BlockPos[]{pos, below}) {
             BlockState s = level.getBlockState(target);
             if ((s.is(Blocks.CAMPFIRE) || s.is(Blocks.SOUL_CAMPFIRE))
@@ -92,16 +113,16 @@ public class MatchProjectile extends Projectile {
             }
         }
 
-        // Netherrack / soul sand / soul soil — place fire on top of the block below
+        // Netherrack / soul sand / soul soil
         if (isFlammableNetherBlock(belowState)) {
             level.setBlock(pos, BaseFireBlock.getState(level, pos), 11);
             discard();
             return;
         }
 
-        // Portal — place fire on or adjacent to obsidian
+        // Portal
         if (belowState.is(Blocks.OBSIDIAN)) {
-            if (level.getBlockState(pos).isAir()) {
+            if (state.isAir()) {
                 level.setBlock(pos, BaseFireBlock.getState(level, pos), 11);
                 discard();
                 return;
@@ -111,7 +132,7 @@ public class MatchProjectile extends Projectile {
         for (Direction dir : Direction.Plane.HORIZONTAL) {
             BlockPos neighbor = pos.relative(dir);
             if (level.getBlockState(neighbor).is(Blocks.OBSIDIAN)) {
-                if (level.getBlockState(pos).isAir()) {
+                if (state.isAir()) {
                     level.setBlock(pos, BaseFireBlock.getState(level, pos), 11);
                     discard();
                     return;
