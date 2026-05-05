@@ -29,7 +29,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Set;
 
 public class SendoAttack extends AbstractSimpleAttack<SendoAttack, HamonSpec> {
-    public static final float CHARGE_COST = 10.0F;
+    public static final float CHARGE_COST = 6.7F;
     private static final int AFTERSHOCK_DELAY = 30;
     private final Object2IntMap<LivingEntity> aftershockTimers = new Object2IntOpenHashMap<>(4);
     public SendoAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
