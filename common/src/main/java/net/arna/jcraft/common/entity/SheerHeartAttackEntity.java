@@ -197,10 +197,11 @@ public class SheerHeartAttackEntity extends Mob implements IOwnable {
     }
 
     public void explode() {
+        final boolean mayAlter = JUtils.mayAlter(level(), getMaster(), getOnPos(), null);
         final boolean griefing = level().getGameRules().getBoolean(JCraft.STAND_GRIEFING);
         JUtils.explode(level(), this, getX(), getY(), getZ(), 1.8f,
                 JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1.get())
-                        .blockInteraction(griefing ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP)
+                        .blockInteraction(griefing && mayAlter ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP)
                         .particleVelocity(Vec3.ZERO)
                         .build());
     }
