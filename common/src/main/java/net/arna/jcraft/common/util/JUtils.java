@@ -117,6 +117,14 @@ public final class JUtils {
         syncVelocityUpdate(entity);
     }
 
+    public static double angleBetween(@NonNull final Vec3 a, @NonNull final Vec3 b) {
+        final double aLength = a.length(), bLength = b.length();
+
+        if (aLength == 0 || bLength == 0) return 0.0;
+
+        return a.dot(b) / (aLength * bLength);
+    }
+
     public static void syncVelocityUpdate(Entity entity) {
         entity.hurtMarked = true;
         if (entity instanceof ServerPlayer serverPlayer) {
@@ -983,6 +991,11 @@ public final class JUtils {
     public static boolean isMortal(@Nullable final ServerPlayer player) {
         if (player == null) return false;
         return !player.isSpectator() && !player.isCreative() && !player.isInvulnerable();
+    }
+
+    @NonNull
+    public static Vec3 getEyePos(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, (double)ent.getEyeHeight(), 0, GravityChangerAPI.getGravityDirection(ent));
     }
 
     @NonNull

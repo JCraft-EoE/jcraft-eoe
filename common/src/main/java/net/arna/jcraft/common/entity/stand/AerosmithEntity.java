@@ -83,20 +83,20 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Shoots supersonic bullets in front of Aerosmith. Prolonged use overheats the guns, making them far less accurate.")
             );
 
-    public static final ItemDropAttack ITEM_DROP = new ItemDropAttack(200, 30f)
+    public static final ItemDropAttack ITEM_DROP = new ItemDropAttack(200, 67f)
             .withInfo(
                     Component.literal("Item Drop"),
                     Component.literal("Orders Aerosmith to drop an item above a given location.")
             );
 
-    public static final BombDropAttack BOMB_DROP = new BombDropAttack(200, 30f)
+    public static final BombDropAttack BOMB_DROP = new BombDropAttack(200, 67f)
             .withCrouchingVariant(ITEM_DROP)
             .withInfo(
                     Component.literal("Bomb Drop"),
                     Component.literal("Orders Aerosmith to drop a bomb above a given location.")
             );
 
-    public static final PatrolMove PATROL = new PatrolMove(0, 32f, 48f)
+    public static final PatrolMove PATROL = new PatrolMove(0, 67f, 48f)
             .withInfo(
                     Component.literal("Patrol Location"),
                     Component.literal("Orders Aerosmith to fly around a given location.")
@@ -114,8 +114,13 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Non-remote: a straight charge, rising at the end. Carries enemies with Aerosmith.")
             );
 
-    public static final BreathXrayMove<AerosmithEntity> XRAY = new BreathXrayMove<AerosmithEntity>(0, 0, 64)
-            .withSound(JSoundRegistry.AS_RADAR_PING)
+    public static final AerosmithAttackOrderMove ATTACK_ORDER_MOVE = new AerosmithAttackOrderMove(0, 0)
+            .withInfo(
+                    Component.literal("Attack Order"),
+                    Component.literal("Orders Aerosmith to attack the entity at a detected location.")
+            );
+
+    public static final BreathXrayMove<AerosmithEntity> XRAY = new BreathXrayMove<AerosmithEntity>(0, 0, 128)
             .withInfo(
                     Component.literal("Breath Detection"),
                     Component.literal("Aerosmith scans the surroundings for the breath of living things.")
@@ -139,7 +144,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         // setYDistanceOffset(10f); // TODO for patrol mode
         setYDistanceOffset(1.2f);
         setNoGravity(true);
-        noPhysics = true;
     }
 
     @NonNull
@@ -155,7 +159,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public boolean allowMoveHandling() {
         return getCurrentMove() == null &&
                 getMoveStun() < JCraft.QUEUE_MOVESTUN_LIMIT &&
-                getMove(BombDropAttack.class).getDropLocation() == null;
+                getMove(BombDropAttack.class).getDropLocation() == null &&
+                getMove(AerosmithAttackOrderMove.class).getCurrentTarget() == null;
     }
 
     @Override
@@ -168,6 +173,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         moves.registerImmediate(MoveClass.HEAVY, BOMB_DROP, State.ACTIVE);
         moves.registerImmediate(MoveClass.UTILITY, PATROL, State.ACTIVE);
         moves.registerImmediate(MoveClass.BARRAGE, CHARGE, State.CHARGE);
+        moves.register(MoveClass.ULTIMATE, ATTACK_ORDER_MOVE);
         moves.register(MoveClass.SPECIAL3, XRAY);
     }
 
@@ -188,9 +194,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Override
     public void tick() {
         xRotChangeAllowed = false;
-
+        noPhysics = true;
         super.tick();
-
+        noPhysics = false;
         xRotChangeAllowed = true;
 
         resetFallDistance();
@@ -222,7 +228,11 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                 case FLYBY -> {
                     lookAt(flyTarget, 6f, 6f);
 
-                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(CRUISE_SPEED)));
+                    final double distanceSqr = distanceToSqr(flyTarget);
+
+                    final double cruiseSpeed = distanceSqr <= 49.0 ? SLOW_CRUISE_SPEED : CRUISE_SPEED;
+
+                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(cruiseSpeed)));
 
                     if (distanceToSqr(flyTarget) <= 4.0) {
                         flyState = FlyState.RETURN;
@@ -255,14 +265,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
         if (user != null) {
             if (isRemote()) {
-                if (flyState == FlyState.RETURN) {
-                    flyTarget = position();
-                    flyState = FlyState.PATROL;
-                } else {
-                    getMove(BombDropAttack.class).clearDropLocation();
+                if (flyState != FlyState.RETURN) {
                     flyState = FlyState.RETURN;
                 }
             }
+
+            getMove(BombDropAttack.class).clearDropLocation();
+
+            getMove(AerosmithAttackOrderMove.class).clearCurrentTarget();
 
             if (distanceToSqr(user) >= 4.0) return;
         }

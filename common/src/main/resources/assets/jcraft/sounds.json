@@ -1254,6 +1254,11 @@
       "jcraft:stands/aerosmith/radarping"
     ]
   },
+  "asradarscan": {
+    "sounds": [
+      "jcraft:stands/aerosmith/radarscan"
+    ]
+  },
   "asbarrage": {
     "sounds": [
       "jcraft:stands/aerosmith/standcry"
@@ -1262,6 +1267,21 @@
   "asbarragehit": {
     "sounds": [
       "jcraft:stands/aerosmith/slices"
+    ]
+  },
+  "asflyby": {
+    "sounds": [
+      "jcraft:stands/aerosmith/flyby"
+    ]
+  },
+  "asidle": {
+    "sounds": [
+      "jcraft:stands/aerosmith/idle"
+    ]
+  },
+  "asmaneuver": {
+    "sounds": [
+      "jcraft:stands/aerosmith/maneuver"
     ]
   },
   "gas_can_toss": {
