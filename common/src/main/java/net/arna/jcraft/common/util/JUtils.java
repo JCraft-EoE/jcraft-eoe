@@ -1,6 +1,5 @@
 package net.arna.jcraft.common.util;
 
-import com.google.common.base.MoreObjects;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import lombok.NonNull;
@@ -13,6 +12,7 @@ import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.JSpecHolder;
+import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -34,6 +34,7 @@ import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.api.splatter.JSplatterManager;
+import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
@@ -512,8 +513,9 @@ public final class JUtils {
             return;
         }
 
+        final boolean fire = modifier.getCreateFire() != null && modifier.getCreateFire();
         Explosion explosion = new Explosion(world, entity, x, y, z, power,
-                MoreObjects.firstNonNull(modifier.getCreateFire(), false), modifier.getBlockInteraction());
+                fire, modifier.getBlockInteraction());
         ((IJExplosion) explosion).jcraft$setModifier(modifier);
         explosion.explode();
         explosion.finalizeExplosion(true);
@@ -521,6 +523,17 @@ public final class JUtils {
         if (world.isClientSide) {
             return;
         }
+
+        // set gasoline on fire (always, independent of fire modifier)
+        JSplatterManager splatterManager = JSplatterManager.get(world);
+        Set<Splatter> gasSplatters = new HashSet<>();
+        for (int i = -Math.round(power); i < Math.round(power); i++) {
+            for (int j = -Math.round(power); j < Math.round(power); j++) {
+                gasSplatters.addAll(splatterManager.getHit(new Vec3(x+i, y, z+j), s -> s instanceof GasolineSplatter));
+            }
+        }
+        gasSplatters.forEach(s -> ((GasolineSplatter) s).lightOnFire());
+
         for (ServerPlayer player : around((ServerLevel) world, new Vec3(x, y, z), 64)) {
             JExplosionPacket.send(player, x, y, z, power, explosion, modifier);
         }
