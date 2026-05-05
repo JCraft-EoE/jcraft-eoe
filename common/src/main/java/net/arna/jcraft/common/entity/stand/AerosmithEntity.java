@@ -26,11 +26,13 @@ import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -50,6 +52,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     public static final double SLOW_CRUISE_SPEED = 0.075;
     public static final double CRUISE_SPEED = 0.15;
+    public static final double MAX_SPEED = 0.22;
 
     public enum FlyState {
         NONE,
@@ -120,7 +123,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Orders Aerosmith to attack the entity at a detected location.")
             );
 
-    public static final BreathXrayMove<AerosmithEntity> XRAY = new BreathXrayMove<AerosmithEntity>(0, 0, 128)
+    public static final BreathXrayMove<AerosmithEntity> XRAY = new BreathXrayMove<AerosmithEntity>(0, 0, 128, true)
             .withInfo(
                     Component.literal("Breath Detection"),
                     Component.literal("Aerosmith scans the surroundings for the breath of living things.")
@@ -139,11 +142,31 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     private CommonMiscComponent miscComponent;
     private int overheatTick;
 
+    @Getter
+    private final MuzzleHitscanAttack shootAttack;
+    @Getter
+    private final BombDropAttack bombDropAttack;
+    @Getter
+    private final ItemDropAttack itemDropAttack;
+    @Getter
+    private final AerosmithChargeAttack chargeAttack;
+    @Getter
+    private final BreathXrayMove<AerosmithEntity> breathXrayMove;
+    @Getter
+    private final AerosmithAttackOrderMove attackOrderMove;
+
     public AerosmithEntity(final Level world) {
         super(JStandTypeRegistry.AEROSMITH.get(), world);
         // setYDistanceOffset(10f); // TODO for patrol mode
         setYDistanceOffset(1.2f);
         setNoGravity(true);
+
+        shootAttack = getMove(MuzzleHitscanAttack.class);
+        bombDropAttack = getMove(BombDropAttack.class);
+        itemDropAttack = getMove(ItemDropAttack.class);
+        chargeAttack = getMove(AerosmithChargeAttack.class);
+        breathXrayMove = getMove(BreathXrayMove.class);
+        attackOrderMove = getMove(AerosmithAttackOrderMove.class);
     }
 
     @NonNull
@@ -156,11 +179,17 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     @Override
+    public boolean shouldOffsetHeight() {
+        return false;
+    }
+
+    @Override
     public boolean allowMoveHandling() {
         return getCurrentMove() == null &&
                 getMoveStun() < JCraft.QUEUE_MOVESTUN_LIMIT &&
-                getMove(BombDropAttack.class).getDropLocation() == null &&
-                getMove(AerosmithAttackOrderMove.class).getCurrentTarget() == null;
+                bombDropAttack.getDropLocation() == null &&
+                itemDropAttack.getDropLocation() == null &&
+                attackOrderMove.getCurrentTarget() == null;
     }
 
     @Override
@@ -177,7 +206,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         moves.register(MoveClass.SPECIAL3, XRAY);
     }
 
-    boolean xRotChangeAllowed = false;
+    private boolean xRotChangeAllowed = false;
+    public void allowXRotChange() { xRotChangeAllowed = true; }
+    public void disallowXRotChange() { xRotChangeAllowed = false; }
 
     @Override
     public void setXRot(float xRot) {
@@ -200,6 +231,18 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         xRotChangeAllowed = true;
 
         resetFallDistance();
+
+        if (!isAlive()) return;
+
+        if (level() instanceof ClientLevel clientLevel) {
+            if (tickCount % 26 == 0) {
+                final Vec3 pos = position();
+                clientLevel.playLocalSound(pos.x, pos.y, pos.z,
+                        JSoundRegistry.AS_IDLE.get(), SoundSource.PLAYERS,
+                        isRemote() ? 0.2f : 1.0f, 1.0f, true);
+            }
+            return;
+        }
 
         final LivingEntity user = getUser();
         if (user == null) return;
@@ -230,12 +273,24 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
                     final double distanceSqr = distanceToSqr(flyTarget);
 
-                    final double cruiseSpeed = distanceSqr <= 49.0 ? SLOW_CRUISE_SPEED : CRUISE_SPEED;
+                    double cruiseSpeed = distanceSqr <= 49.0 ? SLOW_CRUISE_SPEED : CRUISE_SPEED;
+
+                    final var attackTarget = attackOrderMove.getCurrentTarget();
+                    final boolean hasAttackTarget = attackTarget != null;
+
+                    if (hasAttackTarget) {
+                        // moving away from target
+                        if (distanceToSqr(attackTarget) > attackTarget.distanceToSqr(xOld, yOld, zOld)) {
+                            cruiseSpeed = MAX_SPEED;
+                        }
+                    }
 
                     setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(cruiseSpeed)));
 
-                    if (distanceToSqr(flyTarget) <= 4.0) {
-                        flyState = FlyState.RETURN;
+                    if (distanceToSqr(flyTarget) <= 4.0
+                            && bombDropAttack.getDropLocation() == null
+                            && itemDropAttack.getDropLocation() == null) {
+                        flyState = hasAttackTarget ? FlyState.PATROL : FlyState.RETURN;
                     }
                 }
                 case RETURN -> {
@@ -251,6 +306,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
                     if (distanceSqr <= 4.0) {
                         setRemote(false);
+                        flyState = FlyState.NONE;
+                        playSound(JSoundRegistry.AS_LANDING.get());
                     }
                 }
             }
@@ -264,8 +321,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         final LivingEntity user = getUser();
 
         if (user != null) {
-            getMove(BombDropAttack.class).clearDropLocation();
-            getMove(AerosmithAttackOrderMove.class).clearCurrentTarget();
+            bombDropAttack.clearDropLocation();
+            itemDropAttack.clearDropLocation();
+            attackOrderMove.clearCurrentTarget();
 
             if (isRemote()) {
                 if (flyState != FlyState.RETURN) {

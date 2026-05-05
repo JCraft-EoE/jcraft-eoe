@@ -31,8 +31,11 @@ import java.util.Set;
 
 @Getter
 public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity> {
+    public static final float BASE_DROP_RANGE = 1.5f;
+    public static final float DROP_RANGE_INCREASE = 0.01f;
 
     private float range;
+    private float dropRange;
     @Nullable @Setter
     private Vec3 dropLocation;
 
@@ -68,6 +71,8 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
             attacker.lookAt(EntityAnchorArgument.Anchor.FEET, dropLocation);
             attacker.setFlyTarget(dropLocation);
 
+            dropRange = BASE_DROP_RANGE;
+
             if (!attacker.isRemote()) attacker.setRemote(true);
         }
 
@@ -81,15 +86,20 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
 
     @Override
     public void tick(final AerosmithEntity attacker) {
-        if (dropLocation != null) {
-            if (attacker.position().distanceTo(dropLocation) <= 2.25) {
-                // TODO play the animation
-                attacker.playSound(JSoundRegistry.AS_BOMB_DROP.get());
-                dropItem(attacker);
-                dropLocation = null;
-                attacker.setFlyState(AerosmithEntity.FlyState.RETURN);
-            }
+        if (dropLocation == null) {
+            dropRange = BASE_DROP_RANGE;
+            return;
         }
+
+        if (attacker.distanceToSqr(dropLocation) <= dropRange * dropRange) {
+            // TODO play the animation
+            attacker.playSound(JSoundRegistry.AS_BOMB_DROP.get());
+            dropItem(attacker);
+            dropLocation = null;
+            attacker.setFlyState(AerosmithEntity.FlyState.RETURN);
+        }
+
+        dropRange += DROP_RANGE_INCREASE;
     }
 
     private void dropItem(AerosmithEntity attacker) {
@@ -129,6 +139,10 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
         return copyExtras(
                 new ItemDropAttack(getCooldown(), getRange())
         );
+    }
+
+    public void clearDropLocation() {
+        dropLocation = null;
     }
 
     public static class Type extends AbstractMove.Type<ItemDropAttack> {

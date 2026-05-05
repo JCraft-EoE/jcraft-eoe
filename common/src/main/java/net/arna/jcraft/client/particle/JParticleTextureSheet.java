@@ -81,8 +81,6 @@ public class JParticleTextureSheet {
             RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
 
             builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
-
-            RenderSystem.enableDepthTest();
         }
 
         public void end(final Tesselator tessellator) {

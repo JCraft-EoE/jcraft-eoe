@@ -1284,6 +1284,11 @@
       "jcraft:stands/aerosmith/maneuver"
     ]
   },
+  "aslanding": {
+    "sounds": [
+      "jcraft:stands/aerosmith/landing"
+    ]
+  },
   "gas_can_toss": {
     "sounds": [
       "jcraft:projectiles/gas_can/toss"

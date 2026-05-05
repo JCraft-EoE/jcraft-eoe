@@ -36,10 +36,13 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     private boolean active = true;
     private float range;
     private float scanAngle = 0.0f;
+    @Getter
+    private boolean requireRemote;
 
-    public BreathXrayMove(int cooldown, float moveDistance, float range) {
+    public BreathXrayMove(int cooldown, float moveDistance, float range, boolean requireRemote) {
         super(cooldown, 0, 0, moveDistance);
         this.range = range;
+        this.requireRemote = requireRemote;
     }
 
     public float getRange() {
@@ -48,6 +51,11 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
     public BreathXrayMove<?> withRange(float range) {
         this.range = range;
+        return getThis();
+    }
+
+    public BreathXrayMove<?> withRequireRemote(boolean require) {
+        this.requireRemote = require;
         return getThis();
     }
 
@@ -77,6 +85,8 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         scanAngle %= Mth.PI * 2.0;
 
         if (!active) return;
+
+        if (requireRemote && !attacker.isRemote()) return;
 
         final LivingEntity base = attacker.getBaseEntity();
         if (base == null) return;
@@ -185,7 +195,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
     @Override
     public @NonNull BreathXrayMove<A> copy() {
-        return copyExtras(new BreathXrayMove<>(getCooldown(), getMoveDistance(), getRange()));
+        return copyExtras(new BreathXrayMove<>(getCooldown(), getMoveDistance(), getRange(), isRequireRemote()));
     }
 
     public static class Type extends AbstractMove.Type<BreathXrayMove<?>> {
@@ -195,9 +205,13 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
             return Codec.FLOAT.fieldOf("range").forGetter(BreathXrayMove::getRange);
         }
 
-        protected Products.P4<RecordCodecBuilder.Mu<BreathXrayMove<?>>, BaseMoveExtras, Integer, Float, Float>
+        protected RecordCodecBuilder<BreathXrayMove<?>, Boolean> requireRemote() {
+            return Codec.BOOL.fieldOf("requireRemote").forGetter(BreathXrayMove::isRequireRemote);
+        }
+
+        protected Products.P5<RecordCodecBuilder.Mu<BreathXrayMove<?>>, BaseMoveExtras, Integer, Float, Float, Boolean>
         xrayDefault(RecordCodecBuilder.Instance<BreathXrayMove<?>> instance) {
-            return instance.group(extras(), cooldown(), moveDistance(), range());
+            return instance.group(extras(), cooldown(), moveDistance(), range(), requireRemote());
         }
 
         @Override

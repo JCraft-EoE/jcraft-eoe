@@ -19,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Set;
 
 public class AerosmithChargeAttack extends AbstractMultiHitAttack<AerosmithChargeAttack, AerosmithEntity> {
-    Vec3 up, forward, peak, chargeStart;
+    Vec3 up, forward, peak, chargeStart, remoteChargeTarget;
     enum Segment { FIRST_RISE, CHARGE_START, CHARGE, RISE }
     Segment segment;
     boolean remoteCharge;
@@ -48,7 +48,7 @@ public class AerosmithChargeAttack extends AbstractMultiHitAttack<AerosmithCharg
             forward = user.getLookAngle();
 
             final Vec3 pos = user.position().add(up);
-            final Vec3 toPeak = forward.add(up.scale(3));
+            final Vec3 toPeak = forward.add(up);
 
             segment = Segment.FIRST_RISE;
             peak = pos.add(toPeak);
@@ -61,10 +61,15 @@ public class AerosmithChargeAttack extends AbstractMultiHitAttack<AerosmithCharg
         } else {
             final Vec3 start = user.position();
             final HitResult goal = JUtils.raycastAll(user, start, start.add(user.getLookAngle().scale(64.0)), ClipContext.Fluid.NONE);
-            attacker.setFlyState(AerosmithEntity.FlyState.FLYBY);
-            forward = goal.getLocation();
-            segment = Segment.CHARGE;
+            chargeAt(attacker, goal.getLocation());
         }
+    }
+
+    public void chargeAt(final AerosmithEntity attacker, final Vec3 goal) {
+        attacker.setFlyState(AerosmithEntity.FlyState.FLYBY);
+        forward = attacker.getLookAngle();
+        remoteChargeTarget = goal;
+        segment = Segment.CHARGE;
     }
 
     @Override
@@ -73,7 +78,9 @@ public class AerosmithChargeAttack extends AbstractMultiHitAttack<AerosmithCharg
 
         if (remoteCharge) {
             attacker.setDeltaMovement(attacker.getDeltaMovement().scale(0.4).add(attacker.getLookAngle().scale(0.3)));
-            attacker.lookAt(forward, 10f, 10f);
+            attacker.allowXRotChange();
+            attacker.lookAt(remoteChargeTarget, 10f, 10f);
+            attacker.disallowXRotChange();
             return;
         }
 

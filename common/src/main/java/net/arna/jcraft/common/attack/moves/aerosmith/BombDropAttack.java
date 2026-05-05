@@ -27,8 +27,11 @@ import java.util.Set;
 
 @Getter
 public class BombDropAttack extends AbstractMove<BombDropAttack, AerosmithEntity> {
+    public static final float BASE_DROP_RANGE = 1.5f;
+    public static final float DROP_RANGE_INCREASE = 0.01f;
 
     private float range;
+    private float dropRange;
     @Nullable @Getter @Setter
     private Vec3 dropLocation;
 
@@ -55,6 +58,8 @@ public class BombDropAttack extends AbstractMove<BombDropAttack, AerosmithEntity
             attacker.lookAt(EntityAnchorArgument.Anchor.FEET, dropLocation);
             attacker.setFlyTarget(dropLocation);
 
+            dropRange = BASE_DROP_RANGE;
+
             if (!attacker.isRemote()) attacker.setRemote(true);
         }
 
@@ -63,19 +68,25 @@ public class BombDropAttack extends AbstractMove<BombDropAttack, AerosmithEntity
 
     @Override
     public void tick(final AerosmithEntity attacker) {
-        if (dropLocation != null) {
-            if (attacker.position().distanceToSqr(dropLocation) <= 2.25) {
-                // TODO play the animation
-                attacker.playSound(JSoundRegistry.AS_BOMB_DROP.get());
-                dropBomb(attacker);
-                dropLocation = null;
-                attacker.setFlyState(AerosmithEntity.FlyState.RETURN);
-            }
+        if (dropLocation == null) {
+            dropRange = BASE_DROP_RANGE;
+            return;
         }
+
+        if (attacker.distanceToSqr(dropLocation) <= dropRange * dropRange) {
+            // TODO play the animation
+            attacker.playSound(JSoundRegistry.AS_BOMB_DROP.get());
+            dropBomb(attacker);
+            dropLocation = null;
+            attacker.setFlyState(AerosmithEntity.FlyState.RETURN);
+        }
+
+        dropRange += DROP_RANGE_INCREASE;
     }
 
     private void dropBomb(AerosmithEntity attacker) {
-        AerobombProjectile bomb = new AerobombProjectile(attacker.level());
+        final var bomb = new AerobombProjectile(attacker.level());
+
         bomb.setOwner(attacker.hasUser() ? attacker.getUserOrThrow() : attacker);
         bomb.setPos(attacker.position().subtract(0d, 1d, 0d));
 

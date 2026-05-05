@@ -1016,6 +1016,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Tick moves
         moveMap.tickMoves(getThis());
+        moveStun = getMoveStun();
 
         // Block break / Guard crush check
         if (getStandGauge() < 1) {

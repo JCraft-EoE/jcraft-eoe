@@ -8,7 +8,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity.FlyState;
@@ -16,7 +18,9 @@ import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +62,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
         final Vec3 rotVec = user.getLookAngle();
 
-        final BreathXrayMove<AerosmithEntity> xrayMove = attacker.getMove(BreathXrayMove.class);
+        final BreathXrayMove<AerosmithEntity> xrayMove = attacker.getBreathXrayMove();
 
         if (xrayMove == null) return;
 
@@ -98,6 +102,13 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
             }
 
             currentTarget = JUtils.getUserIfStand(closest);
+
+            if (currentTarget != null && user instanceof ServerPlayer serverPlayer) {
+                final var targetPosition = currentTarget.position();
+
+                serverPlayer.connection.send(new ClientboundLevelParticlesPacket(JParticleTypeRegistry.SUN_LOCK_ON.get(), true,
+                        targetPosition.x, targetPosition.y, targetPosition.z, 0, 0, 0, 0, 1));
+            }
         }
     }
 
@@ -105,7 +116,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
     public void tick(AerosmithEntity attacker) {
         final LivingEntity user = attacker.getUser();
 
-        final var bombAttack = attacker.getMove(BombDropAttack.class);
+        final var bombAttack = attacker.getBombDropAttack();
 
         if (currentTarget == null) return;
 
@@ -133,7 +144,23 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
             cds.setCooldown(CooldownType.HEAVY, bombAttack.getCooldown());
         } else {
+            final var chargeAttack = attacker.getChargeAttack();
+
             if (bombAttack.getDropLocation() == null) {
+                if (attacker.getMoveStun() > 0) {
+                    return;
+                }
+
+                boolean tryCharge = attacker.getRandom().nextBoolean();
+
+                if (tryCharge) {
+                    if (cds.getCooldown(CooldownType.BARRAGE) <= 0.0 && attacker.distanceToSqr(currentTarget) < 100.0) {
+                        attacker.initMove(MoveClass.BARRAGE);
+                        chargeAttack.chargeAt(attacker, currentTarget.position());
+                        return;
+                    }
+                }
+
                 if (attacker.getOverheat() < AerosmithEntity.OVERHEAT_MAX / 2f) {
                     attacker.setFlyState(FlyState.FLYBY);
 
@@ -144,8 +171,9 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
                     final Vec3 lookVec = targetPos.subtract(attacker.position()).normalize();
 
                     if (JUtils.angleBetween(lookVec, attacker.getLookAngle()) > 0.93)
-                        if (attacker.tickCount % 2 == 0)
-                            attacker.getMove(MuzzleHitscanAttack.class).perform(attacker, user);
+                        if (attacker.tickCount % 2 == 0) // fire
+                            attacker.getShootAttack().perform(attacker, user);
+
                 } else {
                     final var targetPos = currentTarget.position().add(JUtils.getLocalUp(user).scale(16));
 
@@ -153,6 +181,9 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
                     attacker.setFlyTarget(targetPos);
                 }
+            } else {
+                final var bombTarget = currentTarget.position().add(JUtils.getLocalUp(user).scale(6.7));
+                attacker.setFlyTarget(bombTarget);
             }
         }
 
