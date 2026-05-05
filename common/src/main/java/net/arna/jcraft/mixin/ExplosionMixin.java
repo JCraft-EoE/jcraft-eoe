@@ -121,7 +121,6 @@ public class ExplosionMixin implements IJExplosion {
 
     @WrapOperation(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;ignoreExplosion()Z"))
     private boolean jcraft$checkHurtPredicate(Entity instance, Operation<Boolean> original) {
-        return original.call(instance) && (modifier == null || modifier.getHurtFilter() == null ||
-                !modifier.getHurtFilter().test(instance));
+        return original.call(instance) || (modifier != null && modifier.getHurtFilter() != null && !modifier.getHurtFilter().test(instance));
     }
 }
