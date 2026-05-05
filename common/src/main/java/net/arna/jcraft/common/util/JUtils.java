@@ -12,7 +12,6 @@ import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.JSpecHolder;
-import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -34,7 +33,6 @@ import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.api.splatter.JSplatterManager;
-import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
@@ -525,14 +523,15 @@ public final class JUtils {
         }
 
         // set gasoline on fire (always, independent of fire modifier)
-        JSplatterManager splatterManager = JSplatterManager.get(world);
+        /*JSplatterManager splatterManager = JSplatterManager.get(world);
         Set<Splatter> gasSplatters = new HashSet<>();
-        for (int i = -Math.round(power); i <= Math.round(power); i++) {
-            for (int j = -Math.round(power); j <= Math.round(power); j++) {
-                gasSplatters.addAll(splatterManager.getHit(new Vec3(x+i, y, z+j), s -> s instanceof GasolineSplatter));
+        for (int i = -Math.round(power)-2; i <= Math.round(power)+2; i++) {
+            for (int j = -Math.round(power)-2; j <= Math.round(power)+2; j++) {
+                for (int k = -1; k <= 1; k++)
+                    gasSplatters.addAll(splatterManager.getHit(new Vec3(x+i, y+k, z+j), s -> s instanceof GasolineSplatter));
             }
         }
-        gasSplatters.forEach(s -> ((GasolineSplatter) s).lightOnFire());
+        gasSplatters.forEach(s -> ((GasolineSplatter) s).lightOnFire());*/
 
         for (ServerPlayer player : around((ServerLevel) world, new Vec3(x, y, z), 64)) {
             JExplosionPacket.send(player, x, y, z, power, explosion, modifier);
