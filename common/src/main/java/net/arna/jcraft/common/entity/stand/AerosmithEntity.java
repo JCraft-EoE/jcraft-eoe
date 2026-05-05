@@ -225,7 +225,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public void tick() {
         xRotChangeAllowed = false;
         noPhysics = true;
+
+        if (isRemote()) wantToBlock = false;
         super.tick();
+
         noPhysics = false;
         xRotChangeAllowed = true;
 

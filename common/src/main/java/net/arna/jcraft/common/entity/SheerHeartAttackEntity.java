@@ -1,11 +1,11 @@
 package net.arna.jcraft.common.entity;
 
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.ai.goal.SHAAttackGoal;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.IOwnable;
@@ -213,11 +213,16 @@ public class SheerHeartAttackEntity extends Mob implements IOwnable {
                         .noDamage()
                         .build());
 
-        final DamageSource damageSource = JUtils.getStand(getMaster()) != null ? JDamageSources.stand(JUtils.getStand(getMaster())) : level().damageSources().explosion(getMaster(), this);
-        final Set<? extends LivingEntity> toExplode = JUtils.generateHitbox(level(), position(), 4d, Set.of(this, getMaster()));
-        for (final LivingEntity living : toExplode) {
+        final StandEntity<?, ?> masterStand = JUtils.getStand(master);
+
+        final DamageSource damageSource = masterStand != null ? JDamageSources.stand(masterStand) : level().damageSources().explosion(master, this);
+
+        final Set<LivingEntity> hurt = JUtils.generateHitbox(level(), position(), 4.0, Set.of(this, master));
+
+        for (final LivingEntity living : hurt) {
             final Vec3 kbVec = living.getEyePosition().subtract(position()).normalize();
-            damageLogic(level(), living, kbVec, 2, 3, true, 13f, false, 4, damageSource, getMaster(), null);
+            damageLogic(level(), living, kbVec, 2, 3, true, 13f,
+                    false, 4, damageSource, getMaster(), null, false);
             living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
         }
     }
