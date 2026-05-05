@@ -9,7 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.vehicle.MinecartTNT;
 import net.minecraft.world.level.Level;
@@ -132,8 +131,6 @@ public class MatchProjectile extends Projectile {
 
         if (!level().isClientSide()) {
             checkGas(position());
-            checkBlocks(blockPosition());
-
             // Light flammable players on fire
             level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(0.25),
                             e -> FlammableEffect.isFlammable(e) && !e.isOnFire())

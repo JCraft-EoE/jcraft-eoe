@@ -207,7 +207,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -220,7 +220,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -580,13 +580,13 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -844,13 +844,13 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -1190,13 +1190,13 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -1516,7 +1516,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -1532,7 +1532,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -1866,13 +1866,13 @@
 						"easing": "linear"
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -2257,7 +2257,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -2415,7 +2415,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -2671,7 +2671,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -2801,7 +2801,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -3109,13 +3109,13 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"rotation": {
 						"0.0": {
 							"vector": [-90, -215, 0],
@@ -3580,13 +3580,13 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"rotation": {
 						"0.2": {
 							"vector": [-75, -180, 0],
@@ -3989,7 +3989,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -4035,7 +4035,7 @@
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"rotation": {
 						"0.84": {
 							"vector": [-90, -180, 0],
@@ -4979,7 +4979,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -4991,7 +4991,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -6196,7 +6196,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -6316,7 +6316,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"rotation": {
 						"0.36": {
 							"vector": [0, 0, 90],
@@ -6713,13 +6713,13 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"rotation": {
 						"0.36": {
 							"vector": [0, 0, -192.5],
@@ -7119,13 +7119,13 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -7486,7 +7486,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -7666,7 +7666,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"rotation": {
 						"0.44": {
 							"vector": [-90, 90, 0],
@@ -8029,7 +8029,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -8230,7 +8230,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -8933,7 +8933,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -9307,7 +9307,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -9614,7 +9614,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -9704,7 +9704,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"rotation": {
 						"0.44": {
 							"vector": [90.00002, -90, 89.99998],
@@ -10100,7 +10100,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -10190,7 +10190,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"rotation": {
 						"0.36": {
 							"vector": [30.99293, 51.18666, 127.62925],
@@ -10537,13 +10537,13 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -10892,7 +10892,7 @@
 						}
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -11095,7 +11095,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -11190,7 +11190,7 @@
 			"loop": "hold_on_last_frame",
 			"animation_length": 0.9583,
 			"bones": {
-				"exploding_armor": {
+				"prop3": {
 					"rotation": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -11801,7 +11801,7 @@
 						}
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -12048,13 +12048,13 @@
 						"easing": "linear"
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -12281,7 +12281,7 @@
 						"easing": "linear"
 					}
 				},
-				"exploding_armor": {
+				"prop3": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"
@@ -12327,7 +12327,7 @@
 						"easing": "linear"
 					}
 				},
-				"blur": {
+				"prop4": {
 					"scale": {
 						"vector": ["linear", "linear", "linear"],
 						"easing": "linear"

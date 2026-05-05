@@ -1,13 +1,8 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import lombok.NonNull;
-import mod.azure.azurelib.model.AzBone;
 import mod.azure.azurelib.render.AzRendererPipelineContext;
 import mod.azure.azurelib.render.entity.AzEntityRendererConfig;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
@@ -72,7 +67,6 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
                         .setModelRenderer(StandEntityModelRenderer::new)
                         .setRenderType(renderType())
                         .setPrerenderEntry(preRenderEntry())
-                        .addRenderLayer(new StandHandItemsRenderLayer<>())
                         // .setRenderEntry(renderEntry())
         ).build(), context, type.getId().getPath());
     }
@@ -257,47 +251,6 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
 
     protected float getBlue(final T stand, final float blue, final float alpha) {
         return blue;
-    }
-
-    /**
-     * Like {@link HandItemsRenderLayer} but uses the bone names present in stand geo models
-     * ({@code lower_armRight} / {@code lower_armLeft}) instead of the vanilla biped names.
-     */
-    public static class StandHandItemsRenderLayer<T extends StandEntity<?,?>> extends HandItemsRenderLayer<T> {
-        private static final String STAND_RIGHT_HAND = "lower_armRight";
-        private static final String STAND_LEFT_HAND = "lower_armLeft";
-
-        @Override
-        public ItemStack itemStackForBone(final AzBone bone, final T animatable) {
-            return switch (bone.getName()) {
-                case STAND_LEFT_HAND -> animatable.isLeftHanded() ? mainHandItem : offHandItem;
-                case STAND_RIGHT_HAND -> animatable.isLeftHanded() ? offHandItem : mainHandItem;
-                default -> null;
-            };
-        }
-
-        @Override
-        protected ItemDisplayContext getTransformTypeForStack(final AzBone bone, final ItemStack stack, final T animatable) {
-            return switch (bone.getName()) {
-                case STAND_LEFT_HAND -> ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
-                case STAND_RIGHT_HAND -> ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
-                default -> ItemDisplayContext.NONE;
-            };
-        }
-
-        @Override
-        protected void renderItemForBone(final AzRendererPipelineContext<UUID, T> context, final AzBone bone, final ItemStack itemStack, final T animatable) {
-            final PoseStack poseStack = context.poseStack();
-            final String boneName = bone.getName();
-            if (boneName.equals(STAND_RIGHT_HAND)) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90f));
-                poseStack.translate(0, 0.3, 0);
-            } else if (boneName.equals(STAND_LEFT_HAND)) {
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90f));
-                poseStack.translate(0, 0.3, 0);
-            }
-            superRenderItemForBone(context, bone, itemStack, animatable);
-        }
     }
 
     public static class StandAnimator<T extends StandEntity<?,?>> extends EntityAnimator<T> {
