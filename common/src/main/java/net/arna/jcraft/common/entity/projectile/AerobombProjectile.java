@@ -5,9 +5,7 @@ import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.util.JExplosionModifier;
 import net.arna.jcraft.common.util.JUtils;
@@ -52,17 +50,6 @@ public class AerobombProjectile extends AbstractArrow {
     @Override
     protected void onHitEntity(final EntityHitResult result) {
         mayExplode();
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        if (getOwner() instanceof LivingEntity living) {
-            StandEntity<?,?> stand = JUtils.getStand(living);
-            if (!(living instanceof StandEntity<?,?>) && (stand == null || stand.getStandType() != JStandTypeRegistry.AEROSMITH)) {
-                discard();
-            }
-        }
     }
 
     protected void mayExplode() {
