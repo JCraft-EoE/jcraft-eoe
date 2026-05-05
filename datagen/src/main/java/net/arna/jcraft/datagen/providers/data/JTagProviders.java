@@ -714,7 +714,8 @@ public class JTagProviders {
                     .add(DamageTypes.IN_FIRE)
                     .add(DamageTypes.LAVA)
                     .add(DamageTypes.FALLING_BLOCK)
-                    .add(DamageTypes.DROWN);
+                    .add(DamageTypes.DROWN)
+                    .add(DamageTypes.IN_WALL);
         }
     }
 }

@@ -66,14 +66,8 @@ public class AerobombProjectile extends AbstractArrow {
                             .build());
 
             final DamageSource damageSource = getOwner() instanceof LivingEntity living  && JUtils.getStand(living) != null ? JDamageSources.stand(JUtils.getStand(living)) : level().damageSources().explosion(getOwner(), this);
-            final Set<? extends LivingEntity> toExplode = AbstractSimpleAttack.findHits(
-                    getOwner() instanceof LivingEntity living ? JUtils.getStand(living) : null,
-                    position(), 4f, damageSource);
-
+            final Set<? extends LivingEntity> toExplode = JUtils.generateHitbox(level(), position(), 4d, Set.of(this, getOwner()));
             for (final LivingEntity living : toExplode) {
-                if (living == getOwner()) {
-                    continue;
-                }
                 final Vec3 kbVec = living.getEyePosition().subtract(position()).normalize();
                 damageLogic(level(), living, kbVec, 2, 3, true, 11f, false, 4, damageSource, getOwner(), null);
                 living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
