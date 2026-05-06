@@ -292,6 +292,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> AS_BARRAGE = register("asbarrage");
     RegistrySupplier<SoundEvent> AS_BARRAGE_HIT = register("asbarragehit");
     RegistrySupplier<SoundEvent> AS_IDLE = register("asidle");
+    RegistrySupplier<SoundEvent> AS_FLYBY = register("asflyby");
     RegistrySupplier<SoundEvent> AS_LANDING = register("aslanding");
 
     //// SPECS
