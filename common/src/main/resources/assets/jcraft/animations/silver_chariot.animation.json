@@ -308,7 +308,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [17.99747, 24.35757, -120.46596],
@@ -948,7 +948,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [4.83687, 10.92037, -25.45487],
@@ -1930,7 +1930,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [39.21493, -26.00054, -47.75245],
@@ -2473,7 +2473,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -2844,7 +2844,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [42.5, 0, 0],
@@ -3191,7 +3191,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [90, 0, 0],
@@ -3678,7 +3678,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [117.5, 0, 0],
@@ -4131,7 +4131,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -5853,7 +5853,7 @@
 						}
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [55.6431, 7.13136, 10.29284],
@@ -6416,7 +6416,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, -2.5],
@@ -7754,7 +7754,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -9832,7 +9832,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [57.5, 0, 0],
@@ -10278,7 +10278,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [57.5, 0, 0],
@@ -10597,7 +10597,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [-85.01893, 0.43523, -184.98107],
@@ -11149,7 +11149,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [-85.01893, 0.43523, -184.98107],
@@ -12381,7 +12381,7 @@
 						"easing": "linear"
 					}
 				},
-				"katana": {
+				"prop5": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 32.5, 0],

@@ -196,7 +196,7 @@
 					]
 				},
 				{
-					"name": "katana",
+					"name": "prop5",
 					"parent": "lower_armRight",
 					"pivot": [-6, 13, 0],
 					"cubes": [
