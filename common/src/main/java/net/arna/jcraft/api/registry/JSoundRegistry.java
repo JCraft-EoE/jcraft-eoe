@@ -117,6 +117,8 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> KQ_DETONATE = register("kqdetonate");
     RegistrySupplier<SoundEvent> KQ_UPPERCUT = register("kquppercut");
     RegistrySupplier<SoundEvent> KQ_EXPLODE = register("kqexplode");
+    RegistrySupplier<SoundEvent> KQ_NUKE = register("kqnuke");
+    RegistrySupplier<SoundEvent> SHA_EXPLODE = register("shaexplode");
     RegistrySupplier<SoundEvent> SHA_TREAD = register("shatread");
 
     //Killer Queen: Bites The Dust

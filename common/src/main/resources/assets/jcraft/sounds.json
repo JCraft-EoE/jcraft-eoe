@@ -451,7 +451,17 @@
   },
   "kqexplode": {
     "sounds": [
-      "jcraft:stands/killerqueen/explode"
+      "jcraft:stands/killerqueen/explode1",
+      "jcraft:stands/killerqueen/explode2",
+      "jcraft:stands/killerqueen/explode3",
+      "jcraft:stands/killerqueen/explode4",
+      "jcraft:stands/killerqueen/explode5",
+      "jcraft:stands/killerqueen/explode6"
+    ]
+  },
+  "kqnuke": {
+    "sounds": [
+      "jcraft:stands/killerqueen/nuke"
     ]
   },
   "kqbtdelbow": {
@@ -1208,6 +1218,14 @@
   "shatread": {
     "sounds": [
       "jcraft:sheerheartattack/sha_tread"
+    ]
+  },
+  "shaexplode": {
+    "sounds": [
+      "jcraft:sheerheartattack/sha_explode1",
+      "jcraft:sheerheartattack/sha_explode2",
+      "jcraft:sheerheartattack/sha_explode3",
+      "jcraft:sheerheartattack/sha_explode4"
     ]
   },
   "rrhit": {
