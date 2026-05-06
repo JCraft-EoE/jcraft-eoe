@@ -26,6 +26,8 @@ import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.actions.EffectAction;
 import net.arna.jcraft.common.attack.moves.cream.*;
 import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.attack.moves.toss.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.toss.TossMove;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;

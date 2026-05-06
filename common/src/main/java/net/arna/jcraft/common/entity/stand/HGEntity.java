@@ -20,6 +20,8 @@ import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.moves.hierophantgreen.EmeraldSplashAttack;
 import net.arna.jcraft.common.attack.moves.hierophantgreen.NetSetMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.attack.moves.toss.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.toss.TossMove;
 import net.arna.jcraft.common.entity.projectile.HGNetEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.IOwnable;

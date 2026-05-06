@@ -21,6 +21,8 @@ import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.common.attack.moves.goldexperience.requiem.*;
 import net.arna.jcraft.common.attack.moves.mandom.CountdownMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.attack.moves.toss.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.toss.TossMove;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;

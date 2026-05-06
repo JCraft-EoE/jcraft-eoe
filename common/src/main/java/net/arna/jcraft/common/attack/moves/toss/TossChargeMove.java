@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.attack.moves.shared;
+package net.arna.jcraft.common.attack.moves.toss;
 
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

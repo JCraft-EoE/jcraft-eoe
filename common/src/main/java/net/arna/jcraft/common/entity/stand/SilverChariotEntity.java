@@ -24,6 +24,8 @@ import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.silverchariot.*;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
+import net.arna.jcraft.common.attack.moves.toss.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.toss.TossMove;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;

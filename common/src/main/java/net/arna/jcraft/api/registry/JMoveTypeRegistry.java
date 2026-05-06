@@ -47,6 +47,9 @@ import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWChargeAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWDonutAttack;
 import net.arna.jcraft.common.attack.moves.theworld.overheaven.*;
+import net.arna.jcraft.common.attack.moves.toss.special.KQTossMove;
+import net.arna.jcraft.common.attack.moves.toss.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.toss.TossMove;
 import net.arna.jcraft.common.attack.moves.vampire.*;
 import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.GiveStandAttack;
@@ -117,7 +120,6 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_GRAB_ATTACK = register("killerqueen_kq_grab_attack", KQGrabAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_GRAB_HIT_ATTACK = register("killerqueen_kq_grab_hit_attack", KQGrabHitAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_SHEER_HEART_ATTACK_ATTACK = register("killerqueen_sheer_heart_attack_attack", SheerHeartAttackAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_TOSS_MOVE = register("killerqueen_kq_toss_move", KQTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> KILLERQUEEN_BITESTHEDUST_BTD_DETONATE_ATTACK = register("killerqueen_bitesthedust_btd_detonate_attack", BTDDetonateAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_BITESTHEDUST_BTD_GRAB_HIT_ATTACK = register("killerqueen_bitesthedust_btd_grab_hit_attack", BTDGrabHitAttack.Type.INSTANCE);
@@ -193,8 +195,6 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SHARED_TIME_SKIP_MOVE = register("shared_time_skip_move", TimeSkipMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TIME_STOP_MOVE = register("shared_time_stop_move", TimeStopMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_RESTORATION_ATTACK = register("shared_restoration_attack", RestorationAttack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SHARED_TOSS_CHARGE_MOVE = register("shared_toss_charge_move", TossChargeMove.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SHARED_TOSS_MOVE = register("shared_toss_move", TossMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_SIMPLE_HITSCAN_ATTACK = register("shared_simple_hitscan_attack", SimpleHitscanAttack.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_ARMOR_OFF_ATTACK = register("silverchariot_armor_off_attack", ArmorOffAttack.Type.INSTANCE);
@@ -279,7 +279,10 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> AEROSMITH_CHARGE_ATTACK = register("aerosmith_charge_attack", AerosmithChargeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> BREATH_XRAY_MOVE = register("breath_xray_move", BreathXrayMove.Type.INSTANCE);
 
-
+    // Generic toss moves and custom toss moves
+    RegistrySupplier<MoveType<?>> SHARED_TOSS_CHARGE_MOVE = register("shared_toss_charge_move", TossChargeMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SHARED_TOSS_MOVE = register("shared_toss_move", TossMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> KILLERQUEEN_TOSS_MOVE = register("killerqueen_toss_move", KQTossMove.Type.INSTANCE);
 
     private static RegistrySupplier<MoveType<?>> register(String id, MoveType<?> type) {
         return MOVE_TYPE_REGISTRY.register(id, () -> type);

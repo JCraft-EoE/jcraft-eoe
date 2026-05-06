@@ -20,6 +20,8 @@ import net.arna.jcraft.common.attack.moves.purplehaze.BackhandAttack;
 import net.arna.jcraft.common.attack.moves.purplehaze.PHRekkaAttack;
 import net.arna.jcraft.common.attack.moves.purplehaze.distortion.DistortionMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.attack.moves.toss.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.toss.TossMove;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;

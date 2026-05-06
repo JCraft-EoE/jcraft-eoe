@@ -29,6 +29,8 @@ import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.actions.EffectAction;
 import net.arna.jcraft.common.attack.moves.kingcrimson.*;
 import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.attack.moves.toss.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.toss.TossMove;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
