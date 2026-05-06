@@ -837,40 +837,47 @@ public final class JUtils {
         if (itemStack.getItem() instanceof final ArrowItem arrow) {
             final AbstractArrow arrowEntity = arrow.createArrow(level, itemStack, shooter);
             arrowEntity.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            arrowEntity.setPos(getEyePos(shooter));
             level.addFreshEntity(arrowEntity);
         }
         else if (itemStack.getItem() instanceof SnowballItem) {
             final Snowball snowballEntity = new Snowball(level, shooter);
             snowballEntity.setItem(itemStack);
             snowballEntity.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            snowballEntity.setPos(getEyePos(shooter));
             level.addFreshEntity(snowballEntity);
         }
 
         else if (itemStack.getItem() instanceof TridentItem) {
             final ThrownTrident thrownTrident = new ThrownTrident(level, getUserIfStand(shooter), itemStack);
             thrownTrident.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            thrownTrident.setPos(getEyePos(shooter));
             level.addFreshEntity(thrownTrident);
         }
         else if (itemStack.getItem() instanceof ThrowablePotionItem) {
             final ThrownPotion thrownPotion = new ThrownPotion(level, shooter);
             thrownPotion.setItem(itemStack);
             thrownPotion.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            thrownPotion.setPos(getEyePos(shooter));
             level.addFreshEntity(thrownPotion);
         }
         else if (itemStack.getItem() instanceof EggItem) {
             final ThrownEgg thrownEgg = new ThrownEgg(level, shooter);
             thrownEgg.setItem(itemStack);
             thrownEgg.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            thrownEgg.setPos(getEyePos(shooter));
             level.addFreshEntity(thrownEgg);
         }
         else if (itemStack.getItem() instanceof ScalpelItem) {
             final ScalpelProjectile scalpelProjectile = new ScalpelProjectile(level, shooter);
             scalpelProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            scalpelProjectile.setPos(getEyePos(shooter));
             level.addFreshEntity(scalpelProjectile);
         }
         else if (itemStack.getItem() instanceof KnifeBundleItem) {
             for (int i = 0; i < 9; i++) {
                 KnifeProjectile knife = new KnifeProjectile(level, shooter);
+                knife.setPos(getEyePos(shooter));
                 knife.setPos(knife.position().add(
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5),
@@ -883,23 +890,27 @@ public final class JUtils {
         else if (itemStack.getItem() instanceof KnifeItem) {
             final KnifeProjectile knifeProjectile = new KnifeProjectile(level, shooter);
             knifeProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            knifeProjectile.setPos(getEyePos(shooter));
             level.addFreshEntity(knifeProjectile);
         }
         else if (itemStack.getItem() instanceof EnderpearlItem) {
             final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
             enderpearlProjectile.setItem(itemStack);
             enderpearlProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1.0F);
+            enderpearlProjectile.setPos(getEyePos(shooter));
             level.addFreshEntity(enderpearlProjectile);
         }
         else if (itemStack.getItem() instanceof GasCanItem) {
             final GasCanProjectile gasCan = new GasCanProjectile(JUtils.getUserIfStand(shooter), level);
             gasCan.setItem(itemStack);
             gasCan.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            gasCan.setPos(getEyePos(shooter));
             level.addFreshEntity(gasCan);
         }
         else {
             final AbstractArrow projectile = new ItemTossProjectile(shooter, level, itemStack);
             projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
+            projectile.setPos(getEyePos(shooter));
             level.addFreshEntity(projectile);
             shooter.playSound(JSoundRegistry.TOSS.get());
         }
