@@ -66,7 +66,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.purple_haze"))
                     .proCount(3)
-                    .conCount(3)
+                    .conCount(2)
                     .freeSpace(Component.literal("""
                 PASSIVE: Rage
                 Builds up while the stand is summoned.
