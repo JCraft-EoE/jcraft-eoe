@@ -888,13 +888,13 @@ public final class JUtils {
         else if (itemStack.getItem() instanceof EnderpearlItem) {
             final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
             enderpearlProjectile.setItem(itemStack);
-            enderpearlProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1.5F, 1.0F);
+            enderpearlProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1.0F);
             level.addFreshEntity(enderpearlProjectile);
         }
         else if (itemStack.getItem() instanceof GasCanItem) {
             final GasCanProjectile gasCan = new GasCanProjectile(JUtils.getUserIfStand(shooter), level);
             gasCan.setItem(itemStack);
-            gasCan.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, velocity, 1.0F);
+            gasCan.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
             level.addFreshEntity(gasCan);
         }
         else {
