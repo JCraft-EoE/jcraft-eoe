@@ -725,6 +725,11 @@
       "jcraft:stands/theworldoverheaven/air_knives"
     ]
   },
+  "foolsummon": {
+    "sounds": [
+      "jcraft:stands/fool/summon"
+    ]
+  },
   "foolbark1": {
     "sounds": [
       "jcraft:stands/fool/bark1"

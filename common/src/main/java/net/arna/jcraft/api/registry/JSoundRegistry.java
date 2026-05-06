@@ -185,6 +185,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> GER_RTZ = register("gerrtz");
 
     //The Fool
+    RegistrySupplier<SoundEvent> FOOL_SUMMON = register("foolsummon");
     RegistrySupplier<SoundEvent> FOOL_BARK1 = register("foolbark1");
     RegistrySupplier<SoundEvent> FOOL_BARK2 = register("foolbark2");
     RegistrySupplier<SoundEvent> FOOL_LAUNCH = register("foollaunch");
