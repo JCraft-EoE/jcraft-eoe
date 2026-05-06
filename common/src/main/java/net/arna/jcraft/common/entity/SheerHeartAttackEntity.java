@@ -210,6 +210,7 @@ public class SheerHeartAttackEntity extends Mob implements IOwnable {
                 JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1.get())
                         .blockInteraction(griefing && mayAlter ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP)
                         .particleVelocity(Vec3.ZERO)
+                        .sound(JSoundRegistry.SHA_EXPLODE.get())
                         .noDamage()
                         .build());
 

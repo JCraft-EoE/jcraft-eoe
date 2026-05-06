@@ -111,16 +111,20 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> CREAM_BALLDASH = register("creamballdash");
 
     //Killer Queen
+    RegistrySupplier<SoundEvent> KQ_SUMMON = register("kqsummon");
     RegistrySupplier<SoundEvent> KQ_HEAVY = register("kqheavy");
     RegistrySupplier<SoundEvent> KQ_BARRAGE = register("kqbarrage");
     RegistrySupplier<SoundEvent> KQ_DETONATE = register("kqdetonate");
     RegistrySupplier<SoundEvent> KQ_UPPERCUT = register("kquppercut");
     RegistrySupplier<SoundEvent> KQ_EXPLODE = register("kqexplode");
+    RegistrySupplier<SoundEvent> KQ_NUKE = register("kqnuke");
+    RegistrySupplier<SoundEvent> SHA_EXPLODE = register("shaexplode");
     RegistrySupplier<SoundEvent> SHA_TREAD = register("shatread");
 
     //Killer Queen: Bites The Dust
-    RegistrySupplier<SoundEvent> KQBTD_ELBOW = register("kqbtdelbow");
     RegistrySupplier<SoundEvent> KQBTD_SUMMON = register("kqbtdsummon");
+    RegistrySupplier<SoundEvent> KQBTD_ELBOW = register("kqbtdelbow");;
+    RegistrySupplier<SoundEvent> KQBTD_BUBBLE = register("kqbtdbubble");
 
     //Whitesnake
     RegistrySupplier<SoundEvent> WS_SUMMON = register("wssummon");
@@ -181,6 +185,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> GER_RTZ = register("gerrtz");
 
     //The Fool
+    RegistrySupplier<SoundEvent> FOOL_SUMMON = register("foolsummon");
     RegistrySupplier<SoundEvent> FOOL_BARK1 = register("foolbark1");
     RegistrySupplier<SoundEvent> FOOL_BARK2 = register("foolbark2");
     RegistrySupplier<SoundEvent> FOOL_LAUNCH = register("foollaunch");
@@ -292,6 +297,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> AS_BARRAGE = register("asbarrage");
     RegistrySupplier<SoundEvent> AS_BARRAGE_HIT = register("asbarragehit");
     RegistrySupplier<SoundEvent> AS_IDLE = register("asidle");
+    RegistrySupplier<SoundEvent> AS_FLYBY = register("asflyby");
     RegistrySupplier<SoundEvent> AS_LANDING = register("aslanding");
 
     //// SPECS

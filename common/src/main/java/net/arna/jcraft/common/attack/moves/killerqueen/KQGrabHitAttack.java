@@ -52,7 +52,7 @@ public final class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQ
 
             final Vec3 pos = livingEntity.position();
             JCraft.createParticle(world, pos.x, pos.y, pos.z, JParticleType.BOOM);
-            JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE.get(), world, pos, 96);
+            JUtils.serverPlaySound(JSoundRegistry.KQ_NUKE.get(), world, pos, 96);
 
             final DamageSource damageSource = JDamageSources.stand(attacker);
 

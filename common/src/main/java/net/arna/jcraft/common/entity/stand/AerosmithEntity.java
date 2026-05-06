@@ -36,11 +36,18 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntity.State> {
     public static final MoveSet<AerosmithEntity, AerosmithEntity.State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.AEROSMITH,
@@ -48,6 +55,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     public static final EntityDataAccessor<Float> OVERHEAT = SynchedEntityData.defineId(AerosmithEntity.class, EntityDataSerializers.FLOAT);
     public static final float OVERHEAT_MAX = 15f;
+    public static final int FLYBY_TICK_CHECK = 5;
+    public static final int FLYBY_TICK_PAUSE = 11 * 20;
+    public static final float FLYBY_RANGE = 25f;
 
     public static final double SLOW_CRUISE_SPEED = 0.075;
     public static final double CRUISE_SPEED = 0.15;
@@ -140,6 +150,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     private CommonMiscComponent miscComponent;
     private int overheatTick;
+    private final Map<UUID, Integer> lastFlybyTicks = new HashMap<>();
 
     @Getter
     private final MuzzleHitscanAttack shootAttack;
@@ -244,6 +255,22 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                         isRemote() ? 0.2f : 1.0f, 1.0f, true);
             }
             return;
+        }
+        if (tickCount % FLYBY_TICK_CHECK == 0 && flyState != FlyState.NONE) {
+            final Vec3 pos = position();
+            final List<Player> entitiesOfClass = level().getEntitiesOfClass(Player.class, AABB.ofSize(pos, FLYBY_RANGE, FLYBY_RANGE, FLYBY_RANGE));
+            for (final Player player : entitiesOfClass) {
+                if (player == getUser()) {
+                    continue;
+                }
+                final int lastFlybyTick = lastFlybyTicks.getOrDefault(player.getUUID(), tickCount - FLYBY_TICK_PAUSE);
+                if (tickCount - lastFlybyTick >= FLYBY_TICK_PAUSE) {
+                    // TODO make this work on multiplayer
+//                    ((ServerPlayer)player).connection.send(new ClientboundSoundPacket(Holder.direct(JSoundRegistry.AS_FLYBY.get()), SoundSource.PLAYERS, pos.x(), pos.y(), pos.z(), 1f, 1f, level().getRandom().nextLong()));
+//                    player.playSound(JSoundRegistry.AS_FLYBY.get(), 1f, 1f);
+                    lastFlybyTicks.put(player.getUUID(), tickCount);
+                }
+            }
         }
 
         final LivingEntity user = getUser();
