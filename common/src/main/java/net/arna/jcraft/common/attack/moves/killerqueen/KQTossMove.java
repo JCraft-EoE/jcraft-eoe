@@ -1,7 +1,9 @@
 package net.arna.jcraft.common.attack.moves.killerqueen;
 
 import com.mojang.datafixers.kinds.App;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
@@ -23,8 +25,16 @@ import java.util.Set;
  */
 public final class KQTossMove extends AbstractMove<KQTossMove, AbstractKillerQueenEntity<?, ?>> {
 
+    @Getter
+    private final float velocityMultiplier;
+
     public KQTossMove(final int cooldown, final int windup, final int duration, final float moveDistance) {
+        this(cooldown, windup, duration, moveDistance, 1 / 40f);
+    }
+
+    public KQTossMove(final int cooldown, final int windup, final int duration, final float moveDistance, final float velocityMultiplier) {
         super(cooldown, windup, duration, moveDistance);
+        this.velocityMultiplier = velocityMultiplier;
     }
 
     @Override
@@ -61,15 +71,19 @@ public final class KQTossMove extends AbstractMove<KQTossMove, AbstractKillerQue
 
     @Override
     public @NonNull KQTossMove copy() {
-        return copyExtras(new KQTossMove(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+        return copyExtras(new KQTossMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getVelocityMultiplier()));
     }
 
     public static class Type extends AbstractMove.Type<KQTossMove> {
         public static final Type INSTANCE = new Type();
 
+        protected RecordCodecBuilder<KQTossMove, Float> velocityMultiplier() {
+            return Codec.FLOAT.fieldOf("velocityMultiplier").forGetter(KQTossMove::getVelocityMultiplier);
+        }
+
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<KQTossMove>, KQTossMove> buildCodec(final RecordCodecBuilder.Instance<KQTossMove> instance) {
-            return instance.group(cooldown(), windup(), duration(), moveDistance()).apply(instance, KQTossMove::new);
+            return instance.group(cooldown(), windup(), duration(), moveDistance(), velocityMultiplier()).apply(instance, KQTossMove::new);
         }
     }
 }

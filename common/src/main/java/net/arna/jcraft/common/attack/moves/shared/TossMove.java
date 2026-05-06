@@ -1,7 +1,9 @@
 package net.arna.jcraft.common.attack.moves.shared;
 
 import com.mojang.datafixers.kinds.App;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
@@ -17,8 +19,24 @@ import java.util.Set;
 
 public final class TossMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<TossMove<A>, A> {
 
+    @Getter
+    private final float velocityMultiplier;
+
     public TossMove(int cooldown, int windup, int duration, float moveDistance) {
+        this(cooldown, windup, duration, moveDistance, 1 / 40f);
+    }
+
+    /**
+     *
+     * @param cooldown
+     * @param windup
+     * @param duration
+     * @param moveDistance
+     * @param velocityMultiplier what to multiply the charge time with to get the velocity, defaults to <code>1/40f</code>.
+     */
+    public TossMove(int cooldown, int windup, int duration, float moveDistance, float velocityMultiplier) {
         super(cooldown, windup, duration, moveDistance);
+        this.velocityMultiplier = velocityMultiplier;
     }
 
     @Override
@@ -36,7 +54,7 @@ public final class TossMove<A extends IAttacker<? extends A, ?>> extends Abstrac
                     user.getY() + user.getBbHeight() * 0.5,
                     user.getZ() + lookAngle.z * 0.3
             );
-            JUtils.tossItem(stand, stand.level(), projectile, getChargeTime() / 40f, true, throwPos);
+            JUtils.tossItem(stand, stand.level(), projectile, getChargeTime() * velocityMultiplier, true, throwPos);
         }
         return Set.of();
     }
@@ -48,15 +66,19 @@ public final class TossMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
     @Override
     public @NonNull TossMove<A> copy() {
-        return copyExtras(new TossMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+        return copyExtras(new TossMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getVelocityMultiplier()));
     }
 
     public static class Type extends AbstractMove.Type<TossMove<?>> {
         public static final Type INSTANCE = new Type();
 
+        protected RecordCodecBuilder<TossMove<?>, Float> velocityMultiplier() {
+            return Codec.FLOAT.fieldOf("velocityMultiplier").forGetter(TossMove::getVelocityMultiplier);
+        }
+
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<TossMove<?>>, TossMove<?>> buildCodec(RecordCodecBuilder.Instance<TossMove<?>> instance) {
-            return instance.group(cooldown(), windup(), duration(), moveDistance()).apply(instance, TossMove::new);
+            return instance.group(cooldown(), windup(), duration(), moveDistance(), velocityMultiplier()).apply(instance, TossMove::new);
         }
     }
 }
