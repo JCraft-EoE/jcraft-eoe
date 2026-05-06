@@ -13,7 +13,6 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
@@ -22,8 +21,15 @@ public final class TossMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     @Getter
     private final float velocityMultiplier;
 
+    @Getter
+    private final float spreadMultiplier;
+
     public TossMove(int cooldown, int windup, int duration, float moveDistance) {
         this(cooldown, windup, duration, moveDistance, 1 / 40f);
+    }
+
+    public TossMove(int cooldown, int windup, int duration, float moveDistance, float velocityMultiplier) {
+        this(cooldown, windup, duration, moveDistance, velocityMultiplier, 1f);
     }
 
     /**
@@ -33,10 +39,12 @@ public final class TossMove<A extends IAttacker<? extends A, ?>> extends Abstrac
      * @param duration
      * @param moveDistance
      * @param velocityMultiplier what to multiply the charge time with to get the velocity, defaults to <code>1/40f</code>.
+     * @param spreadMultiplier what to multiply the inaccurancy with, defaults to <code>1f</code>.
      */
-    public TossMove(int cooldown, int windup, int duration, float moveDistance, float velocityMultiplier) {
+    public TossMove(int cooldown, int windup, int duration, float moveDistance, float velocityMultiplier, float spreadMultiplier) {
         super(cooldown, windup, duration, moveDistance);
         this.velocityMultiplier = velocityMultiplier;
+        this.spreadMultiplier = spreadMultiplier;
     }
 
     @Override
@@ -48,13 +56,7 @@ public final class TossMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user) {
         if (attacker instanceof StandEntity<?,?> stand && !stand.level().isClientSide()) {
             final ItemStack projectile = stand.getItemInHand(InteractionHand.MAIN_HAND);
-            final Vec3 lookAngle = user.getLookAngle();
-            final Vec3 throwPos = new Vec3(
-                    user.getX() + lookAngle.x * 0.3,
-                    user.getY() + user.getBbHeight() * 0.5,
-                    user.getZ() + lookAngle.z * 0.3
-            );
-            JUtils.tossItem(stand, stand.level(), projectile, getChargeTime() * velocityMultiplier, true, throwPos);
+            JUtils.tossItem(stand, stand.level(), projectile, getChargeTime() * velocityMultiplier, spreadMultiplier, true);
         }
         return Set.of();
     }
@@ -66,7 +68,7 @@ public final class TossMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
     @Override
     public @NonNull TossMove<A> copy() {
-        return copyExtras(new TossMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getVelocityMultiplier()));
+        return copyExtras(new TossMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getVelocityMultiplier(), getSpreadMultiplier()));
     }
 
     public static class Type extends AbstractMove.Type<TossMove<?>> {
@@ -76,9 +78,13 @@ public final class TossMove<A extends IAttacker<? extends A, ?>> extends Abstrac
             return Codec.FLOAT.fieldOf("velocityMultiplier").forGetter(TossMove::getVelocityMultiplier);
         }
 
+        protected RecordCodecBuilder<TossMove<?>, Float> spreadMultiplier() {
+            return Codec.FLOAT.fieldOf("spreadMultiplier").forGetter(TossMove::getSpreadMultiplier);
+        }
+
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<TossMove<?>>, TossMove<?>> buildCodec(RecordCodecBuilder.Instance<TossMove<?>> instance) {
-            return instance.group(cooldown(), windup(), duration(), moveDistance(), velocityMultiplier()).apply(instance, TossMove::new);
+            return instance.group(cooldown(), windup(), duration(), moveDistance(), velocityMultiplier(), spreadMultiplier()).apply(instance, TossMove::new);
         }
     }
 }
