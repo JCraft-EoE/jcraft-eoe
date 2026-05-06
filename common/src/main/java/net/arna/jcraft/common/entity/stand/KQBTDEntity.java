@@ -70,10 +70,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     .skinName(Component.literal("Back from the Dead"))
                     .skinName(Component.literal("Garf"))
                     .build())
-            .summonData(SummonData.builder()
-                    .sound(JSoundRegistry.KQBTD_SUMMON)
-                    .playGenericSound(true)
-                    .build())
+            .summonData(SummonData.of(JSoundRegistry.KQBTD_SUMMON))
             .build();
     public static final Supplier<IPoseModifier> POSE = AbstractKillerQueenEntity.POSE;
 
@@ -94,7 +91,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             );
     public static final BubbleAttack BUBBLE = new BubbleAttack(120, 15, 18, 0.75f)
             .withCrouchingVariant(BUBBLE_COUNTER)
-            .withSound(JSoundRegistry.KQ_UPPERCUT)
+            .withSound(JSoundRegistry.KQBTD_BUBBLE)
             .withInfo(
                     Component.literal("Stray Cat Bubble"),
                     Component.literal("launches an explosive bubble guided by your view rotation")

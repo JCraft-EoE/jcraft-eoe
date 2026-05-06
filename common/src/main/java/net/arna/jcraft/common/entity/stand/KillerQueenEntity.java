@@ -15,6 +15,7 @@ import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
+import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.moves.killerqueen.*;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
@@ -57,6 +58,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                     .skinName(Component.literal("Deadly"))
                     .skinName(Component.literal("1999"))
                     .build())
+            .summonData(SummonData.of(JSoundRegistry.KQ_SUMMON))
             .build();
     public static final Supplier<IPoseModifier> POSE = AbstractKillerQueenEntity.POSE;
 

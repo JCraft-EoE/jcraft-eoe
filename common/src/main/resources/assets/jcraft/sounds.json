@@ -424,6 +424,11 @@
       "jcraft:stands/cream/overhead"
     ]
   },
+  "kqsummon": {
+    "sounds": [
+      "jcraft:stands/killerqueen/summon"
+    ]
+  },
   "kqheavy": {
     "sounds": [
       "jcraft:stands/killerqueen/heavy"
@@ -457,6 +462,11 @@
   "kqbtdsummon": {
     "sounds": [
       "jcraft:stands/kqbtd/summon"
+    ]
+  },
+  "kqbtdbubble": {
+    "sounds": [
+      "jcraft:stands/kqbtd/bubble"
     ]
   },
   "wssummon": {

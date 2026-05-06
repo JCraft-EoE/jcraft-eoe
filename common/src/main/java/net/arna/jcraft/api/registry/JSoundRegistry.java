@@ -111,6 +111,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> CREAM_BALLDASH = register("creamballdash");
 
     //Killer Queen
+    RegistrySupplier<SoundEvent> KQ_SUMMON = register("kqsummon");
     RegistrySupplier<SoundEvent> KQ_HEAVY = register("kqheavy");
     RegistrySupplier<SoundEvent> KQ_BARRAGE = register("kqbarrage");
     RegistrySupplier<SoundEvent> KQ_DETONATE = register("kqdetonate");
@@ -119,8 +120,9 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> SHA_TREAD = register("shatread");
 
     //Killer Queen: Bites The Dust
-    RegistrySupplier<SoundEvent> KQBTD_ELBOW = register("kqbtdelbow");
     RegistrySupplier<SoundEvent> KQBTD_SUMMON = register("kqbtdsummon");
+    RegistrySupplier<SoundEvent> KQBTD_ELBOW = register("kqbtdelbow");;
+    RegistrySupplier<SoundEvent> KQBTD_BUBBLE = register("kqbtdbubble");
 
     //Whitesnake
     RegistrySupplier<SoundEvent> WS_SUMMON = register("wssummon");
