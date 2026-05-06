@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.item;
 
+import lombok.NonNull;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -32,7 +33,13 @@ public class BloodBottleItem extends Item {
         super(settings);
     }
 
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    @NonNull
+    public InteractionResultHolder<ItemStack> use(@NonNull final Level world, @NonNull final Player user, @NonNull final InteractionHand hand) {
+        final var result = super.use(world, user, hand);
+
+        if (result.getResult() == InteractionResult.FAIL)
+            return result;
+
         return ItemUtils.startUsingInstantly(world, user, hand);
     }
 

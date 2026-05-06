@@ -70,7 +70,7 @@
     "LightStorageAccessor",
     "LivingEntityInvoker",
     "LivingEntityMixin",
-    "LongUseItemMixin",
+    "ItemUseMixin",
     "MinecraftServerAccessor",
     "MobEffectMixin",
     "MobEntityMixin",
