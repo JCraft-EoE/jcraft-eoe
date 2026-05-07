@@ -25,6 +25,9 @@ import static org.lwjgl.opengl.GL33C.*;
 
 public class GLBakedProgram extends BakedProgram {
     private final int handle;
+    private int needsRestoreTextures = 0;
+    private final int[] oldTextureUnits = new int[32];
+    private final int[] oldTextures     = new int[32];
 
     public GLBakedProgram(String name, int handle)
     {
@@ -34,11 +37,47 @@ public class GLBakedProgram extends BakedProgram {
 
     @Override
     protected void bindProgram() {
+        saveTextureState();
         glUseProgram(handle);
+    }
+
+    private void saveTextureState()
+    {
+        needsRestoreTextures = 0;
+        for (int i = 0; i <= 31; i++)
+        {
+            glActiveTexture(GL_TEXTURE0+i);
+            int oldTex = glGetInteger(GL_TEXTURE_BINDING_2D);
+            if (oldTex == 0) continue;
+
+            oldTextures[i] = oldTex;
+            oldTextureUnits[needsRestoreTextures++] = i;
+        }
+
+        glActiveTexture(GL_TEXTURE0); // set it back to 0 from 31
+    }
+
+    private void restoreTextures()
+    {
+        glActiveTexture(GL_TEXTURE0);
+
+        for (int i = 0; i < needsRestoreTextures; i++)
+        {
+            int unit = oldTextureUnits[i];
+            int oldTex = oldTextures[i];
+            glActiveTexture(GL_TEXTURE0 + unit);
+            glBindTexture(GL_TEXTURE_2D, oldTex);
+        }
+        needsRestoreTextures = 0;
+
+        // Minecraft expects it to currently be bound to Texture 0.
+        glActiveTexture(GL_TEXTURE0);
     }
 
     @Override
     protected void unbindProgram() {
+        restoreTextures();
+
         // NOTE: this is not modified because we do not use the Minecraft shader instance
         ShaderInstance previousShader = RenderSystem.getShader();
         if (previousShader != null)

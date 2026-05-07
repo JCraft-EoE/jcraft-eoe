@@ -21,6 +21,7 @@ public class GLShaderSampler extends ShaderSampler {
         } else {
             this.unit = unit;
             JCraft.LOGGER.info("Bound '{}' (@ {}) to '{}'", name, location, unit);
+
             program.bind();
             glUniform1i(location, unit);
             program.unbind();

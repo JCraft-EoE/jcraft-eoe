@@ -52,15 +52,6 @@ public class LevelRendererMixin {
 
         TimestopShaderEffect.freezeInvTransformMat();
         if (JShaderRegistry.TIMESTOP_EFFECT != null) JShaderRegistry.TIMESTOP_EFFECT.update(tickDelta);
-
-        if (EpitaphOverlay.shouldRenderVignette() && JShaderRegistry.EPITAPH_VIGNETTE != null)
-        {
-            JShaderRegistry.EPITAPH_VIGNETTE.renderVignette(
-                    EpitaphOverlay.getVignetteIntensity(),
-                    EpitaphOverlay.getVignetteExtend()
-            );
-        }
-
         PostWorldRenderCallback.EVENT.invoker().onWorldRendered(matrices, camera, tickDelta, nanoTime);
     }
 

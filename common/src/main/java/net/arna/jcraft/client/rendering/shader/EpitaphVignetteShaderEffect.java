@@ -1,13 +1,17 @@
 package net.arna.jcraft.client.rendering.shader;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
+import net.arna.jcraft.client.rendering.api.callbacks.PostWorldRenderCallback;
 import net.arna.jcraft.client.rendering.shader.api.BakedProgram;
 import net.arna.jcraft.client.rendering.shader.api.ShaderEffect;
 import net.arna.jcraft.client.rendering.shader.texture.api.ShaderSampler;
 import net.arna.jcraft.client.rendering.shader.texture.impl.GLShaderTexture;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 
-public class EpitaphVignetteShaderEffect extends ShaderEffect {
+public class EpitaphVignetteShaderEffect extends ShaderEffect implements PostWorldRenderCallback {
     private ShaderSampler colorSampler;
 
     public EpitaphVignetteShaderEffect() {
@@ -21,6 +25,8 @@ public class EpitaphVignetteShaderEffect extends ShaderEffect {
         linkData.addSampler("DiffuseSampler");
 
         linkData.freeze();
+
+        PostWorldRenderCallback.EVENT.register(this);
     }
 
     @Override
@@ -36,7 +42,7 @@ public class EpitaphVignetteShaderEffect extends ShaderEffect {
 
     }
 
-    public void renderVignette(float intensity, float extend)
+    private void renderVignette(float intensity, float extend)
     {
         this.program.pass(()->{
             this.program.setUniform("Intensity", intensity);
@@ -47,5 +53,16 @@ public class EpitaphVignetteShaderEffect extends ShaderEffect {
 
             this.program.renderFullscreen();
         });
+    }
+
+    @Override
+    public void onWorldRendered(PoseStack matrices, Camera camera, float tickDelta, long nanoTime) {
+        if (EpitaphOverlay.shouldRenderVignette() && JShaderRegistry.EPITAPH_VIGNETTE != null)
+        {
+            renderVignette(
+                    EpitaphOverlay.getVignetteIntensity(),
+                    EpitaphOverlay.getVignetteExtend()
+            );
+        }
     }
 }
