@@ -7,7 +7,6 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
-import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
@@ -839,7 +838,7 @@ public final class JUtils {
         if (itemStack.getItem() instanceof KnifeBundleItem) {
             for (int i = 0; i < 9; i++) {
                 KnifeProjectile knife = new KnifeProjectile(level, shooter);
-                knife.setPos(getEyePos(shooter));
+                knife.setPos(shooter.position().add(getEyePos(shooter)));
                 knife.setPos(knife.position().add(
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5),
