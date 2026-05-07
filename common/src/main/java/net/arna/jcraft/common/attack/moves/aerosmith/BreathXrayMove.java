@@ -17,6 +17,7 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
@@ -100,9 +101,15 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
             boolean doPing = false;
 
             for (Entity entity : base.level().getEntities().getAll()) {
-                if (entity.distanceToSqr(pos) > range * range) continue;
-
-                if (entity == user || entity == base) continue;
+                if (entity.distanceToSqr(pos) > range * range) {
+                    continue;
+                }
+                if (entity == user || entity == base) {
+                    continue;
+                }
+                if (JUtils.inTimeErase(entity)) {
+                    continue;
+                }
 
                 if (entity instanceof LivingEntity living) {
                     final Vec3 target = living.position().add(GravityChangerAPI.getEyeOffset(living));
