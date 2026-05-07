@@ -54,3 +54,6 @@ run/
 
 .architectury-transformer/
 .direnv
+
+# exclude renderdoc settings
+renderdoc/*.cap
