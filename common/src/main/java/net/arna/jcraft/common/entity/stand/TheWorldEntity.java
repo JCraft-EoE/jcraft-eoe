@@ -217,9 +217,9 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<TheWorldEntity> TOSS = new TossMove<TheWorldEntity>(0, 1, 1, 0.75f)
+    public static final TossMove<TheWorldEntity> TOSS = new TossMove<TheWorldEntity>(0, 1, 1, 0.75f, 0.15f)
             .withAnim(TheWorldEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<TheWorldEntity> TOSS_CHARGE = new TossChargeMove<TheWorldEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<TheWorldEntity> TOSS_CHARGE = new TossChargeMove<TheWorldEntity>(70, 1 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
     public TheWorldEntity(Level worldIn) {

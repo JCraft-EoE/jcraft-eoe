@@ -200,8 +200,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<StarPlatinumEntity> TOSS = new TossMove<StarPlatinumEntity>(0, 1, 1, 0.75f, 0.2f
-    )
+    public static final TossMove<StarPlatinumEntity> TOSS = new TossMove<StarPlatinumEntity>(0, 1, 1, 0.75f, 0.2f,0.5f)
             .withAnim(State.ITEM_TOSS);
     public static final TossChargeMove<StarPlatinumEntity> TOSS_CHARGE = new TossChargeMove<StarPlatinumEntity>(70, 1 * 20 + 1, 2 * 20 - 5, 1.0f, 15)
             .withFollowup(TOSS);

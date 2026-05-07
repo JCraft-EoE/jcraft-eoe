@@ -212,9 +212,9 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<WhiteSnakeEntity> TOSS = new TossMove<WhiteSnakeEntity>(0, 1, 1, 0.75f)
+    public static final TossMove<WhiteSnakeEntity> TOSS = new TossMove<WhiteSnakeEntity>(0, 1, 1, 0.75f,0.13f,1f)
             .withAnim(WhiteSnakeEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<WhiteSnakeEntity> TOSS_CHARGE = new TossChargeMove<WhiteSnakeEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<WhiteSnakeEntity> TOSS_CHARGE = new TossChargeMove<WhiteSnakeEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
     public WhiteSnakeEntity(Level worldIn) {

@@ -213,9 +213,9 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<MadeInHeavenEntity> TOSS = new TossMove<MadeInHeavenEntity>(0, 1, 1, 0.75f)
+    public static final TossMove<MadeInHeavenEntity> TOSS = new TossMove<MadeInHeavenEntity>(0, 1, 1, 0.75f,0.5f,2f)
             .withAnim(MadeInHeavenEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<MadeInHeavenEntity> TOSS_CHARGE = new TossChargeMove<MadeInHeavenEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<MadeInHeavenEntity> TOSS_CHARGE = new TossChargeMove<MadeInHeavenEntity>(30, 1 * 20 + 1, 1 * 20, 1.0f, 0)
             .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Integer> ACCEL_TIME = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.INT);
