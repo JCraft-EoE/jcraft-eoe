@@ -1,6 +1,7 @@
 package net.arna.jcraft.client.util;
 
 import lombok.NonNull;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.particle.AuraArcParticle;
@@ -22,6 +23,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
@@ -386,6 +388,38 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
                     sneak = options.keyShift.isDown();
 
             vehicle.movementTick(w, a, s, d, jump, sneak);
+        }
+    }
+
+    @Override
+    public void aerosmithClientTick(final AerosmithEntity aerosmith) {
+        final var pos = aerosmith.position();
+        final var level = aerosmith.level();
+        final boolean isRemote = aerosmith.isRemote();
+
+        if (aerosmith.tickCount % 26 == 0) {
+            level.playLocalSound(pos.x, pos.y, pos.z,
+                    JSoundRegistry.AS_IDLE.get(), SoundSource.PLAYERS,
+                    isRemote ? 0.2f : 1.0f, 1.0f, true);
+        }
+
+        if (isRemote) {
+            final var localPlayer = Minecraft.getInstance().player;
+            final var localPos = localPlayer.position();
+
+            final double angle = JUtils.angleBetween(aerosmith.getDeltaMovement(), localPos.subtract(pos));
+
+            if (
+                    Math.signum(aerosmith.lastMovementToLocalPlayerAngle) != Math.signum(angle)
+                            && angle < 0
+                            && aerosmith.distanceToSqr(localPlayer) < 35 * 35)
+            { // got close, moving away
+                level.playLocalSound(pos.x, pos.y, pos.z,
+                        JSoundRegistry.AS_FLYBY.get(), SoundSource.PLAYERS,
+                        1.0f, 1.0f, true);
+            }
+
+            aerosmith.lastMovementToLocalPlayerAngle = angle;
         }
     }
 }
