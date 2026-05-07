@@ -194,9 +194,9 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<GoldExperienceEntity> TOSS = new TossMove<GoldExperienceEntity>(0, 1, 1, 0.75f)
+    public static final TossMove<GoldExperienceEntity> TOSS = new TossMove<GoldExperienceEntity>(0, 1, 1, 0.75f,0.13f)
             .withAnim(GoldExperienceEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<GoldExperienceEntity> TOSS_CHARGE = new TossChargeMove<GoldExperienceEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<GoldExperienceEntity> TOSS_CHARGE = new TossChargeMove<GoldExperienceEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
     public GoldExperienceEntity(Level worldIn) {
