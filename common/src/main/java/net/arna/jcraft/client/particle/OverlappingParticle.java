@@ -12,6 +12,12 @@ public class OverlappingParticle extends RisingParticle {
                                final SpriteSet spriteProvider) {
         super(clientLevel, x, y, z, vx, vy, vz);
         pickSprite(spriteProvider);
+        quadSize = 0.67f;
+    }
+
+    @Override
+    protected int getLightColor(float tint) {
+        return 255;
     }
 
     @Override

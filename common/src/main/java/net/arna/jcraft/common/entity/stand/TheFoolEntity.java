@@ -11,6 +11,7 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.actions.EffectAction;
 import net.arna.jcraft.api.attack.enums.BlockableType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
@@ -95,6 +96,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                     .skinName(Component.literal("OVA"))
                     .skinName(Component.literal("Neon"))
                     .build())
+            .summonData(SummonData.of(JSoundRegistry.FOOL_SUMMON))
             .build();
 
     public static final SimpleMultiHitAttack<TheFoolEntity> DRILL = new SimpleMultiHitAttack<TheFoolEntity>(0,

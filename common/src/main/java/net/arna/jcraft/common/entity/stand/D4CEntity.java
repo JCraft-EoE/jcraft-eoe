@@ -67,10 +67,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                     .skinName(Component.literal("Teaser"))
                     .skinName(Component.literal("Spangled"))
                     .build())
-            .summonData(SummonData.builder()
-                    .sound(JSoundRegistry.D4C_SUMMON)
-                    .playGenericSound(true)
-                    .build())
+            .summonData(SummonData.of(JSoundRegistry.D4C_SUMMON))
             .build();
 
     public static final ItemPlaceMove ITEM_PLACE = new ItemPlaceMove(JCraft.LIGHT_COOLDOWN, 8, 12, 0.75f)

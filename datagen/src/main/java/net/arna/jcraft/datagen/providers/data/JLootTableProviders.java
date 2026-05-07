@@ -57,6 +57,7 @@ public class JLootTableProviders {
             addDrop(JEntityTypeRegistry.AYA_TSUJI.get(), this::ayaTsujiLoot);
             addDrop(JEntityTypeRegistry.DARBY_OLDER.get(), this::darbyOlderLoot);
             addDrop(JEntityTypeRegistry.ANUBIS_SPEC_USER.get(), this::anubisSpecUserLoot);
+            addDrop(JEntityTypeRegistry.BRAWLER_SPEC_USER.get(), this::brawlerSpecUserLoot);
         }
 
         // loot builder for Petshop
@@ -85,6 +86,13 @@ public class JLootTableProviders {
             return LootTable.lootTable()
                     .withPool(constantPool(1f)
                             .add(LootItem.lootTableItem(JItemRegistry.ANUBIS_SHEATHED.get()).setWeight(1).apply(constantAmount(1f))));
+        }
+
+        // loot builder for Brawler
+        private LootTable.Builder brawlerSpecUserLoot(EntityType<?> type) {
+            return LootTable.lootTable()
+                    .withPool(constantPool(1f)
+                            .add(LootItem.lootTableItem(JItemRegistry.BOXING_GLOVES.get()).setWeight(1).apply(constantAmount(1f))));
         }
 
         public <T extends Entity> void addDrop(EntityType<T> type, Function<EntityType<T>, LootTable.Builder> function) {

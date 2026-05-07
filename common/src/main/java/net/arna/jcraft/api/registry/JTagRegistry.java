@@ -4,6 +4,7 @@ import net.arna.jcraft.JCraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
@@ -50,10 +51,13 @@ public interface JTagRegistry {
     TagKey<EntityType<?>> SPEC_USER = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("spec_user"));
     TagKey<EntityType<?>> CANNOT_TAKE_STAND_FROM = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cannot_take_stand_from"));
     TagKey<EntityType<?>> UNAFFECTED_BY_EPITAPH = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("unaffected_by_epitaph"));
+    TagKey<EntityType<?>> PREFERS_GOLD_DRIP = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("prefer_gold_drip"));
 
     TagKey<Biome> METEORS_CAN_FALL = TagKey.create(Registries.BIOME, JCraft.id("meteors_can_fall"));
 
     TagKey<StructureTemplatePool> STONE_BASE = TagKey.create(Registries.TEMPLATE_POOL, JCraft.id("stone_base"));
+
+    TagKey<DamageType> STAND_IMMUNE = TagKey.create(Registries.DAMAGE_TYPE, JCraft.id("stand_immune"));
 
     static void init() {
         // intentionally left empty

@@ -1,5 +1,8 @@
 {
   "textures": [
-    "jcraft:pixel"
+    "jcraft:breath/0",
+    "jcraft:breath/1",
+    "jcraft:breath/2",
+    "jcraft:breath/3"
   ]
 }

@@ -11,15 +11,18 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
 public class AerosmithChargeAttack extends AbstractMultiHitAttack<AerosmithChargeAttack, AerosmithEntity> {
-    Vec3 up, forward, peak, chargeStart;
+    Vec3 up, forward, peak, chargeStart, remoteChargeTarget;
     enum Segment { FIRST_RISE, CHARGE_START, CHARGE, RISE }
     Segment segment;
+    boolean remoteCharge;
 
     public AerosmithChargeAttack(int cooldown, int duration, float damage, int stun, float hitboxSize, float knockback, float offset,
                                  @NonNull IntCollection hitMoments) {
@@ -36,16 +39,16 @@ public class AerosmithChargeAttack extends AbstractMultiHitAttack<AerosmithCharg
     public void onInitiate(AerosmithEntity attacker) {
         super.onInitiate(attacker);
 
-        final boolean remoteVersion = attacker.isRemote();
+        remoteCharge = attacker.isRemote();
 
-        if (!remoteVersion) {
-            final LivingEntity user = attacker.getUserOrThrow();
+        final LivingEntity user = attacker.getUserOrThrow();
 
+        if (!remoteCharge) {
             up = JUtils.getLocalUp(user);
             forward = user.getLookAngle();
 
             final Vec3 pos = user.position().add(up);
-            final Vec3 toPeak = forward.add(up.scale(3));
+            final Vec3 toPeak = forward.add(up);
 
             segment = Segment.FIRST_RISE;
             peak = pos.add(toPeak);
@@ -56,42 +59,58 @@ public class AerosmithChargeAttack extends AbstractMultiHitAttack<AerosmithCharg
             attacker.setDeltaMovement(toPeak.normalize().scale(0.5));
             attacker.setFlyState(AerosmithEntity.FlyState.RETURN);
         } else {
-            // TODO: REMOTE AERO CHARGE
+            final Vec3 start = user.position();
+            final HitResult goal = JUtils.raycastAll(user, start, start.add(user.getLookAngle().scale(64.0)), ClipContext.Fluid.NONE);
+            chargeAt(attacker, goal.getLocation());
         }
+    }
+
+    public void chargeAt(final AerosmithEntity attacker, final Vec3 goal) {
+        attacker.setFlyState(AerosmithEntity.FlyState.FLYBY);
+        forward = attacker.getLookAngle();
+        remoteChargeTarget = goal;
+        segment = Segment.CHARGE;
     }
 
     @Override
     public void tick(AerosmithEntity attacker) {
         if (attacker.getCurrentMove() != this) return;
 
+        if (remoteCharge) {
+            attacker.setDeltaMovement(attacker.getDeltaMovement().scale(0.4).add(attacker.getLookAngle().scale(0.3)));
+            attacker.allowXRotChange();
+            attacker.lookAt(remoteChargeTarget, 10f, 10f);
+            attacker.disallowXRotChange();
+            return;
+        }
+
         final int duration = getDuration();
         int time = duration - attacker.getMoveStun();
 
-        if (segment == Segment.FIRST_RISE) {
-            if (time > duration / 10) segment = Segment.CHARGE_START;
-        }
+        switch (segment) {
+            case FIRST_RISE -> {
+                if (time > duration / 10) segment = Segment.CHARGE_START;
+            }
+            case CHARGE_START -> {
+                final var pos = attacker.position();
+                attacker.setDeltaMovement(chargeStart.subtract(pos).normalize().scale(0.4));
+                if (time > duration * 2 / 10) segment = Segment.CHARGE;
+            }
+            case CHARGE -> {
+                final var vel = attacker.getDeltaMovement();
+                attacker.setDeltaMovement(vel.scale(0.6).add(forward.scale(0.2)));
+                if (time > duration * 7 / 10) segment = Segment.RISE;
+            }
+            case RISE -> {
+                final var vel = attacker.getDeltaMovement();
+                attacker.setDeltaMovement(vel.scale(0.95).add(up.scale(0.04)));
 
-        else if (segment == Segment.CHARGE_START) {
-            final var pos = attacker.position();
-            attacker.setDeltaMovement(chargeStart.subtract(pos).normalize().scale(0.4));
-            if (time > duration * 2 / 10) segment = Segment.CHARGE;
-        }
-
-        else if (segment == Segment.CHARGE) {
-            final var vel = attacker.getDeltaMovement();
-            attacker.setDeltaMovement(vel.scale(0.6).add(forward.scale(0.2)));
-            if (time > duration * 6 / 8) segment = Segment.RISE;
-        }
-
-        else if (segment == Segment.RISE) {
-            final var vel = attacker.getDeltaMovement();
-            attacker.setDeltaMovement(vel.scale(0.95).add(up.scale(0.04)));
-
-            final double d = forward.x;
-            final double f = forward.z;
-            attacker.setXRot(89.0F);
-            attacker.setYRot(Mth.wrapDegrees((float)(Mth.atan2(f, d) * Mth.RAD_TO_DEG) - 90.0F));
-            attacker.setYHeadRot(attacker.getYRot());
+                final double d = forward.x;
+                final double f = forward.z;
+                attacker.setXRot(89.0F);
+                attacker.setYRot(Mth.wrapDegrees((float)(Mth.atan2(f, d) * Mth.RAD_TO_DEG) - 90.0F));
+                attacker.setYHeadRot(attacker.getYRot());
+            }
         }
     }
 

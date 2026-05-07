@@ -65,6 +65,10 @@
       "jcraft:hamon",
       "jcraft:vampire",
       "jcraft:texas_hold_em"
-    ]
+    ],
+    "lithium:options": {
+      "mixin.entity.collisions.intersection": false,
+      "mixin.entity.collisions.movement": false
+    }
   }
 }

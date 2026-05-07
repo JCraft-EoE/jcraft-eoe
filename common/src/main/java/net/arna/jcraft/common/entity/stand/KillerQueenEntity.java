@@ -15,10 +15,10 @@ import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
+import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.moves.killerqueen.*;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
-import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.minecraft.network.chat.Component;
@@ -58,6 +58,7 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                     .skinName(Component.literal("Deadly"))
                     .skinName(Component.literal("1999"))
                     .build())
+            .summonData(SummonData.of(JSoundRegistry.KQ_SUMMON))
             .build();
     public static final Supplier<IPoseModifier> POSE = AbstractKillerQueenEntity.POSE;
 
@@ -90,10 +91,14 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                     Component.literal("Grab"),
                     Component.literal("grabs opponent by the face, then detonates them, launching them upwards")
             );
-    public static final CoinTossMove COIN_TOSS = new CoinTossMove(240);
+    public static final CoinTossMove COIN_TOSS = new CoinTossMove(240)
+            .withInfo(
+                    Component.literal("Coin Toss"),
+                    Component.literal("Instantly tosses a coin in an arch that becomes your primary bomb.")
+            );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<KillerQueenEntity> TOSS = new TossMove<KillerQueenEntity>(0, 1, 1, 0.75f)
+    public static final KQTossMove TOSS = new KQTossMove(0, 1, 1, 0.75f)
             .withAnim(KillerQueenEntity.State.ITEM_TOSS);
     public static final TossChargeMove<KillerQueenEntity> TOSS_CHARGE = new TossChargeMove<KillerQueenEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);

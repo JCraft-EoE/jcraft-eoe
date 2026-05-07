@@ -224,7 +224,7 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
         consumer.accept(obtainBloodBottle);
         // find stone mask
         final Advancement obtainRedHat = Advancement.Builder.advancement()
-                .display(JItemRegistry.STONE_MASK.get(),
+                .display(JItemRegistry.RED_HAT.get(),
                         Component.translatable("advancements.jcraft.obtain_red_hat.title"),
                         Component.translatable("advancements.jcraft.obtain_red_hat.description"),
                         null,

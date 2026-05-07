@@ -17,7 +17,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import java.util.Set;
 
 public final class ZoomPunchAttack extends AbstractSimpleAttack<ZoomPunchAttack, HamonSpec> {
-    public static final float CHARGE_COST = 10.0F;
+    public static final float CHARGE_COST = 6.7F;
     public ZoomPunchAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                          float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);

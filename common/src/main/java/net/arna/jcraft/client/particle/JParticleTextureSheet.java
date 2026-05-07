@@ -27,6 +27,7 @@ public class JParticleTextureSheet {
             RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
 
             RenderSystem.depthMask(false);
+            RenderSystem.enableDepthTest();
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
 

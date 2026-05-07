@@ -12,6 +12,9 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
@@ -25,13 +28,9 @@ import net.arna.jcraft.client.rendering.shader.TimeEraseShaderEffect;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.config.ConfigOption;
 import net.arna.jcraft.common.data.AttackerDataLoader;
-import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -55,7 +54,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -578,19 +579,19 @@ public class ClientPacketHandler {
 
     public static void handleTimeAccelState(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
         final TimeAccelStatePacket.State state = buf.readEnum(TimeAccelStatePacket.State.class);
-        final Entity e = client.level == null ? null : client.level.getEntity(buf.readVarInt());
+        final int entityId = buf.readVarInt();
 
-        if (!(e instanceof final MadeInHeavenEntity mih) || !mih.isAlive()) {
-            return;
-        }
+//        if (!(e instanceof final MadeInHeavenEntity mih) || !mih.isAlive()) {
+//            return;
+//        }
 
         switch (state) {
             case START -> {
                 final int duration = buf.readVarInt();
                 final long startTime = buf.readLong();
-                TimeAccelStatePacket.addAcceleration(mih.getId(), (int) (duration - (System.currentTimeMillis() - startTime) / 50), startTime);
+                TimeAccelStatePacket.addAcceleration(entityId, (int) (duration - (System.currentTimeMillis() - startTime) / 50), startTime);
             }
-            case STOP -> TimeAccelStatePacket.removeAcceleration(mih.getId());
+            case STOP -> TimeAccelStatePacket.removeAcceleration(entityId);
         }
     }
 
