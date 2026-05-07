@@ -121,8 +121,8 @@ public class AerosmithChargeAttack extends AbstractMultiHitAttack<AerosmithCharg
                 JUtils.addVelocity(target, up.x * 0.45, up.y * 0.45, up.z * 0.45);
             } else {
                 // vacuum victims to front
-                final Vec3 forceInFront = attacker.position().add(forward).subtract(target.position()).normalize().scale(0.5);
-                JUtils.setVelocity(target, attacker.getDeltaMovement().scale(0.7).add(forceInFront));
+                final Vec3 forceInFront = attacker.position().add(forward).subtract(target.position()).normalize().scale(0.65);
+                JUtils.setVelocity(target, attacker.getDeltaMovement().scale(0.8).add(forceInFront));
             }
         }
     }
