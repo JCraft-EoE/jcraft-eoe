@@ -43,6 +43,8 @@ public class GLBakedProgram extends BakedProgram {
 
     private void saveTextureState()
     {
+        glActiveTexture(GL_TEXTURE0);
+
         needsRestoreTextures = 0;
         for (int i = 0; i <= 31; i++)
         {
