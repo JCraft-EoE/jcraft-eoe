@@ -54,7 +54,6 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withSound(JSoundRegistry.ANUBIS_SLASH)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
             .withHitSpark(JParticleType.SWEEP_ATTACK)
-            .withHyperArmor()
             .withInfo(Component.literal("Slash"), Component.literal("Uninterruptible get-off-me tool. Great stun."));
     public static final SimpleAnubisAttack POMMEL = new SimpleAnubisAttack(20, 5, 8,
             1f, 4f, 7, 1.25f, 0.2f, 0f, false, true)
@@ -84,12 +83,14 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     public static final SimpleAnubisMultiHitAttack UNSHEATHING_SWEEP = new SimpleAnubisMultiHitAttack(5, 16, 1f,
             3f, 10, 1.25f, 0.3f, 0.3f, IntSet.of(6, 10), true)
             .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withArmor(1)
             .withInfo(Component.literal("Unsheating Sweep"), Component.literal("2 hits, knocks down."));
     public static final UnsheathingAttack UNSHEATHING_ATTACK = new UnsheathingAttack(5, 6, 12, 1f, 5f,
             13, 1.75f, 0.5f, 0f)
             .withCrouchingVariant(UNSHEATHING_SWEEP)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
             .withHitSpark(JParticleType.SWEEP_ATTACK)
+            .withArmor(1)
             .withInfo(Component.literal("Unsheathing Attack"), Component.literal("Unsheathes Anubis."));
 
     @Setter

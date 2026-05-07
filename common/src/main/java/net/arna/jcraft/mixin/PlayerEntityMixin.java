@@ -26,11 +26,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
 public abstract class PlayerEntityMixin implements IComboCounter, IFoodData {
 
-    @Shadow protected FoodData foodData;
+    @Shadow
+    protected FoodData foodData;
     // Combo tracking
     @Unique
     private int comboCount = 1;
@@ -77,6 +79,13 @@ public abstract class PlayerEntityMixin implements IComboCounter, IFoodData {
     @Override
     public FoodData getFoodData() {
         return foodData;
+    }
+
+    @Inject(method = "canEat", at = @At("HEAD"), cancellable = true)
+    private void jcraft$canEat(boolean canAlwaysEat, CallbackInfoReturnable<Boolean> cir) {
+        if (((Player)(Object)this).hasEffect(JStatusRegistry.DAZED.get())) {
+            cir.setReturnValue(false);
+        }
     }
 
     /*
