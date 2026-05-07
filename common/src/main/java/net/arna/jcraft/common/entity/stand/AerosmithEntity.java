@@ -24,16 +24,13 @@ import net.arna.jcraft.common.attack.moves.aerosmith.*;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -109,7 +106,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             );
 
     public static final AerosmithChargeAttack CHARGE = new AerosmithChargeAttack(
-            300, 50, 1.0f, 15, 1.66f, 0.1f, 0.0f,
+            100, 50, 1.0f, 15, 1.66f, 0.1f, 0.0f,
             IntSet.of(10, 15, 20, 25, 30, 35, 40, 45, 50))
             .withStaticY()
             .withStunType(StunType.LAUNCH)
@@ -225,7 +222,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         return super.canBlock();
     }
 
-    private double lastMovementToLocalPlayerAngle = 0.0;
+    public double lastMovementToLocalPlayerAngle = 0.0;
 
     @Override
     public void tick() {
@@ -243,31 +240,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         if (!isAlive()) return;
 
         if (level().isClientSide()) {
-            if (tickCount % 26 == 0) {
-                final Vec3 pos = position();
-                level().playLocalSound(pos.x, pos.y, pos.z,
-                        JSoundRegistry.AS_IDLE.get(), SoundSource.PLAYERS,
-                        isRemote() ? 0.2f : 1.0f, 1.0f, true);
-            }
+            JCraft.getClientEntityHandler().aerosmithClientTick(this);
             return;
-        }
-        if (flyState != FlyState.NONE) {
-            final var localPlayer = Minecraft.getInstance().player;
-            final var localPos = localPlayer.position();
-
-            final double angle = JUtils.angleBetween(getDeltaMovement(), localPos.subtract(position()));
-
-            if (
-                    Math.signum(lastMovementToLocalPlayerAngle) != Math.signum(angle)
-                            && angle < 0
-                            && distanceToSqr(localPlayer) < 35 * 35)
-            { // got close, moving away
-                level().playLocalSound(localPos.x, localPos.y, localPos.z,
-                        JSoundRegistry.AS_FLYBY.get(), SoundSource.PLAYERS,
-                        isRemote() ? 0.2f : 1.0f, 1.0f, true);
-            }
-
-            lastMovementToLocalPlayerAngle = angle;
         }
 
         final LivingEntity user = getUser();
@@ -330,7 +304,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
                     setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(cruiseSpeed)));
 
-                    if (distanceSqr <= 4.0) {
+                    if (distanceSqr <= 6.25) {
                         setRemote(false);
                         flyState = FlyState.NONE;
                         playSound(JSoundRegistry.AS_LANDING.get());

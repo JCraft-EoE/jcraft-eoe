@@ -52,6 +52,7 @@ public interface JTagRegistry {
     TagKey<EntityType<?>> CANNOT_TAKE_STAND_FROM = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cannot_take_stand_from"));
     TagKey<EntityType<?>> UNAFFECTED_BY_EPITAPH = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("unaffected_by_epitaph"));
     TagKey<EntityType<?>> PREFERS_GOLD_DRIP = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("prefer_gold_drip"));
+    TagKey<EntityType<?>> DOESNT_BREATHE = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("doesnt_breathe"));
 
     TagKey<Biome> METEORS_CAN_FALL = TagKey.create(Registries.BIOME, JCraft.id("meteors_can_fall"));
 

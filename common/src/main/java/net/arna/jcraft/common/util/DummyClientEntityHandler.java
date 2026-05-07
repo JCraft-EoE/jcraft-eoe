@@ -50,4 +50,8 @@ public class DummyClientEntityHandler implements IClientEntityHandler {
     @Override
     public void spawnGroundedMoshParticles(AbstractArrow projectile) {
     }
+
+    @Override
+    public void aerosmithClientTick(AerosmithEntity aerosmith) {
+    }
 }
