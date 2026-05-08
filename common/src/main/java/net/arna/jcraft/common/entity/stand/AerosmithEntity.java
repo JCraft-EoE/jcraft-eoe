@@ -82,7 +82,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             .withShootSpark(JParticleType.LEMON)
             .withStunType(StunType.WINDED)
             .withInfo(
-                    Component.literal("Fire Autocannons"),
+                    Component.literal("Fire Gunpods"),
                     Component.literal("Shoots supersonic bullets in front of Aerosmith. Prolonged use overheats the guns, making them far less accurate.")
             );
 
