@@ -12,7 +12,6 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
-import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
@@ -103,25 +102,7 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
     }
 
     private void dropItem(AerosmithEntity attacker) {
-        final LivingEntity user = attacker.getUser();
-
-        if (user == null) return;
-
-        final var itemProjectile = new ItemTossProjectile(user, attacker.level(), attacker.getHeldItem());
-
-        attacker.setHeldItem(ItemStack.EMPTY);
-
-        itemProjectile.setOwner(user);
-        itemProjectile.setPos(attacker.position().subtract(0d, 1d, 0d));
-
-        itemProjectile.setXRot(attacker.getXRot());
-        itemProjectile.xRotO = attacker.xRotO;
-
-        itemProjectile.setYRot(attacker.getYRot());
-        itemProjectile.yRotO = attacker.yRotO;
-
-        itemProjectile.setDeltaMovement(attacker.getDeltaMovement().normalize().scale(1d/16));
-        attacker.level().addFreshEntity(itemProjectile);
+        JUtils.tossItem(attacker, attacker.level(), attacker.getHeldItem(), 1/16f, 0f, true);
     }
 
     @Override
