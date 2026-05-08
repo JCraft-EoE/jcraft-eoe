@@ -12,6 +12,7 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.splatter.Splatter;
@@ -92,6 +93,11 @@ public class ClientPacketHandler {
         register(S2C_MANDOM_DATA, ClientPacketHandler::handleMandomData);
         register(S2C_IPS_TRIGGERED, ClientPacketHandler::handleIPSTriggered);
         register(S2C_DAMAGE_NUMBER, ClientPacketHandler::handleDamageNumber);
+        register(S2C_BLOCK_BREAKAGE, ClientPacketHandler::handleBlockBreakage);
+    }
+
+    private static void handleBlockBreakage(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
+        BlockBreakerClient.onBreakagePacket(buf);
     }
 
     private static void handleDamageNumber(final @NonNull Minecraft client, final FriendlyByteBuf buf) {

@@ -2,8 +2,12 @@ package net.arna.jcraft.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.arna.jcraft.client.rendering.api.callbacks.PostWorldRenderCallback;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.mixin_logic.StillDepthHolder;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -12,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.world.entity.Entity;
 import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
@@ -24,6 +29,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.SortedSet;
 
 @SuppressWarnings("AddedMixinMembersNamePattern") // We use @Unique, this makes no sense.
 @Mixin(LevelRenderer.class)
@@ -109,5 +116,12 @@ public class LevelRendererMixin {
         }
 
         return yaw;
+    }
+
+    @ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;long2ObjectEntrySet()Lit/unimi/dsi/fastutil/objects/ObjectSet;"))
+    private ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> injectBlockBreakerBreakage(ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> original) {
+        ObjectOpenHashSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> set = new ObjectOpenHashSet<>(original);
+        set.addAll(BlockBreakerClient.getBreakStates());
+        return set;
     }
 }
