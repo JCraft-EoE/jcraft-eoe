@@ -619,7 +619,7 @@
   "jcraft.serverconfig.option.enableFriendlyFire": "Friendly Fire (Uses scoreboard teams)",
   "jcraft.serverconfig.option.enableIPS": "Stun Falloff (use with low cooldowns)",
   "jcraft.serverconfig.option.enableMoveCooldowns": "Move Cooldowns",
-  "jcraft.serverconfig.option.exclusiveStands": "Exclusive Stands",
+  "jcraft.serverconfig.option.exclusiveStands": "Claimed Stands",
   "jcraft.serverconfig.option.gravityOnlyAffectsPlayers": "Gravity Changes only affect Players",
   "jcraft.serverconfig.option.healthToDamageScaling": "Health to Damage Scaling",
   "jcraft.serverconfig.option.ignoreArmor": "Stands Ignore Armor",
