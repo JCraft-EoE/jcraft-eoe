@@ -3,12 +3,12 @@ package net.arna.jcraft.client.util;
 import com.google.common.collect.Sets;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientTickEvent;
-import dev.architectury.event.events.common.BlockEvent;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
+import net.arna.jcraft.common.events.JBlockEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.Util;
@@ -63,7 +63,7 @@ public class BlockBreakerClient {
 
     public static void init() {
         ClientTickEvent.CLIENT_LEVEL_POST.register(BlockBreakerClient::tick);
-        BlockEvent.BREAK.register((level, pos, state, player, xp) -> onBlockBreak(pos));
+        JBlockEvents.BEFORE_SET.register((pos, oldState, newState, level) -> onBlockBreak(pos));
     }
 
     private static EventResult onBlockBreak(BlockPos pos) {

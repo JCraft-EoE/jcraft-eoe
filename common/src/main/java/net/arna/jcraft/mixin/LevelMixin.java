@@ -25,27 +25,23 @@ public class LevelMixin {
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", at = @At("HEAD"), cancellable = true)
     public void jcraft$setBlock(BlockPos pos, BlockState newState, int flags, CallbackInfoReturnable<Boolean> cir) {
         final Level level = (Level)(Object)this;
-        // only on server side
-        if (!level.isClientSide()) {
-            final BlockState oldState = level.getBlockState(pos);
-            // don't notify no changes
-            if (Objects.equals(oldState, newState)) {
+        final BlockState oldState = level.getBlockState(pos);
+        // don't notify no changes
+        if (Objects.equals(oldState, newState)) {
+            return;
+        }
+        // avoid chunk generation
+        // todo: pliz make the mixin itself just not apply to a select few classes
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            if ((MINECRAFT_SERVER_NAME.equals(element.getClassName()) && "prepareLevels".equals(element.getMethodName())) ||
+                    LEVEL_CHUNK_NAME.equals(element.getClassName()) && "postProcessGeneration".equals(element.getMethodName())) {
                 return;
             }
-            // avoid chunk generation
-            // todo: pliz make the mixin itself just not apply to a select few classes
-            for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-                if ((MINECRAFT_SERVER_NAME.equals(element.getClassName()) && "prepareLevels".equals(element.getMethodName())) ||
-                        LEVEL_CHUNK_NAME.equals(element.getClassName()) && "postProcessGeneration".equals(element.getMethodName())) {
-                    return;
-                }
-            }
-            // actually invoke the hook
-            if (JBlockEvents.BEFORE_SET.invoker().setBlock(pos, oldState, newState, level).interruptsFurtherEvaluation()) {
-                cir.setReturnValue(false);
-                cir.cancel();
-            }
+        }
+        // actually invoke the hook
+        if (JBlockEvents.BEFORE_SET.invoker().setBlock(pos, oldState, newState, level).interruptsFurtherEvaluation()) {
+            cir.setReturnValue(false);
+            cir.cancel();
         }
     }
-
 }

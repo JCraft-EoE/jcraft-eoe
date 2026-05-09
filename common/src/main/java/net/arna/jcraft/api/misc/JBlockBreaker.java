@@ -2,13 +2,13 @@ package net.arna.jcraft.api.misc;
 
 import com.mojang.datafixers.util.Pair;
 import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import lombok.Data;
 import net.arna.jcraft.api.registry.JPacketRegistry;
+import net.arna.jcraft.common.events.JBlockEvents;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -48,7 +48,8 @@ public class JBlockBreaker {
     public static void init() {
         TickEvent.SERVER_LEVEL_POST.register(JBlockBreaker::tick);
         TickEvent.SERVER_POST.register(s -> tickCounter++);
-        BlockEvent.BREAK.register((level, pos, state, player, xp) -> onBlockBreak(level, pos));
+        JBlockEvents.BEFORE_SET.register((pos, oldState, newState, level) ->
+                onBlockBreak(level, pos));
     }
 
     /**
@@ -119,6 +120,7 @@ public class JBlockBreaker {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         level.removeBlock(pos, false);
         Block.dropResources(state, level, pos, blockEntity, breaker, ItemStack.EMPTY);
+        level.levelEvent(2001, pos, Block.getId(state));
     }
 
     /**
