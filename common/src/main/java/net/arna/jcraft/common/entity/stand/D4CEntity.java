@@ -174,9 +174,9 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                     Component.literal("hides in a flag in an un-stunnable, floating state"));
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<D4CEntity> TOSS = new TossMove<D4CEntity>(0, 1, 1, 0.75f)
+    public static final TossMove<D4CEntity> TOSS = new TossMove<D4CEntity>(0, 1, 1, 0.75f,0.13f)
             .withAnim(D4CEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<D4CEntity> TOSS_CHARGE = new TossChargeMove<D4CEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<D4CEntity> TOSS_CHARGE = new TossChargeMove<D4CEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
     public D4CEntity(Level worldIn) {

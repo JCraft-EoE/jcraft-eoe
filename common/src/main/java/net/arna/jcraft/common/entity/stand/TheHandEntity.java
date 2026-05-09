@@ -223,9 +223,9 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<TheHandEntity> TOSS = new TossMove<TheHandEntity>(0, 1, 1, 0.75f)
+    public static final TossMove<TheHandEntity> TOSS = new TossMove<TheHandEntity>(0, 1, 1, 0.75f,0.13f)
             .withAnim(TheHandEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<TheHandEntity> TOSS_CHARGE = new TossChargeMove<TheHandEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<TheHandEntity> TOSS_CHARGE = new TossChargeMove<TheHandEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
     public TheHandEntity(final Level world) {

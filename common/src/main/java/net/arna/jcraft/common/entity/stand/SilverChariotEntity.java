@@ -260,7 +260,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     // TODO balance x2
     public static final TossMove<SilverChariotEntity> TOSS = new TossMove<SilverChariotEntity>(0, 1, 1, 0.75f)
             .withAnim(SilverChariotEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<SilverChariotEntity> TOSS_CHARGE = new TossChargeMove<SilverChariotEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<SilverChariotEntity> TOSS_CHARGE = new TossChargeMove<SilverChariotEntity>(40, 1 * 20 + 1, 1 * 20, 1.0f, 5)
             .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Boolean> HAS_RAPIER;

@@ -132,7 +132,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
         final var cds = JComponentPlatformUtils.getCooldowns(user);
 
-        if (cds.getCooldown(CooldownType.HEAVY) <= 0.0 && currentTarget.onGround()) {
+        if (cds.getCooldown(CooldownType.STAND_HEAVY) <= 0.0 && currentTarget.onGround()) {
             final var targetPos = currentTarget.position();
 
             attacker.setFlyState(FlyState.FLYBY);
@@ -142,7 +142,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
             bombAttack.setDropLocation(bombTarget);
 
-            cds.setCooldown(CooldownType.HEAVY, bombAttack.getCooldown());
+            cds.setCooldown(CooldownType.STAND_HEAVY, bombAttack.getCooldown());
         } else {
             final var chargeAttack = attacker.getChargeAttack();
 
@@ -154,7 +154,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
                 boolean tryCharge = attacker.getRandom().nextBoolean();
 
                 if (tryCharge) {
-                    if (cds.getCooldown(CooldownType.BARRAGE) <= 0.0 && attacker.distanceToSqr(currentTarget) < 100.0) {
+                    if (cds.getCooldown(CooldownType.STAND_BARRAGE) <= 0.0 && attacker.distanceToSqr(currentTarget) < 100.0) {
                         attacker.initMove(MoveClass.BARRAGE);
                         chargeAttack.chargeAt(attacker, currentTarget.position());
                         return;
