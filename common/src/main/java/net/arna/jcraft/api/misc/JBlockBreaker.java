@@ -1,5 +1,7 @@
 package net.arna.jcraft.api.misc;
 
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
@@ -38,6 +40,7 @@ public class JBlockBreaker {
     public static void init() {
         TickEvent.SERVER_LEVEL_POST.register(JBlockBreaker::tick);
         TickEvent.SERVER_POST.register(s -> tickCounter++);
+        BlockEvent.BREAK.register((level, pos, state, player, xp) -> onBlockBreak(level, pos));
     }
 
     /**
@@ -88,6 +91,12 @@ public class JBlockBreaker {
 
         Collection<ServerPlayer> players = JUtils.around(serverLevel, pos, 512);
         NetworkManager.sendToPlayers(players, JPacketRegistry.S2C_BLOCK_BREAKAGE, buf);
+    }
+
+    private static EventResult onBlockBreak(Level level, BlockPos pos) {
+        // Remove any breakage state for this block when it's broken.
+        breakStates.getOrDefault(level, Collections.emptyMap()).remove(pos);
+        return EventResult.pass();
     }
 
     /**

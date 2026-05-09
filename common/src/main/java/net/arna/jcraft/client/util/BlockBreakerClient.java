@@ -1,7 +1,9 @@
 package net.arna.jcraft.client.util;
 
 import com.google.common.collect.Sets;
+import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.common.BlockEvent;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
@@ -45,6 +47,13 @@ public class BlockBreakerClient {
 
     public static void init() {
         ClientTickEvent.CLIENT_LEVEL_POST.register(BlockBreakerClient::tick);
+        BlockEvent.BREAK.register((level, pos, state, player, xp) -> onBlockBreak(pos));
+    }
+
+    private static EventResult onBlockBreak(BlockPos pos) {
+        // Remove any breakage state for this block when it's broken.
+        breakStates.remove(pos.asLong());
+        return EventResult.pass();
     }
 
     private static void tick(ClientLevel level) {
