@@ -1,10 +1,10 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -22,6 +22,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class EmeraldProjectile extends AbstractArrow {
     private int ticksInAir;
@@ -131,6 +132,15 @@ public class EmeraldProjectile extends AbstractArrow {
 
         JUtils.projectileDamageLogic(this, level(), entity, Vec3.ZERO, 10, 1, false, 1, 4, CommonHitPropertyComponent.HitAnimation.MID);
         playSound(SoundEvents.AMETHYST_BLOCK_BREAK, 1, 1);
+        discard();
+    }
+
+    @Override
+    protected void onHitBlock(@NotNull BlockHitResult result) {
+        super.onHitBlock(result);
+
+        float breakage = JBlockBreaker.calculateBreakage(level(), result.getBlockPos(), 2f);
+        JBlockBreaker.setBreakState(level(), (LivingEntity) getOwner(), result.getBlockPos(), breakage);
         discard();
     }
 

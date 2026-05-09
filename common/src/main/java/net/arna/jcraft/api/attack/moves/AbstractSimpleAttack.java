@@ -39,7 +39,6 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -519,7 +518,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @return how much this move breaks blocks.
      */
     protected float getBlockDestructionMultiplier(A attacker) {
-        return 2.0f;
+        return getDamage() / 2.5f;
     }
 
     /**
@@ -632,11 +631,8 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         double distanceMult = Mth.clamp(1.5 - distance, 0, 1);
         distanceMult *= distanceMult;
 
-        BlockState state = level.getBlockState(pos);
-        final float destroySpeed = state.getDestroySpeed(level, pos);
-        if (destroySpeed <= 0) return 0f;
-
-        return (float) (getBlockDestructionMultiplier(attacker) / destroySpeed * distanceMult);
+        float strength = getBlockDestructionMultiplier(attacker);
+        return (float) (JBlockBreaker.calculateBreakage(level, pos, strength) * distanceMult);
     }
 
     /**

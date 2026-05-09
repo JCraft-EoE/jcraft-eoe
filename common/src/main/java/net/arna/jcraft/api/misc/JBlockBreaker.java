@@ -135,6 +135,21 @@ public class JBlockBreaker {
         return breakState == null ? 0f : breakState.getBreakage();
     }
 
+    /**
+     * Calculates a sensible breakage based on block hardness and a break strength.
+     * @param level The level the block is in
+     * @param pos The position the block is at
+     * @param strength The strength at which we're attacking the block
+     * @return A sensible breakage value to use
+     */
+    public static float calculateBreakage(Level level, BlockPos pos, float strength) {
+        BlockState state = level.getBlockState(pos);
+        final float destroySpeed = state.getDestroySpeed(level, pos);
+        if (destroySpeed <= 0) return 0f;
+
+        return strength / destroySpeed;
+    }
+
     private static void sendBreakStates(Level level, List<BreakState> breakStates) {
         if (!(level instanceof ServerLevel serverLevel) || breakStates.isEmpty()) return;
 
