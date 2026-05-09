@@ -519,7 +519,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * @return how much this move breaks blocks.
      */
     protected float getBlockDestructionMultiplier(A attacker) {
-        return 0.25f;
+        return 2.0f;
     }
 
     /**

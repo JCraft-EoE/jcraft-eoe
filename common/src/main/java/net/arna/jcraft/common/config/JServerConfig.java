@@ -72,7 +72,7 @@ public class JServerConfig {
 
     // Interaction options
     private static final String INTERACTION = "interaction";
-    public static final BooleanOption MINING_BARRAGE = new BooleanOption("miningBarrage", INTERACTION, true);
+    public static final BooleanOption MINING_BARRAGE = new BooleanOption("miningBarrage", INTERACTION, false);
     public static final FloatOption METEOR_SPAWN_RATE = new FloatOption("meteorSpawnRate", INTERACTION, 0.02f, 0f, 1f);
     public static final FloatOption STAND_ARROW_SPAWN_RATE = new FloatOption("standArrowSpawnRate", INTERACTION, 0.01f, 0f, 1f);
     public static final IntOption DUMMY_DAMAGE_INDICATOR_RANGE = new IntOption("dummyDamageIndicatorRange", INTERACTION, 64, 0, 512);
