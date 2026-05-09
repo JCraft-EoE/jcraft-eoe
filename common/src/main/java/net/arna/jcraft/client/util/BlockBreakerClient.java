@@ -19,12 +19,14 @@ import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.util.Mth;
 
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Environment(EnvType.CLIENT)
 public class BlockBreakerClient {
     // Storing these the exact same way as the LevelRenderer does to ensure we don't need to convert anything
     // in LevelRendererMixin upon every frame.
     private static final Long2ObjectMap<SortedSet<BlockDestructionProgress>> breakStates = new Long2ObjectOpenHashMap<>();
+    public static final TreeSet<BlockDestructionProgress> emptySet = Sets.newTreeSet();
     private static int tickCounter = 0;
 
     public static void onBreakagePacket(FriendlyByteBuf buf) {
@@ -41,8 +43,22 @@ public class BlockBreakerClient {
         }
     }
 
+    public static boolean isEmpty() {
+        return breakStates.isEmpty();
+    }
+
     public static ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> getBreakStates() {
         return breakStates.long2ObjectEntrySet();
+    }
+
+    public static int getBreakProgress(BlockPos pos) {
+        int progress = 0;
+
+        for (BlockDestructionProgress p : breakStates.getOrDefault(pos.asLong(), emptySet)) {
+            if (p.getProgress() > progress) progress = p.getProgress();
+        }
+
+        return progress;
     }
 
     public static void init() {

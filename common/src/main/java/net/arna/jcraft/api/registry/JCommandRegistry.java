@@ -1,6 +1,7 @@
 package net.arna.jcraft.api.registry;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.common.command.*;
 import net.minecraft.commands.CommandBuildContext;
@@ -33,11 +34,13 @@ public interface JCommandRegistry {
         // TODO test command, remove this
         dispatcher.register(Commands.literal("jbreak")
                 .then(Commands.argument("pos", BlockPosArgument.blockPos())
-                        .executes(ctx -> {
-                            ServerLevel level = ctx.getSource().getLevel();
-                            BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
-                            JBlockBreaker.setBreakState(level, pos, 0.5f);
-                            return 1;
-                        })));
+                        .then(Commands.argument("breakage", FloatArgumentType.floatArg(0, 1))
+                                .executes(ctx -> {
+                                    ServerLevel level = ctx.getSource().getLevel();
+                                    BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
+                                    float breakage = FloatArgumentType.getFloat(ctx, "breakage");
+                                    JBlockBreaker.setBreakState(level, pos, breakage);
+                                    return 1;
+                                }))));
     }
 }

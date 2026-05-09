@@ -69,6 +69,18 @@ public class JBlockBreaker {
         sendBreakStates(level, newBreakStates);
     }
 
+    /**
+     * Gets the breakage for the block at the given position, if there is one.
+     * If there isn't, returns 0.
+     * @param level The level the block is in
+     * @param pos The position the block is at
+     * @return The breakage of the block
+     */
+    public static float getBreakage(Level level, BlockPos pos) {
+        BreakState breakState = breakStates.getOrDefault(level, Collections.emptyMap()).get(pos);
+        return breakState == null ? 0f : breakState.getBreakage();
+    }
+
     private static void sendBreakStates(Level level, List<BreakState> breakStates) {
         if (!(level instanceof ServerLevel serverLevel) || breakStates.isEmpty()) return;
 
@@ -107,7 +119,15 @@ public class JBlockBreaker {
         Map<BlockPos, BreakState> breakStates = JBlockBreaker.breakStates.get(level);
         if (breakStates == null) return;
 
-        breakStates.values().forEach(BreakState::tick);
+        List<BlockPos> toRemove = new ArrayList<>();
+        for (BreakState breakState : breakStates.values()) {
+            breakState.tick();
+            if (breakState.getBreakage() <= 0f) {
+                toRemove.add(breakState.getPos());
+            }
+        }
+
+        toRemove.forEach(breakStates::remove);
     }
 
     @Data

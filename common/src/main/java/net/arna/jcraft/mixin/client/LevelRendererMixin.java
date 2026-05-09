@@ -120,6 +120,8 @@ public class LevelRendererMixin {
 
     @ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;long2ObjectEntrySet()Lit/unimi/dsi/fastutil/objects/ObjectSet;"))
     private ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> injectBlockBreakerBreakage(ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> original) {
+        if (BlockBreakerClient.isEmpty()) return original;
+
         ObjectOpenHashSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> set = new ObjectOpenHashSet<>(original);
         set.addAll(BlockBreakerClient.getBreakStates());
         return set;
