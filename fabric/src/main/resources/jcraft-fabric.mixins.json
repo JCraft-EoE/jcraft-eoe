@@ -13,6 +13,7 @@
     "ShaderProgramMixin",
     "client.GameRendererMixin",
     "client.KeyBindingMixin",
+    "client.MultiPlayerGameModeMixin",
     "client.gravity.ScreenEffectRendererMixin"
   ],
   "injectors": {

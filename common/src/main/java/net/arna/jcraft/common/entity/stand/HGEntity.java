@@ -54,7 +54,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                     .freeSpace(Component.literal("""
                         BNBs:
                             -the calamari
-                            Light>Barrage>Net Set>delay.Emarald Splash>crouch.Emerald Splash>
+                            Light>Barrage>Net Set>delay.Emerald Splash>crouch.Emerald Splash>
                             ...Extend>crouch.Light~Light
                             ...Sendoff"""))
                     .skinName(Component.literal("Cold"))
