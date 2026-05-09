@@ -139,8 +139,13 @@ public class EmeraldProjectile extends AbstractArrow {
     protected void onHitBlock(@NotNull BlockHitResult result) {
         super.onHitBlock(result);
 
+        if (level().isClientSide()) {
+            return;
+        }
+
         float breakage = JBlockBreaker.calculateBreakage(level(), result.getBlockPos(), 2f);
-        JBlockBreaker.setBreakState(level(), (LivingEntity) getOwner(), result.getBlockPos(), breakage);
+        LivingEntity owner = getOwner() instanceof LivingEntity le ? le : null;
+        JBlockBreaker.setBreakState(level(), owner, result.getBlockPos(), breakage);
         discard();
     }
 

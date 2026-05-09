@@ -612,7 +612,6 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     }
 
     private void breakBlocks(final A attacker, final Set<AABB> boxes) {
-        float dmg = getDamage();
         Level level = attacker.getEntityWorld();
 
         Object2FloatMap<BlockPos> breakages = boxes.stream()

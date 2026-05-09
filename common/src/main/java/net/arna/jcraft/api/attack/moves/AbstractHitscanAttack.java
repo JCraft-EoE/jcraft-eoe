@@ -108,7 +108,7 @@ public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A
         else if (hitResult.getType() == HitResult.Type.BLOCK && user.level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
             final BlockPos pos = ((BlockHitResult)hitResult).getBlockPos();
             final BlockState state = user.level().getBlockState(pos);
-            if (state.getFluidState().isEmpty()) {
+            if (state.getFluidState().isEmpty() && mayBreak(user, pos)) {
                 AABB box = AABB.ofSize(hitResult.getLocation(), 1, 1, 1);
                 Level level = attacker.getEntityWorld();
                 float breakage = getBreakage(attacker, level, pos, box);
