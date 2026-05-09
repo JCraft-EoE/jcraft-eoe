@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.arna.jcraft.common.events.JBlockEvents;
 import net.fabricmc.api.EnvType;
@@ -26,8 +27,9 @@ public class BlockBreakerClient {
     // Storing these the exact same way as the LevelRenderer does to ensure we don't need to convert anything
     // in LevelRendererMixin upon every frame.
     private static final Long2ObjectMap<SortedSet<BlockDestructionProgress>> breakStates = new Long2ObjectOpenHashMap<>();
-    public static final TreeSet<BlockDestructionProgress> emptySet = Sets.newTreeSet();
+    private static final TreeSet<BlockDestructionProgress> emptySet = Sets.newTreeSet();
     private static int tickCounter = 0;
+    private static final Object lock = new Object();
 
     public static void onBreakagePacket(FriendlyByteBuf buf) {
         int count = buf.readVarInt();
@@ -39,23 +41,31 @@ public class BlockBreakerClient {
             breakState.updateTick(tickCounter);
             breakState.setProgress(progress);
 
-            breakStates.put(pos.asLong(), Util.make(Sets.newTreeSet(), s -> s.add(breakState)));
+            synchronized (lock) {
+                breakStates.put(pos.asLong(), Util.make(Sets.newTreeSet(), s -> s.add(breakState)));
+            }
         }
     }
 
     public static boolean isEmpty() {
-        return breakStates.isEmpty();
+        synchronized (lock) {
+            return breakStates.isEmpty();
+        }
     }
 
     public static ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> getBreakStates() {
-        return breakStates.long2ObjectEntrySet();
+        synchronized (lock) {
+            return new ObjectOpenHashSet<>(breakStates.long2ObjectEntrySet());
+        }
     }
 
     public static int getBreakProgress(BlockPos pos) {
         int progress = 0;
 
-        for (BlockDestructionProgress p : breakStates.getOrDefault(pos.asLong(), emptySet)) {
-            if (p.getProgress() > progress) progress = p.getProgress();
+        synchronized (lock) {
+            for (BlockDestructionProgress p : breakStates.getOrDefault(pos.asLong(), emptySet)) {
+                if (p.getProgress() > progress) progress = p.getProgress();
+            }
         }
 
         return progress;
@@ -68,20 +78,24 @@ public class BlockBreakerClient {
 
     private static EventResult onBlockBreak(BlockPos pos) {
         // Remove any breakage state for this block when it's broken.
-        breakStates.remove(pos.asLong());
+        synchronized (lock) {
+            breakStates.remove(pos.asLong());
+        }
         return EventResult.pass();
     }
 
     private static void tick(ClientLevel level) {
         LongSet toRemove = new LongArraySet();
-        breakStates.long2ObjectEntrySet().forEach(e -> {
-            e.getValue().forEach(BlockBreakerClient::tick);
-            e.getValue().removeIf(p -> p.getProgress() <= 0);
+        synchronized (lock) {
+            breakStates.long2ObjectEntrySet().forEach(e -> {
+                e.getValue().forEach(BlockBreakerClient::tick);
+                e.getValue().removeIf(p -> p.getProgress() <= 0);
 
-            if (e.getValue().isEmpty()) toRemove.add(e.getLongKey());
-        });
+                if (e.getValue().isEmpty()) toRemove.add(e.getLongKey());
+            });
 
-        toRemove.forEach(breakStates::remove);
+            toRemove.forEach(breakStates::remove);
+        }
 
         tickCounter++;
     }
