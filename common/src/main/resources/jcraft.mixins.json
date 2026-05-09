@@ -28,7 +28,6 @@
     "client.LivingEntityRendererMixin",
     "client.MinecraftMixin",
     "client.ModelBakeryMixin",
-    "client.MultiPlayerGameModeMixin",
     "client.ParticleAccessor",
     "client.ParticleManagerMixin",
     "client.RenderTargetMixin",

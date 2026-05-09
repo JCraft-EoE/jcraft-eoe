@@ -1,4 +1,4 @@
-package net.arna.jcraft.mixin.client;
+package net.arna.jcraft.forge.mixin.client;
 
 import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,8 +20,10 @@ public class MultiPlayerGameModeMixin {
     @Shadow
     private float destroyProgress;
 
-    @Inject(method = "method_41930", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;destroyBlockProgress(ILnet/minecraft/core/BlockPos;I)V"))
-    private void setDestroyProgressOnBreakStart(BlockState blockState, BlockPos blockPos, Direction direction, int i, CallbackInfoReturnable<Packet<ServerGamePacketListener>> cir) {
+    @Inject(method = "lambda$startDestroyBlock$1", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;destroyBlockProgress(ILnet/minecraft/core/BlockPos;I)V"))
+    private void setDestroyProgressOnBreakStart(BlockState blockState, PlayerInteractEvent.LeftClickBlock event,
+                                                BlockPos blockPos, Direction direction, int i,
+                                                CallbackInfoReturnable<Packet<ServerGamePacketListener>> cir) {
         int progress = BlockBreakerClient.getBreakProgress(blockPos);
 
         // When the player starts breaking a block, check if the block is already partially broken.
