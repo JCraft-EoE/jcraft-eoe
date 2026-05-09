@@ -10,6 +10,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
 
 public interface JCommandRegistry {
     static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
@@ -37,9 +38,10 @@ public interface JCommandRegistry {
                         .then(Commands.argument("breakage", FloatArgumentType.floatArg(0, 1))
                                 .executes(ctx -> {
                                     ServerLevel level = ctx.getSource().getLevel();
+                                    LivingEntity entity = (LivingEntity) ctx.getSource().getEntityOrException();
                                     BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
                                     float breakage = FloatArgumentType.getFloat(ctx, "breakage");
-                                    JBlockBreaker.setBreakState(level, pos, breakage);
+                                    JBlockBreaker.setBreakState(level, entity, pos, breakage);
                                     return 1;
                                 }))));
     }

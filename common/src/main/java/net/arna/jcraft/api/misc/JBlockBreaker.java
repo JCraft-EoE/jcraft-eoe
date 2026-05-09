@@ -1,5 +1,6 @@
 package net.arna.jcraft.api.misc;
 
+import com.mojang.datafixers.util.Pair;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.event.events.common.TickEvent;
@@ -13,11 +14,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * System for setting destruction states of blocks.
@@ -49,9 +57,17 @@ public class JBlockBreaker {
      * @param pos The position of the block that's breaking
      * @param breakage How much the block is broken ([0, 1])
      */
-    public static void setBreakState(Level level, BlockPos pos, float breakage) {
-        BreakState breakState = new BreakState(pos, breakage);
-        breakStates.computeIfAbsent(level, l -> new HashMap<>()).put(pos, breakState);
+    public static void setBreakState(Level level, @Nullable LivingEntity breaker, BlockPos pos, float breakage) {
+        BreakState breakState = new BreakState(pos, breakage + getBreakage(level, pos));
+        Map<BlockPos, BreakState> breakStates = JBlockBreaker.breakStates.computeIfAbsent(level, l -> new HashMap<>());
+
+        if (breakState.getBreakage() >= 1) {
+            breakBlockAndDrop(level, breaker, pos);
+            breakStates.remove(pos);
+            return;
+        }
+
+        breakStates.put(pos, breakState);
         sendBreakStates(level, List.of(breakState));
     }
 
@@ -60,13 +76,49 @@ public class JBlockBreaker {
      * @param level The level these blocks are in
      * @param map A map of block positions to their breakage ([0, 1])
      */
-    public static void setBreakState(Level level, Object2FloatMap<BlockPos> map) {
-        List<BreakState> newBreakStates = map.object2FloatEntrySet().stream()
-                .map(e -> new BreakState(e.getKey(), e.getFloatValue()))
-                .toList();
-        newBreakStates.forEach(s -> breakStates.computeIfAbsent(level, l -> new HashMap<>())
-                .put(s.getPos(), s));
-        sendBreakStates(level, newBreakStates);
+    public static void setBreakState(Level level, @Nullable LivingEntity breaker, Object2FloatMap<BlockPos> map) {
+        Pair<List<BreakState>, List<BreakState>> newBreakStates = map.object2FloatEntrySet().stream()
+                .filter(entry -> entry.getFloatValue() > 0)
+                .map(e -> new BreakState(e.getKey(), e.getFloatValue() +
+                        getBreakage(level, e.getKey())))
+                // Divide up into a group of break states and a group of broken blocks.
+                .reduce(Pair.of(new ArrayList<>(), new ArrayList<>()),
+                        (p, b) -> {
+                            if (b.getBreakage() >= 1f) p.getSecond().add(b);
+                            else p.getFirst().add(b);
+                            return p;
+                        }, (p1, p2) ->
+                        Pair.of(Stream.concat(p1.getFirst().stream(), p2.getFirst().stream()).toList(),
+                                Stream.concat(p1.getSecond().stream(), p2.getSecond().stream()).toList()));
+
+        List<BreakState> breaking = newBreakStates.getFirst();
+        List<BreakState> broken = newBreakStates.getSecond();
+        Map<BlockPos, BreakState> breakStates = JBlockBreaker.breakStates.computeIfAbsent(level, l -> new HashMap<>());
+
+        // Send breaking blocks
+        if (!breaking.isEmpty()) {
+            breaking.forEach(s -> breakStates.put(s.getPos(), s));
+            sendBreakStates(level, breaking);
+        }
+
+        // Break broken blocks
+        for (BreakState breakState : broken) {
+            breakBlockAndDrop(level, breaker, breakState.getPos());
+            breakStates.remove(breakState.getPos()); // If there was one, it's gone now.
+        }
+    }
+
+    /**
+     * Breaks the block at the given position and drops its loot, including xp (if applicable)
+     * @param level The level the block is in
+     * @param breaker The entity that broke the block
+     * @param pos The position of the broken block
+     */
+    public static void breakBlockAndDrop(Level level, @Nullable LivingEntity breaker, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        level.removeBlock(pos, false);
+        Block.dropResources(state, level, pos, blockEntity, breaker, ItemStack.EMPTY);
     }
 
     /**

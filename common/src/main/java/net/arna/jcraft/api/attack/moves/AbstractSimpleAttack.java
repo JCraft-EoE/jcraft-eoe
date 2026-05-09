@@ -5,6 +5,10 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.util.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.Pair;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectFloatPair;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
@@ -14,6 +18,7 @@ import net.arna.jcraft.api.attack.core.HitBoxData;
 import net.arna.jcraft.api.attack.enums.BlockableType;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.core.data.AttackMoveExtras;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
@@ -23,8 +28,10 @@ import net.arna.jcraft.common.util.ExtraProducts;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -32,6 +39,7 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +50,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
@@ -506,6 +515,14 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     }
 
     /**
+     * Gets the multiplier that determines how much this move breaks blocks.
+     * @return how much this move breaks blocks.
+     */
+    protected float getBlockDestructionMultiplier() {
+        return 0.25f;
+    }
+
+    /**
      * Spawns shockwaves for the given attacker and user.
      * Can be overridden to change shockwave behavior.
      * @param attacker The attacker
@@ -556,6 +573,9 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     protected final Set<LivingEntity> attackBoxes(final A attacker, final Set<AABB> boxes, final DamageSource damageSource, final Vec3 center) {
         JUtils.displayHitboxes(attacker.getEntityWorld(), boxes);
 
+        // Break blocks
+        breakBlocks(attacker, boxes);
+
         Set<LivingEntity> targets = findHits(attacker, boxes, damageSource, mayHitUser);
         if (targets.isEmpty()) {
             return Set.of();
@@ -590,6 +610,34 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         }
 
         return targets;
+    }
+
+    private void breakBlocks(final A attacker, final Set<AABB> boxes) {
+        float dmg = getDamage();
+        Level level = attacker.getEntityWorld();
+
+        Object2FloatMap<BlockPos> breakages = boxes.stream()
+                .flatMap(box -> BlockPos.betweenClosedStream(box)
+                        .map(BlockPos::new)
+                        .filter(p -> mayBreak(attacker.getUser(), p))
+                        .map(p -> ObjectFloatPair.of(new BlockPos(p), getBreakage(level, p, box))))
+                .collect(Collectors.toMap(Pair::left, ObjectFloatPair::rightFloat,
+                        (f1, f2) -> f1, Object2FloatOpenHashMap::new));
+
+        JBlockBreaker.setBreakState(level, attacker.getUser(), breakages);
+    }
+
+    protected float getBreakage(Level level, BlockPos pos, AABB box) {
+        double distance = pos.getCenter().distanceTo(box.getCenter());
+        double distanceMult = Mth.clamp(1.5 - distance, 0, 1);
+        distanceMult *= distanceMult;
+
+        BlockState state = level.getBlockState(pos);
+        final float destroySpeed = state.getDestroySpeed(level, pos);
+        if (destroySpeed <= 0) return 0f;
+
+        float breakage = (float) (getBlockDestructionMultiplier() / destroySpeed * distanceMult);
+        return breakage;
     }
 
     /**
