@@ -36,7 +36,7 @@ public interface JCommandRegistry {
                         .executes(ctx -> {
                             ServerLevel level = ctx.getSource().getLevel();
                             BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
-                            JBlockBreaker.setBreakState(level, pos, 5);
+                            JBlockBreaker.setBreakState(level, pos, 0.5f);
                             return 1;
                         })));
     }

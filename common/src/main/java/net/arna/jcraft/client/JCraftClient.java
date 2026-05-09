@@ -30,6 +30,7 @@ import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.handler.*;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
@@ -101,6 +102,8 @@ public class JCraftClient {
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, StandUserPoseLoader::onReload);
 
         GravityChannelClient.init();
+
+        BlockBreakerClient.init();
 
         // Rendering
         JRenderLayerRegistry.init();
