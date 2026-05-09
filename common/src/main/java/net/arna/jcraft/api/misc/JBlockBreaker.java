@@ -15,6 +15,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -59,7 +60,8 @@ public class JBlockBreaker {
      * @param breakage How much the block is broken ([0, 1])
      */
     public static void setBreakState(Level level, @Nullable LivingEntity breaker, BlockPos pos, float breakage) {
-        BreakState breakState = new BreakState(pos, breakage + getBreakage(level, pos));
+        int breakerId = breaker == null ? 0 : breaker.getId();
+        BreakState breakState = new BreakState(pos, breakage + getBreakage(level, pos), breakerId);
         Map<BlockPos, BreakState> breakStates = JBlockBreaker.breakStates.computeIfAbsent(level, l -> new HashMap<>());
 
         if (breakState.getBreakage() >= 1) {
@@ -78,10 +80,12 @@ public class JBlockBreaker {
      * @param map A map of block positions to their breakage ([0, 1])
      */
     public static void setBreakState(Level level, @Nullable LivingEntity breaker, Object2FloatMap<BlockPos> map) {
+        int breakerId = breaker == null ? 0 : breaker.getId();
+
         Pair<List<BreakState>, List<BreakState>> newBreakStates = map.object2FloatEntrySet().stream()
                 .filter(entry -> entry.getFloatValue() > 0)
                 .map(e -> new BreakState(e.getKey(), e.getFloatValue() +
-                        getBreakage(level, e.getKey())))
+                        getBreakage(level, e.getKey()), breakerId))
                 // Divide up into a group of break states and a group of broken blocks.
                 .reduce(Pair.of(new ArrayList<>(), new ArrayList<>()),
                         (p, b) -> {
@@ -98,7 +102,11 @@ public class JBlockBreaker {
 
         // Send breaking blocks
         if (!breaking.isEmpty()) {
-            breaking.forEach(s -> breakStates.put(s.getPos(), s));
+            for (BreakState s : breaking) {
+                BreakState prev = breakStates.put(s.getPos(), s);
+                if ((prev == null || prev.getBreakage() <= 0) && breaker instanceof Player player)
+                    level.getBlockState(s.getPos()).attack(level, s.getPos(), player);
+            }
             sendBreakStates(level, breaking);
         }
 
@@ -166,8 +174,7 @@ public class JBlockBreaker {
                 pos = breakState.getPos().getCenter();
             else pos = pos.multiply(i, i, i).add(breakState.getPos().getCenter()).multiply(mult, mult, mult);
 
-            buf.writeBlockPos(breakState.getPos());
-            buf.writeFloat(breakState.getBreakage());
+            breakState.write(buf);
         }
 
         Collection<ServerPlayer> players = JUtils.around(serverLevel, pos, 512);
@@ -202,11 +209,13 @@ public class JBlockBreaker {
     @Data
     public static class BreakState {
         private final BlockPos pos;
+        private final int breakerId;
         private int lastUpdate;
         private float breakage;
 
-        public BreakState(BlockPos pos, float breakage) {
+        public BreakState(BlockPos pos, float breakage, int breakerId) {
             this.pos = pos;
+            this.breakerId = breakerId;
             this.lastUpdate = tickCounter;
             this.breakage = breakage;
         }
@@ -214,6 +223,7 @@ public class JBlockBreaker {
         public void write(FriendlyByteBuf buf) {
             buf.writeBlockPos(pos);
             buf.writeFloat(breakage);
+            buf.writeVarInt(breakerId);
         }
 
         public void tick() {

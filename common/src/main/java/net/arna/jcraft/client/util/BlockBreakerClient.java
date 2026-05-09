@@ -12,13 +12,16 @@ import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.arna.jcraft.common.events.JBlockEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -32,17 +35,34 @@ public class BlockBreakerClient {
     private static final Object lock = new Object();
 
     public static void onBreakagePacket(FriendlyByteBuf buf) {
+        Minecraft minecraft = Minecraft.getInstance();
+        ClientLevel level = Objects.requireNonNull(minecraft.level);
+
         int count = buf.readVarInt();
         for (int i = 0; i < count; i++) {
             BlockPos pos = buf.readBlockPos();
             int progress = Mth.clamp((int) (buf.readFloat() * 10), 0, 10);
+            int breakerId = buf.readVarInt();
+
+            Entity breaker = breakerId > 0 ? level.getEntity(breakerId) : null;
+            Player player = breaker instanceof Player p ? p : null;
 
             BlockDestructionProgress breakState = new BlockDestructionProgress(0, pos);
             breakState.updateTick(tickCounter);
             breakState.setProgress(progress);
 
             synchronized (lock) {
-                breakStates.put(pos.asLong(), Util.make(Sets.newTreeSet(), s -> s.add(breakState)));
+                TreeSet<BlockDestructionProgress> set = Sets.newTreeSet();
+                set.add(breakState);
+                SortedSet<BlockDestructionProgress> prev = breakStates.put(pos.asLong(), set);
+
+                // New block attack, attack the block
+                if (player != null && (prev == null || prev.isEmpty() ||
+                        prev.stream().allMatch(p -> p.getProgress() <= 0))) {
+                    minecraft.execute(() -> {
+                        Objects.requireNonNull(level).getBlockState(pos).attack(level, pos, player);
+                    });
+                }
             }
         }
     }
