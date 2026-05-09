@@ -518,7 +518,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
      * Gets the multiplier that determines how much this move breaks blocks.
      * @return how much this move breaks blocks.
      */
-    protected float getBlockDestructionMultiplier() {
+    protected float getBlockDestructionMultiplier(A attacker) {
         return 0.25f;
     }
 
@@ -620,14 +620,14 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                 .flatMap(box -> BlockPos.betweenClosedStream(box)
                         .map(BlockPos::new)
                         .filter(p -> mayBreak(attacker.getUser(), p))
-                        .map(p -> ObjectFloatPair.of(new BlockPos(p), getBreakage(level, p, box))))
+                        .map(p -> ObjectFloatPair.of(new BlockPos(p), getBreakage(attacker, level, p, box))))
                 .collect(Collectors.toMap(Pair::left, ObjectFloatPair::rightFloat,
                         (f1, f2) -> f1, Object2FloatOpenHashMap::new));
 
         JBlockBreaker.setBreakState(level, attacker.getUser(), breakages);
     }
 
-    protected float getBreakage(Level level, BlockPos pos, AABB box) {
+    protected float getBreakage(A attacker, Level level, BlockPos pos, AABB box) {
         double distance = pos.getCenter().distanceTo(box.getCenter());
         double distanceMult = Mth.clamp(1.5 - distance, 0, 1);
         distanceMult *= distanceMult;
@@ -636,8 +636,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         final float destroySpeed = state.getDestroySpeed(level, pos);
         if (destroySpeed <= 0) return 0f;
 
-        float breakage = (float) (getBlockDestructionMultiplier() / destroySpeed * distanceMult);
-        return breakage;
+        return (float) (getBlockDestructionMultiplier(attacker) / destroySpeed * distanceMult);
     }
 
     /**

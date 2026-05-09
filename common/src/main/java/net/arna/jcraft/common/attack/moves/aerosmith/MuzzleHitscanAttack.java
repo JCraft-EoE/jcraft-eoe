@@ -14,7 +14,6 @@ import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
@@ -23,23 +22,20 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Set;
 
 public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAttack, AerosmithEntity> {
-
     private static final float HALF_PI = (float)Math.PI/2;
 
-    private final float originalBreakChance;
     private final float originalSpread;
     private int shootCount;
 
-    public MuzzleHitscanAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun, final float knockback, final float range, final float hardness, final float breakChance, final float spread) {
-        super(cooldown, windup, duration, moveDistance, damage, stun, knockback, range, hardness, breakChance, spread);
-        originalBreakChance = breakChance;
+    public MuzzleHitscanAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
+                               final float damage, final int stun, final float knockback, final float range, final float spread) {
+        super(cooldown, windup, duration, moveDistance, damage, stun, knockback, range, spread);
         originalSpread = spread;
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(final AerosmithEntity attacker, final LivingEntity user) {
         attacker.addOverheat(0.225f);
-        withBreakChance(Mth.clamp(originalBreakChance - attacker.getOverheat() / 100, 0f, 1f));
         withSpread(Mth.clamp(originalSpread + attacker.getOverheat() / 100, 0f, HALF_PI));
 
         Vec3 hitPos;
@@ -95,6 +91,11 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
     }
 
     @Override
+    protected float getBlockDestructionMultiplier(AerosmithEntity attacker) {
+        return super.getBlockDestructionMultiplier(attacker) * Mth.clamp(1 - attacker.getOverheat() / 100f, 0, 1);
+    }
+
+    @Override
     public @NonNull MoveType<MuzzleHitscanAttack> getMoveType() {
         return MuzzleHitscanAttack.Type.INSTANCE.cast();
     }
@@ -107,7 +108,7 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
     @Override
     public @NonNull MuzzleHitscanAttack copy() {
         return copyExtras(new MuzzleHitscanAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getKnockback(), getRange(), getHardness(), originalBreakChance, originalSpread));
+                getKnockback(), getRange(), originalSpread));
     }
 
     public static class Type extends AbstractHitscanAttack.Type<MuzzleHitscanAttack> {
