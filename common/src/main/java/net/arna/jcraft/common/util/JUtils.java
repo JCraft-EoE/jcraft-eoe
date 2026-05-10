@@ -824,15 +824,19 @@ public final class JUtils {
      * @return The spawned projectile entity, or <code>null</code> if nothing was or several entities were spawned.
      */
     public static @Nullable Entity tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, float inaccurancy, boolean decrement) {
+        return tossItem(shooter, level, itemStack, velocity, inaccurancy, decrement, null);
+    }
+
+    public static @Nullable Entity tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, float inaccurancy, boolean decrement, @Nullable Vec3 spawnPos) {
         if (level.isClientSide() || itemStack.isEmpty()) {
             return null;
         }
+        final Vec3 resolvedSpawnPos = spawnPos != null ? spawnPos : shooter.position().add(getEyePos(shooter));
         // knife bundle needs extra care
         if (itemStack.getItem() instanceof KnifeBundleItem) {
             for (int i = 0; i < 9; i++) {
                 KnifeProjectile knife = new KnifeProjectile(level, shooter);
-                knife.setPos(shooter.position().add(getEyePos(shooter)));
-                knife.setPos(knife.position().add(
+                knife.setPos(resolvedSpawnPos.add(
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5)
@@ -885,7 +889,7 @@ public final class JUtils {
         else {
             spawned = new ItemTossProjectile(shooter, level, itemStack);
         }
-        spawned.setPos(shooter.position().add(getEyePos(shooter)));
+        spawned.setPos(resolvedSpawnPos);
         spawned.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, inaccurancy);
         level.addFreshEntity(spawned);
         if (decrement) {
