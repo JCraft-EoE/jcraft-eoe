@@ -252,6 +252,8 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final TossChargeMove<CreamEntity> TOSS_CHARGE = new TossChargeMove<CreamEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
+    public static final float VOIDING_FLIGHT_SPEED = 0.05f;
+
     private static final EntityDataAccessor<Integer> VOID_TIME = SynchedEntityData.defineId(CreamEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> HALF_BALL = SynchedEntityData.defineId(CreamEntity.class, EntityDataSerializers.BOOLEAN);
     @Setter
@@ -451,8 +453,18 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         // Players get creative flight, and mobs get gravity removed and y level equalization with target; see: handleAIVoid()
         if (user instanceof Player playerEntity) {
             notCreativeOrSpectator = (!playerEntity.isCreative() && !playerEntity.isSpectator());
-            if (notCreativeOrSpectator && !charging && !isFree()) {
-                playerEntity.getAbilities().flying = voiding;
+            if (!charging && !isFree()) {
+                if (voiding) {
+                    // Force flight on during voiding for ALL players (including creative).
+                    // The noPhysics override means a player without abilities.flying just falls
+                    // through the world, since Player.travel only cancels gravity when flying=true.
+                    // Re-asserting every tick also defeats accidental double-tap-space toggles.
+                    playerEntity.getAbilities().flying = true;
+                } else if (notCreativeOrSpectator) {
+                    // After voiding ends, drop survival/adventure players out of flight.
+                    // Leave creative/spectator alone -- flight is their normal ability.
+                    playerEntity.getAbilities().flying = false;
+                }
             }
             userIsPlayer = true;
         } else {
