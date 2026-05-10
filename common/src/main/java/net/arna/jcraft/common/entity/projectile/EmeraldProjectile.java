@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
@@ -143,9 +144,11 @@ public class EmeraldProjectile extends AbstractArrow {
             return;
         }
 
-        float breakage = JBlockBreaker.calculateBreakage(level(), result.getBlockPos(), 2f);
         LivingEntity owner = getOwner() instanceof LivingEntity le ? le : null;
-        JBlockBreaker.setBreakState(level(), owner, result.getBlockPos(), breakage);
+        if (AbstractMove.mayBreak(level(), owner, result.getBlockPos(), null)) {
+            float breakage = JBlockBreaker.calculateBreakage(level(), result.getBlockPos(), 2f);
+            JBlockBreaker.setBreakState(level(), owner, result.getBlockPos(), breakage);
+        }
         discard();
     }
 
