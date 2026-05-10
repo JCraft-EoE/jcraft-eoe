@@ -14,7 +14,7 @@
     "client.CameraInvoker",
     "client.CameraMixin",
     "client.ClientPlayerEntityMixin",
-    "client.ClientPlayNetworkHandlerMixin",
+    "client.ClientPacketListenerMixin",
     "client.ClientWorldMixin",
     "client.EffectProgramMixin",
     "client.EntityRenderDispatcherMixin",
