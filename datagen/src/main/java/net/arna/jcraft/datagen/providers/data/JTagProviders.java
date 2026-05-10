@@ -660,6 +660,8 @@ public class JTagProviders {
 
             final var doesntBreathe = getOrCreateTagBuilder(JTagRegistry.DOESNT_BREATHE);
             doesntBreathe.add(EntityType.ARMOR_STAND);
+            doesntBreathe.add(JEntityTypeRegistry.ROAD_ROLLER.getId());
+            doesntBreathe.addTag(JTagRegistry.STANDS);
 
             addTagsForCompatibilities(arg);
         }
