@@ -349,7 +349,7 @@ public class JClientEvents {
                                 && !StandTypeUtil.isNone(pType);
                     }
             )) {
-                tickMenacing(p, inRangeIds, level, JParticleTypeRegistry.DO, count++ < 15);
+                tickMenacing(p, inRangeIds, level, JParticleTypeRegistry.DO, count++ > 15);
             }
         }
 
@@ -367,7 +367,7 @@ public class JClientEvents {
                 if (JClientUtils.shouldNotRender(user)) {
                     continue;
                 }
-                tickMenacing(user, inRangeIds, level, JParticleTypeRegistry.GO, count++ < 15);
+                tickMenacing(user, inRangeIds, level, JParticleTypeRegistry.GO, count++ > 15);
             }
         }
 

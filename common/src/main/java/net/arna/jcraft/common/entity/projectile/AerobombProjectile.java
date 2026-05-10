@@ -73,7 +73,9 @@ public class AerobombProjectile extends AbstractArrow {
             final DamageSource damageSource = ownerStand == null ? level().damageSources().explosion(owner, this) : JDamageSources.stand(ownerStand);
 
             for (final LivingEntity living : hurt) {
-                if (hurt == owner) continue;
+                if (living == owner || living == ownerStand) {
+                    continue;
+                }
 
                 final Vec3 kbVec = JUtils.getEyePos(living).subtract(position()).normalize();
 

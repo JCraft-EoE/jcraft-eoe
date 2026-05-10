@@ -205,7 +205,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Epitaph"),
                     Component.literal("0.2s windup, 1.5s counter, combo starter. Cannot be buffered.")
             );
-    public static final PredictionMove PREDICTION = new PredictionMove(480, 4, 104, -1f)
+    public static final PredictionMove PREDICTION = new PredictionMove(160, 4, 104, -1f)
             .withCrouchingVariant(EPITAPH)
             .withSound(JSoundRegistry.KC_EPITAPH)
             .withInfo(

@@ -91,7 +91,7 @@ public final class PredictionMove extends AbstractMove<PredictionMove, KingCrims
         LivingEntity user = attacker.getUserOrThrow();
         final CommonCooldownsComponent cooldowns = JComponentPlatformUtils.getCooldowns(user);
         if (cooldowns.getCooldown(CooldownType.STAND_ULTIMATE) <= 0) {
-            cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, 400);
+            cooldowns.setCooldown(CooldownType.STAND_ULTIMATE, 20);
             finishPrediction(attacker);
         }
 

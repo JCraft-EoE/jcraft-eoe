@@ -76,13 +76,13 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     // TODO: balance this
     public static final MuzzleHitscanAttack BULLET = new MuzzleHitscanAttack(
-            1, 1, 2, 0f, 1f, 0, 0f, 30f, 10f, 1/6f, 0.01f)
+            1, 1, 2, 0f, 1f, 0, 0f, 30f, 0.01f)
             .withSound(JSoundRegistry.AS_SHOOT)
             .withHitSpark(JParticleType.HIT_SPARK_1)
             .withShootSpark(JParticleType.LEMON)
             .withStunType(StunType.WINDED)
             .withInfo(
-                    Component.literal("Fire Autocannons"),
+                    Component.literal("Fire Gunpods"),
                     Component.literal("Shoots supersonic bullets in front of Aerosmith. Prolonged use overheats the guns, making them far less accurate.")
             );
 

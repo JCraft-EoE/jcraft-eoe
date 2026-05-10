@@ -12,9 +12,10 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
-import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
+import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.item.KnifeBundleItem;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.world.InteractionHand;
@@ -102,26 +103,27 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
         dropRange += DROP_RANGE_INCREASE;
     }
 
-    private void dropItem(AerosmithEntity attacker) {
-        final LivingEntity user = attacker.getUser();
-
-        if (user == null) return;
-
-        final var itemProjectile = new ItemTossProjectile(user, attacker.level(), attacker.getHeldItem());
-
-        attacker.setHeldItem(ItemStack.EMPTY);
-
-        itemProjectile.setOwner(user);
-        itemProjectile.setPos(attacker.position().subtract(0d, 1d, 0d));
-
-        itemProjectile.setXRot(attacker.getXRot());
-        itemProjectile.xRotO = attacker.xRotO;
-
-        itemProjectile.setYRot(attacker.getYRot());
-        itemProjectile.yRotO = attacker.yRotO;
-
-        itemProjectile.setDeltaMovement(attacker.getDeltaMovement().normalize().scale(1d/16));
-        attacker.level().addFreshEntity(itemProjectile);
+    private void dropItem(final AerosmithEntity attacker) {
+        // knife bundle needs extra care
+        if (attacker.getHeldItem().getItem() instanceof KnifeBundleItem) {
+            for (int i = 0; i < 9; i++) {
+                KnifeProjectile knife = new KnifeProjectile(attacker.level(), attacker);
+                knife.setPos(attacker.position().subtract(0d, 2.5d, 0d));
+                knife.setPos(knife.position().add(
+                        attacker.level().random.triangle(0, 0.5),
+                        attacker.level().random.triangle(0, 0.5),
+                        attacker.level().random.triangle(0, 0.5)
+                ));
+                knife.shootFromRotation(attacker, attacker.getXRot(),attacker.getYRot(), 0f, -0.2f, 0f);
+                attacker.level().addFreshEntity(knife);
+            }
+        }
+        else {
+            var projectile = JUtils.tossItem(attacker, attacker.level(), attacker.getHeldItem(), -0.5f, 0f, true);
+            if (projectile != null) {
+                projectile.setPos(projectile.position().subtract(0d, 2.5d, 0d));
+            }
+        }
     }
 
     @Override

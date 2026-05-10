@@ -9,6 +9,7 @@ import net.arna.jcraft.api.attack.moves.AbstractHoldableMove;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -54,6 +55,13 @@ public final class TossChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
         final ItemStack holdItem = attacker.getBaseEntity().getItemInHand(InteractionHand.MAIN_HAND);
         return super.conditionsMet(attacker) &&
                 (JUtils.isHoldingSomethingThrowable(attacker.getUser()) || !holdItem.isEmpty());
+    }
+
+    @Override
+    public void onCancel(final A attacker) {
+        final LivingEntity baseEntity = attacker.getBaseEntity();
+        Containers.dropItemStack(baseEntity.level(), baseEntity.getX(), baseEntity.getY(), baseEntity.getZ(),
+                baseEntity.getItemInHand(InteractionHand.MAIN_HAND));
     }
 
     @Override

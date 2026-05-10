@@ -259,7 +259,7 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
     @Inject(method = "isAffectedByPotions()Z", at = @At("RETURN"), cancellable = true)
     public void jcraft$dontApplyPotionsToTE(final CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue() && JUtils.inTimeErase((LivingEntity)(Object)this)) {
-            cir.setReturnValue(true);
+            cir.setReturnValue(false);
         }
     }
 }

@@ -29,6 +29,8 @@ import net.arna.jcraft.client.registry.*;
 import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
+import net.arna.jcraft.client.rendering.handler.*;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
@@ -102,6 +104,8 @@ public class JCraftClient {
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, JShaderRegistry::onReload);
 
         GravityChannelClient.init();
+
+        BlockBreakerClient.init();
 
         // Rendering
         JRenderLayerRegistry.init();

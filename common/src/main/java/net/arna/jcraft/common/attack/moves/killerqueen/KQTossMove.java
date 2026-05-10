@@ -10,6 +10,7 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -60,6 +61,13 @@ public final class KQTossMove extends AbstractMove<KQTossMove, AbstractKillerQue
             JComponentPlatformUtils.getBombTracker(user).getMainBomb().setBomb(thrown);
         }
         return Set.of();
+    }
+
+    @Override
+    public void onCancel(final AbstractKillerQueenEntity<?,?> attacker) {
+        final LivingEntity baseEntity = attacker.getBaseEntity();
+        Containers.dropItemStack(baseEntity.level(), baseEntity.getX(), baseEntity.getY(), baseEntity.getZ(),
+                baseEntity.getItemInHand(InteractionHand.MAIN_HAND));
     }
 
     @Override

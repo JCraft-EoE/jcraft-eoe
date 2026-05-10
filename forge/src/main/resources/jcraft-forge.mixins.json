@@ -15,6 +15,7 @@
     "client.ForgeItemModelShaperMixin",
     "client.KeyBindingMixin",
     "client.LevelRendererAccessor",
+    "client.MultiPlayerGameModeMixin",
     "client.gravity.ScreenEffectRendererMixin"
   ],
   "injectors": {

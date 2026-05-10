@@ -16,6 +16,7 @@ import mod.azure.azurelib.animation.cache.AzIdentityRegistry;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
@@ -239,8 +240,8 @@ public final class JCraft {
         STATS.register();
 
         MoveTickQueue.registerMoveTickQueue();
-
         GravityChannel.registerReceivers();
+        JBlockBreaker.init();
 
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);
