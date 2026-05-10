@@ -616,13 +616,17 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
 
         Object2FloatMap<BlockPos> breakages = boxes.stream()
                 .flatMap(box -> BlockPos.betweenClosedStream(box)
-                        .map(BlockPos::new)
-                        .filter(p -> mayBreak(attacker.getUser(), p))
-                        .map(p -> ObjectFloatPair.of(new BlockPos(p), getBreakage(attacker, level, p, box))))
+                        .map(BlockPos::new) // make an immutable copy
+                        .filter(p -> mayBreak(attacker.getUser(), p)) // check if we can break this block
+                        // Map each block pos to a breakage
+                        .map(p -> ObjectFloatPair.of(new BlockPos(p), getBreakage(attacker, level, p, box)))
+                )
+                // Collect the block positions and their breakage into a map
                 .collect(Collectors.toMap(Pair::left, ObjectFloatPair::rightFloat,
                         (f1, f2) -> f1, Object2FloatOpenHashMap::new));
 
-        JBlockBreaker.setBreakState(level, attacker.getUser(), breakages);
+        // Send the breakages, treat block attack as coming from the user.
+        JBlockBreaker.setBreakState(level, attacker.getUser(), breakages, attacker.getUser().position());
     }
 
     protected float getBreakage(A attacker, Level level, BlockPos pos, AABB box) {
