@@ -1,5 +1,7 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
@@ -7,6 +9,7 @@ import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.food.IFoodData;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
 import net.arna.jcraft.common.util.IComboCounter;
@@ -29,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
-public abstract class PlayerEntityMixin implements IComboCounter, IFoodData {
+public abstract class PlayerMixin implements IComboCounter, IFoodData {
 
     @Shadow
     protected FoodData foodData;
@@ -204,5 +207,17 @@ public abstract class PlayerEntityMixin implements IComboCounter, IFoodData {
         if (JServerConfig.DISABLE_COMBAT_ELYTRA.getValue() && JComponentPlatformUtils.getMiscData(player).isOnDamageTimer()) {
             ci.cancel();
         }
+    }
+
+    @SuppressWarnings("ConstantValue")
+    @ModifyReturnValue(method = "isAffectedByFluids", at = @At("RETURN"))
+    private boolean jcraft$unaffectedByFluidsIfCreaming(boolean original) {
+        return original && !CreamEntity.isCreaming((LivingEntity) (Object)this);
+    }
+
+    @SuppressWarnings("ConstantValue")
+    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSpectator()Z", ordinal = 0))
+    private boolean jcraft$noPhysicsIfCreaming(boolean original) {
+        return original || CreamEntity.isCreaming((LivingEntity) (Object)this);
     }
 }

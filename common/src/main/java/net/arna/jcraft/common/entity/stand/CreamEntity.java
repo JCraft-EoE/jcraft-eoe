@@ -686,6 +686,17 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
         }
     }
 
+    /**
+     * Whether the given entity has a Cream stand and is voiding.
+     * @param entity The entity to check for
+     * @return whether the given entity has a cream stand and is voiding.
+     */
+    public static boolean isCreaming(Entity entity) {
+        return entity instanceof LivingEntity le &&
+                JUtils.getStand(le) instanceof CreamEntity cream &&
+                cream.getVoidTime() > 0;
+    }
+
     @Override
     @NonNull
     public CreamEntity getThis() {
