@@ -658,6 +658,9 @@ public class JTagProviders {
             prefersGoldDrip.add(EntityType.PIGLIN_BRUTE);
             prefersGoldDrip.add(EntityType.ZOMBIFIED_PIGLIN);
 
+            final var doesntBreathe = getOrCreateTagBuilder(JTagRegistry.DOESNT_BREATHE);
+            doesntBreathe.add(EntityType.ARMOR_STAND);
+
             addTagsForCompatibilities(arg);
         }
 
