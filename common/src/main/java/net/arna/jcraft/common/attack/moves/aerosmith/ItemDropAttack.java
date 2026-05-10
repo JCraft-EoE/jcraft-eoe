@@ -108,20 +108,20 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
         if (attacker.getHeldItem().getItem() instanceof KnifeBundleItem) {
             for (int i = 0; i < 9; i++) {
                 KnifeProjectile knife = new KnifeProjectile(attacker.level(), attacker);
-                knife.setPos(attacker.position().subtract(0d, 1d, 0d));
+                knife.setPos(attacker.position().subtract(0d, 2.5d, 0d));
                 knife.setPos(knife.position().add(
                         attacker.level().random.triangle(0, 0.5),
                         attacker.level().random.triangle(0, 0.5),
                         attacker.level().random.triangle(0, 0.5)
                 ));
-                knife.shootFromRotation(attacker, attacker.getXRot(),attacker.getYRot(), 0f, 0f, 0f);
+                knife.shootFromRotation(attacker, attacker.getXRot(),attacker.getYRot(), 0f, -0.2f, 0f);
                 attacker.level().addFreshEntity(knife);
             }
         }
         else {
-            var projectile = JUtils.tossItem(attacker, attacker.level(), attacker.getHeldItem(), 0f, 0f, true);
+            var projectile = JUtils.tossItem(attacker, attacker.level(), attacker.getHeldItem(), -0.5f, 0f, true);
             if (projectile != null) {
-                projectile.setPos(projectile.position().subtract(0d, 1d, 0d));
+                projectile.setPos(projectile.position().subtract(0d, 2.5d, 0d));
             }
         }
     }
