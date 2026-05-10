@@ -397,12 +397,6 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         final var level = aerosmith.level();
         final boolean isRemote = aerosmith.isRemote();
 
-//        if (aerosmith.tickCount % 26 == 0) {
-//            level.playLocalSound(pos.x, pos.y, pos.z,
-//                    JSoundRegistry.AS_IDLE.get(), SoundSource.PLAYERS,
-//                    isRemote ? 0.2f : 1.0f, 1.0f, true);
-//        }
-
         if (isRemote) {
             final var localPlayer = Minecraft.getInstance().player;
             final var localPos = localPlayer.position();

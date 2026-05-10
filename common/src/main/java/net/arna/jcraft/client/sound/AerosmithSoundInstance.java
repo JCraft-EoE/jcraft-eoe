@@ -40,9 +40,4 @@ public class AerosmithSoundInstance extends AbstractTickableSoundInstance {
         y = aerosmith.getY();
         z = aerosmith.getZ();
     }
-
-    @Override
-    public boolean canPlaySound() {
-        return true;
-    }
 }
