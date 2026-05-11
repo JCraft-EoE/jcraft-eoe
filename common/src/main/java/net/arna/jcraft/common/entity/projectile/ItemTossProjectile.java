@@ -75,6 +75,11 @@ public class ItemTossProjectile extends AbstractArrow {
         RICOCHETS = SynchedEntityData.defineId(ItemTossProjectile.class, EntityDataSerializers.INT);
     }
 
+    private static final float SPIN_DEGREES_PER_VELOCITY = 40f;
+
+    public float prevSpinAngle = 0f;
+    public float spinAngle = 0f;
+
     public ItemTossProjectile(final Level level) {
         super(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE.get(), level);
         setItem(ItemStack.EMPTY);
@@ -82,6 +87,7 @@ public class ItemTossProjectile extends AbstractArrow {
 
     public ItemTossProjectile(final LivingEntity shooter, final Level level, final ItemStack item) {
         super(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE.get(), shooter, level);
+        setCritArrow(true);
         setItem(item);
         if (getItem().is(JTagRegistry.HEAVY_IMPACT)) {
             this.setBaseDamage(2d);
@@ -91,6 +97,13 @@ public class ItemTossProjectile extends AbstractArrow {
             this.setBaseDamage(0d);
             this.setKnockback(0);
         }
+    }
+
+    @Override
+    public void tick() {
+        prevSpinAngle = spinAngle;
+        spinAngle += (float) getDeltaMovement().length() * SPIN_DEGREES_PER_VELOCITY;
+        super.tick();
     }
 
     public ItemStack getItem() {
