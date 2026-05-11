@@ -102,7 +102,9 @@ public class ItemTossProjectile extends AbstractArrow {
     @Override
     public void tick() {
         prevSpinAngle = spinAngle;
-        spinAngle += (float) getDeltaMovement().length() * SPIN_DEGREES_PER_VELOCITY;
+        if (!inGround) {
+            spinAngle += (float) getDeltaMovement().length() * SPIN_DEGREES_PER_VELOCITY;
+        }
         super.tick();
     }
 
@@ -398,7 +400,7 @@ public class ItemTossProjectile extends AbstractArrow {
                 level().setBlockAndUpdate(result.getBlockPos(), stripped.get());
                 item.hurtAndBreak(1, (LivingEntity)getOwner(), owner -> {/* do nothing */});
             }
-            dropItem(result.getLocation());
+            stickOrDrop(result.getLocation());
         }
         // hoe get used
         else if (item.getItem() instanceof HoeItem) {
@@ -414,7 +416,7 @@ public class ItemTossProjectile extends AbstractArrow {
                     }
                 }
             }
-            dropItem(result.getLocation());
+            stickOrDrop(result.getLocation());
         }
         // buckets empty their content if any
         else if (item.getItem() instanceof BucketItem bucket && bucket.content != Fluids.EMPTY) {
@@ -471,12 +473,34 @@ public class ItemTossProjectile extends AbstractArrow {
                 entityType2.spawn((ServerLevel)level(), item, null, pos, MobSpawnType.SPAWN_EGG, true, false);
             }
         }
-        // rest just get dropped
+        // rest just get dropped (or stuck if damageable)
         else {
-            dropItem(result.getLocation());
+            stickOrDrop(result.getLocation());
         }
-        inGround = true;
-        discard();
+        if (pickup == Pickup.ALLOWED) {
+            // Position flush with the block face so the item doesn't sink in
+            final Vec3 loc = result.getLocation();
+            final Vec3 toHit = loc.subtract(getX(), getY(), getZ()).normalize().scale(0.05);
+            setPosRaw(loc.x - toHit.x, loc.y - toHit.y, loc.z - toHit.z);
+            setDeltaMovement(Vec3.ZERO);
+            inGround = true;
+        } else {
+            inGround = true;
+            discard();
+        }
+    }
+
+    /**
+     * Drops the item, or sticks it in the block if it has durability (axes, swords, pickaxes, etc.).
+     * Returns true if sticking, false if dropped.
+     */
+    private boolean stickOrDrop(final Vec3 pos) {
+        if (getItem().getItem() instanceof TieredItem) {
+            pickup = Pickup.ALLOWED;
+            return true;
+        }
+        dropItem(pos);
+        return false;
     }
 
     /**

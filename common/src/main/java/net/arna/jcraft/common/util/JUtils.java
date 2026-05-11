@@ -834,8 +834,10 @@ public final class JUtils {
         final Vec3 resolvedSpawnPos = spawnPos != null ? spawnPos : shooter.position().add(getEyePos(shooter));
         // knife bundle needs extra care
         if (itemStack.getItem() instanceof KnifeBundleItem) {
+            final Entity bundleOwner = getUserIfStand(shooter);
+            final LivingEntity bundleOwnerLiving = bundleOwner instanceof LivingEntity le ? le : shooter;
             for (int i = 0; i < 9; i++) {
-                KnifeProjectile knife = new KnifeProjectile(level, shooter);
+                KnifeProjectile knife = new KnifeProjectile(level, bundleOwnerLiving);
                 knife.setPos(resolvedSpawnPos.add(
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5),
@@ -852,7 +854,8 @@ public final class JUtils {
         // other cases
         final Projectile spawned;
         if (itemStack.getItem() instanceof final ArrowItem arrow) {
-            spawned = arrow.createArrow(level, itemStack, shooter);
+            final Entity arrowOwner = getUserIfStand(shooter);
+            spawned = arrow.createArrow(level, itemStack, arrowOwner instanceof LivingEntity le ? le : shooter);
         }
         else if (itemStack.getItem() instanceof SnowballItem) {
             final Snowball snowballEntity = new Snowball(level, shooter);
@@ -873,10 +876,12 @@ public final class JUtils {
             spawned = thrownEgg;
         }
         else if (itemStack.getItem() instanceof ScalpelItem) {
-            spawned = new ScalpelProjectile(level, shooter);
+            final Entity scalpelOwner = getUserIfStand(shooter);
+            spawned = new ScalpelProjectile(level, scalpelOwner instanceof LivingEntity le ? le : shooter);
         }
         else if (itemStack.getItem() instanceof KnifeItem) {
-            spawned = new KnifeProjectile(level, shooter);
+            final Entity knifeOwner = getUserIfStand(shooter);
+            spawned = new KnifeProjectile(level, knifeOwner instanceof LivingEntity le ? le : shooter);
         }
         else if (itemStack.getItem() instanceof EnderpearlItem) {
             final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
