@@ -26,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public class EmeraldProjectile extends AbstractArrow {
+    private static final float BLOCK_BREAK_STRENGTH = 2f;
     private int ticksInAir;
     private int bouncesLeft = 5;
     private boolean reflect = false;
@@ -146,7 +147,8 @@ public class EmeraldProjectile extends AbstractArrow {
 
         LivingEntity owner = getOwner() instanceof LivingEntity le ? le : null;
         if (AbstractMove.mayBreak(level(), owner, result.getBlockPos(), null)) {
-            float breakage = JBlockBreaker.calculateBreakage(level(), result.getBlockPos(), 2f);
+            float breakage = JBlockBreaker.calcBreakageForProjectile(level(), result.getBlockPos(), getDeltaMovement(),
+                    BLOCK_BREAK_STRENGTH);
             JBlockBreaker.setBreakState(level(), owner, result.getBlockPos(), breakage);
         }
         discard();

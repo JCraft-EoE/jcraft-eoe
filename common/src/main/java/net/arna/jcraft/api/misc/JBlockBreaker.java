@@ -228,12 +228,26 @@ public class JBlockBreaker {
      * @param strength The strength at which we're attacking the block
      * @return A sensible breakage value to use
      */
-    public static float calculateBreakage(Level level, BlockPos pos, float strength) {
+    public static float calcBreakage(Level level, BlockPos pos, float strength) {
         BlockState state = level.getBlockState(pos);
         final float destroySpeed = state.getDestroySpeed(level, pos);
         if (destroySpeed <= 0) return 0f;
 
         return strength / destroySpeed;
+    }
+
+    /**
+     * Calculates a sensible breakage based on block hardness and break strength,
+     * while taking projectile velocity into account.
+     * @param level The level the block is in
+     * @param pos The position the block is at
+     * @param velocity The velocity of the projectile
+     * @param strength The strength at which we're attacking the block
+     * @return A sensible breakage value to use
+     */
+    public static float calcBreakageForProjectile(Level level, BlockPos pos, Vec3 velocity, float strength) {
+        float breakage = calcBreakage(level, pos, strength);
+        return (float) (breakage * velocity.length());
     }
 
     private static void sendBreakStates(Level level, List<BreakState> breakStates) {
