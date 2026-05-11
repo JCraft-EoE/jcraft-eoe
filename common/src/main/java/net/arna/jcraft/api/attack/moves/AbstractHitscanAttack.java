@@ -8,6 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.common.attack.core.data.AttackMoveExtras;
@@ -18,6 +19,7 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,6 +30,8 @@ import net.minecraft.world.phys.*;
 
 import java.util.Set;
 
+import static net.arna.jcraft.api.Attacks.damageLogic;
+
 /**
  * A simple attack that uses ray-cast to hitscan.
  *
@@ -37,9 +41,11 @@ import java.util.Set;
 @SuppressWarnings("UnusedReturnValue")
 @Getter
 public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A>, A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<T, A> {
-    private float range;
-    private float spread;
-    private @NonNull JParticleType shootSpark = JParticleType.LEMON;
+    protected float range;
+    protected float spread;
+    @Getter
+    protected boolean cancelMoves = true;
+    protected @NonNull JParticleType shootSpark = JParticleType.LEMON;
 
     protected AbstractHitscanAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage,
                                     final int stun, final float knockback, final float range, final float spread) {
@@ -59,6 +65,11 @@ public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A
         return getThis();
     }
 
+    public T withCancelMoves(final boolean cancel) {
+        this.cancelMoves = cancel;
+        return getThis();
+    }
+
     public T withShootSpark(final JParticleType shootSpark) {
         this.shootSpark = shootSpark;
         return getThis();
@@ -71,6 +82,20 @@ public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A
         }
 
         return Set.of();
+    }
+
+    @Override
+    protected void processTarget(final A attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
+        damageLogic(
+                attacker.getEntityWorld(),
+                target,
+                new AttackData(
+                        kbVec, getStun(), getStunType().ordinal(), isOverrideStun(),
+                        getDamage(), isLift(), getBlockStun(), damageSource, attacker.getUserOrThrow(),
+                        getHitAnimation(), attacker.getMoveUsage(), isCanBackstab(), getBlockableType().isNonBlockable(),
+                        cancelMoves
+                )
+        );
     }
 
     public Vec3 fire(final A attacker, final LivingEntity user, final Vec3 start, final Vec3 direction) {
@@ -164,20 +189,27 @@ public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A
                     .forGetter(AbstractHitscanAttack::getShootSpark);
         }
 
-        protected Products.P12<RecordCodecBuilder.Mu<M>, BaseMoveExtras, AttackMoveExtras, Integer, Integer, Integer, Float,
-                Float, Integer, Float, Float, Float, JParticleType>
+        protected RecordCodecBuilder<M, Boolean> cancelMoves() {
+            return Codec.BOOL.fieldOf("cancelMoves")
+                    .forGetter(AbstractHitscanAttack::isCancelMoves);
+        }
+
+        protected Products.P13<RecordCodecBuilder.Mu<M>, BaseMoveExtras, AttackMoveExtras, Integer, Integer, Integer, Float,
+                Float, Integer, Float, Float, Float, JParticleType, Boolean>
         hitscanDefault(RecordCodecBuilder.Instance<M> instance) {
             return instance.group(extras(), attackExtras(), cooldown(), windup(), duration(), moveDistance(), damage(), stun(),
-                    knockback(), range(), spread(), shootSpark());
+                    knockback(), range(), spread(), shootSpark(), cancelMoves());
         }
 
         protected App<RecordCodecBuilder.Mu<M>, M> hitscanDefault(RecordCodecBuilder.Instance<M> instance, Function9<Integer, Integer, Integer, Float,
                                                                         Float, Integer, Float, Float, Float, M> function) {
-            return hitscanDefault(instance).apply(instance, applyAttackExtras((cooldown, windup, duration,
-                                                             moveDistance, damage, stun, knockback, range,
-                                                                               spread, shootSpark) -> {
+            return hitscanDefault(instance).apply(instance, applyAttackExtras(
+                    (cooldown, windup, duration,
+                     moveDistance, damage, stun, knockback, range,
+                     spread, shootSpark, cancelMoves) -> {
                 M move = function.apply(cooldown, windup, duration, moveDistance, damage, stun, knockback, range, spread);
                 move.withShootSpark(shootSpark);
+                move.withCancelMoves(cancelMoves);
                 return move;
             }));
         }

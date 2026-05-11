@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.moves.AbstractHitscanAttack;
 import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
@@ -26,17 +27,24 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
 
     private final float originalSpread;
     private int shootCount;
+    private boolean wantToContinue;
 
     public MuzzleHitscanAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
                                final float damage, final int stun, final float knockback, final float range, final float spread) {
         super(cooldown, windup, duration, moveDistance, damage, stun, knockback, range, spread);
         originalSpread = spread;
+        cancelMoves = false;
+    }
+
+    @Override
+    public void onInitiate(AerosmithEntity attacker) {
+        super.onInitiate(attacker);
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(final AerosmithEntity attacker, final LivingEntity user) {
         attacker.addOverheat(0.225f);
-        withSpread(Mth.clamp(originalSpread + attacker.getOverheat() / 100, 0f, HALF_PI));
+        spread = Mth.clamp(originalSpread + attacker.getOverheat() / 100, 0f, HALF_PI);
 
         Vec3 hitPos;
 
@@ -69,6 +77,24 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
                 JParticleType.HIT_SPARK_1);
 
         return Set.of();
+    }
+
+    @Override
+    public void onUserMoveInput(final AerosmithEntity attacker, final MoveInputType type, final boolean pressed, final boolean moveInitiated) {
+        super.onUserMoveInput(attacker, type, pressed, moveInitiated);
+        if (getMoveClass() == type.getMoveClass()) {
+            wantToContinue = pressed;
+        }
+    }
+
+    @Override
+    public void tick(AerosmithEntity attacker) {
+        super.tick(attacker);
+
+        if (wantToContinue && attacker.getMoveStun() < 1) {
+            attacker.cancelMove(false);
+            attacker.initMove(getMoveClass());
+        }
     }
 
     @Override

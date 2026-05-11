@@ -92,7 +92,12 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
             return;
         }
 
-        if (attacker.distanceToSqr(dropLocation) <= dropRange * dropRange) {
+        final var pos = attacker.position();
+        final double dx = pos.x - dropLocation.x, dz = pos.z - dropLocation.z;
+        final var rangeSqr = dropRange * dropRange;
+
+        // drop is always vertical
+        if (dx * dx + dz * dz <= rangeSqr && pos.y >= dropLocation.y) {
             // TODO play the animation
             attacker.playSound(JSoundRegistry.AS_BOMB_DROP.get());
             dropItem(attacker);

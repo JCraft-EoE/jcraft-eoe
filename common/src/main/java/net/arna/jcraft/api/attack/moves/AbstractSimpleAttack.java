@@ -653,7 +653,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                 new AttackData(
                     kbVec, stun, stunType.ordinal(), overrideStun,
                     damage, lift, getBlockStun(), damageSource, attacker.getUserOrThrow(),
-                    hitAnimation, attacker.getMoveUsage(), canBackstab, blockableType.isNonBlockable()
+                    hitAnimation, attacker.getMoveUsage(), canBackstab, blockableType.isNonBlockable(), true
                 )
         );
     }

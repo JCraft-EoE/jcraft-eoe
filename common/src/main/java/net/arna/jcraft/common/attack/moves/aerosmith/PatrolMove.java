@@ -48,6 +48,11 @@ public class PatrolMove extends AbstractMove<PatrolMove, AerosmithEntity> {
         final LivingEntity user = attacker.getUser();
 
         if (user != null) {
+            if (user.isShiftKeyDown()) {
+                attacker.setPatrolDirection(attacker.getPatrolDirection().invert());
+                return;
+            }
+
             final Vec3 userEyePos = user.position().add(GravityChangerAPI.getEyeOffset(user));
             final Vec3 rotVec = user.getLookAngle();
             final HitResult goal = JUtils.raycastAll(
@@ -58,9 +63,7 @@ public class PatrolMove extends AbstractMove<PatrolMove, AerosmithEntity> {
                     EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(EntitySelector.NO_SPECTATORS)
             );
 
-            attacker.setPatrolRadius(radius);
-            attacker.setFlyState(AerosmithEntity.FlyState.PATROL);
-            attacker.setFlyTarget(goal.getLocation());
+            attacker.patrol(goal.getLocation(), radius);
             if (!attacker.isRemote()) attacker.setRemote(true);
         }
     }

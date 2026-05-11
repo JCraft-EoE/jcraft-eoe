@@ -6,7 +6,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
-import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
@@ -15,11 +14,9 @@ import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity.FlyState;
 import net.arna.jcraft.common.util.CooldownType;
-import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -153,33 +150,35 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
                 boolean tryCharge = attacker.getRandom().nextBoolean();
 
+                var targetPos = currentTarget.position();
+
+                final Vec3 lookVec = targetPos.subtract(attacker.position()).normalize();
+
                 if (tryCharge) {
-                    if (cds.getCooldown(CooldownType.STAND_BARRAGE) <= 0.0 && attacker.distanceToSqr(currentTarget) < 100.0) {
+                    if (cds.getCooldown(CooldownType.STAND_BARRAGE) <= 0.0
+                            && attacker.distanceToSqr(currentTarget) < 49.0
+                            && JUtils.angleBetween(lookVec, attacker.getLookAngle()) > 0.9) {
                         attacker.initMove(MoveClass.BARRAGE);
                         chargeAttack.chargeAt(attacker, currentTarget.position());
                         return;
                     }
                 }
 
-                if (attacker.getOverheat() < AerosmithEntity.OVERHEAT_MAX / 2f) {
+                if (attacker.getOverheat() < AerosmithEntity.OVERHEAT_MAX / 2f && !attacker.isInWall()) {
                     attacker.setFlyState(FlyState.FLYBY);
 
-                    final var targetPos = currentTarget.position().add(JUtils.getEyePos(currentTarget));
+                    targetPos = targetPos.add(JUtils.getEyePos(currentTarget));
 
                     attacker.setFlyTarget(targetPos);
-
-                    final Vec3 lookVec = targetPos.subtract(attacker.position()).normalize();
 
                     if (JUtils.angleBetween(lookVec, attacker.getLookAngle()) > 0.93)
                         if (attacker.tickCount % 2 == 0) // fire
                             attacker.getShootAttack().perform(attacker, user);
 
                 } else {
-                    final var targetPos = currentTarget.position().add(JUtils.getLocalUp(user).scale(16));
+                    targetPos = targetPos.add(JUtils.getLocalUp(user).scale(16));
 
-                    attacker.setFlyState(FlyState.PATROL);
-
-                    attacker.setFlyTarget(targetPos);
+                    attacker.patrol(targetPos, AerosmithEntity.DEFAULT_PATROL_RADIUS);
                 }
             } else {
                 final var bombTarget = currentTarget.position().add(JUtils.getLocalUp(user).scale(6.7));
@@ -187,8 +186,12 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
             }
         }
 
-        final var flyTarget = attacker.getFlyTarget();
-        JCraft.createParticle((ServerLevel) attacker.level(), flyTarget.x, flyTarget.y, flyTarget.z, JParticleType.BACK_STAB);
+        if (attacker.tickCount % 6 == 0 && user instanceof ServerPlayer serverPlayer) {
+            final var targetPos = attacker.getFlyTarget();
+
+            serverPlayer.connection.send(new ClientboundLevelParticlesPacket(JParticleTypeRegistry.SUN_LOCK_ON.get(), true,
+                    targetPos.x, targetPos.y, targetPos.z, 0, 0, 0, 0, 1));
+        }
     }
 
     @Override
