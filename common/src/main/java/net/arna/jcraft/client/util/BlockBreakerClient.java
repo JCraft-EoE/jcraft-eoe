@@ -15,11 +15,17 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.BlockDestructionProgress;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.SortedSet;
@@ -35,14 +41,15 @@ public class BlockBreakerClient {
     private static final Object lock = new Object();
 
     public static void onBreakagePacket(FriendlyByteBuf buf) {
-        Minecraft minecraft = Minecraft.getInstance();
-        ClientLevel level = Objects.requireNonNull(minecraft.level);
+        Minecraft client = Minecraft.getInstance();
+        ClientLevel level = Objects.requireNonNull(client.level);
 
         int count = buf.readVarInt();
         for (int i = 0; i < count; i++) {
             BlockPos pos = buf.readBlockPos();
             int progress = Mth.clamp((int) (buf.readFloat() * 10), 0, 10);
             int breakerId = buf.readVarInt();
+            Direction attackedFrom = buf.readBoolean() ? buf.readEnum(Direction.class) : null;
 
             Entity breaker = breakerId > 0 ? level.getEntity(breakerId) : null;
             Player player = breaker instanceof Player p ? p : null;
@@ -59,9 +66,36 @@ public class BlockBreakerClient {
                 // New block attack, attack the block
                 if (player != null && (prev == null || prev.isEmpty() ||
                         prev.stream().allMatch(p -> p.getProgress() <= 0))) {
-                    minecraft.execute(() -> {
-                        Objects.requireNonNull(level).getBlockState(pos).attack(level, pos, player);
-                    });
+                    client.execute(() -> attackBlock(client, level, pos, player, breakState.getProgress(), attackedFrom));
+                }
+            }
+        }
+    }
+
+    private static void attackBlock(Minecraft client, ClientLevel level, BlockPos pos, Player player, int progress,
+                                    @Nullable Direction attackedFrom) {
+        // Attack block (used for spawning particles when you hit redstone ore,
+        // or playing a note when hitting a note block)
+        BlockState blockState = Objects.requireNonNull(level).getBlockState(pos);
+        blockState.attack(level, pos, player);
+
+        // Play hit sound
+        SoundType soundType = blockState.getSoundType();
+        SoundEvent hitSound = soundType.getHitSound();
+        float volume = (soundType.getVolume() + 1.0F) / 8.0F;
+        float pitch = soundType.getPitch() * 0.5F;
+        level.playLocalSound(pos, hitSound, SoundSource.BLOCKS, volume, pitch, false);
+
+        // Spawn crack particles
+        if (attackedFrom != null) {
+            for (int i = 0; i < progress; i++) {
+                client.particleEngine.crack(pos, attackedFrom);
+            }
+        } else {
+            // Spawn crack particles from all directions if we don't know where the hit came from.
+            for (int i = 0; i < progress; i++) {
+                for (Direction direction : Direction.values()) {
+                    client.particleEngine.crack(pos, direction);
                 }
             }
         }

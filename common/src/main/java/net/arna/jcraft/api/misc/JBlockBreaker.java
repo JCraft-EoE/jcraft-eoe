@@ -6,11 +6,13 @@ import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import lombok.Data;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.common.events.JBlockEvents;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,6 +28,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -56,12 +59,41 @@ public class JBlockBreaker {
     /**
      * Sets the break state of the given position.
      * @param level The level in which this breakage is.
+     * @param breaker The entity that caused this breakage, if any.
      * @param pos The position of the block that's breaking
      * @param breakage How much the block is broken ([0, 1])
      */
     public static void setBreakState(Level level, @Nullable LivingEntity breaker, BlockPos pos, float breakage) {
+        Vec3 attackFrom = breaker == null ? null : breaker.position();
+        setBreakState(level, breaker, pos, breakage, attackFrom);
+    }
+
+    /**
+     * Sets the break state of the given position.
+     * @param level The level in which this breakage is.
+     * @param breaker The entity that caused this breakage, if any.
+     * @param pos The position of the block that's breaking
+     * @param breakage How much the block is broken ([0, 1])
+     * @param attackFrom Where this block is attacked from (some position, likely close to the block)
+     *                   defaults to the breaker's position (if omitted) or null if there isn't one.
+     */
+    public static void setBreakState(Level level, @Nullable LivingEntity breaker, BlockPos pos, float breakage,
+                                     @Nullable Vec3 attackFrom) {
+        setBreakState(level, breaker, pos, breakage, getAttackDirection(attackFrom, pos));
+    }
+
+    /**
+     * Sets the break state of the given position.
+     * @param level The level in which this breakage is.
+     * @param breaker The entity that caused this breakage, if any.
+     * @param pos The position of the block that's breaking
+     * @param breakage How much the block is broken ([0, 1])
+     * @param attackFrom The direction this block is attacked from
+     */
+    public static void setBreakState(Level level, @Nullable LivingEntity breaker, BlockPos pos, float breakage,
+                                     @Nullable Direction attackFrom) {
         int breakerId = breaker == null ? 0 : breaker.getId();
-        BreakState breakState = new BreakState(pos, breakage + getBreakage(level, pos), breakerId);
+        BreakState breakState = new BreakState(pos, breakage + getBreakage(level, pos), breakerId, attackFrom);
         Map<BlockPos, BreakState> breakStates = JBlockBreaker.breakStates.computeIfAbsent(level, l -> new HashMap<>());
 
         if (breakState.getBreakage() >= 1) {
@@ -77,15 +109,45 @@ public class JBlockBreaker {
     /**
      * Sets the break state of multiple blocks
      * @param level The level these blocks are in
+     * @param breaker The entity that caused this breakage, if any.
      * @param map A map of block positions to their breakage ([0, 1])
      */
     public static void setBreakState(Level level, @Nullable LivingEntity breaker, Object2FloatMap<BlockPos> map) {
+        Vec3 attackFrom = breaker == null ? null : breaker.position();
+        setBreakState(level, breaker, map, attackFrom);
+    }
+
+    /**
+     * Sets the break state of multiple blocks
+     * @param level The level these blocks are in
+     * @param breaker The entity that caused this breakage, if any.
+     * @param map A map of block positions to their breakage ([0, 1])
+     * @param attackFrom Where all blocks were attacked from (some position, likely close to the blocks)
+     *                   defaults to the breaker's position (if omitted) or null if there isn't one.
+     */
+    public static void setBreakState(Level level, @Nullable LivingEntity breaker, Object2FloatMap<BlockPos> map,
+                                     @Nullable Vec3 attackFrom) {
+        Object2FloatMap<Pair<BlockPos, Direction>> mapWithDirs = map.object2FloatEntrySet().stream()
+                .map(e -> Pair.of(Pair.of(e.getKey(), getAttackDirection(attackFrom, e.getKey())), e.getFloatValue()))
+                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (f1, f2) -> f1, Object2FloatOpenHashMap::new));
+
+        setBreakStateDirectional(level, breaker, mapWithDirs);
+    }
+
+    /**
+     * Sets the break state of multiple blocks
+     * @param level The level these blocks are in
+     * @param breaker The entity that caused this breakage, if any.
+     * @param map A map of block positions and their attack direction to their breakage ([0, 1])
+     */
+    public static void setBreakStateDirectional(Level level, @Nullable LivingEntity breaker,
+                                     Object2FloatMap<Pair<BlockPos, @Nullable Direction>> map) {
         int breakerId = breaker == null ? 0 : breaker.getId();
 
         Pair<List<BreakState>, List<BreakState>> newBreakStates = map.object2FloatEntrySet().stream()
                 .filter(entry -> entry.getFloatValue() > 0)
-                .map(e -> new BreakState(e.getKey(), e.getFloatValue() +
-                        getBreakage(level, e.getKey()), breakerId))
+                .map(e -> new BreakState(e.getKey().getFirst(), e.getFloatValue() +
+                        getBreakage(level, e.getKey().getFirst()), breakerId, e.getKey().getSecond()))
                 // Divide up into a group of break states and a group of broken blocks.
                 .reduce(Pair.of(new ArrayList<>(), new ArrayList<>()),
                         (p, b) -> {
@@ -115,6 +177,22 @@ public class JBlockBreaker {
             breakBlockAndDrop(level, breaker, breakState.getPos());
             breakStates.remove(breakState.getPos()); // If there was one, it's gone now.
         }
+    }
+
+    /**
+     * Calculates the direction from the attack position to the block position.
+     * @param attackFromPos The position the block was attacked from
+     * @param pos The position of the block
+     * @return The direction
+     */
+    public static Direction getAttackDirection(Vec3 attackFromPos, BlockPos pos) {
+        Direction direction = null;
+        if (attackFromPos != null) {
+            Vec3 dirVec = attackFromPos.subtract(pos.getCenter());
+            direction = Direction.getNearest(dirVec.x, dirVec.y, dirVec.z);
+        }
+
+        return direction;
     }
 
     /**
@@ -210,12 +288,15 @@ public class JBlockBreaker {
     public static class BreakState {
         private final BlockPos pos;
         private final int breakerId;
+        @Nullable
+        private final Direction attackedFrom;
         private int lastUpdate;
         private float breakage;
 
-        public BreakState(BlockPos pos, float breakage, int breakerId) {
+        public BreakState(BlockPos pos, float breakage, int breakerId, @Nullable Direction attackedFrom) {
             this.pos = pos;
             this.breakerId = breakerId;
+            this.attackedFrom = attackedFrom;
             this.lastUpdate = tickCounter;
             this.breakage = breakage;
         }
@@ -224,6 +305,10 @@ public class JBlockBreaker {
             buf.writeBlockPos(pos);
             buf.writeFloat(breakage);
             buf.writeVarInt(breakerId);
+            buf.writeBoolean(attackedFrom != null);
+            if (attackedFrom != null) {
+                buf.writeEnum(attackedFrom);
+            }
         }
 
         public void tick() {

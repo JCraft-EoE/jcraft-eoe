@@ -1,25 +1,34 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.mojang.authlib.GameProfile;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.food.IFoodData;
 import net.arna.jcraft.common.network.s2c.ComboCounterPacket;
 import net.arna.jcraft.common.util.IComboCounter;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.mixin_logic.AbilitiesAddon;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
+import net.minecraft.world.level.Level;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -29,10 +38,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
-public abstract class PlayerEntityMixin implements IComboCounter, IFoodData {
+public abstract class PlayerMixin implements IComboCounter, IFoodData {
 
     @Shadow
     protected FoodData foodData;
+    @Shadow
+    @Final
+    private Abilities abilities;
     // Combo tracking
     @Unique
     private int comboCount = 1;
@@ -204,5 +216,31 @@ public abstract class PlayerEntityMixin implements IComboCounter, IFoodData {
         if (JServerConfig.DISABLE_COMBAT_ELYTRA.getValue() && JComponentPlatformUtils.getMiscData(player).isOnDamageTimer()) {
             ci.cancel();
         }
+    }
+
+    @SuppressWarnings("ConstantValue")
+    @ModifyReturnValue(method = "isAffectedByFluids", at = @At("RETURN"))
+    private boolean jcraft$unaffectedByFluidsIfCreaming(boolean original) {
+        return original && !CreamEntity.isCreaming((LivingEntity) (Object)this);
+    }
+
+    // Player.tick calls isSpectator() twice back-to-back: once to set noPhysics, and once to
+    // gate setOnGround(false). We need BOTH to flip while creaming -- without the second one,
+    // onGround stays true, getFrictionInfluencedSpeed takes the on-ground branch, and our
+    // getFlyingSpeed override below is never reached for horizontal movement.
+    @SuppressWarnings("ConstantValue")
+    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSpectator()Z"))
+    private boolean jcraft$noPhysicsIfCreaming(boolean original) {
+        return original || CreamEntity.isCreaming((LivingEntity) (Object)this);
+    }
+
+    @ModifyReturnValue(method = "getFlyingSpeed", at = @At("RETURN"))
+    private float jcraft$overrideFlightSpeedIfCreaming(float original) {
+        return CreamEntity.isCreaming((LivingEntity) (Object)this) ? CreamEntity.VOIDING_FLIGHT_SPEED : original;
+    }
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void setAbilitiesPlayer(Level level, BlockPos pos, float yRot, GameProfile gameProfile, CallbackInfo ci) {
+        ((AbilitiesAddon) abilities).jcraft$setPlayer((Player) (Object) this);
     }
 }
