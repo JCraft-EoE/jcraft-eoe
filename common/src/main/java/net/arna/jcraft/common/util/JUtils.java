@@ -834,10 +834,9 @@ public final class JUtils {
         final Vec3 resolvedSpawnPos = spawnPos != null ? spawnPos : shooter.position().add(getEyePos(shooter));
         // knife bundle needs extra care
         if (itemStack.getItem() instanceof KnifeBundleItem) {
-            final Entity bundleOwner = getUserIfStand(shooter);
-            final LivingEntity bundleOwnerLiving = bundleOwner instanceof LivingEntity le ? le : shooter;
+            final LivingEntity bundleOwner = getUserIfStand(shooter);
             for (int i = 0; i < 9; i++) {
-                KnifeProjectile knife = new KnifeProjectile(level, bundleOwnerLiving);
+                KnifeProjectile knife = new KnifeProjectile(level, bundleOwner);
                 knife.setPos(resolvedSpawnPos.add(
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5),
@@ -876,12 +875,10 @@ public final class JUtils {
             spawned = thrownEgg;
         }
         else if (itemStack.getItem() instanceof ScalpelItem) {
-            final Entity scalpelOwner = getUserIfStand(shooter);
-            spawned = new ScalpelProjectile(level, scalpelOwner instanceof LivingEntity le ? le : shooter);
+            spawned = new ScalpelProjectile(level, getUserIfStand(shooter));
         }
         else if (itemStack.getItem() instanceof KnifeItem) {
-            final Entity knifeOwner = getUserIfStand(shooter);
-            spawned = new KnifeProjectile(level, knifeOwner instanceof LivingEntity le ? le : shooter);
+            spawned = new KnifeProjectile(level, getUserIfStand(shooter));
         }
         else if (itemStack.getItem() instanceof EnderpearlItem) {
             final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));

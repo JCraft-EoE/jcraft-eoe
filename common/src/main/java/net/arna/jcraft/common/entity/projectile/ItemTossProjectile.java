@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import com.mojang.datafixers.util.Pair;
+import lombok.Getter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
@@ -77,8 +78,10 @@ public class ItemTossProjectile extends AbstractArrow {
 
     private static final float SPIN_DEGREES_PER_VELOCITY = 40f;
 
-    public float prevSpinAngle = 0f;
-    public float spinAngle = 0f;
+    @Getter
+    private float prevSpinAngle = 0f;
+    @Getter
+    private float spinAngle = 0f;
 
     public ItemTossProjectile(final Level level) {
         super(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE.get(), level);
@@ -87,7 +90,7 @@ public class ItemTossProjectile extends AbstractArrow {
 
     public ItemTossProjectile(final LivingEntity shooter, final Level level, final ItemStack item) {
         super(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE.get(), shooter, level);
-        setCritArrow(true);
+        setCritArrow(true); // leverages vanilla's built-in crit particle spawning each tick for a free particle trail
         setItem(item);
         if (getItem().is(JTagRegistry.HEAVY_IMPACT)) {
             this.setBaseDamage(2d);

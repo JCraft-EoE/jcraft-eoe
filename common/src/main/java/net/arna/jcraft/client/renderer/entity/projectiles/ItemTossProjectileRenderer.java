@@ -32,7 +32,7 @@ public class ItemTossProjectileRenderer extends EntityRenderer<ItemTossProjectil
         poseStack.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90f));
 
         // Forward tumble: speed correlates with velocity
-        poseStack.mulPose(Axis.ZP.rotationDegrees(-Mth.lerp(partialTick, entity.prevSpinAngle, entity.spinAngle)));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(-Mth.lerp(partialTick, entity.getPrevSpinAngle(), entity.getSpinAngle())));
 
         itemRenderer.renderStatic(entity.getItem(), ItemDisplayContext.FIXED, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, entity.level(), entity.getId());
 
@@ -42,6 +42,6 @@ public class ItemTossProjectileRenderer extends EntityRenderer<ItemTossProjectil
 
     @Override
     public ResourceLocation getTextureLocation(ItemTossProjectile entity) {
-        return null;
+        return null; // TODO would be better to return the actual texture location here, in case something really calls this method
     }
 }
