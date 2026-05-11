@@ -15,7 +15,7 @@
           "functions": [
             {
               "function": "minecraft:set_nbt",
-              "tag": "Blood:15"
+              "tag": "{Blood:15}"
             }
           ]
         },
@@ -26,7 +26,7 @@
           "functions": [
             {
               "function": "minecraft:set_nbt",
-              "tag": "Blood:14"
+              "tag": "{Blood:14}"
             }
           ]
         },
@@ -37,7 +37,7 @@
           "functions": [
             {
               "function": "minecraft:set_nbt",
-              "tag": "Blood:13"
+              "tag": "{Blood:13}"
             }
           ]
         },
@@ -48,7 +48,7 @@
           "functions": [
             {
               "function": "minecraft:set_nbt",
-              "tag": "Blood:12"
+              "tag": "{Blood:12}"
             }
           ]
         },
@@ -59,7 +59,7 @@
           "functions": [
             {
               "function": "minecraft:set_nbt",
-              "tag": "Blood:11"
+              "tag": "{Blood:11}"
             }
           ]
         },
@@ -70,7 +70,7 @@
           "functions": [
             {
               "function": "minecraft:set_nbt",
-              "tag": "Blood:10"
+              "tag": "{Blood:10}"
             }
           ]
         },
@@ -81,7 +81,7 @@
           "functions": [
             {
               "function": "minecraft:set_nbt",
-              "tag": "Blood:9"
+              "tag": "{Blood:9}"
             }
           ]
         },
@@ -92,7 +92,7 @@
           "functions": [
             {
               "function": "minecraft:set_nbt",
-              "tag": "Blood:8"
+              "tag": "{Blood:8}"
             }
           ]
         },
@@ -103,7 +103,7 @@
           "functions": [
             {
               "function": "minecraft:set_nbt",
-              "tag": "Blood:7"
+              "tag": "{Blood:7}"
             }
           ]
         }
