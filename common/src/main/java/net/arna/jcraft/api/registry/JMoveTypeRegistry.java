@@ -69,6 +69,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> CMOON_GRAV_PUNCH_ATTACK = register("cmoon_grav_punch_attack", GravPunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CMOON_GROUND_SLAM_ATTACK = register("cmoon_ground_slam_attack", CGroundSlamAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CMOON_LAUNCH_ATTACK = register("cmoon_launch_attack", LaunchAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> CMOON_TOSS_MOVE = register("cmoon_toss_move", CMoonTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> CREAM_BALL_CHARGE_ATTACK = register("cream_ball_charge_attack", BallChargeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CREAM_BALL_MODE_ENTER_MOVE = register("cream_ball_mode_enter_move", BallModeEnterMove.Type.INSTANCE);
@@ -145,6 +146,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> MAGICIANSRED_LIFE_DETECTOR_ATTACK = register("magiciansred_life_detector_attack", LifeDetectorAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MAGICIANSRED_RED_BIND_ATTACK = register("magiciansred_red_bind_attack", RedBindAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MAGICIANSRED_REDIRECT_ATTACK = register("magiciansred_redirect_attack", RedirectAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> MAGICIANSRED_TOSS_MOVE = register("magiciansred_toss_move", MagiciansRedTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> METALLICA_GIVE_SCALPEL_MOVE = register("metallica_give_scalpel_move", GiveScalpelMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> METALLICA_BISECT_ATTACK = register("metallica_bisect_attack", BisectAttack.Type.INSTANCE);

@@ -185,7 +185,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<MagiciansRedEntity> TOSS = new TossMove<MagiciansRedEntity>(0, 1, 1, 0.75f)
+    public static final MagiciansRedTossMove TOSS = new MagiciansRedTossMove(0, 1, 1, 0.75f)
             .withAnim(MagiciansRedEntity.State.ITEM_TOSS);
     public static final TossChargeMove<MagiciansRedEntity> TOSS_CHARGE = new TossChargeMove<MagiciansRedEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);
