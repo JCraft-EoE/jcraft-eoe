@@ -106,8 +106,9 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
     private void dropItem(final AerosmithEntity attacker) {
         // knife bundle needs extra care
         if (attacker.getHeldItem().getItem() instanceof KnifeBundleItem) {
+            final LivingEntity knifeOwner = JUtils.getUserIfStand(attacker);
             for (int i = 0; i < 9; i++) {
-                KnifeProjectile knife = new KnifeProjectile(attacker.level(), attacker);
+                KnifeProjectile knife = new KnifeProjectile(attacker.level(), knifeOwner);
                 knife.setPos(attacker.position().subtract(0d, 2.5d, 0d));
                 knife.setPos(knife.position().add(
                         attacker.level().random.triangle(0, 0.5),
@@ -117,6 +118,7 @@ public class ItemDropAttack extends AbstractMove<ItemDropAttack, AerosmithEntity
                 knife.shootFromRotation(attacker, attacker.getXRot(),attacker.getYRot(), 0f, -0.2f, 0f);
                 attacker.level().addFreshEntity(knife);
             }
+            attacker.getHeldItem().shrink(1);
         }
         else {
             var projectile = JUtils.tossItem(attacker, attacker.level(), attacker.getHeldItem(), -0.5f, 0f, true);
