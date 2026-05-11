@@ -706,7 +706,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static boolean isCreaming(Entity entity) {
         return entity instanceof LivingEntity le &&
                 JUtils.getStand(le) instanceof CreamEntity cream &&
-                cream.getVoidTime() > 0;
+                cream.getVoidTime() > 0 && !cream.isFree();
     }
 
     @Override
