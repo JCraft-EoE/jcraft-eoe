@@ -7,6 +7,7 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,10 +19,13 @@ import java.util.function.Function;
 public class MagneticFields {
     public static class MagneticField {
         public static final int TICKS_TO_LIVE = 60 * 20;
+        public static final int EXPLOSION_TICKS = 12;
 
         public int time = TICKS_TO_LIVE;
+        private int explodeTime = 0;
         public Vec3 pos;
-        private final double baseStrength, additiveStrength;
+        private double baseStrength;
+        private final double additiveStrength;
         private final ServerLevel level;
         private final Entity owner;
 
@@ -34,10 +38,15 @@ public class MagneticFields {
         }
 
         public double getStrength() {
+            if (explodeTime > 0)
+                return baseStrength;
             return baseStrength + additiveStrength * time / (double) TICKS_TO_LIVE;
         }
 
         private void tick() {
+            if (explodeTime == EXPLOSION_TICKS / 2)
+                baseStrength *= -1.0f;
+
             for (Entity entity : level.getAllEntities()) {
                 if (!JUtils.isFerrous(entity)) continue;
                 if (entity == owner) continue;
@@ -51,12 +60,42 @@ public class MagneticFields {
                 // Hard linear cutoff outside range
                 if (distanceSqr > strength * strength) attraction -= Math.sqrt(distanceSqr) / strength;
 
-                if (attraction <= 0.0) continue;
+                if (explodeTime <= 0 && attraction <= 0.0) continue;
 
                 JUtils.addVelocity(entity, pos.subtract(entity.position()).normalize().scale(attraction));
             }
 
+            if (explodeTime > 0)
+                explodeTime--;
+
             time--;
+        }
+
+        public void explode() {
+            time = explodeTime = EXPLOSION_TICKS;
+            baseStrength = -baseStrength;
+
+            for (Entity entity : level.getAllEntities()) {
+                if (!JUtils.isFerrous(entity)) continue;
+                if (entity == owner) continue;
+
+                final double strength = getStrength();
+                final double distanceSqr = entity.distanceToSqr(pos);
+                double attraction = (strength - Math.cbrt(distanceSqr)) / 35.0;
+
+                if (entity instanceof RazorProjectile) attraction /= 2.0;
+                // Hard linear cutoff outside range
+                if (distanceSqr > strength * strength) attraction -= Math.sqrt(distanceSqr) / strength;
+
+                if (entity instanceof AbstractArrow abstractArrow) {
+                    if (abstractArrow.inGround) {
+                        abstractArrow.inGround = false;
+
+                    }
+                }
+
+                JUtils.addVelocity(entity, pos.subtract(entity.position()).normalize().scale(attraction));
+            }
         }
     }
 

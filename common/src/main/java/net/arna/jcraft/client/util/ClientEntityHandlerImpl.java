@@ -247,7 +247,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
     }
 
     @Override
-    public void spawnGroundedMoshParticles(AbstractArrow projectile) {
+    public void spawnGroundedMoshParticles(final AbstractArrow projectile) {
         if (!JClientConfig.getInstance().isStandAuras()) {
             return;
         }
@@ -270,6 +270,7 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         final Vec3 pos = projectile.position();
         final Vector3f color = metallica.getMoshColor();
         MoshParticle.Factory.color = color;
+        MoshParticle.Factory.parent = projectile;
         final ClientLevel clientWorld = (ClientLevel) projectile.level();
         final RandomSource random = clientWorld.getRandom();
         final int typeIndex = random.nextInt(JParticleTypeRegistry.MOSH_TYPES.size());

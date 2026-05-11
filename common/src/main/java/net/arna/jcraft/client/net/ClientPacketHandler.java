@@ -135,9 +135,14 @@ public class ClientPacketHandler {
         );
 
         client.execute(() -> {
+            if (client.level == null) return;
+
             for (int i = 0; i < NUM_MAGNETIC_CIRCLES; i++) {
                 final double phi = i * Math.PI * 2 / NUM_MAGNETIC_CIRCLES;
-                final Vec3 direction = new Vec3(Math.cos(phi), 0, Math.sin(phi));
+                Vec3 direction = new Vec3(Math.cos(phi), 0, Math.sin(phi));
+
+                if (strength < 0) // exploding
+                    direction = direction.add(JUtils.randUnitVec(client.level.random));
 
                 final Vec3 basePos = pos.add(direction.scale(strength / 2.0));
 
