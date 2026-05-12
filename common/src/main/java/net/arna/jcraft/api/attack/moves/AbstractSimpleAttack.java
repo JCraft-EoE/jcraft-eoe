@@ -635,7 +635,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         distanceMult *= distanceMult;
 
         float strength = getBlockDestructionMultiplier(attacker);
-        return (float) (JBlockBreaker.calculateBreakage(level, pos, strength) * distanceMult);
+        return (float) (JBlockBreaker.calcBreakage(level, pos, strength) * distanceMult);
     }
 
     /**
@@ -653,7 +653,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                 new AttackData(
                     kbVec, stun, stunType.ordinal(), overrideStun,
                     damage, lift, getBlockStun(), damageSource, attacker.getUserOrThrow(),
-                    hitAnimation, attacker.getMoveUsage(), canBackstab, blockableType.isNonBlockable()
+                    hitAnimation, attacker.getMoveUsage(), canBackstab, blockableType.isNonBlockable(), true
                 )
         );
     }

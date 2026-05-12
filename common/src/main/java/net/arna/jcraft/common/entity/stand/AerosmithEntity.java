@@ -40,6 +40,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntity.State> {
     public static final MoveSet<AerosmithEntity, AerosmithEntity.State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.AEROSMITH,
@@ -47,12 +48,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     public static final EntityDataAccessor<Float> OVERHEAT = SynchedEntityData.defineId(AerosmithEntity.class, EntityDataSerializers.FLOAT);
     public static final float OVERHEAT_MAX = 15f;
-    public static final int FLYBY_TICK_PAUSE = 11 * 20;
-    public static final float FLYBY_RANGE = 25f;
-
     public static final double SLOW_CRUISE_SPEED = 0.075;
     public static final double CRUISE_SPEED = 0.15;
     public static final double MAX_SPEED = 0.22;
+    public static final float DEFAULT_PATROL_RADIUS = 48.0f;
 
     public enum FlyState {
         NONE,
@@ -62,7 +61,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     @Getter @Setter
-    private float patrolRadius = 48.0f;
+    private float patrolRadius = DEFAULT_PATROL_RADIUS;
 
     @NonNull @Getter @Setter
     private Vec3 flyTarget = Vec3.ZERO;
@@ -76,7 +75,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     // TODO: balance this
     public static final MuzzleHitscanAttack BULLET = new MuzzleHitscanAttack(
-            1, 1, 2, 0f, 1f, 0, 0f, 30f, 0.01f)
+            1, 1, 2, 0f, 3.25f, 0, 0.4f, 30f, 0.01f)
             .withSound(JSoundRegistry.AS_SHOOT)
             .withHitSpark(JParticleType.HIT_SPARK_1)
             .withShootSpark(JParticleType.LEMON)
@@ -102,7 +101,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public static final PatrolMove PATROL = new PatrolMove(0, 67f, 48f)
             .withInfo(
                     Component.literal("Patrol Location"),
-                    Component.literal("Orders Aerosmith to fly around a given location.")
+                    Component.literal("Orders Aerosmith to fly around a given location. Use while crouching to invert the patrol direction.")
             );
 
     public static final AerosmithChargeAttack CHARGE = new AerosmithChargeAttack(
@@ -135,6 +134,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     .skinName(Component.literal("Manga"))
                     .skinName(Component.literal("Vento Aureo"))
                     .skinName(Component.literal("Interceptor"))
+                    .freeSpace(Component.literal("Remote-oriented stand with individually powerful moves that are weak up-close. While remote, Aerosmith's moves cannot be cancelled by the user being hit."))
                     .build())
             .summonData(SummonData.of(JSoundRegistry.AS_SUMMON).withAnimDuration(48))
             .build();
@@ -155,6 +155,26 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Getter
     private final AerosmithAttackOrderMove attackOrderMove;
 
+    public enum PatrolDirection {
+        CLOCKWISE(1),
+        COUNTER_CLOCKWISE(-1);
+
+        @Getter
+        private final float value;
+
+        PatrolDirection(float value) {
+            this.value = value;
+        }
+
+        public PatrolDirection invert() {
+            if (value == 1)
+                return COUNTER_CLOCKWISE;
+            return CLOCKWISE;
+        }
+    };
+    @Getter @Setter
+    private PatrolDirection patrolDirection = PatrolDirection.CLOCKWISE;
+
     public AerosmithEntity(final Level world) {
         super(JStandTypeRegistry.AEROSMITH.get(), world);
         // setYDistanceOffset(10f); // TODO for patrol mode
@@ -167,6 +187,13 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         chargeAttack = getMove(AerosmithChargeAttack.class);
         breathXrayMove = getMove(BreathXrayMove.class);
         attackOrderMove = getMove(AerosmithAttackOrderMove.class);
+
+        auraColors = new Vector3f[]{
+                new Vector3f(0.6f, 0.5f, 0.2f),
+                new Vector3f(0.2f, 0.4f, 0.7f),
+                new Vector3f(0.8f, 0.2f, 0.5f),
+                new Vector3f(0.0f, 0.1f, 1.0f)
+        };
     }
 
     @NonNull
@@ -185,11 +212,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     @Override
     public boolean allowMoveHandling() {
-        return getCurrentMove() == null &&
+        return getCurrentMove() == shootAttack ||
+                (
+                getCurrentMove() == null &&
                 getMoveStun() < JCraft.QUEUE_MOVESTUN_LIMIT &&
                 bombDropAttack.getDropLocation() == null &&
                 itemDropAttack.getDropLocation() == null &&
-                attackOrderMove.getCurrentTarget() == null;
+                attackOrderMove.getCurrentTarget() == null
+                );
     }
 
     @Override
@@ -220,6 +250,12 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public boolean canBlock() {
         if (isRemote()) return false;
         return super.canBlock();
+    }
+
+    @Override
+    public void cancelMove(boolean offensiveCancel) {
+        if (offensiveCancel && isRemote()) return;
+        super.cancelMove(offensiveCancel);
     }
 
     public double lastMovementToLocalPlayerAngle = 0.0;
@@ -253,10 +289,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             addOverheat(-0.4f);
         }
 
+        if (isInWall() && patrolRadius > patrolRadius / 2) {
+            patrolRadius -= 0.2f;
+        }
+
         if (currentMove == null) {
             switch (flyState) {
                 case PATROL -> {
-                    final float theta = tickCount / patrolRadius / 2.0f;
+                    final float theta = tickCount / patrolRadius / 2.0f * patrolDirection.getValue();
                     final Vec3 offset = RotationUtil.vecPlayerToWorld(
                             Mth.sin(theta) * patrolRadius, 1.0, Mth.cos(theta) * patrolRadius,
                             GravityChangerAPI.getGravityDirection(this)
@@ -314,6 +354,12 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         }
 
         xRotChangeAllowed = false;
+    }
+
+    public void patrol(final Vec3 targetPos, final float radius) {
+        flyState = FlyState.PATROL;
+        flyTarget = targetPos;
+        patrolRadius = radius;
     }
 
     @Override

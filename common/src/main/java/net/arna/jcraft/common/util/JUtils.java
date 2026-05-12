@@ -824,15 +824,20 @@ public final class JUtils {
      * @return The spawned projectile entity, or <code>null</code> if nothing was or several entities were spawned.
      */
     public static @Nullable Entity tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, float inaccurancy, boolean decrement) {
+        return tossItem(shooter, level, itemStack, velocity, inaccurancy, decrement, null);
+    }
+
+    public static @Nullable Entity tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, float inaccurancy, boolean decrement, @Nullable Vec3 spawnPos) {
         if (level.isClientSide() || itemStack.isEmpty()) {
             return null;
         }
+        final Vec3 resolvedSpawnPos = spawnPos != null ? spawnPos : shooter.position().add(getEyePos(shooter));
         // knife bundle needs extra care
         if (itemStack.getItem() instanceof KnifeBundleItem) {
+            final LivingEntity bundleOwner = getUserIfStand(shooter);
             for (int i = 0; i < 9; i++) {
-                KnifeProjectile knife = new KnifeProjectile(level, shooter);
-                knife.setPos(shooter.position().add(getEyePos(shooter)));
-                knife.setPos(knife.position().add(
+                KnifeProjectile knife = new KnifeProjectile(level, bundleOwner);
+                knife.setPos(resolvedSpawnPos.add(
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5)
@@ -848,7 +853,8 @@ public final class JUtils {
         // other cases
         final Projectile spawned;
         if (itemStack.getItem() instanceof final ArrowItem arrow) {
-            spawned = arrow.createArrow(level, itemStack, shooter);
+            final Entity arrowOwner = getUserIfStand(shooter);
+            spawned = arrow.createArrow(level, itemStack, arrowOwner instanceof LivingEntity le ? le : shooter);
         }
         else if (itemStack.getItem() instanceof SnowballItem) {
             final Snowball snowballEntity = new Snowball(level, shooter);
@@ -869,10 +875,10 @@ public final class JUtils {
             spawned = thrownEgg;
         }
         else if (itemStack.getItem() instanceof ScalpelItem) {
-            spawned = new ScalpelProjectile(level, shooter);
+            spawned = new ScalpelProjectile(level, getUserIfStand(shooter));
         }
         else if (itemStack.getItem() instanceof KnifeItem) {
-            spawned = new KnifeProjectile(level, shooter);
+            spawned = new KnifeProjectile(level, getUserIfStand(shooter));
         }
         else if (itemStack.getItem() instanceof EnderpearlItem) {
             final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
@@ -885,7 +891,7 @@ public final class JUtils {
         else {
             spawned = new ItemTossProjectile(shooter, level, itemStack);
         }
-        spawned.setPos(shooter.position().add(getEyePos(shooter)));
+        spawned.setPos(resolvedSpawnPos);
         spawned.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, inaccurancy);
         level.addFreshEntity(spawned);
         if (decrement) {

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import com.mojang.datafixers.util.Pair;
+import lombok.Getter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
@@ -9,6 +10,7 @@ import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
+import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
 import net.arna.jcraft.common.item.BloodBottleItem;
 import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.util.JUtils;
@@ -24,7 +26,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Containers;
@@ -34,12 +35,14 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
@@ -75,6 +78,13 @@ public class ItemTossProjectile extends AbstractArrow {
         RICOCHETS = SynchedEntityData.defineId(ItemTossProjectile.class, EntityDataSerializers.INT);
     }
 
+    private static final float SPIN_DEGREES_PER_VELOCITY = 40f;
+
+    @Getter
+    private float prevSpinAngle = 0f;
+    @Getter
+    private float spinAngle = 0f;
+
     public ItemTossProjectile(final Level level) {
         super(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE.get(), level);
         setItem(ItemStack.EMPTY);
@@ -82,15 +92,33 @@ public class ItemTossProjectile extends AbstractArrow {
 
     public ItemTossProjectile(final LivingEntity shooter, final Level level, final ItemStack item) {
         super(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE.get(), shooter, level);
+        setCritArrow(true); // leverages vanilla's built-in crit particle spawning each tick for a free particle trail
         setItem(item);
         if (getItem().is(JTagRegistry.HEAVY_IMPACT)) {
             this.setBaseDamage(2d);
             this.setKnockback(4);
+        } else if (getItem().getItem() instanceof TieredItem) {
+            // deal the item's actual attack damage as a crit
+            final var modifiers = getItem().getAttributeModifiers(EquipmentSlot.MAINHAND);
+            double damage = modifiers.get(Attributes.ATTACK_DAMAGE).stream()
+                    .mapToDouble(AttributeModifier::getAmount)
+                    .sum();
+            this.setBaseDamage(damage > 0 ? damage * 1.5 : 1.0); // 1.5x for crit
+            this.setKnockback(1);
         }
         else {
             this.setBaseDamage(0d);
             this.setKnockback(0);
         }
+    }
+
+    @Override
+    public void tick() {
+        prevSpinAngle = spinAngle;
+        if (!inGround) {
+            spinAngle += (float) getDeltaMovement().length() * SPIN_DEGREES_PER_VELOCITY;
+        }
+        super.tick();
     }
 
     public ItemStack getItem() {
@@ -124,7 +152,7 @@ public class ItemTossProjectile extends AbstractArrow {
     @Override
     public boolean isOnFire() {
         // this might be better to move to doPostHurtEffects
-        return getItem().is(JTagRegistry.BURNS_ON_IMPACT);
+        return super.isOnFire() || getItem().is(JTagRegistry.BURNS_ON_IMPACT);
     }
 
     @Override
@@ -223,9 +251,9 @@ public class ItemTossProjectile extends AbstractArrow {
             }
         }
 
-        // force stand on target
-        if (entity instanceof LivingEntity livingEntity && (livingEntity instanceof ServerPlayer ||
-                livingEntity.getType().is(JTagRegistry.CAN_HAVE_STAND)) && getItem().is(JItemRegistry.STAND_DISC.get())) {
+        // force stand on target — only WhiteSnake can throw discs, and can do so into any living entity
+        if (entity instanceof LivingEntity livingEntity && getOwner() instanceof WhiteSnakeEntity
+                && getItem().is(JItemRegistry.STAND_DISC.get())) {
             // get NBT
             StandType itemStand = null;
             int itemSkin = 0;
@@ -318,7 +346,9 @@ public class ItemTossProjectile extends AbstractArrow {
                     getItem().is(JTagRegistry.EXPLODES_ON_IMPACT) ||
                     getItem().is(JTagRegistry.SLOWS_ON_IMPACT) ||
                     getItem().is(JTagRegistry.POISONS_ON_IMPACT))) {
-                dropItem(result.getLocation());
+                // drop at owner position so the item doesn't land on the target and get picked up
+                final Vec3 dropTarget = entity2 != null ? entity2.position() : result.getLocation();
+                dropItem(dropTarget);
             }
             this.discard();
         }
@@ -385,7 +415,7 @@ public class ItemTossProjectile extends AbstractArrow {
                 level().setBlockAndUpdate(result.getBlockPos(), stripped.get());
                 item.hurtAndBreak(1, (LivingEntity)getOwner(), owner -> {/* do nothing */});
             }
-            dropItem(result.getLocation());
+            stickOrDrop(result.getLocation());
         }
         // hoe get used
         else if (item.getItem() instanceof HoeItem) {
@@ -401,7 +431,7 @@ public class ItemTossProjectile extends AbstractArrow {
                     }
                 }
             }
-            dropItem(result.getLocation());
+            stickOrDrop(result.getLocation());
         }
         // buckets empty their content if any
         else if (item.getItem() instanceof BucketItem bucket && bucket.content != Fluids.EMPTY) {
@@ -458,12 +488,34 @@ public class ItemTossProjectile extends AbstractArrow {
                 entityType2.spawn((ServerLevel)level(), item, null, pos, MobSpawnType.SPAWN_EGG, true, false);
             }
         }
-        // rest just get dropped
+        // rest just get dropped (or stuck if damageable)
         else {
-            dropItem(result.getLocation());
+            stickOrDrop(result.getLocation());
         }
-        inGround = true;
-        discard();
+        if (pickup == Pickup.ALLOWED) {
+            // Position flush with the block face so the item doesn't sink in
+            final Vec3 loc = result.getLocation();
+            final Vec3 toHit = loc.subtract(getX(), getY(), getZ()).normalize().scale(0.05);
+            setPosRaw(loc.x - toHit.x, loc.y - toHit.y, loc.z - toHit.z);
+            setDeltaMovement(Vec3.ZERO);
+            inGround = true;
+        } else {
+            inGround = true;
+            discard();
+        }
+    }
+
+    /**
+     * Drops the item, or sticks it in the block if it has durability (axes, swords, pickaxes, etc.).
+     * Returns true if sticking, false if dropped.
+     */
+    private boolean stickOrDrop(final Vec3 pos) {
+        if (getItem().getItem() instanceof TieredItem) {
+            pickup = Pickup.ALLOWED;
+            return true;
+        }
+        dropItem(pos);
+        return false;
     }
 
     /**

@@ -197,7 +197,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
                     Component.literal("user & stand charge forward, launches")
             );
     public static final TWChargeAttack CHARGE = new TWChargeAttack(100,
-            5, 19, 7.5f, 5f, 20, 1.5f, 0.25f, 0)
+            7, 19, 7.5f, 5f, 20, 1.5f, 0.25f, 0)
             .withCrouchingVariant(LUNGE)
             .withSound(JSoundRegistry.TW_CHARGE)
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)

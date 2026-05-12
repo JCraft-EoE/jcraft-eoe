@@ -8,10 +8,7 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.tickable.MagneticFields;
-import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
@@ -38,18 +35,11 @@ public class ExplodeMagneticFieldMove extends AbstractMove<ExplodeMagneticFieldM
 
         final Vec3 hitPos = hitResult.getLocation();
 
-        JComponentPlatformUtils.getCooldowns(user).setCooldown(CooldownType.SPECIAL2, 400);
+        final var field = MagneticFields.nearestOfOwnerTo(user, hitPos);
 
-        MagneticFields.nearestOfOwnerTo(user, hitPos);
-        MagneticFields.createField(
-                (ServerLevel) user.level(),
-                user,
-                hitPos.subtract(
-                        Vec3.atLowerCornerOf(
-                                GravityChangerAPI.getGravityDirection(user).getNormal()
-                        ).scale(2.0)
-                )
-        );
+        if (field != null) {
+            field.explode();
+        }
 
         return Set.of();
     }
