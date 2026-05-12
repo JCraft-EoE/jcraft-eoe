@@ -6,7 +6,7 @@
     "type": "jcraft:aerosmith_bullet_attack",
     "attack_extras": {
       "backstab": true,
-      "block_stun": 7,
+      "block_stun": 0,
       "hit_animation": "MID",
       "hit_spark": "HIT_SPARK_1",
       "stun_type": "WINDED"
@@ -31,7 +31,7 @@
       }
     },
     "knockback": 0.4,
-    "move_distance": 0.0,
+    "move_distance": 1.5,
     "range": 30.0,
     "shootSpark": "LEMON",
     "spread": 0.01,
