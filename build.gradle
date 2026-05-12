@@ -7,6 +7,50 @@ plugins {
     id 'signing'
 }
 
+// ---------------------------------------------------------------------------
+// Automatic datagen before platform builds
+// ---------------------------------------------------------------------------
+// Why a nested GradleBuild instead of a direct task dependency?
+//
+// A direct dependency chain would be circular:
+//   runDatagen → :common/:fabric jar (needs compiled classes)
+//              → jar → processResources
+//              → processResources should run after runDatagen  ← cycle!
+//
+// The fix: run datagen in a *child* Gradle invocation that finishes before
+// the parent build reaches processResources. Both :fabric:build and
+// :forge:build depend on the same runDatagenOnce task instance, so Gradle
+// deduplicates it — datagen runs exactly once per `./gradlew build`.
+//
+// Pass -PdatagenChild to the child build so it does not schedule itself
+// again, preventing infinite recursion.
+// ---------------------------------------------------------------------------
+if (!rootProject.hasProperty('datagenChild')) {
+    tasks.register('runDatagenOnce', GradleBuild) {
+        group = 'build'
+        description = 'Runs :datagen:runDatagen in a child build so that freshly ' +
+                'generated resources are present when the platform builds package their jars.'
+        dir = rootDir
+        tasks = [':datagen:runDatagen']
+        startParameter.projectProperties =
+                (startParameter.projectProperties ?: [:]) + [datagenChild: 'true']
+    }
+
+    gradle.projectsEvaluated {
+        // :common:processResources reads src/main/generated, so it must wait for
+        // datagen to finish writing there — otherwise parallel builds race on that dir.
+        project(':common').tasks.named('processResources').configure {
+            dependsOn(rootProject.tasks.named('runDatagenOnce'))
+        }
+        project(':fabric').tasks.named('build').configure {
+            dependsOn(rootProject.tasks.named('runDatagenOnce'))
+        }
+        project(':forge').tasks.named('build').configure {
+            dependsOn(rootProject.tasks.named('runDatagenOnce'))
+        }
+    }
+}
+
 architectury {
     minecraft = project.minecraft_version
 }
