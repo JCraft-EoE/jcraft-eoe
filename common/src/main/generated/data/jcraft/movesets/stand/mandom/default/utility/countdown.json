@@ -27,19 +27,19 @@
     "move_distance": 0.0,
     "radius": 64,
     "rewindIds": [
-      "minecraft:vel",
-      "minecraft:food_data",
-      "minecraft:health",
-      "jcraft:blood_gauge",
-      "minecraft:vehicle",
-      "minecraft:fall_distance",
-      "minecraft:air",
-      "jcraft:hamon_charge",
       "minecraft:active_effects",
+      "minecraft:air",
+      "jcraft:blood_gauge",
+      "minecraft:fall_distance",
+      "minecraft:food_data",
+      "jcraft:hamon_charge",
+      "minecraft:health",
       "minecraft:pos",
+      "minecraft:vehicle",
+      "minecraft:vel",
+      "minecraft:xrot",
       "minecraft:yheadrot",
-      "minecraft:yrot",
-      "minecraft:xrot"
+      "minecraft:yrot"
     ],
     "windup": 10
   }

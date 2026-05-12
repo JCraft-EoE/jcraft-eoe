@@ -8,10 +8,12 @@ import lombok.NonNull;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.common.entity.stand.GEREntity;
-import net.arna.jcraft.common.marker.*;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.common.entity.stand.GEREntity;
+import net.arna.jcraft.common.marker.EntityMarker;
+import net.arna.jcraft.common.marker.EntityMarkerType;
+import net.arna.jcraft.common.marker.RewindData;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.TriConsumer;
 import net.minecraft.nbt.CompoundTag;
@@ -27,7 +29,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public final class ReturnToZeroMove extends AbstractMove<ReturnToZeroMove, GEREntity> {
     @Getter
@@ -146,7 +147,14 @@ public final class ReturnToZeroMove extends AbstractMove<ReturnToZeroMove, GEREn
 
         @Override
         protected @NotNull App<RecordCodecBuilder.Mu<ReturnToZeroMove>, ReturnToZeroMove> buildCodec(RecordCodecBuilder.Instance<ReturnToZeroMove> instance) {
-            return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("radius").forGetter(ReturnToZeroMove::getRadius), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("reach").forGetter(ReturnToZeroMove::getReach), ResourceLocation.CODEC.listOf().xmap(list -> list.stream().collect(Collectors.toSet()), set -> set.stream().toList()).fieldOf("rewindIds").forGetter(move -> move.getEntityMarkerType().getIds()), JRegistries.EXTRACTOR_CODEC.fieldOf("extractor").forGetter(move -> move.getEntityMarkerType().getDataHandler().extractor()), JRegistries.INJECTOR_CODEC.fieldOf("injector").forGetter(move -> move.getEntityMarkerType().getDataHandler().injector())).apply(instance, applyExtras(ReturnToZeroMove::new));
+            return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("radius").forGetter(ReturnToZeroMove::getRadius),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("reach").forGetter(ReturnToZeroMove::getReach),
+                    ResourceLocation.CODEC.listOf().<Set<ResourceLocation>>xmap(HashSet::new, ArrayList::new).fieldOf("rewindIds")
+                            .forGetter(move -> move.getEntityMarkerType().getOrderedIds()),
+                    JRegistries.EXTRACTOR_CODEC.fieldOf("extractor").forGetter(move -> move.getEntityMarkerType().getDataHandler().extractor()),
+                    JRegistries.INJECTOR_CODEC.fieldOf("injector").forGetter(move -> move.getEntityMarkerType().getDataHandler().injector()))
+                    .apply(instance, applyExtras(ReturnToZeroMove::new));
         }
     }
 }

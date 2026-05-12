@@ -36,7 +36,6 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntity> implements BlockMarkerMove {
     private static final int COUNTDOWN_COOLDOWN_TICKS = 120; // 6 seconds
@@ -263,7 +262,14 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
 
         @Override
         protected @NotNull App<RecordCodecBuilder.Mu<CountdownMove>, CountdownMove> buildCodec(RecordCodecBuilder.Instance<CountdownMove> instance) {
-            return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("radius").forGetter(CountdownMove::getRadius), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("maxCountdownTicks").forGetter(CountdownMove::getMaxCountdownTicks), ResourceLocation.CODEC.listOf().xmap(list -> list.stream().collect(Collectors.toSet()), set -> set.stream().toList()).fieldOf("rewindIds").forGetter(move -> move.getEntityMarkerType().getIds()), JRegistries.EXTRACTOR_CODEC.fieldOf("extractor").forGetter(move -> move.getEntityMarkerType().getDataHandler().extractor()), JRegistries.INJECTOR_CODEC.fieldOf("injector").forGetter(move -> move.getEntityMarkerType().getDataHandler().injector())).apply(instance, applyExtras(CountdownMove::new));
+            return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("radius").forGetter(CountdownMove::getRadius),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("maxCountdownTicks").forGetter(CountdownMove::getMaxCountdownTicks),
+                    ResourceLocation.CODEC.listOf().<Set<ResourceLocation>>xmap(HashSet::new, ArrayList::new).fieldOf("rewindIds")
+                            .forGetter(move -> move.getEntityMarkerType().getOrderedIds()),
+                    JRegistries.EXTRACTOR_CODEC.fieldOf("extractor").forGetter(move -> move.getEntityMarkerType().getDataHandler().extractor()),
+                    JRegistries.INJECTOR_CODEC.fieldOf("injector").forGetter(move -> move.getEntityMarkerType().getDataHandler().injector()))
+                    .apply(instance, applyExtras(CountdownMove::new));
         }
     }
 }
