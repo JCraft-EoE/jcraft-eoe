@@ -7,12 +7,14 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
+import net.arna.jcraft.common.item.KnifeBundleItem;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,8 +52,13 @@ public abstract class AbstractTossMove<T extends AbstractTossMove<T, A>, A exten
         if (base.level().isClientSide()) return Set.of();
         final ItemStack itemStack = base.getItemInHand(InteractionHand.MAIN_HAND);
         if (itemStack.isEmpty()) return Set.of();
-        final Entity thrown = JUtils.tossItem(base, base.level(), itemStack, getChargeTime() * velocityMultiplier, spreadMultiplier, true, getSpawnPos(base));
-        onTossed(attacker, user, thrown);
+        if (itemStack.getItem() instanceof KnifeBundleItem) {
+            handleKnifeBundle(base, base.level(), itemStack, getChargeTime() * velocityMultiplier, spreadMultiplier, true, getSpawnPos(base));
+        }
+        else {
+            final Entity thrown = JUtils.tossItem(base, base.level(), itemStack, getChargeTime() * velocityMultiplier, spreadMultiplier, true, getSpawnPos(base));
+            onTossed(attacker, user, thrown);
+        }
         return Set.of();
     }
 
@@ -68,6 +75,10 @@ public abstract class AbstractTossMove<T extends AbstractTossMove<T, A>, A exten
                 .add(up)
                 .add(right.scale(5.0 / 16.0))
                 .add(look.scale(1.0 / 16.0));
+    }
+
+    protected void handleKnifeBundle(final LivingEntity living, final Level level, final ItemStack itemStack, final float velocity, final float spreadMultiplier, final boolean decrement, final @NonNull Vec3 spawnPos) {
+        JUtils.tossItem(living, level, itemStack, velocity, spreadMultiplier, decrement, spawnPos);
     }
 
     protected void onTossed(A attacker, LivingEntity user, @Nullable Entity thrown) {}
