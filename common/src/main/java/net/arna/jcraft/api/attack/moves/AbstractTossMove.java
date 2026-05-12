@@ -62,10 +62,6 @@ public abstract class AbstractTossMove<T extends AbstractTossMove<T, A>, A exten
         return Set.of();
     }
 
-    private void handleKnifeBundle(final LivingEntity living, final Level level, final ItemStack itemStack, final float velocity, final float spreadMultiplier, final boolean decrement, final @NonNull Vec3 spawnPos) {
-        JUtils.tossItem(living, level, itemStack, velocity, spreadMultiplier, decrement, spawnPos);
-    }
-
     /**
      * Returns the world-space position from which the item should be spawned.
      * Defaults to the right-hand position derived from the D4C model's bipedHandRight bone:
@@ -79,6 +75,10 @@ public abstract class AbstractTossMove<T extends AbstractTossMove<T, A>, A exten
                 .add(up)
                 .add(right.scale(5.0 / 16.0))
                 .add(look.scale(1.0 / 16.0));
+    }
+
+    protected void handleKnifeBundle(final LivingEntity living, final Level level, final ItemStack itemStack, final float velocity, final float spreadMultiplier, final boolean decrement, final @NonNull Vec3 spawnPos) {
+        JUtils.tossItem(living, level, itemStack, velocity, spreadMultiplier, decrement, spawnPos);
     }
 
     protected void onTossed(A attacker, LivingEntity user, @Nullable Entity thrown) {}
