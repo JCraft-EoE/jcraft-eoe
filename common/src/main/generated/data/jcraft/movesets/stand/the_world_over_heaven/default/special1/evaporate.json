@@ -1,0 +1,81 @@
+{
+  "aerial_variant": {
+    "anim_state": "SMITE",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:theworld_overheaven_smite_attack",
+      "aerial": true,
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 13,
+        "hit_animation": "HIGH"
+      },
+      "cooldown": 200,
+      "damage": 6.0,
+      "duration": 20,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:twohsmite"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_world_over_heaven.default.you_wont_run_away.air.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_world_over_heaven.default.you_wont_run_away.air.name"
+        },
+        "ranged": true
+      },
+      "hitbox_size": 3.0,
+      "knockback": 0.0,
+      "levitation_amplifier": 9,
+      "levitation_duration": 7,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "stun": 21,
+      "windup": 10
+    }
+  },
+  "anim_state": "SMITE",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:theworld_overheaven_smite_attack",
+    "aerial": false,
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 13,
+      "hit_animation": "HIGH"
+    },
+    "cooldown": 200,
+    "damage": 8.0,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:twohsmite"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_world_over_heaven.default.evaporate.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_world_over_heaven.default.evaporate.name"
+      }
+    },
+    "hitbox_size": 3.0,
+    "knockback": 0.0,
+    "levitation_amplifier": 9,
+    "levitation_duration": 7,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 21,
+    "windup": 10
+  }
+}

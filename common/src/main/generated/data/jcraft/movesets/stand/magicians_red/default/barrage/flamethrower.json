@@ -1,0 +1,40 @@
+{
+  "anim_state": "BARRAGE",
+  "class": "BARRAGE",
+  "cooldown_type": "STAND_BARRAGE",
+  "move": {
+    "type": "jcraft:magiciansred_flamethrower_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 3,
+      "hit_animation": "MID",
+      "stun_type": "WINDED"
+    },
+    "cooldown": 200,
+    "damage": 0.4,
+    "duration": 40,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mrbarrage"
+        }
+      ],
+      "armor": 1,
+      "description": {
+        "translate": "move.jcraft.magicians_red.default.flamethrower.description"
+      },
+      "name": {
+        "translate": "move.jcraft.magicians_red.default.flamethrower.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "interval": 3,
+    "knockback": 0.25,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 0,
+    "windup": 0
+  }
+}

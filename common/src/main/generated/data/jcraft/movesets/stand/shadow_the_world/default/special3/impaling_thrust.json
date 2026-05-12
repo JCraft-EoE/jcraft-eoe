@@ -1,0 +1,45 @@
+{
+  "anim_state": "IMPALING_THRUST_CHARGE",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "followup": {
+    "anim_state": "IMPALING_THRUST_HIT",
+    "class": "SPECIAL3",
+    "cooldown_type": "STAND_SP3",
+    "move": {
+      "type": "jcraft:shadowtheworld_impaling_thrust_attack",
+      "cooldown": 0,
+      "duration": 11,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.shadow_the_world.default.null.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.shadow_the_world.default.null.followup.name"
+        }
+      },
+      "move_distance": 0.8,
+      "windup": 1
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_holdable_move",
+    "cooldown": 200,
+    "duration": 60,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.shadow_the_world.default.impaling_thrust.description"
+      },
+      "is_holdable": true,
+      "mobility_type": "TELEPORT",
+      "name": {
+        "translate": "move.jcraft.shadow_the_world.default.impaling_thrust.name"
+      },
+      "ranged": true
+    },
+    "minimum_charge": 10,
+    "move_distance": 0.75,
+    "set_move_stun": false,
+    "windup": 61
+  }
+}

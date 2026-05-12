@@ -1,0 +1,16 @@
+{
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:killerqueen_explosive_dash_attack",
+    "cooldown": 240,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.explosive_dash.description"
+      },
+      "name": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.explosive_dash.name"
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "anim_state": "LASER",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "followup": {
+    "anim_state": "LASER_FIRE",
+    "class": "SPECIAL2",
+    "cooldown_type": "STAND_SP2",
+    "move": {
+      "type": "jcraft:goldexperience_requiem_life_beam_attack",
+      "cooldown": 0,
+      "duration": 10,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:gerlaserfire"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.gold_experience_requiem.default.life_beam.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.gold_experience_requiem.default.life_beam.followup.name"
+        },
+        "ranged": true
+      },
+      "move_distance": 1.1,
+      "windup": 1
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_holdable_move",
+    "cooldown": 100,
+    "duration": 40,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:gerlaser"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.gold_experience_requiem.default.life_beam.description"
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.gold_experience_requiem.default.life_beam.name"
+      }
+    },
+    "minimum_charge": 9,
+    "move_distance": 1.1,
+    "set_move_stun": false,
+    "windup": 0
+  }
+}

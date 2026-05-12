@@ -1,0 +1,38 @@
+{
+  "parent": "jcraft:obtain_stand",
+  "criteria": {
+    "has_arrow": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:requiem_arrow"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_requiem_arrow.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:requiem_arrow"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_requiem_arrow.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_arrow"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

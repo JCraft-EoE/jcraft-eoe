@@ -1,0 +1,32 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:packed_mud",
+    "#c:sand_blocks",
+    "minecraft:sea_lantern",
+    {
+      "id": "c:glass_blocks",
+      "required": false
+    },
+    {
+      "id": "c:glass_panes",
+      "required": false
+    },
+    "minecraft:grass_block",
+    "minecraft:podzol",
+    "minecraft:dirt",
+    "minecraft:coarse_dirt",
+    "minecraft:mud",
+    "minecraft:clay",
+    "minecraft:gravel",
+    "minecraft:snow_block",
+    "minecraft:crimson_nylium",
+    "minecraft:warped_nylium",
+    "minecraft:soul_sand",
+    "minecraft:soul_soil",
+    "jcraft:soul_block",
+    "minecraft:netherrack",
+    "minecraft:glowstone",
+    "minecraft:shroomlight"
+  ]
+}

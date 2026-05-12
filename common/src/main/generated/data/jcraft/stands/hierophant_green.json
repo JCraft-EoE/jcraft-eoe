@@ -1,0 +1,29 @@
+{
+  "idle_rotation": 220.0,
+  "info": {
+    "con_count": 2,
+    "free_space": {
+      "translate": "entity.jcraft.hierophantgreen.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.hierophantgreen"
+    },
+    "pro_count": 3,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.hierophantgreen.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.hierophantgreen.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.hierophantgreen.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:hgsummon"
+    }
+  }
+}

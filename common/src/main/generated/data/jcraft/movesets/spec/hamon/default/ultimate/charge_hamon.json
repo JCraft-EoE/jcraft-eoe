@@ -1,0 +1,31 @@
+{
+  "class": "ULTIMATE",
+  "cooldown_type": "ULTIMATE",
+  "move": {
+    "type": "jcraft:hamon_charge_move",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 3,
+      "hit_animation": "MID",
+      "stun_type": "WINDED"
+    },
+    "duration": 1200,
+    "extras": {
+      "conditions": [
+        {
+          "type": "jcraft:hamon_breath",
+          "lessonTime": 1800
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.hamon.default.charge_hamon.description"
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.hamon.default.charge_hamon.name"
+      }
+    },
+    "interval": 1,
+    "move_distance": 0.0
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "type": "group",
+  "modifiers": [
+    {
+      "type": "group",
+      "conditions": [
+        "USER_NOT_MOVING"
+      ],
+      "modifiers": [
+        {
+          "type": "group",
+          "conditions": [
+            "LEFT_ARM_EMPTY"
+          ],
+          "modifiers": [
+            {
+              "type": "custom",
+              "operation": "ADD",
+              "part": "leftArm",
+              "property": "Y_ROT",
+              "value": 0.2617994
+            },
+            {
+              "type": "custom",
+              "operation": "ADD",
+              "part": "leftArm",
+              "property": "X_ROT",
+              "value": -0.2617994
+            },
+            {
+              "type": "custom",
+              "operation": "ADD",
+              "part": "leftArm",
+              "property": "Z_ROT",
+              "value": 0.7853982
+            },
+            {
+              "type": "empty"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "conditions": [
+            "RIGHT_ARM_EMPTY"
+          ],
+          "modifiers": [
+            {
+              "type": "custom",
+              "operation": "ADD",
+              "part": "rightArm",
+              "property": "Y_ROT",
+              "value": -0.2617994
+            },
+            {
+              "type": "custom",
+              "operation": "ADD",
+              "part": "rightArm",
+              "property": "X_ROT",
+              "value": -0.2617994
+            },
+            {
+              "type": "custom",
+              "operation": "ADD",
+              "part": "rightArm",
+              "property": "Z_ROT",
+              "value": -0.7853982
+            },
+            {
+              "type": "empty"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "modifiers": [
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "body",
+          "property": "X_ROT",
+          "value": -0.08726646
+        },
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "leftLeg",
+          "property": "Z",
+          "value": -1.0
+        },
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "rightLeg",
+          "property": "Z",
+          "value": -1.0
+        },
+        {
+          "type": "empty"
+        }
+      ]
+    }
+  ]
+}

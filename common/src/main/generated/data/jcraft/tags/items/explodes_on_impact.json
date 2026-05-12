@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:end_crystal",
+    "minecraft:tnt",
+    "minecraft:tnt_minecart",
+    "minecraft:firework_rocket"
+  ]
+}

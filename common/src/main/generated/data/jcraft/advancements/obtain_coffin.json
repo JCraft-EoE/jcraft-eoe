@@ -1,0 +1,38 @@
+{
+  "parent": "jcraft:find_stone_mask",
+  "criteria": {
+    "has_coffin": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:coffin"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_coffin.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:coffin"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_coffin.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_coffin"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

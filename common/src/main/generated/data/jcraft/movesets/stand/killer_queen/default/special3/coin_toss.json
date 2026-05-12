@@ -1,0 +1,17 @@
+{
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:killerqueen_coin_toss_move",
+    "cooldown": 240,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.killer_queen.default.coin_toss.description"
+      },
+      "name": {
+        "translate": "move.jcraft.killer_queen.default.coin_toss.name"
+      },
+      "ranged": true
+    }
+  }
+}

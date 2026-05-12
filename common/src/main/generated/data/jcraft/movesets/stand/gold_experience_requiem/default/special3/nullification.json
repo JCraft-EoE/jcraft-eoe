@@ -1,0 +1,27 @@
+{
+  "anim_state": "COUNTER",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:goldexperience_requiem_nullification_attack",
+    "cooldown": 480,
+    "duration": 35,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:geheal"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.gold_experience_requiem.default.nullification.description"
+      },
+      "name": {
+        "translate": "move.jcraft.gold_experience_requiem.default.nullification.name"
+      }
+    },
+    "move_distance": 1.0,
+    "windup": 5
+  }
+}

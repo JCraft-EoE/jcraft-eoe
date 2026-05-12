@@ -1,0 +1,31 @@
+{
+  "evolution": true,
+  "idle_rotation": -45.0,
+  "info": {
+    "con_count": 4,
+    "free_space": {
+      "translate": "entity.jcraft.twoh.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.twoh"
+    },
+    "pro_count": 4,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.twoh.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.twoh.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.twoh.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "anim_duration": 29,
+    "sound": {
+      "sound_id": "jcraft:twohsummon"
+    }
+  }
+}

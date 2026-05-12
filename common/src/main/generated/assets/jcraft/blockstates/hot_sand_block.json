@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "jcraft:block/hot_sand_block"
+      },
+      {
+        "model": "jcraft:block/hot_sand_block",
+        "y": 90
+      },
+      {
+        "model": "jcraft:block/hot_sand_block",
+        "y": 180
+      },
+      {
+        "model": "jcraft:block/hot_sand_block",
+        "y": 270
+      }
+    ]
+  }
+}

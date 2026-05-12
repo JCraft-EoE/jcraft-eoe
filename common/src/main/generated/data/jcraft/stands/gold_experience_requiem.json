@@ -1,0 +1,25 @@
+{
+  "evolution": true,
+  "idle_rotation": -30.0,
+  "info": {
+    "con_count": 2,
+    "free_space": {
+      "translate": "entity.jcraft.ger.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.ger"
+    },
+    "pro_count": 5,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.ger.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.ger.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.ger.info.skin3"
+      }
+    ]
+  }
+}

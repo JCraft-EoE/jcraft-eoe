@@ -1,0 +1,74 @@
+{
+  "anim_state": "BLOODSUCK",
+  "class": "SPECIAL2",
+  "cooldown_type": "SPECIAL2",
+  "move": {
+    "type": "jcraft:vampire_blood_suck_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 5,
+      "hit_spark": "BACK_STAB",
+      "override_stun": true,
+      "stun_type": "UNBURSTABLE"
+    },
+    "cooldown": 240,
+    "damage": 1.0,
+    "duration": 18,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:vampiregrabhit"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "run": "on_hit",
+          "sound": "jcraft:impact9"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.vampire.default.blood_suck.description"
+      },
+      "name": {
+        "translate": "move.jcraft.vampire.default.blood_suck.name"
+      }
+    },
+    "grab_duration": 25,
+    "grab_offset": 2.0,
+    "hit_move": {
+      "type": "jcraft:vampire_blood_suck_hits_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 8,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1",
+        "stun_type": "UNBURSTABLE"
+      },
+      "cooldown": 0,
+      "damage": 4.0,
+      "duration": 25,
+      "extras": {
+        "name": {
+          "text": "Blood Suck (Hit)"
+        }
+      },
+      "hit_moments": [
+        8,
+        16,
+        24
+      ],
+      "hitbox_size": 1.5,
+      "knockback": 0.6,
+      "move_distance": 1.0,
+      "offset": -0.1,
+      "stun": 5
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.0,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 25,
+    "windup": 10
+  }
+}

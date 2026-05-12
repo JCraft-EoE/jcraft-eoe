@@ -1,0 +1,47 @@
+{
+  "anim_state": "PREDICT",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "crouching_variant": {
+    "anim_state": "EPITAPH",
+    "class": "SPECIAL3",
+    "cooldown_type": "STAND_SP3",
+    "move": {
+      "type": "jcraft:kingcrimson_epitaph_attack",
+      "cooldown": 480,
+      "duration": 34,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.king_crimson.default.epitaph.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.king_crimson.default.epitaph.cr.name"
+        }
+      },
+      "move_distance": -1.0,
+      "windup": 4
+    }
+  },
+  "move": {
+    "type": "jcraft:kingcrimson_prediction_move",
+    "cooldown": 160,
+    "duration": 104,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:kcepitaph"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.king_crimson.default.predictionmove_cancel.description"
+      },
+      "name": {
+        "translate": "move.jcraft.king_crimson.default.predictionmove_cancel.name"
+      }
+    },
+    "move_distance": -1.0,
+    "windup": 4
+  }
+}

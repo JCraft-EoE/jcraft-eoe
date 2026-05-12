@@ -1,0 +1,29 @@
+{
+  "idle_rotation": -45.0,
+  "info": {
+    "con_count": 4,
+    "free_space": {
+      "translate": "entity.jcraft.shadow_the_world.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.shadow_the_world"
+    },
+    "pro_count": 5,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.shadow_the_world.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.shadow_the_world.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.shadow_the_world.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:stwwarble"
+    }
+  }
+}

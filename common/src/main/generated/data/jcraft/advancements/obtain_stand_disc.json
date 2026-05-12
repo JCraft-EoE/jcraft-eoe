@@ -1,0 +1,38 @@
+{
+  "parent": "jcraft:obtain_stand",
+  "criteria": {
+    "has_disc": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:stand_disc"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_stand_disc.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:stand_disc"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_stand_disc.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_disc"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

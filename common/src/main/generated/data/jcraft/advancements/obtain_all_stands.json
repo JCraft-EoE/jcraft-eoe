@@ -1,0 +1,269 @@
+{
+  "parent": "jcraft:obtain_stand_disc",
+  "criteria": {
+    "has_aerosmith": {
+      "conditions": {
+        "stand": "jcraft:aerosmith"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_c_moon": {
+      "conditions": {
+        "stand": "jcraft:c_moon"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_cream": {
+      "conditions": {
+        "stand": "jcraft:cream"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_d4c": {
+      "conditions": {
+        "stand": "jcraft:d4c"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_gold_experience": {
+      "conditions": {
+        "stand": "jcraft:gold_experience"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_gold_experience_requiem": {
+      "conditions": {
+        "stand": "jcraft:gold_experience_requiem"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_hierophant_green": {
+      "conditions": {
+        "stand": "jcraft:hierophant_green"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_horus": {
+      "conditions": {
+        "stand": "jcraft:horus"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_killer_queen": {
+      "conditions": {
+        "stand": "jcraft:killer_queen"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_killer_queen_bites_the_dust": {
+      "conditions": {
+        "stand": "jcraft:killer_queen_bites_the_dust"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_king_crimson": {
+      "conditions": {
+        "stand": "jcraft:king_crimson"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_made_in_heaven": {
+      "conditions": {
+        "stand": "jcraft:made_in_heaven"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_magicians_red": {
+      "conditions": {
+        "stand": "jcraft:magicians_red"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_mandom": {
+      "conditions": {
+        "stand": "jcraft:mandom"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_metallica": {
+      "conditions": {
+        "stand": "jcraft:metallica"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_purple_haze": {
+      "conditions": {
+        "stand": "jcraft:purple_haze"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_purple_haze_distortion": {
+      "conditions": {
+        "stand": "jcraft:purple_haze_distortion"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_shadow_the_world": {
+      "conditions": {
+        "stand": "jcraft:shadow_the_world"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_silver_chariot": {
+      "conditions": {
+        "stand": "jcraft:silver_chariot"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_star_platinum": {
+      "conditions": {
+        "stand": "jcraft:star_platinum"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_star_platinum_the_world": {
+      "conditions": {
+        "stand": "jcraft:star_platinum_the_world"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_the_fool": {
+      "conditions": {
+        "stand": "jcraft:the_fool"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_the_hand": {
+      "conditions": {
+        "stand": "jcraft:the_hand"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_the_sun": {
+      "conditions": {
+        "stand": "jcraft:the_sun"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_the_world": {
+      "conditions": {
+        "stand": "jcraft:the_world"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_the_world_over_heaven": {
+      "conditions": {
+        "stand": "jcraft:the_world_over_heaven"
+      },
+      "trigger": "jcraft:obtained_stand"
+    },
+    "has_white_snake": {
+      "conditions": {
+        "stand": "jcraft:white_snake"
+      },
+      "trigger": "jcraft:obtained_stand"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.jcraft.obtain_all_stands.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:stand_disc"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_all_stands.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_star_platinum"
+    ],
+    [
+      "has_star_platinum_the_world"
+    ],
+    [
+      "has_magicians_red"
+    ],
+    [
+      "has_the_world"
+    ],
+    [
+      "has_king_crimson"
+    ],
+    [
+      "has_d4c"
+    ],
+    [
+      "has_cream"
+    ],
+    [
+      "has_killer_queen"
+    ],
+    [
+      "has_white_snake"
+    ],
+    [
+      "has_silver_chariot"
+    ],
+    [
+      "has_the_fool"
+    ],
+    [
+      "has_gold_experience"
+    ],
+    [
+      "has_hierophant_green"
+    ],
+    [
+      "has_the_sun"
+    ],
+    [
+      "has_purple_haze"
+    ],
+    [
+      "has_c_moon"
+    ],
+    [
+      "has_made_in_heaven"
+    ],
+    [
+      "has_the_world_over_heaven"
+    ],
+    [
+      "has_killer_queen_bites_the_dust"
+    ],
+    [
+      "has_gold_experience_requiem"
+    ],
+    [
+      "has_purple_haze_distortion"
+    ],
+    [
+      "has_horus"
+    ],
+    [
+      "has_shadow_the_world"
+    ],
+    [
+      "has_metallica"
+    ],
+    [
+      "has_the_hand"
+    ],
+    [
+      "has_mandom"
+    ],
+    [
+      "has_aerosmith"
+    ]
+  ],
+  "rewards": {
+    "experience": 1395
+  },
+  "sends_telemetry_event": true
+}

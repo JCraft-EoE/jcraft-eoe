@@ -1,0 +1,76 @@
+{
+  "anim_state": "HEAL_SELF",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "crouching_variant": {
+    "anim_state": "HEAL",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:shared_heal_move",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 4,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 520,
+      "duration": 16,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:geheal"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.gold_experience.default.healing_hand_others.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.gold_experience.default.healing_hand_others.cr.name"
+        }
+      },
+      "health": 4.0,
+      "hitbox_size": 1.25,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "pacify_mobs": false,
+      "target": "TARGETS",
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_heal_move",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 4,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 520,
+    "duration": 14,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:geheal"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.gold_experience.default.healing_hand.description"
+      },
+      "name": {
+        "translate": "move.jcraft.gold_experience.default.healing_hand.name"
+      }
+    },
+    "health": 4.0,
+    "hitbox_size": 0.0,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "pacify_mobs": false,
+    "target": "USER",
+    "windup": 10
+  }
+}

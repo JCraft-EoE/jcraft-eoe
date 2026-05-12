@@ -1,0 +1,21 @@
+{
+  "anim_state": "SHA",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:killerqueen_sheer_heart_attack_attack",
+    "cooldown": 1000,
+    "duration": 20,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.killer_queen.default.sheer_heart_attack.description"
+      },
+      "name": {
+        "translate": "move.jcraft.killer_queen.default.sheer_heart_attack.name"
+      },
+      "ranged": true
+    },
+    "move_distance": 1.0,
+    "windup": 16
+  }
+}

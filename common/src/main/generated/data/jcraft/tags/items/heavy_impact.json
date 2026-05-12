@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "jcraft:meteorite_block",
+    "jcraft:polished_meteorite_block",
+    "minecraft:iron_block",
+    "jcraft:stellar_iron_block",
+    "minecraft:gold_block",
+    "minecraft:diamond_block",
+    "minecraft:netherite_block",
+    "minecraft:raw_iron_block",
+    "minecraft:raw_gold_block",
+    "minecraft:blast_furnace",
+    "minecraft:cauldron",
+    "#minecraft:anvil",
+    "minecraft:chipped_anvil",
+    "minecraft:damaged_anvil",
+    "minecraft:obsidian",
+    "minecraft:crying_obsidian",
+    "minecraft:respawn_anchor",
+    "jcraft:road_roller"
+  ]
+}

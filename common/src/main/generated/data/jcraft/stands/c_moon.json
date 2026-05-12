@@ -1,0 +1,30 @@
+{
+  "evolution": true,
+  "idle_rotation": 220.0,
+  "info": {
+    "con_count": 2,
+    "free_space": {
+      "translate": "entity.jcraft.cmoon.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.cmoon"
+    },
+    "pro_count": 4,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.cmoon.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.cmoon.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.cmoon.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:cmoonsummon"
+    }
+  }
+}
