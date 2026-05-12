@@ -37,10 +37,13 @@ if (!rootProject.hasProperty('datagenChild')) {
     }
 
     gradle.projectsEvaluated {
-        // :common:processResources reads src/main/generated, so it must wait for
-        // datagen to finish writing there — otherwise parallel builds race on that dir.
+        // :common:processResources reads src/main/generated and must not race with
+        // datagen writing to that directory. mustRunAfter (not dependsOn) enforces
+        // the ordering when both tasks are scheduled together (e.g. ./gradlew build),
+        // but does NOT pull runDatagenOnce into the graph when running
+        // :datagen:runDatagen directly — which would otherwise cause a double-run.
         project(':common').tasks.named('processResources').configure {
-            dependsOn(rootProject.tasks.named('runDatagenOnce'))
+            mustRunAfter(rootProject.tasks.named('runDatagenOnce'))
         }
         project(':fabric').tasks.named('build').configure {
             dependsOn(rootProject.tasks.named('runDatagenOnce'))
