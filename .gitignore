@@ -49,8 +49,5 @@ run/
 /common/src/main/generated/.cache/*
 /common/logs/latest.log
 
-/common/src/main/generated/data/*
-/common/src/main/generated/assets/jcraft/*
-
 .architectury-transformer/
 .direnv
