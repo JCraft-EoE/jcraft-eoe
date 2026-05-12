@@ -73,9 +73,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public float oldPitch = 0.0f, oldYaw = 0.0f, oldRoll = 0.0f;
     public float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
 
-    // TODO: balance this
     public static final MuzzleHitscanAttack BULLET = new MuzzleHitscanAttack(
-            1, 1, 2, 0f, 3.25f, 0, 0.4f, 30f, 0.01f)
+            1, 1, 2, 1.5f, 3.25f, 0, 0.4f, 30f, 0.01f)
+            .withBlockStun(0)
             .withSound(JSoundRegistry.AS_SHOOT)
             .withHitSpark(JParticleType.HIT_SPARK_1)
             .withShootSpark(JParticleType.LEMON)
@@ -189,7 +189,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         attackOrderMove = getMove(AerosmithAttackOrderMove.class);
 
         auraColors = new Vector3f[]{
-                new Vector3f(0.6f, 0.5f, 0.2f),
+                new Vector3f(0.9f, 0.3f, 0.2f),
                 new Vector3f(0.2f, 0.4f, 0.7f),
                 new Vector3f(0.8f, 0.2f, 0.5f),
                 new Vector3f(0.0f, 0.1f, 1.0f)
@@ -207,7 +207,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     @Override
     public boolean shouldOffsetHeight() {
-        return false;
+        return getState() == State.IDLE || getState() == State.BLOCK;
     }
 
     @Override
