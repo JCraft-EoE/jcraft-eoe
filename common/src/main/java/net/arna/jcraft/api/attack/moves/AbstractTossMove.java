@@ -13,7 +13,6 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -53,12 +52,11 @@ public abstract class AbstractTossMove<T extends AbstractTossMove<T, A>, A exten
         if (base.level().isClientSide()) return Set.of();
         final ItemStack itemStack = base.getItemInHand(InteractionHand.MAIN_HAND);
         if (itemStack.isEmpty()) return Set.of();
-        final boolean decrement = !(attacker.hasUser() && attacker.getUserOrThrow() instanceof Player player && player.getAbilities().instabuild);
         if (itemStack.getItem() instanceof KnifeBundleItem) {
-            handleKnifeBundle(base, base.level(), itemStack, getChargeTime() * velocityMultiplier, spreadMultiplier, decrement, getSpawnPos(base));
+            handleKnifeBundle(base, base.level(), itemStack, getChargeTime() * velocityMultiplier, spreadMultiplier, true, getSpawnPos(base));
         }
         else {
-            final Entity thrown = JUtils.tossItem(base, base.level(), itemStack, getChargeTime() * velocityMultiplier, spreadMultiplier, decrement, getSpawnPos(base));
+            final Entity thrown = JUtils.tossItem(base, base.level(), itemStack, getChargeTime() * velocityMultiplier, spreadMultiplier, true, getSpawnPos(base));
             onTossed(attacker, user, thrown);
         }
         return Set.of();
