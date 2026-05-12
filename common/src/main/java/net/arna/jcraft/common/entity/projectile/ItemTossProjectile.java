@@ -20,6 +20,7 @@ import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -347,7 +348,9 @@ public class ItemTossProjectile extends AbstractArrow {
                     getItem().is(JTagRegistry.EXPLODES_ON_IMPACT) ||
                     getItem().is(JTagRegistry.SLOWS_ON_IMPACT) ||
                     getItem().is(JTagRegistry.POISONS_ON_IMPACT))) {
-                dropItem(result.getLocation());
+                // drop at owner position so the item doesn't land on the target and get picked up
+                final Vec3 dropTarget = entity2 != null ? entity2.position() : result.getLocation();
+                dropItem(dropTarget);
             }
             this.discard();
         }
