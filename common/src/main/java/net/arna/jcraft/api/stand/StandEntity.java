@@ -1066,10 +1066,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 final float attackDist = move.getMoveDistance();
 
                 if (!move.isCharge()) {
-                    if (!isRemote) {
+/*                    if (!isRemote) {
                         // TODO: find a cleaner way to slow down the users attack speed
-                        //user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 4, true, false));
-                    }
+                        user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 4, true, false));
+                    }*/
 
                     setAttackRotationOffset();
                     setDistanceOffset(attackDist);
