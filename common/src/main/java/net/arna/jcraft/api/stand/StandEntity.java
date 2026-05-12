@@ -1068,7 +1068,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 if (!move.isCharge()) {
                     if (!isRemote) {
                         // TODO: find a cleaner way to slow down the users attack speed
-                        user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 4, true, false));
+                        //user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 4, true, false));
                     }
 
                     setAttackRotationOffset();
