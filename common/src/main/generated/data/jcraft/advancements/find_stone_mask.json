@@ -23,7 +23,7 @@
     "hidden": false,
     "icon": {
       "item": "jcraft:stone_mask",
-      "nbt": "{Damage:0,az_id:[I;1675721939,1263486282,-1626973103,-2127237987]}"
+      "nbt": "{Damage:0,az_id:[I;-994543774,-1112067257,-1115476039,-1738903803]}"
     },
     "show_toast": true,
     "title": {
