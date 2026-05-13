@@ -157,12 +157,9 @@ public class TonpettyEntity extends HamonSpecUser implements NeutralMob {
     }
 
     @Override
-    public void aiStep() {
-        super.aiStep();
-
-        if (!level().isClientSide) {
-            updatePersistentAnger((ServerLevel)level(), true);
-        }
+    public void customServerAiStep() {
+        bossEvent.setProgress(getHealth() / getMaxHealth());
+        updatePersistentAnger((ServerLevel)level(), true);
     }
 
     @Override
@@ -175,6 +172,16 @@ public class TonpettyEntity extends HamonSpecUser implements NeutralMob {
     public void readAdditionalSaveData(@NotNull CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         readPersistentAngerSaveData(level(), compound);
+
+        if (hasCustomName()) {
+            bossEvent.setName(getDisplayName());
+        }
+    }
+
+    @Override
+    public void setCustomName(@Nullable Component name) {
+        super.setCustomName(name);
+        bossEvent.setName(getDisplayName());
     }
 
     @Override
