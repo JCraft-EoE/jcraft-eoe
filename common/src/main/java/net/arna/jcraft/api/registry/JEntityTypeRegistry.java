@@ -831,7 +831,7 @@ public interface JEntityTypeRegistry {
         EntityAttributeRegistry.register(AYA_TSUJI, AyaTsujiEntity::createAyaTsujiAttributes);
         EntityAttributeRegistry.register(DARBY_OLDER, DarbyOlderEntity::createDarbyOlderAttributes);
         EntityAttributeRegistry.register(DARBY_YOUNGER, DarbyYoungerEntity::createDarbyYoungerAttributes);
-        EntityAttributeRegistry.register(TONPETTY, TonpettyEntity::createTonpettiAttributes);
+        EntityAttributeRegistry.register(TONPETTY, TonpettyEntity::createTonpettyAttributes);
 
         EntityAttributeRegistry.register(METALLICA, MetallicaEntity::createMobAttributes);
         EntityAttributeRegistry.register(THE_HAND, TheHandEntity::createMobAttributes);
