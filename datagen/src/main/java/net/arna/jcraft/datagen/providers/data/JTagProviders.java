@@ -501,7 +501,7 @@ public class JTagProviders {
             discs.add(JItemRegistry.SPEC_DISC.get());
             
             final var ferrous = getOrCreateTagBuilder(JTagRegistry.FERROUS_ITEMS);
-            ferrous.addTag(ItemTags.IRON_ORES);
+            ferrous.addOptionalTag(ItemTags.IRON_ORES);
             ferrous.add(Items.RAW_IRON);
             ferrous.add(Items.RAW_IRON_BLOCK);
             ferrous.add(Items.IRON_NUGGET);
