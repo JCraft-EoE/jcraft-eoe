@@ -569,4 +569,9 @@ public class ItemTossProjectile extends AbstractArrow {
         }
         return 1d;
     }
+
+    public boolean isFerrous() {
+        final ItemStack stack = getItem();
+        return stack != null && stack.is(JTagRegistry.FERROUS_ITEMS);
+    }
 }
