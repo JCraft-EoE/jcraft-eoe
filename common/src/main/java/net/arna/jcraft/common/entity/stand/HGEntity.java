@@ -48,7 +48,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .info(StandInfo.builder()
-                    .name(Component.translatable("entity.jcraft.hierophantgreen"))
+                    .name(Component.translatable("entity.jcraft.hierophant_green"))
                     .proCount(3)
                     .conCount(2)
                     .freeSpace(Component.literal("""
