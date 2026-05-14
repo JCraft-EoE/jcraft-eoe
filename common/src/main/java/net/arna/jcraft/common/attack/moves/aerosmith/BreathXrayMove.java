@@ -12,15 +12,14 @@ import net.arna.jcraft.api.MoveSelectionResult;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.client.particle.BreathParticle;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -156,16 +155,8 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     }
 
     public static void displayBreathParticle(@NonNull final ServerPlayer serverPlayer, @NonNull final Vec3 target) {
-        serverPlayer.connection.send(
-                new ClientboundLevelParticlesPacket(
-                        JParticleTypeRegistry.OVERLAP.get(),
-                        true,
-                        target.x, target.y, target.z,
-                        0, 0, 0,
-                        0,
-                        1
-                )
-        );
+        serverPlayer.serverLevel().sendParticles(serverPlayer, new BreathParticle.BreathParticleOptions(1f),
+                true, target.x, target.y, target.z, 1, 0, 0, 0, 0);
     }
 
     public static void playPingSound(@NonNull final ServerPlayer serverPlayer) {

@@ -1,6 +1,7 @@
 package net.arna.jcraft.api.registry;
 
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.arna.jcraft.client.particle.BreathParticle;
 import net.minecraft.core.particles.SimpleParticleType;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public interface JParticleTypeRegistry {
     RegistrySupplier<SimpleParticleType> GO = PARTICLES.register("go", () -> new SimpleParticleType(false));
     RegistrySupplier<SimpleParticleType> DO = PARTICLES.register("do", () -> new SimpleParticleType(false));
     RegistrySupplier<SimpleParticleType> INVERSION = PARTICLES.register("inversion", () -> new SimpleParticleType(false));
-    RegistrySupplier<SimpleParticleType> OVERLAP = PARTICLES.register("overlap", () -> new SimpleParticleType(false));
+    RegistrySupplier<BreathParticle.BreathParticleType> BREATH = PARTICLES.register("breath", () -> BreathParticle.BreathParticleType.INSTANCE);
     RegistrySupplier<SimpleParticleType> SUN_LOCK_ON = PARTICLES.register("sun_lock_on", () -> new SimpleParticleType(false));
     RegistrySupplier<SimpleParticleType> PURPLE_HAZE_CLOUD = PARTICLES.register("purple_haze_cloud", () -> new SimpleParticleType(false));
     RegistrySupplier<SimpleParticleType> PURPLE_HAZE_PARTICLE = PARTICLES.register("purple_haze_particle", () -> new SimpleParticleType(false));
