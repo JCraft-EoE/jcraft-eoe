@@ -12,6 +12,7 @@ import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
 import net.arna.jcraft.common.ai.CombatEntityContext;
@@ -116,7 +117,7 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
     void setState(final S state);
 
     default void playAttackerSound(final SoundEvent sound, final float volume, final float pitch) {
-        getBaseEntity().playSound(sound, volume, pitch);
+        BoundSoundPlayer.playSoundFrom(getBaseEntity(), sound, getBaseEntity().getSoundSource(), volume, pitch);
     }
 
     /**
