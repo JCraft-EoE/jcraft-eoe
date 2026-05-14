@@ -30,6 +30,7 @@ import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.handler.*;
+import net.arna.jcraft.client.sound.BoundSoundClient;
 import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
@@ -104,6 +105,7 @@ public class JCraftClient {
         GravityChannelClient.init();
 
         BlockBreakerClient.init();
+        BoundSoundClient.init();
 
         // Rendering
         JRenderLayerRegistry.init();

@@ -743,15 +743,9 @@ public final class JUtils {
         return world.getPlayers(p -> p.distanceToSqr(pos) <= radiusSq);
     }
 
-    public static Collection<ServerPlayer> all(MinecraftServer server) {
-        Objects.requireNonNull(server, "The server cannot be null");
-
+    public static Collection<ServerPlayer> all(@NonNull MinecraftServer server) {
         // return an immutable collection to guard against accidental removals.
-        if (server.getPlayerList() != null) {
-            return Collections.unmodifiableCollection(server.getPlayerList().getPlayers());
-        }
-
-        return Collections.emptyList();
+        return Collections.unmodifiableCollection(server.getPlayerList().getPlayers());
     }
 
     /**
