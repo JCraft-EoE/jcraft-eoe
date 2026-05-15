@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>> {
     private final Supplier<SoundEvent> sound;
     private final float minVol, maxVol, minPitch, maxPitch;
+    private final boolean bind;
 
     private PlaySoundAction(final Supplier<SoundEvent> sound, final float minVol, final float maxVol,
                             final float minPitch, final float maxPitch, final boolean onImpact) {
@@ -29,6 +30,7 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
         this.maxVol = maxVol;
         this.minPitch = minPitch;
         this.maxPitch = maxPitch;
+        this.bind = !onImpact;
 
         if (onImpact)
             setRunMoment(RunMoment.ON_HIT);
@@ -96,8 +98,9 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
 
     @Override
     public void perform(IAttacker<?, ?> attacker, LivingEntity user, Set<LivingEntity> targets) {
-        attacker.playAttackerSound(sound.get(), randomize(attacker.getBaseEntity().getRandom(), minVol, maxVol),
-                randomize(attacker.getBaseEntity().getRandom(), minPitch, maxPitch));
+        float volume = randomize(attacker.getBaseEntity().getRandom(), minVol, maxVol);
+        float pitch = randomize(attacker.getBaseEntity().getRandom(), minPitch, maxPitch);
+        attacker.playAttackerSound(sound.get(), volume, pitch, bind);
     }
 
     @Override

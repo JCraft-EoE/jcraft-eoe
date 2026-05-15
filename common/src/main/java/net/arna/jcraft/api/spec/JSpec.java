@@ -16,6 +16,7 @@ import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.AbstractMultiHitAttack;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
@@ -160,8 +161,11 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     @Override
-    public void playAttackerSound(SoundEvent sound, float volume, float pitch) {
-        user.level().playSound(null, user.getX(), user.getY(), user.getZ(), sound, SoundSource.PLAYERS,
+    public void playAttackerSound(SoundEvent sound, float volume, float pitch, boolean bind) {
+        if (user.isSilent()) return;
+
+        if (bind) BoundSoundPlayer.playSoundFrom(user, sound, SoundSource.PLAYERS, volume, pitch);
+        else user.level().playSound(null, user.getX(), user.getY(), user.getZ(), sound, SoundSource.PLAYERS,
                 volume, pitch);
     }
 

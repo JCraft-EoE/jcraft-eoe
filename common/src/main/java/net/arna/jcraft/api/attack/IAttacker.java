@@ -116,8 +116,12 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
 
     void setState(final S state);
 
-    default void playAttackerSound(final SoundEvent sound, final float volume, final float pitch) {
-        BoundSoundPlayer.playSoundFrom(getBaseEntity(), sound, getBaseEntity().getSoundSource(), volume, pitch);
+    default void playAttackerSound(final SoundEvent sound, final float volume, final float pitch, boolean bind) {
+        LivingEntity e = getBaseEntity();
+        if (e.isSilent()) return;
+
+        if (bind) BoundSoundPlayer.playSoundFrom(e, sound, e.getSoundSource(), volume, pitch);
+        else e.playSound(sound, volume, pitch);
     }
 
     /**
