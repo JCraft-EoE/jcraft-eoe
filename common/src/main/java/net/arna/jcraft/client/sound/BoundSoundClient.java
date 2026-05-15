@@ -70,13 +70,18 @@ public class BoundSoundClient {
         if (level == null) return;
 
         byte type = buf.readByte();
-        long id = buf.readVarLong();
 
         // Stop packet, stop the sound.
         if (type == BoundSoundPlayer.SoundHandle.TYPE_STOP) {
-            stopBoundSound(id);
+            while (buf.readableBytes() > 0) {
+                long id = buf.readVarLong();
+                stopBoundSound(id);
+            }
+
             return;
         }
+
+        long id = buf.readVarLong();
 
         ResourceKey<SoundEvent> soundKey = buf.readResourceKey(BuiltInRegistries.SOUND_EVENT.key());
         SoundEvent sound = BuiltInRegistries.SOUND_EVENT.get(soundKey);

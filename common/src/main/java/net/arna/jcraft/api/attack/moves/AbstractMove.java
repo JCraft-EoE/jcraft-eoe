@@ -22,6 +22,7 @@ import net.arna.jcraft.api.attack.core.RunMoment;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
@@ -96,6 +97,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     // How long this move was charged for, if any.
     @Getter @Setter
     private int chargeTime = 0;
+    private final Map<A, List<BoundSoundPlayer.SoundHandle>> activeSounds = new WeakHashMap<>();
 
     protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
         this.cooldown = cooldown;
@@ -622,12 +624,30 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
                 action.perform(attacker, user, targets);
             }
         }
+
+        activeSounds.remove(attacker);
     }
 
     /**
-     * Called when this move is canceled. Does nothing by default.
+     * Called when this move is canceled.
+     * Cancels ongoing sounds by default. Overriding methods should call this.
      */
-    public void onCancel(final A attacker) {}
+    public void onCancel(final A attacker) {
+        List<BoundSoundPlayer.SoundHandle> sounds = activeSounds.remove(attacker);
+        if (sounds == null) return;
+
+        BoundSoundPlayer.stopAll(sounds);
+    }
+
+    /**
+     * Adds a sound handle to the list of active sounds for the given attacker.
+     * These sounds will be cancelled if the move is cancelled.
+     * @param attacker The attacker the sound is playing for
+     * @param handle The sound handle
+     */
+    public void submitBoundSound(final A attacker, final BoundSoundPlayer.SoundHandle handle) {
+        activeSounds.computeIfAbsent(attacker, a -> new ArrayList<>()).add(handle);
+    }
 
     /**
      * Whether this attack should be allowed to move onto its finisher.

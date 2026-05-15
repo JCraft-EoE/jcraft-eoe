@@ -41,7 +41,7 @@ public class ChargeHamonMove extends AbstractBarrageAttack<ChargeHamonMove, Hamo
         final int currentTimestamp = attacker.getBaseEntity().tickCount;
 
         if (currentTimestamp - lastUseTimestamp >= SOUND_COOLDOWN) {
-            attacker.playAttackerSound(JSoundRegistry.HAMON_BREATHE.get(), 1.0f, 1.0f);
+            attacker.playAttackerSound(JSoundRegistry.HAMON_BREATHE.get(), 1f, 1f, true);
             lastUseTimestamp = currentTimestamp;
         }
     }

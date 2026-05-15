@@ -7,7 +7,7 @@ import lombok.Synchronized;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.client.sound.BoundSoundClient;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,6 +20,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BoundSoundPlayer {
 
@@ -35,6 +36,26 @@ public class BoundSoundPlayer {
         PosSoundHandle handle = new PosSoundHandle(level, pos, sound, category, volume, pitch, listeners);
         startSoundHandle(level, handle);
         return handle;
+    }
+
+    public static void stopAll(Collection<? extends SoundHandle> sounds) {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        buf.writeByte(SoundHandle.TYPE_STOP);
+
+        // Write IDs
+        sounds.stream()
+                .mapToLong(SoundHandle::getId)
+                .distinct()
+                .forEach(buf::writeVarLong);
+
+        // Get players to send this packet to
+        Set<ServerPlayer> listeners = sounds.stream()
+                .flatMap(s -> s.getListeners().stream())
+                .filter(p -> p instanceof ServerPlayer)
+                .map(p -> (ServerPlayer) p)
+                .collect(Collectors.toSet());
+
+        NetworkManager.sendToPlayers(listeners, JPacketRegistry.S2C_BOUND_SOUND, buf);
     }
 
     private static Collection<? extends Player> getListeners(Level level, Vec3 position) {
@@ -98,8 +119,7 @@ public class BoundSoundPlayer {
             buf.writeVarLong(id);
 
             // Write sound
-            ResourceKey<SoundEvent> soundKey = BuiltInRegistries.SOUND_EVENT.getResourceKey(sound)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid sound event!"));
+            ResourceKey<SoundEvent> soundKey = ResourceKey.create(Registries.SOUND_EVENT, sound.getLocation());
             buf.writeResourceKey(soundKey);
 
             buf.writeEnum(category);

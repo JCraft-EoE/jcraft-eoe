@@ -54,6 +54,8 @@ public final class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenE
 
     @Override
     public void onCancel(final MadeInHeavenEntity attacker) {
+        super.onCancel(attacker);
+
         endCircle(attacker);
     }
 

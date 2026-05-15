@@ -59,6 +59,8 @@ public final class TossChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
 
     @Override
     public void onCancel(final A attacker) {
+        super.onCancel(attacker);
+
         final LivingEntity baseEntity = attacker.getBaseEntity();
         Containers.dropItemStack(baseEntity.level(), baseEntity.getX(), baseEntity.getY(), baseEntity.getZ(),
                 baseEntity.getItemInHand(InteractionHand.MAIN_HAND));
