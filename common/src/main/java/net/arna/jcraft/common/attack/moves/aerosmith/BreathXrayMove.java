@@ -116,18 +116,45 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
                     if (!withinScanArc(pos, base.getLookAngle(), target, scanAngle, Mth.DEG_TO_RAD * 30.0)) continue;
 
+                    boolean inLineOfSight = living.hasLineOfSight(base);
                     if (!detected.containsKey(living))
-                        if (living.hasLineOfSight(base))
+                        if (inLineOfSight)
                             doPing = true;
 
                     detected.put(living, 20);
 
-                    displayBreathParticle(serverPlayer, target);
+                    float scale = calculateBreathScale(living, inLineOfSight);
+                    displayBreathParticle(serverPlayer, target, scale);
                 }
             }
 
             if (doPing) playPingSound(serverPlayer);
         }
+    }
+
+    private float calculateBreathScale(LivingEntity entity, boolean inLineOfSight) {
+        float scale = 1f;
+
+        // Incorporate max health (bigger health bar, bigger breath)
+        scale *= entity.getMaxHealth() / 5f;
+
+        // Incorporate lost health (0 health is half size)
+        scale *= entity.getHealth() / entity.getMaxHealth() * 0.5f + 0.5f;
+
+        // Incorporate velocity.
+        // Standing still is 20% reduction.
+        double velocity = entity.getDeltaMovement().length();
+        scale *= (float) (velocity + 0.8f);
+
+        // Double size if in line of sight
+        scale *= inLineOfSight ? 2f : 1f;
+
+        // Reduce by 75% if the target is sneaking.
+        scale *= entity.isDiscrete() ? 0.25f : 1f;
+
+        // Distance is already incorporated naturally through perspective.
+
+        return scale;
     }
 
     /**
@@ -154,8 +181,9 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         return Math.abs(angleDiff) <= sweepArc / 2.0;
     }
 
-    public static void displayBreathParticle(@NonNull final ServerPlayer serverPlayer, @NonNull final Vec3 target) {
-        serverPlayer.serverLevel().sendParticles(serverPlayer, new BreathParticle.Options(1f),
+    public static void displayBreathParticle(@NonNull final ServerPlayer serverPlayer, @NonNull final Vec3 target,
+                                             final float scale) {
+        serverPlayer.serverLevel().sendParticles(serverPlayer, new BreathParticle.Options(scale),
                 true, target.x, target.y, target.z, 1, 0, 0, 0, 0);
     }
 
