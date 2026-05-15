@@ -26,9 +26,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Random;
 import java.util.Set;
 
 public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<BreathXrayMove<A>, A> {
@@ -123,7 +125,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
                     detected.put(living, 20);
 
-                    float scale = calculateBreathScale(living, inLineOfSight);
+                    float scale = calculateBreathScale(living, inLineOfSight)/7;
                     displayBreathParticle(serverPlayer, target, scale);
                 }
             }
@@ -136,7 +138,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         float scale = 1f;
 
         // Incorporate max health (bigger health bar, bigger breath)
-        scale *= entity.getMaxHealth() / 5f;
+        scale *= Math.min(entity.getMaxHealth() / 10f, 10f);
 
         // Incorporate lost health (0 health is half size)
         scale *= entity.getHealth() / entity.getMaxHealth() * 0.5f + 0.5f;
@@ -144,13 +146,16 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         // Incorporate velocity.
         // Standing still is 20% reduction.
         double velocity = entity.getDeltaMovement().length();
-        scale *= (float) (velocity + 0.8f);
+        scale *= (float) (velocity * 5 + 0.8f);
 
         // Double size if in line of sight
         scale *= inLineOfSight ? 2f : 1f;
 
         // Reduce by 75% if the target is sneaking.
         scale *= entity.isDiscrete() ? 0.25f : 1f;
+
+        // Increase if entity is being ridden, and not a player.
+        scale *= entity.getPassengers().isEmpty() || entity instanceof Player ? 1f : 2f;
 
         // Distance is already incorporated naturally through perspective.
 
@@ -189,13 +194,15 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
     public static void playPingSound(@NonNull final ServerPlayer serverPlayer) {
         final var pos = serverPlayer.position();
-
+        Random random = new Random();
+        float volume = 1 - random.nextFloat() * 0.2f;
+        float pitch = 1 - random.nextFloat() * 0.2f;
         serverPlayer.connection.send(
                 new ClientboundSoundPacket(
                         Holder.direct(JSoundRegistry.AS_RADAR_PING.get()),
                         SoundSource.PLAYERS,
                         pos.x, pos.y, pos.z,
-                        1, 1, 0
+                        volume, pitch, 0
                 )
         );
     }
