@@ -155,7 +155,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     }
 
     public static void displayBreathParticle(@NonNull final ServerPlayer serverPlayer, @NonNull final Vec3 target) {
-        serverPlayer.serverLevel().sendParticles(serverPlayer, new BreathParticle.BreathParticleOptions(1f),
+        serverPlayer.serverLevel().sendParticles(serverPlayer, new BreathParticle.Options(1f),
                 true, target.x, target.y, target.z, 1, 0, 0, 0, 0);
     }
 
