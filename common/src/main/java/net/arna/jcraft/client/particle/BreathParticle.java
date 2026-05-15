@@ -16,14 +16,10 @@ import org.jetbrains.annotations.Nullable;
 public class BreathParticle extends RisingParticle {
 
     public BreathParticle(ClientLevel clientLevel, double x, double y, double z, double vx, double vy, double vz,
-                          final SpriteSet spriteProvider) {
+                          final SpriteSet spriteSet, final Options options) {
         super(clientLevel, x, y, z, vx, vy, vz);
-        pickSprite(spriteProvider);
-    }
-
-    private BreathParticle applyOptions(BreathParticleOptions options) {
         quadSize = options.scale();
-        return this;
+        pickSprite(spriteSet);
     }
 
     @Override
@@ -36,44 +32,43 @@ public class BreathParticle extends RisingParticle {
         return JParticleTextureSheet.OVERLAP_SHEET;
     }
 
-    public static class Factory implements ParticleProvider<BreathParticleOptions> {
-        private final SpriteSet spriteProvider;
+    public static class Factory implements ParticleProvider<Options> {
+        private final SpriteSet spriteSet;
 
-        public Factory(SpriteSet spriteProvider) {
-            this.spriteProvider = spriteProvider;
+        public Factory(SpriteSet spriteSet) {
+            this.spriteSet = spriteSet;
         }
 
         @Nullable
         @Override
-        public Particle createParticle(final @NotNull BreathParticleOptions parameters, final @NotNull ClientLevel world,
+        public Particle createParticle(final @NotNull BreathParticle.Options options, final @NotNull ClientLevel world,
                                        final double x, final double y, final double z, final double velocityX,
                                        final double velocityY, final double velocityZ) {
-            return new BreathParticle(world, x, y, z, velocityX, velocityY, velocityZ, spriteProvider)
-                    .applyOptions(parameters);
+            return new BreathParticle(world, x, y, z, velocityX, velocityY, velocityZ, spriteSet, options);
         }
     }
 
-    public static class BreathParticleType extends ParticleType<BreathParticleOptions> {
-        public static BreathParticleType INSTANCE = new BreathParticleType();
+    public static class Type extends ParticleType<Options> {
+        public static Type INSTANCE = new Type();
 
-        private BreathParticleType() {
-            super(true, BreathParticleOptions.Deserializer.INSTANCE);
+        private Type() {
+            super(true, Options.Deserializer.INSTANCE);
         }
 
         @Override
-        public @NotNull Codec<BreathParticleOptions> codec() {
-            return BreathParticleOptions.CODEC;
+        public @NotNull Codec<Options> codec() {
+            return Options.CODEC;
         }
     }
 
-    public record BreathParticleOptions(float scale) implements ParticleOptions {
-            public static Codec<BreathParticleOptions> CODEC = RecordCodecBuilder.create(instance ->
-                    instance.group(Codec.FLOAT.fieldOf("scale").forGetter(BreathParticleOptions::scale))
-                            .apply(instance, BreathParticleOptions::new));
+    public record Options(float scale) implements ParticleOptions {
+            public static Codec<Options> CODEC = RecordCodecBuilder.create(instance ->
+                    instance.group(Codec.FLOAT.fieldOf("scale").forGetter(Options::scale))
+                            .apply(instance, Options::new));
 
         @Override
         public @NotNull ParticleType<?> getType() {
-            return BreathParticleType.INSTANCE;
+            return Type.INSTANCE;
         }
 
         @Override
@@ -83,28 +78,28 @@ public class BreathParticle extends RisingParticle {
 
         @Override
         public @NotNull String writeToString() {
-            return BuiltInRegistries.PARTICLE_TYPE.getKey(getType()) + " ";
+            return BuiltInRegistries.PARTICLE_TYPE.getKey(getType()) + " " + scale;
         }
 
         @SuppressWarnings("deprecation") // No clue why it's deprecated, this class is required.
-        public static class Deserializer implements ParticleOptions.Deserializer<BreathParticleOptions> {
+        public static class Deserializer implements ParticleOptions.Deserializer<Options> {
             public static final Deserializer INSTANCE = new Deserializer();
 
             private Deserializer() {}
 
             @Override
-            public @NotNull BreathParticleOptions fromCommand(@NotNull ParticleType<BreathParticleOptions> particleType,
-                                                              @NotNull StringReader reader) throws CommandSyntaxException {
+            public @NotNull BreathParticle.Options fromCommand(@NotNull ParticleType<Options> particleType,
+                                                               @NotNull StringReader reader) throws CommandSyntaxException {
                 reader.expect(' ');
                 float scale = reader.readFloat();
-                return new BreathParticleOptions(scale);
+                return new Options(scale);
             }
 
             @Override
-            public @NotNull BreathParticleOptions fromNetwork(@NotNull ParticleType<BreathParticleOptions> particleType,
-                                                              @NotNull FriendlyByteBuf buffer) {
+            public @NotNull BreathParticle.Options fromNetwork(@NotNull ParticleType<Options> particleType,
+                                                               @NotNull FriendlyByteBuf buffer) {
                 float scale = buffer.readFloat();
-                return new BreathParticleOptions(scale);
+                return new Options(scale);
             }
         }
     }
