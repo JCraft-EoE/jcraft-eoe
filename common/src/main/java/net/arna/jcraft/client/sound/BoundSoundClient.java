@@ -1,10 +1,7 @@
 package net.arna.jcraft.client.sound;
 
 import dev.architectury.event.events.client.ClientTickEvent;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.*;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.common.events.JEntityEvents;
@@ -73,11 +70,11 @@ public class BoundSoundClient {
 
         // Stop packet, stop the sound.
         if (type == BoundSoundPlayer.SoundHandle.TYPE_STOP) {
-            while (buf.readableBytes() > 0) {
-                long id = buf.readVarLong();
-                stopBoundSound(id);
-            }
+            LongSet toCancel = new LongOpenHashSet();
+            while (buf.readableBytes() > 0)
+                toCancel.add(buf.readVarLong());
 
+            client.execute(() -> toCancel.forEach(BoundSoundClient::stopBoundSound));
             return;
         }
 
@@ -124,6 +121,6 @@ public class BoundSoundClient {
         playingSounds.put(id, inst);
         if (inst.getBoundEntity() != null)
             byEntity.computeIfAbsent(inst.getBoundEntity(), e -> new ArrayList<>()).add(inst);
-        client.getSoundManager().queueTickingSound(inst);
+        client.execute(() -> client.getSoundManager().queueTickingSound(inst));
     }
 }
