@@ -20,6 +20,7 @@ import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
@@ -1184,10 +1185,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         SummonData summonData = getStandData().getSummonData();
         SoundEvent summonSound = summonData.getSound();
         if (summonSound != null) {
-            playSound(summonSound, 1f, 1f);
+            playBoundSound(summonSound, 1f, 1f);
         }
         if (summonSound == null || summonData.isPlayGenericSound()) {
-            playSound(JSoundRegistry.STAND_SUMMON.get(), 1f, 1f);
+            playBoundSound(JSoundRegistry.STAND_SUMMON.get(), 1f, 1f);
         }
     }
 
@@ -1304,6 +1305,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     public abstract @NonNull E getThis();
+
+    public @Nullable BoundSoundPlayer.EntitySoundHandle playBoundSound(SoundEvent sound, float volume, float pitch) {
+        return isSilent() ? null : BoundSoundPlayer.playSoundFrom(this, sound, getSoundSource(), volume, pitch);
+    }
 
     void randomlyDesireStandOff(int aiLevel, float baseChance, float subtraction, int maxAILevel,
                                 AttackerBrainInfo info, CombatEntityContext attackerCtx, AbstractMove<?, ?> selectedAttack) {
