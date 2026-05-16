@@ -10,14 +10,12 @@ import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.registry.JStatusRegistry;
-import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.TheWorldOverHeavenEntity;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
-import static net.arna.jcraft.api.Attacks.trueDamage;
 
 @Getter
 public final class SingularityAttack extends AbstractSimpleAttack<SingularityAttack, TheWorldOverHeavenEntity> {
@@ -41,8 +39,6 @@ public final class SingularityAttack extends AbstractSimpleAttack<SingularityAtt
             target.removeEffect(JStatusRegistry.DAZED.get());
             JCraft.stun(target, getStun(), 0, attacker);
         }
-
-        trueDamage(6, JDamageSources.stand(attacker), target);
     }
 
     @Override
