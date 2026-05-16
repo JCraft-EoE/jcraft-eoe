@@ -1,7 +1,14 @@
 package net.arna.jcraft.client.sound;
 
+import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.common.EntityEvent;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.*;
+import lombok.Getter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.common.events.JEntityEvents;
@@ -17,7 +24,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * The client part of the bound sound system.
@@ -28,11 +37,13 @@ import java.util.*;
  */
 public class BoundSoundClient {
     private static final Long2ObjectMap<BoundSoundInstance> playingSounds = new Long2ObjectOpenHashMap<>();
-    private static final Map<Entity, List<BoundSoundInstance>> byEntity = new WeakHashMap<>();
+    private static final Int2ObjectMap<List<BoundSoundInstance>> byEntity = new Int2ObjectOpenHashMap<>();
+    private static final Int2ObjectMap<EntityRemovalCountdown> removedEntities = new Int2ObjectOpenHashMap<>();
 
     public static void init() {
         ClientTickEvent.CLIENT_POST.register(BoundSoundClient::tick);
         JEntityEvents.REMOVE.register(BoundSoundClient::onEntityRemoved);
+        EntityEvent.ADD.register(BoundSoundClient::onEntityAdded);
     }
 
     private static void tick(Minecraft client) {
@@ -45,13 +56,39 @@ public class BoundSoundClient {
                 .collect(LongArrayList::new, LongArrayList::add, LongArrayList::addAll);
 
         toRemove.forEach(playingSounds::remove);
+
+        IntSet entitiesToRemove = new IntOpenHashSet();
+        removedEntities.values().forEach(e -> {
+            if (e.tick()) {
+                List<BoundSoundInstance> sounds = byEntity.remove(e.getEntity().getId());
+                if (sounds != null) sounds.forEach(soundManager::stop);
+                entitiesToRemove.add(e.getEntity().getId());
+            }
+        });
+        entitiesToRemove.forEach(removedEntities::remove);
+    }
+
+    private static EventResult onEntityAdded(Entity entity, Level level) {
+        // When the user teleports, their stand is removed and added back a few ticks later.
+        // We don't want to cancel the sound when this happens, so we delay the
+        // cancelling by a few ticks to ensure the entity really is gone.
+        removedEntities.remove(entity.getId());
+
+        if (entity instanceof LivingEntity le)
+            byEntity.getOrDefault(entity.getId(), Collections.emptyList())
+                .forEach(i -> i.setBoundEntity(le));
+
+        return EventResult.pass();
     }
 
     private static void onEntityRemoved(Entity entity, Entity.RemovalReason reason) {
         // Stop bound sounds when entity is removed.
-        SoundManager soundManager = Minecraft.getInstance().getSoundManager();
-        List<BoundSoundInstance> sounds = byEntity.remove(entity);
-        if (sounds != null) sounds.forEach(soundManager::stop);
+        if (byEntity.containsKey(entity.getId()))
+            removedEntities.put(entity.getId(), new EntityRemovalCountdown(entity, 4));
+    }
+
+    public static boolean isPendingRemoval(Entity entity) {
+        return removedEntities.containsKey(entity.getId());
     }
 
     /**
@@ -67,10 +104,10 @@ public class BoundSoundClient {
         LivingEntity entity = inst.getBoundEntity();
         if (entity == null) return;
 
-        List<BoundSoundInstance> entitySounds = byEntity.getOrDefault(entity, Collections.emptyList());
+        List<BoundSoundInstance> entitySounds = byEntity.getOrDefault(entity.getId(), Collections.emptyList());
         entitySounds.remove(inst);
 
-        if (entitySounds.isEmpty()) byEntity.remove(entity);
+        if (entitySounds.isEmpty()) byEntity.remove(entity.getId());
     }
 
     /**
@@ -140,7 +177,22 @@ public class BoundSoundClient {
 
         playingSounds.put(id, inst);
         if (inst.getBoundEntity() != null)
-            byEntity.computeIfAbsent(inst.getBoundEntity(), e -> new ArrayList<>()).add(inst);
+            byEntity.computeIfAbsent(inst.getBoundEntity().getId(), e -> new ArrayList<>()).add(inst);
         client.execute(() -> client.getSoundManager().queueTickingSound(inst));
+    }
+
+    private static class EntityRemovalCountdown {
+        @Getter
+        private final Entity entity;
+        private int ticks;
+
+        public EntityRemovalCountdown(Entity entity, int ticks) {
+            this.entity = entity;
+            this.ticks = ticks;
+        }
+
+        public boolean tick() {
+            return ticks-- == 0;
+        }
     }
 }
