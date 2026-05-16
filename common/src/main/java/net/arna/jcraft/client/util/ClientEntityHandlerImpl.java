@@ -233,12 +233,9 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
     private void displayMoshParticles(ClientLevel clientWorld, RandomSource random, Entity entity,
                                       Vector3f maxBox, int count, Vector3f color) {
-        MoshParticle.Factory.parent = entity;
-        MoshParticle.Factory.color = color;
         final Vec3 pos = entity.position();
-        final int typeIndex = random.nextInt(JParticleTypeRegistry.MOSH_TYPES.size());
         for (int i = 0; i < count; i++) {
-            clientWorld.addParticle(JParticleTypeRegistry.MOSH_TYPES.get(typeIndex).get(), false,
+            clientWorld.addParticle(new MoshParticle.Options(entity.getId(), color), true,
                     pos.x + maxBox.x() * random.triangle(0, 2),
                     pos.y + maxBox.y() * random.triangle(0.5, 0.5),
                     pos.z + maxBox.z() * random.triangle(0, 2),
@@ -269,12 +266,9 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
 
         final Vec3 pos = projectile.position();
         final Vector3f color = metallica.getMoshColor();
-        MoshParticle.Factory.color = color;
-        MoshParticle.Factory.parent = projectile;
         final ClientLevel clientWorld = (ClientLevel) projectile.level();
         final RandomSource random = clientWorld.getRandom();
-        final int typeIndex = random.nextInt(JParticleTypeRegistry.MOSH_TYPES.size());
-        clientWorld.addParticle(JParticleTypeRegistry.MOSH_TYPES.get(typeIndex).get(), false,
+        clientWorld.addParticle(new MoshParticle.Options(projectile.getId(), color), false,
                 pos.x + random.triangle(0, 0.2),
                 pos.y + 0.5 + random.triangle(0, 0.2),
                 pos.z + random.triangle(0, 0.2),

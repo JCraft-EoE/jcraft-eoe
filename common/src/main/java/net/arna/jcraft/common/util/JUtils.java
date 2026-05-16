@@ -805,6 +805,10 @@ public final class JUtils {
             return true;
         }
 
+        if (entity instanceof ItemTossProjectile toss && toss.isFerrous()) {
+            return true;
+        }
+
         final String stringName = entity.getName().toString().toLowerCase(Locale.ROOT);
         return stringName.contains("iron") || stringName.contains("ferro"); // Cross-mod compatibility :D
     }

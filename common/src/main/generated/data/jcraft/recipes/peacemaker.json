@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "item": "minecraft:heavy_weighted_pressure_plate"
+    },
+    "B": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "minecraft:iron_ingot"
+    },
+    "D": {
+      "item": "minecraft:iron_block"
+    },
+    "E": {
+      "item": "minecraft:iron_bars"
+    },
+    "F": {
+      "item": "minecraft:stripped_oak_wood"
+    }
+  },
+  "pattern": [
+    " AB",
+    "CDC",
+    " EF"
+  ],
+  "result": {
+    "item": "jcraft:peacemaker"
+  },
+  "show_notification": true
+}
