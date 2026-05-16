@@ -79,7 +79,7 @@ public class AerobombProjectile extends AbstractArrow {
 
                 final Vec3 kbVec = JUtils.getEyePos(living).subtract(position()).normalize();
 
-                damageLogic(level(), living, kbVec, 2, 3, true, 15f, false, 4, damageSource, owner, null);
+                damageLogic(level(), living, kbVec, 2, 3, true, 12f, false, 4, damageSource, owner, null);
 
                 living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
             }

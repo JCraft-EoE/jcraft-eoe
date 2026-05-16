@@ -322,7 +322,7 @@
   "entity.jcraft.purple_haze.info.con1": "uncontrollable",
   "entity.jcraft.purple_haze.info.con2": "can and will hurt the user",
   "entity.jcraft.purple_haze.info.desc": "Automatic Walking BIOWEAPON",
-  "entity.jcraft.purple_haze.info.freeSpace": "PASSIVE: Rage\nBuilds up while the stand is summoned.\nMaxes out after 1 minute. When maxed, aura turns red.\nRage decreases by half with each living thing Purple Haze kills.\nPurple Haze has a chance to target it's own user which increases with rage.\n\nEVOLUTION: Give Purple Haze any flower after it has killed a stand user.\nDoing this 5 times will evolve it into Purple Haze: Distortion.",
+  "entity.jcraft.purple_haze.info.freeSpace": "PASSIVE: Rage\nBuilds up while the stand is summoned.\nMaxes out after 1 minute. When maxed, aura turns red.\nRage decreases by half with each living thing Purple Haze kills.\nPurple Haze has a chance to target it's own user which increases with rage.\n\nHold Utility to control Purple Haze for a limited time, shown with a purple gauge.\n\nEVOLUTION: Give Purple Haze any flower after it has killed a stand user.\nDoing this 5 times will evolve it into Purple Haze: Distortion.",
   "entity.jcraft.purple_haze.info.pro1": "fast buttons",
   "entity.jcraft.purple_haze.info.pro2": "oppressive, fast pressure",
   "entity.jcraft.purple_haze.info.pro3": "great area control",
