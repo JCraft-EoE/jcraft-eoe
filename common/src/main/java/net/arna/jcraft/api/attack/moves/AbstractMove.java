@@ -22,6 +22,7 @@ import net.arna.jcraft.api.attack.core.RunMoment;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
@@ -831,8 +832,13 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public static boolean mayBreak(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
                                    @Nullable Predicate<BlockState> pred) {
+        if (user != null && user.getType().is(JTagRegistry.CANT_BREAK_BLOCKS)) {
+            return false;
+        }
         Predicate<BlockState> isDestructable = state -> {
-            if (state.isAir()) return true;
+            if (state.isAir()) {
+                return true;
+            }
             else {
                 Block block = state.getBlock();
                 float destroyTime = block.defaultDestroyTime();
