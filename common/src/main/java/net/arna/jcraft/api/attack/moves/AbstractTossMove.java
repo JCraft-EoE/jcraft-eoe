@@ -85,8 +85,6 @@ public abstract class AbstractTossMove<T extends AbstractTossMove<T, A>, A exten
 
     @Override
     public void onCancel(A attacker) {
-        super.onCancel(attacker);
-
         final LivingEntity base = attacker.getBaseEntity();
         Containers.dropItemStack(base.level(), base.getX(), base.getY(), base.getZ(),
                 base.getItemInHand(InteractionHand.MAIN_HAND));

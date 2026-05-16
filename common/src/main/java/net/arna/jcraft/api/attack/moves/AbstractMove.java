@@ -617,6 +617,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * By default, only plays the sound(s) and invokes the init actions, if any.
      */
     public void onInitiate(final A attacker) {
+        activeSounds.remove(attacker);
+
         LivingEntity user = attacker.getUser();
         Set<LivingEntity> targets = Set.of(); // Obviously none yet
         for (final MoveAction<?, ? super A> action : actions) {
@@ -624,20 +626,12 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
                 action.perform(attacker, user, targets);
             }
         }
-
-        activeSounds.remove(attacker);
     }
 
     /**
-     * Called when this move is canceled.
-     * Cancels ongoing sounds by default. Overriding methods should call this.
+     * Called when this move is canceled. Does nothing by default.
      */
-    public void onCancel(final A attacker) {
-        List<BoundSoundPlayer.SoundHandle> sounds = activeSounds.remove(attacker);
-        if (sounds == null) return;
-
-        BoundSoundPlayer.stopAll(sounds);
-    }
+    public void onCancel(final A attacker) {}
 
     /**
      * Adds a sound handle to the list of active sounds for the given attacker.
@@ -647,6 +641,20 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public void submitBoundSound(final A attacker, final BoundSoundPlayer.SoundHandle handle) {
         activeSounds.computeIfAbsent(attacker, a -> new ArrayList<>()).add(handle);
+    }
+
+    /**
+     * Called when the move is deactivated. I.e., when the current move of the attacker changes
+     * from this move to something else.
+     * <p>
+     * Stops ongoing sounds by default.
+     * @param attacker The attacker that deactivated this move.
+     */
+    public void onDeactivate(final A attacker) {
+        List<BoundSoundPlayer.SoundHandle> sounds = activeSounds.remove(attacker);
+        if (sounds == null) return;
+
+        BoundSoundPlayer.stopAll(sounds);
     }
 
     /**

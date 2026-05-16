@@ -74,7 +74,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     @Getter
     private MoveUsage moveUsage;
     public AbstractMove<?, ? super A> curMove;
-    public AbstractMove<?, ? super A> previousAttack;
+    public AbstractMove<?, ? super A> prevMove;
 
     public MoveInputType queuedMove;
 
@@ -136,7 +136,8 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public void setCurrentMove(@Nullable AbstractMove<?, ? super A> move) {
-        previousAttack = curMove;
+        prevMove = curMove;
+        if (prevMove != null) prevMove.onDeactivate(getThis());
         curMove = move;
         if (curMove != null) {
             moveUsage = new MoveUsage(user.tickCount, move);
@@ -409,8 +410,8 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
                 queuedMove = null;
             }
 
-            if (curMove != previousAttack && curMove != null) {
-                previousAttack = curMove;
+            if (curMove != prevMove && curMove != null) {
+                prevMove = curMove;
             }
             return;
         }

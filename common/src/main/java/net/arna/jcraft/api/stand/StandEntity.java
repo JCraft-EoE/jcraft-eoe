@@ -595,6 +595,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     @Override
     public void setCurrentMove(@Nullable AbstractMove<?, ? super E> move) {
         prevMove = curMove;
+        if (prevMove != null) prevMove.onDeactivate(getThis());
         curMove = move;
         if (curMove != null) {
             moveUsage = new MoveUsage(tickCount, curMove);
@@ -757,18 +758,15 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param animState int identifier for which state to put the stand into
      */
     public void setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
-        AbstractMove<?, ? super E> prevMove = curMove;
-        curMove = move; // Needed to ensure sounds played upon initiation are bound to the move.
+        setCurrentMove(move);
         move.onInitiate(getThis());
 
         // If the attack has a duration of 0, just perform it immediately.
         if (move.getDuration() == 0) {
             move.doPerform(getThis());
-            curMove = prevMove;
             return;
         }
 
-        setCurrentMove(move); // Officially set current move
         setMoveStun(move.getDuration());
         //setReset(false); // makes it worse
         if (animState != null) {

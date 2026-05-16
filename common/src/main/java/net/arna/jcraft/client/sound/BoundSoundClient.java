@@ -47,11 +47,16 @@ public class BoundSoundClient {
         if (sounds != null) sounds.forEach(soundManager::stop);
     }
 
+    /**
+     * Stops a bound sound by its id if it's still active and cleans up after.
+     * @param id The id of the sound to stop.
+     */
     private static void stopBoundSound(long id) {
+        SoundManager soundManager = Minecraft.getInstance().getSoundManager();
         BoundSoundInstance inst = playingSounds.remove(id);
-        if (inst == null) return;
+        if (inst == null || !soundManager.isActive(inst)) return;
 
-        Minecraft.getInstance().getSoundManager().stop(inst);
+        soundManager.stop(inst);
         LivingEntity entity = inst.getBoundEntity();
         if (entity == null) return;
 
@@ -61,6 +66,14 @@ public class BoundSoundClient {
         if (entitySounds.isEmpty()) byEntity.remove(entity);
     }
 
+    /**
+     * Processes a bound sound packet.
+     * Either stops the listed sounds if the type is
+     * {@link net.arna.jcraft.api.misc.BoundSoundPlayer.SoundHandle#TYPE_STOP SoundHandle.TYPE_STOP},
+     * or plays a new sound bound to either an entity or a position.
+     * @param client The Minecraft instance that holds the sound manager to use.
+     * @param buf The byte buf that contains the packet data
+     */
     public static void onBoundSoundPacket(Minecraft client, FriendlyByteBuf buf) {
         Level level = client.level;
 

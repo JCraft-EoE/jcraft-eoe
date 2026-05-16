@@ -45,8 +45,6 @@ public final class SpinBarrageAttack extends AbstractBarrageAttack<SpinBarrageAt
 
     @Override
     public void onCancel(final SilverChariotEntity attacker) {
-        super.onCancel(attacker);
-
         giveBack(attacker);
     }
 
