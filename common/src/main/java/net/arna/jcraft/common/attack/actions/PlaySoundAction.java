@@ -22,15 +22,18 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
     private final Supplier<SoundEvent> sound;
     private final float minVol, maxVol, minPitch, maxPitch;
     private final boolean bind;
+    private final boolean linger;
 
     private PlaySoundAction(final Supplier<SoundEvent> sound, final float minVol, final float maxVol,
-                            final float minPitch, final float maxPitch, final boolean onImpact) {
+                            final float minPitch, final float maxPitch, final boolean onImpact,
+                            final boolean linger) {
         this.sound = sound;
         this.minVol = minVol;
         this.maxVol = maxVol;
         this.minPitch = minPitch;
         this.maxPitch = maxPitch;
         this.bind = !onImpact;
+        this.linger = linger;
 
         if (onImpact)
             setRunMoment(RunMoment.ON_HIT);
@@ -45,7 +48,7 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
     }
 
     public static PlaySoundAction playSound(SoundEvent sound, float volMin, float volMax, float pitchMin, float pitchMax) {
-        return new PlaySoundAction(() -> sound, volMin, volMax, pitchMin, pitchMax, false);
+        return new PlaySoundAction(() -> sound, volMin, volMax, pitchMin, pitchMax, false, false);
     }
 
     public static PlaySoundAction playSound(RegistrySupplier<SoundEvent> sound) {
@@ -57,7 +60,7 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
     }
 
     public static PlaySoundAction playSound(RegistrySupplier<SoundEvent> sound, float volMin, float volMax, float pitchMin, float pitchMax) {
-        return new PlaySoundAction(sound, volMin, volMax, pitchMin, pitchMax, false);
+        return new PlaySoundAction(sound, volMin, volMax, pitchMin, pitchMax, false, false);
     }
 
     public static PlaySoundAction playImpactSound(SoundEvent sound) {
@@ -69,7 +72,7 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
     }
 
     public static PlaySoundAction playImpactSound(SoundEvent sound, float volMin, float volMax, float pitchMin, float pitchMax) {
-        return new PlaySoundAction(() -> sound, volMin, volMax, pitchMin, pitchMax, true);
+        return new PlaySoundAction(() -> sound, volMin, volMax, pitchMin, pitchMax, true, false);
     }
 
     public static PlaySoundAction playImpactSound(RegistrySupplier<SoundEvent> sound) {
@@ -81,7 +84,7 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
     }
 
     public static PlaySoundAction playImpactSound(RegistrySupplier<SoundEvent> sound, float volMin, float volMax, float pitchMin, float pitchMax) {
-        return new PlaySoundAction(sound, volMin, volMax, pitchMin, pitchMax, true);
+        return new PlaySoundAction(sound, volMin, volMax, pitchMin, pitchMax, true, false);
     }
 
     /**
@@ -89,7 +92,15 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
      * @return The action
      */
     public PlaySoundAction onImpact() {
-        return new PlaySoundAction(sound, minVol, maxVol, minPitch, maxPitch, true);
+        return copyRunMoment(new PlaySoundAction(sound, minVol, maxVol, minPitch, maxPitch, true, linger));
+    }
+
+    /**
+     * Whether this sound should linger. I.e, shouldn't be stopped when the move is.
+     * @return The action
+     */
+    public PlaySoundAction linger() {
+        return copyRunMoment(new PlaySoundAction(sound, minVol, maxVol, minPitch, maxPitch, false, true));
     }
 
     private static float randomize(RandomSource random, float min, float max) {
@@ -100,7 +111,7 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
     public void perform(IAttacker<?, ?> attacker, LivingEntity user, Set<LivingEntity> targets) {
         float volume = randomize(attacker.getBaseEntity().getRandom(), minVol, maxVol);
         float pitch = randomize(attacker.getBaseEntity().getRandom(), minPitch, maxPitch);
-        attacker.playAttackerSound(sound.get(), volume, pitch, bind);
+        attacker.playAttackerSound(sound.get(), volume, pitch, bind, linger);
     }
 
     @Override
@@ -119,9 +130,10 @@ public class PlaySoundAction extends MoveAction<PlaySoundAction, IAttacker<?, ?>
                     Codec.FLOAT.optionalFieldOf("min_vol", 1f).forGetter(PlaySoundAction::getMinVol),
                     Codec.FLOAT.optionalFieldOf("max_vol", 1f).forGetter(PlaySoundAction::getMaxVol),
                     Codec.FLOAT.optionalFieldOf("min_pitch", 1f).forGetter(PlaySoundAction::getMinPitch),
-                    Codec.FLOAT.optionalFieldOf("max_pitch", 1f).forGetter(PlaySoundAction::getMaxPitch)
-            ).apply(instance, apply((sound, minVol, maxVol, minPitch, maxPitch) ->
-                    new PlaySoundAction(sound, minVol, maxVol, minPitch, maxPitch, false))));
+                    Codec.FLOAT.optionalFieldOf("max_pitch", 1f).forGetter(PlaySoundAction::getMaxPitch),
+                    Codec.BOOL.optionalFieldOf("linger", false).forGetter(PlaySoundAction::isLinger)
+            ).apply(instance, apply((sound, minVol, maxVol, minPitch, maxPitch, linger) ->
+                    new PlaySoundAction(sound, minVol, maxVol, minPitch, maxPitch, false, linger))));
         }
     }
 }

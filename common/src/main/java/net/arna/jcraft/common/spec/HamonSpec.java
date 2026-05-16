@@ -258,7 +258,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             tracker.connection.send(packet);
         }
 
-        playAttackerSound(JSoundRegistry.HAMON_SURGE.get(), 1.0f, 1.0f, true);
+        playAttackerSound(JSoundRegistry.HAMON_SURGE.get(), 1.0f, 1.0f, true, false);
     }
 
     @Override

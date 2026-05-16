@@ -137,8 +137,8 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     @Override
     public void setCurrentMove(@Nullable AbstractMove<?, ? super A> move) {
         prevMove = curMove;
-        if (prevMove != null) prevMove.onDeactivate(getThis());
         curMove = move;
+        if (prevMove != null) prevMove.onDeactivate(getThis());
         if (curMove != null) {
             moveUsage = new MoveUsage(user.tickCount, move);
         }

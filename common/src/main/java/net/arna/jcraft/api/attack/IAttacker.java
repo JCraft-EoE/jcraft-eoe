@@ -117,13 +117,14 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
     void setState(final S state);
 
     default @Nullable BoundSoundPlayer.EntitySoundHandle playAttackerSound(final SoundEvent sound, final float volume,
-                                                                           final float pitch, boolean bind) {
+                                                                           final float pitch, final boolean bind,
+                                                                           final boolean linger) {
         LivingEntity e = getBaseEntity();
         if (e.isSilent()) return null;
 
         if (bind) {
             BoundSoundPlayer.EntitySoundHandle handle = BoundSoundPlayer.playSoundFrom(e, sound, e.getSoundSource(), volume, pitch);
-            if (getCurrentMove() != null)
+            if (!linger && getCurrentMove() != null)
                 getCurrentMove().submitBoundSound(getThis(), handle);
             return handle;
         }

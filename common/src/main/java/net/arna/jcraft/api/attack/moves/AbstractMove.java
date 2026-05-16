@@ -80,6 +80,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private Boolean isHoldable;
     private boolean loopPrevention = true;
     private OptionalInt followupFrame = OptionalInt.empty();
+    private boolean lingeringSounds;
 
     // Properties that are NOT serialized (usually set in constructor)
     // Used to help AI know how and when to use this attack.
@@ -502,6 +503,14 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    public T withLingeringSounds() {
+        return withLingeringSounds(true);
+    }
+
+    public T withLingeringSounds(final boolean lingeringSounds) {
+        return getThis();
+    }
+
     // Lombok does not understand these variable names already start with 'is',
     // even though IntelliJ thinks it does.
     // Also, for some reason, suppressing the warning gives a warning about the suppression being redundant,
@@ -535,7 +544,6 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         isFollowup = true;
         return getThis();
     }
-
 
     /**
      * Called when this move is registered to a {@link MoveMap MoveMap}.
@@ -647,12 +655,18 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * Called when the move is deactivated. I.e., when the current move of the attacker changes
      * from this move to something else.
      * <p>
-     * Stops ongoing sounds by default.
+     * Stops ongoing sounds by default unless the move ended naturally (move stun = 0)
      * @param attacker The attacker that deactivated this move.
      */
     public void onDeactivate(final A attacker) {
         List<BoundSoundPlayer.SoundHandle> sounds = activeSounds.remove(attacker);
-        if (sounds == null) return;
+
+        // Stop sounds if there are any, unless this move ended naturally (move sound 0),
+        // this move has lingering sounds or we switched to this move's finisher or followup.
+        if (sounds == null || sounds.isEmpty() || attacker.getMoveStun() == 0 || isLingeringSounds() ||
+            finisher != null && attacker.getCurrentMove() == finisher.right() ||
+            followup != null && attacker.getCurrentMove() == followup)
+            return;
 
         BoundSoundPlayer.stopAll(sounds);
     }
