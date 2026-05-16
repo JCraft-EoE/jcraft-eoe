@@ -19,6 +19,13 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
+/**
+ * The client part of the bound sound system.
+ * This class is responsible for handling the sound packets and actually playing the sounds.
+ * Binding sounds to entities is done by the sound instance itself.
+ *
+ * @see BoundSoundInstance
+ */
 public class BoundSoundClient {
     private static final Long2ObjectMap<BoundSoundInstance> playingSounds = new Long2ObjectOpenHashMap<>();
     private static final Map<Entity, List<BoundSoundInstance>> byEntity = new WeakHashMap<>();

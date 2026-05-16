@@ -22,8 +22,22 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A class to play sounds bound to entities or at positions that can later be cancelled using a handle.
+ *
+ * @see BoundSoundClient
+ */
 public class BoundSoundPlayer {
 
+    /**
+     * Plays the given sound and binds it to the given entity, moving with it and stopping when it dies/is removed.
+     * @param entity The entity to bind to
+     * @param sound The sound to play
+     * @param category The category to use for the sound
+     * @param volume The volume to play at
+     * @param pitch The pitch to play at
+     * @return A handle that can be used later to cancel the sound for all listeners
+     */
     public static EntitySoundHandle playSoundFrom(LivingEntity entity, SoundEvent sound, SoundSource category, float volume, float pitch) {
         Collection<? extends Player> listeners = getListeners(entity.level(), entity.position());
         EntitySoundHandle handle = new EntitySoundHandle(entity, sound, category, volume, pitch, listeners);
@@ -31,6 +45,16 @@ public class BoundSoundPlayer {
         return handle;
     }
 
+    /**
+     * Plays the given sound at the given position.
+     * @param level The level to play the sound in
+     * @param pos The position to play the sound at
+     * @param sound The sound to play
+     * @param category The category to use for the sound
+     * @param volume The volume to play at
+     * @param pitch The pitch to play at
+     * @return A handle that can be used later to cancel the sound for all listeners
+     */
     public static PosSoundHandle playSoundAt(Level level, Vec3 pos, SoundEvent sound, SoundSource category, float volume, float pitch) {
         Collection<? extends Player> listeners = getListeners(level, pos);
         PosSoundHandle handle = new PosSoundHandle(level, pos, sound, category, volume, pitch, listeners);
@@ -38,6 +62,11 @@ public class BoundSoundPlayer {
         return handle;
     }
 
+    /**
+     * Stops all given sound handles.
+     * Preferred over stopping each of them separately as it combines them into a single packet.
+     * @param sounds The handles of the sounds to stop
+     */
     public static void stopAll(Collection<? extends SoundHandle> sounds) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeByte(SoundHandle.TYPE_STOP);
@@ -65,7 +94,7 @@ public class BoundSoundPlayer {
                 .toList();
     }
 
-    public static void startSoundHandle(Level level, SoundHandle handle) {
+    private static void startSoundHandle(Level level, SoundHandle handle) {
         if (level.isClientSide()) {
             startSoundHandleClient(handle);
             return;
