@@ -209,6 +209,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_SC_CHARGE_ATTACK = register("silverchariot_sc_charge_attack", SCChargeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_SC_COUNTER_ATTACK = register("silverchariot_sc_counter_attack", SCCounterAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_SPIN_BARRAGE_ATTACK = register("silverchariot_spin_barrage_attack", SpinBarrageAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SILVERCHARIOT_TOSS_MOVE = register("silverchariot_toss_move", SilverChariotTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> STARPLATINUM_BLOCK_BREAKING_ATTACK = register("starplatinum_block_breaking_attack", BlockBreakingAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> STARPLATINUM_INHALE_ATTACK = register("starplatinum_inhale_attack", InhaleAttack.Type.INSTANCE);
