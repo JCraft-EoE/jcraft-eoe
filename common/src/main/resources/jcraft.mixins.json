@@ -81,6 +81,7 @@
     "NetherPortalBlockMixin",
     "PersistentEntitySectionManagerMixin",
     "PlayerMixin",
+    "ProjectileMixin",
     "RandomStrollGoalMixin",
     "ReloadableServerResourcesMixin",
     "RespawnAnchorBlockMixin",
