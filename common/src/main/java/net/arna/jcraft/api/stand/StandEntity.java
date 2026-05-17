@@ -764,6 +764,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         // If the attack has a duration of 0, just perform it immediately.
         if (move.getDuration() == 0) {
             move.doPerform(getThis());
+            setCurrentMove(null);
             return;
         }
 
