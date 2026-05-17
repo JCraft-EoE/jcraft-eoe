@@ -264,8 +264,8 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             return;
         }
 
-        playSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
-        playSound(JSoundRegistry.MUDA_DA.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.MUDA_DA.get(), 1f, 1f);
     }
 
     @Override

@@ -57,6 +57,7 @@ public class BoundSoundClient {
 
         toRemove.forEach(playingSounds::remove);
 
+        // Tick down removed entities and stop their sounds if the countdown has elapsed.
         IntSet entitiesToRemove = new IntOpenHashSet();
         removedEntities.values().forEach(e -> {
             if (e.tick()) {
@@ -72,6 +73,7 @@ public class BoundSoundClient {
         // When the user teleports, their stand is removed and added back a few ticks later.
         // We don't want to cancel the sound when this happens, so we delay the
         // cancelling by a few ticks to ensure the entity really is gone.
+        // Between the remove event and this add event, though, the volume is set to 0.
         removedEntities.remove(entity.getId());
 
         if (entity instanceof LivingEntity le)

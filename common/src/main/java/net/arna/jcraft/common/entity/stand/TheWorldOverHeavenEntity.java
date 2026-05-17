@@ -335,8 +335,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             return;
         }
 
-        playSound(JSoundRegistry.TWOH_SUMMON.get(), 1f, 1f);
-        playSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.TWOH_SUMMON.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
     }
 
     @Override
