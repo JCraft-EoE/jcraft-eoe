@@ -7,7 +7,7 @@
     "class": "TOSS",
     "cooldown_type": "STAND_TOSS",
     "move": {
-      "type": "jcraft:shared_toss_move",
+      "type": "jcraft:silverchariot_toss_move",
       "cooldown": 0,
       "duration": 1,
       "move_distance": 0.75,
