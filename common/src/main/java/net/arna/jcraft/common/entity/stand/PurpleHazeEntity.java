@@ -44,6 +44,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -416,7 +417,11 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     @Override
     public void executePlan(int aiLevel, AttackerBrainInfo info, CombatInstantContext combatCtx) {
         super.executePlan(aiLevel, info, combatCtx);
-        info.setDesiredStandOffTime(getTarget() == getUser() ? random.nextInt(80) : 0);
+
+        final var user = getUser();
+
+        if (user instanceof Mob)
+            info.setDesiredStandOffTime(getTarget() == user ? random.nextInt(80) : 0);
     }
 
     @Override

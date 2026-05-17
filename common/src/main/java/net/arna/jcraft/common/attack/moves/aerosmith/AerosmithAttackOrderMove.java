@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
@@ -29,7 +30,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
     @Getter
     private float range;
 
-    @Nullable @Getter
+    @Nullable @Getter @Setter
     private LivingEntity currentTarget = null;
 
     private Vec3 lastFlyTarget;

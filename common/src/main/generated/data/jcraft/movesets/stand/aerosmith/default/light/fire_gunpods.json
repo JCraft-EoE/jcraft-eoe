@@ -13,7 +13,7 @@
     },
     "cancelMoves": false,
     "cooldown": 1,
-    "damage": 3.25,
+    "damage": 2.0,
     "duration": 2,
     "extras": {
       "actions": [
@@ -30,7 +30,7 @@
         "translate": "move.jcraft.aerosmith.default.fire_gunpods.name"
       }
     },
-    "knockback": 0.4,
+    "knockback": 0.12,
     "move_distance": 1.5,
     "range": 30.0,
     "shootSpark": "LEMON",
