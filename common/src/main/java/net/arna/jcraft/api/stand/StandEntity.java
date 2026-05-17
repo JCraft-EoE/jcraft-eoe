@@ -940,9 +940,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         final boolean client = level().isClientSide;
-        if (tickCount == 1) {
-            if (client) playSummonSound();
-            else if (getUser() instanceof Player player) {
+        if (tickCount == 1 && !client) {
+            playSummonSound();
+            if (getUser() instanceof Player player) {
                 player.awardStat(JStatRegistry.STAND_SUMMONED.get());
             }
         }
