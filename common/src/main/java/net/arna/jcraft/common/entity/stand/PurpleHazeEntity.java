@@ -20,6 +20,7 @@ import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.*;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
+import net.arna.jcraft.common.ai.CombatInstantContext;
 import net.arna.jcraft.common.ai.IJAttackerBrain;
 import net.arna.jcraft.common.ai.brain.StandAttackerBrain;
 import net.arna.jcraft.common.attack.moves.purplehaze.BackhandAttack;
@@ -32,6 +33,9 @@ import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -73,6 +77,8 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 Maxes out after 1 minute. When maxed, aura turns red.
                 Rage decreases by half with each living thing Purple Haze kills.
                 Purple Haze has a chance to target it's own user which increases with rage.
+                
+                Hold Utility to control Purple Haze for a limited time, shown with a purple gauge.
                 
                 EVOLUTION: Give Purple Haze any flower after it has killed a stand user.
                 Doing this 5 times will evolve it into Purple Haze: Distortion."""))
@@ -129,8 +135,16 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     private static final PlayMove PLAY = new PlayMove(0, 30, 31)
             .withInfo(Component.literal("Playing with flower"), Component.empty());
 
+    public static final int MAX_OBEDIENCE = 60, MAX_OBEDIENCE_GAIN_COOLDOWN = 40;
+    private int obedienceGainCooldown = 0;
+    private static final EntityDataAccessor<Integer> OBEDIENCE = SynchedEntityData.defineId(PurpleHazeEntity.class, EntityDataSerializers.INT);
+    public int getObedience() { return entityData.get(OBEDIENCE); }
+    public void setObedience(int obedience) { entityData.set(OBEDIENCE, obedience); }
+
     public static final int MAX_RAGE = 20 * 60;
     private int rage = 0;
+    private boolean allowMoveUsage = false;
+    private boolean wantToDesummon = false;
     private boolean flowerable = false, hasFlower = false, toEvolve = false;
     private final AttackerBrainInfo attackerBrainInfo = new AttackerBrainInfo(IJAttackerBrain.COMPETITIVE_LEVEL);
     final Comparator<Entity> distanceComparator = (entity1, entity2) -> {
@@ -151,6 +165,12 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     }
 
     @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(OBEDIENCE, 0);
+    }
+
+    @Override
     public Vector3f getAuraColor() {
         if (rage == MAX_RAGE) {
             return new Vector3f(1f, 0f, 0f);
@@ -160,10 +180,18 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     @Override
     public void desummon() {
-        if (toEvolve && hasUser()) {
-            JComponentPlatformUtils.getStandComponent(getUserOrThrow())
-                    .setType(JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get());
-            JCraft.summon(level(), getUserOrThrow());
+        final LivingEntity user = getUser();
+
+        if (user != null) {
+            if (toEvolve) {
+                JComponentPlatformUtils.getStandComponent(getUserOrThrow())
+                        .setType(JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get());
+                JCraft.summon(level(), getUserOrThrow());
+            }
+
+            if (!JUtils.canAct(this) || !JUtils.canAct(user)) {
+                return;
+            }
         }
 
         super.desummon();
@@ -194,19 +222,23 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     public boolean handleMove(MoveClass moveClass) {
         MoveMap.Entry<PurpleHazeEntity, State> entry = getFirstValidEntry(moveClass);
-        if (entry == null) {
-            return false;
-        }
+        if (entry == null) return false;
 
-        LivingEntity stateChecker = (isRemote() && !remoteControllable()) ? this : getUserOrThrow();
+        final LivingEntity user = getUser();
 
-        if (hasUser() && !stateChecker.onGround() && entry.getAerialVariant() != null) {
+        if (user == null) return false;
+
+        LivingEntity stateChecker = (isRemote() && !remoteControllable()) ? this : user;
+
+        if (!stateChecker.onGround() && entry.getAerialVariant() != null) {
             entry = entry.getAerialVariant();
         }
-        if (hasUser() && stateChecker.isShiftKeyDown() && entry.getCrouchingVariant() != null) {
+
+        if (stateChecker.isShiftKeyDown() && entry.getCrouchingVariant() != null) {
             entry = entry.getCrouchingVariant();
         }
-        if (hasUser() && !stateChecker.onGround() && entry.getAerialVariant() != null) {
+
+        if (!stateChecker.onGround() && entry.getAerialVariant() != null) {
             entry = entry.getAerialVariant();
         }
 
@@ -216,12 +248,39 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     @Override
     public boolean allowMoveHandling() {
-        return remoteControllable();
+        return true;
+    }
+
+    @Override
+    public boolean acceptsUserMoveInit(MoveInputType type) {
+        return allowMoveUsage;
     }
 
     @Override
     public boolean remoteControllable() {
         return false;
+    }
+
+    @Override
+    public boolean forwardInputToSpec(MoveInputType type) {
+        return !allowMoveUsage;
+    }
+
+    @Override
+    public void onUserMoveInput(AbstractMove<?, ? super PurpleHazeEntity> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
+        if (type == MoveInputType.UTILITY) {
+            allowMoveUsage = getObedience() > 0 && pressed;
+            return;
+        }
+
+        if (type == MoveInputType.STAND_SUMMON && pressed && tickCount > 1) {
+            wantToDesummon = true;
+            return;
+        }
+
+        if (allowMoveUsage) {
+            super.onUserMoveInput(currentMove, type, pressed, moveInitiated);
+        }
     }
 
     @Override
@@ -260,16 +319,33 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 desummon();
             }
         } else {
-            if (++rage >= MAX_RAGE) {
-                rage = MAX_RAGE;
-            }
+            if (++rage >= MAX_RAGE) rage = MAX_RAGE;
 
-            if (!hasUser()) {
-                return;
-            }
-            LivingEntity user = getUser();
+            final LivingEntity user = getUser();
+
+            if (user == null) return;
 
             if (!level().isClientSide()) {
+
+                if (wantToDesummon) {
+                    desummon();
+                    return;
+                }
+
+                // obedience
+                int obedience = getObedience();
+
+                if (allowMoveUsage) {
+                    setObedience(obedience - 1);
+                    obedienceGainCooldown = MAX_OBEDIENCE_GAIN_COOLDOWN;
+                } else {
+                    if (obedienceGainCooldown > 0)
+                        obedienceGainCooldown--;
+                    else if (obedience < MAX_OBEDIENCE)
+                        setObedience(obedience + 1);
+                }
+
+                // targetting and ai ticking
                 boolean isRemote = isRemote();
 
                 if (!remoteControllable()) {
@@ -328,11 +404,19 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 }
 
                 if (isRemote) {
-                    tickRemoteState(getMoveControl().getSpeedModifier(), getMoveControl().strafeRight, onGround());
-                    StandAttackerBrain.tick(this, attackerBrainInfo);
+                    tickRemoteState(navigation.isInProgress() ? getMoveControl().getSpeedModifier() : 0, getMoveControl().strafeRight, onGround());
+
+                    if (!allowMoveUsage)
+                        StandAttackerBrain.tick(this, attackerBrainInfo);
                 }
             }
         }
+    }
+
+    @Override
+    public void executePlan(int aiLevel, AttackerBrainInfo info, CombatInstantContext combatCtx) {
+        super.executePlan(aiLevel, info, combatCtx);
+        info.setDesiredStandOffTime(getTarget() == getUser() ? random.nextInt(80) : 0);
     }
 
     @Override
