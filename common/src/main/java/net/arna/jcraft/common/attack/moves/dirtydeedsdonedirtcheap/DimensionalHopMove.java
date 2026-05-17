@@ -262,8 +262,11 @@ public final class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHo
 
         @Override
         protected @NotNull App<RecordCodecBuilder.Mu<DimensionalHopMove>, DimensionalHopMove> buildCodec(RecordCodecBuilder.Instance<DimensionalHopMove> instance) {
-            return instance.group(cooldown(), windup(), duration(), moveDistance(), damage(),
-                    stun(), hitboxSize(), knockback(), offset(), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("dimensionalHopDuration").forGetter(DimensionalHopMove::getDimensionalHopDuration)).apply(instance, DimensionalHopMove::new);
+            return instance.group(extras(), attackExtras(), cooldown(), windup(), duration(), moveDistance(), damage(),
+                    stun(), hitboxSize(), knockback(), offset(),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("dimensionalHopDuration")
+                            .forGetter(DimensionalHopMove::getDimensionalHopDuration))
+                    .apply(instance, applyAttackExtras(DimensionalHopMove::new));
         }
     }
 }

@@ -32,6 +32,7 @@ import net.arna.jcraft.client.renderer.item.GasCanItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.StandUserPoseLoader;
 import net.arna.jcraft.client.rendering.handler.*;
+import net.arna.jcraft.client.sound.BoundSoundClient;
 import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
@@ -105,6 +106,7 @@ public class JCraftClient {
         GravityChannelClient.init();
 
         BlockBreakerClient.init();
+        BoundSoundClient.init();
 
         // Rendering
         JRenderLayerRegistry.init();

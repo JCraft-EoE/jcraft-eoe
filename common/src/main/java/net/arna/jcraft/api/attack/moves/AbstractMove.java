@@ -22,6 +22,7 @@ import net.arna.jcraft.api.attack.core.RunMoment;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -82,6 +83,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private Boolean isHoldable;
     private boolean loopPrevention = true;
     private OptionalInt followupFrame = OptionalInt.empty();
+    private boolean lingeringSounds;
 
     // Properties that are NOT serialized (usually set in constructor)
     // Used to help AI know how and when to use this attack.
@@ -99,6 +101,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     // How long this move was charged for, if any.
     @Getter @Setter
     private int chargeTime = 0;
+    private final Map<A, List<BoundSoundPlayer.SoundHandle>> activeSounds = new WeakHashMap<>();
 
     protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
         this.cooldown = cooldown;
@@ -503,6 +506,14 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    public T withLingeringSounds() {
+        return withLingeringSounds(true);
+    }
+
+    public T withLingeringSounds(final boolean lingeringSounds) {
+        return getThis();
+    }
+
     // Lombok does not understand these variable names already start with 'is',
     // even though IntelliJ thinks it does.
     // Also, for some reason, suppressing the warning gives a warning about the suppression being redundant,
@@ -536,7 +547,6 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         isFollowup = true;
         return getThis();
     }
-
 
     /**
      * Called when this move is registered to a {@link MoveMap MoveMap}.
@@ -618,6 +628,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * By default, only plays the sound(s) and invokes the init actions, if any.
      */
     public void onInitiate(final A attacker) {
+        activeSounds.remove(attacker);
+
         LivingEntity user = attacker.getUser();
         Set<LivingEntity> targets = Set.of(); // Obviously none yet
         for (final MoveAction<?, ? super A> action : actions) {
@@ -631,6 +643,36 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * Called when this move is canceled. Does nothing by default.
      */
     public void onCancel(final A attacker) {}
+
+    /**
+     * Adds a sound handle to the list of active sounds for the given attacker.
+     * These sounds will be cancelled if the move is cancelled.
+     * @param attacker The attacker the sound is playing for
+     * @param handle The sound handle
+     */
+    public void submitBoundSound(final A attacker, final BoundSoundPlayer.SoundHandle handle) {
+        activeSounds.computeIfAbsent(attacker, a -> new ArrayList<>()).add(handle);
+    }
+
+    /**
+     * Called when the move is deactivated. I.e., when the current move of the attacker changes
+     * from this move to something else.
+     * <p>
+     * Stops ongoing sounds by default unless the move ended naturally (move stun = 0)
+     * @param attacker The attacker that deactivated this move.
+     */
+    public void onDeactivate(final A attacker) {
+        List<BoundSoundPlayer.SoundHandle> sounds = activeSounds.remove(attacker);
+
+        // Stop sounds if there are any, unless this move ended naturally (move sound 0),
+        // this move has lingering sounds or we switched to this move's finisher or followup.
+        if (sounds == null || sounds.isEmpty() || attacker.getMoveStun() == 0 || isLingeringSounds() ||
+            finisher != null && attacker.getCurrentMove() == finisher.right() ||
+            followup != null && attacker.getCurrentMove() == followup)
+            return;
+
+        BoundSoundPlayer.stopAll(sounds);
+    }
 
     /**
      * Whether this attack should be allowed to move onto its finisher.

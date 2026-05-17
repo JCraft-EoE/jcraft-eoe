@@ -12,6 +12,7 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.sound.BoundSoundClient;
 import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
@@ -93,6 +94,11 @@ public class ClientPacketHandler {
         register(S2C_IPS_TRIGGERED, ClientPacketHandler::handleIPSTriggered);
         register(S2C_DAMAGE_NUMBER, ClientPacketHandler::handleDamageNumber);
         register(S2C_BLOCK_BREAKAGE, ClientPacketHandler::handleBlockBreakage);
+        register(S2C_BOUND_SOUND, ClientPacketHandler::handleBoundSound);
+    }
+
+    private static void handleBoundSound(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
+        BoundSoundClient.onBoundSoundPacket(client, buf);
     }
 
     private static void handleBlockBreakage(final @NonNull Minecraft client, final FriendlyByteBuf buf) {

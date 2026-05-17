@@ -34,8 +34,6 @@ import net.arna.jcraft.common.util.SpecAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -76,7 +74,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     @Getter
     private MoveUsage moveUsage;
     public AbstractMove<?, ? super A> curMove;
-    public AbstractMove<?, ? super A> previousAttack;
+    public AbstractMove<?, ? super A> prevMove;
 
     public MoveInputType queuedMove;
 
@@ -138,8 +136,9 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public void setCurrentMove(@Nullable AbstractMove<?, ? super A> move) {
-        previousAttack = curMove;
+        prevMove = curMove;
         curMove = move;
+        if (prevMove != null) prevMove.onDeactivate(getThis());
         if (curMove != null) {
             moveUsage = new MoveUsage(user.tickCount, move);
         }
@@ -157,12 +156,6 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     public void setState(S state) {
         this.state = state;
         setAnimation(state.getKey(getThis()), moveStun, 1f);
-    }
-
-    @Override
-    public void playAttackerSound(SoundEvent sound, float volume, float pitch) {
-        user.level().playSound(null, user.getX(), user.getY(), user.getZ(), sound, SoundSource.PLAYERS,
-                volume, pitch);
     }
 
     @Override
@@ -417,8 +410,8 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
                 queuedMove = null;
             }
 
-            if (curMove != previousAttack && curMove != null) {
-                previousAttack = curMove;
+            if (curMove != prevMove && curMove != null) {
+                prevMove = curMove;
             }
             return;
         }
