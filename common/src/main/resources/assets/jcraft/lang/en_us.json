@@ -703,6 +703,8 @@
   "move.jcraft.aerosmith.default.dive_charge.name": "Dive Charge",
   "move.jcraft.aerosmith.default.fire_gunpods.description": "Shoots supersonic bullets in front of Aerosmith. Prolonged use overheats the guns, making them far less accurate.",
   "move.jcraft.aerosmith.default.fire_gunpods.name": "Fire Gunpods",
+  "move.jcraft.aerosmith.default.fly_by_location.description": "Orders Aerosmith to fly to a given location, returning after arriving.",
+  "move.jcraft.aerosmith.default.fly_by_location.name": "Fly by Location",
   "move.jcraft.aerosmith.default.item_drop.cr.description": "Orders Aerosmith to drop an item above a given location.",
   "move.jcraft.aerosmith.default.item_drop.cr.name": "Item Drop",
   "move.jcraft.aerosmith.default.patrol_location.description": "Orders Aerosmith to fly around a given location. Use while crouching to invert the patrol direction.",

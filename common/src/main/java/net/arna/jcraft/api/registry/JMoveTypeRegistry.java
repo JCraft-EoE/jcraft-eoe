@@ -54,6 +54,7 @@ import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.StealStandAttack;
 
+@SuppressWarnings("unused")
 public interface JMoveTypeRegistry {
     DeferredRegister<MoveType<?>> MOVE_TYPE_REGISTRY = DeferredRegister.create(JCraft.MOD_ID, JRegistries.MOVE_TYPE_REGISTRY_KEY);
 
@@ -277,10 +278,10 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_ITEM_DROP_ATTACK = register("aerosmith_item_drop_attack", ItemDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_PATROL_MOVE = register("aerosmith_patrol_move", PatrolMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_FLYBY_MOVE = register("aerosmith_flyby_move", FlybyMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_ATTACK_ORDER_MOVE = register("aerosmith_attack_order_move", AerosmithAttackOrderMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_CHARGE_ATTACK = register("aerosmith_charge_attack", AerosmithChargeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> BREATH_XRAY_MOVE = register("breath_xray_move", BreathXrayMove.Type.INSTANCE);
-
 
 
     private static RegistrySupplier<MoveType<?>> register(String id, MoveType<?> type) {

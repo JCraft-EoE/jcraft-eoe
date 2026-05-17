@@ -170,18 +170,18 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
                     targetPos = targetPos.add(JUtils.getEyePos(currentTarget));
 
                     attacker.setFlyTarget(targetPos);
-
-                    if (JUtils.angleBetween(lookVec, attacker.getLookAngle()) > 0.93)
-                        if (attacker.tickCount % 2 == 0) // fire
-                            attacker.getShootAttack().perform(attacker, user);
-
                 } else {
                     targetPos = targetPos.add(JUtils.getLocalUp(user).scale(16));
 
                     attacker.patrol(targetPos, AerosmithEntity.DEFAULT_PATROL_RADIUS);
                 }
+
+                if (JUtils.angleBetween(lookVec, attacker.getLookAngle()) > 0.93)
+                    if (attacker.tickCount % 2 == 0) // fire
+                        attacker.getShootAttack().perform(attacker, user);
             } else {
                 final var bombTarget = currentTarget.position().add(JUtils.getLocalUp(user).scale(6.7));
+                bombAttack.setDropLocation(bombTarget);
                 attacker.setFlyTarget(bombTarget);
             }
         }

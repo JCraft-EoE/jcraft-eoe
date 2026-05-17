@@ -98,6 +98,12 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Orders Aerosmith to drop a bomb above a given location.")
             );
 
+    public static final FlybyMove FLYBY = new FlybyMove(0, 67f)
+            .withInfo(
+                    Component.literal("Fly by Location"),
+                    Component.literal("Orders Aerosmith to fly to a given location, returning after arriving.")
+            );
+
     public static final PatrolMove PATROL = new PatrolMove(0, 67f, 48f)
             .withInfo(
                     Component.literal("Patrol Location"),
@@ -233,6 +239,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         moves.registerImmediate(MoveClass.UTILITY, PATROL, State.ACTIVE);
         moves.registerImmediate(MoveClass.BARRAGE, CHARGE, State.CHARGE);
         moves.register(MoveClass.ULTIMATE, ATTACK_ORDER_MOVE);
+        moves.register(MoveClass.SPECIAL1, FLYBY);
         moves.register(MoveClass.SPECIAL3, XRAY);
     }
 
@@ -293,7 +300,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             patrolRadius -= 0.2f;
         }
 
-        if (currentMove == null) {
+        if (currentMove != chargeAttack) {
             switch (flyState) {
                 case PATROL -> {
                     final float theta = tickCount / patrolRadius / 2.0f * patrolDirection.getValue();
