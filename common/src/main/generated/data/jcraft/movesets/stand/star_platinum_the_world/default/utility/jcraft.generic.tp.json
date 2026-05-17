@@ -1,0 +1,22 @@
+{
+  "anim_state": "TIME_SKIP",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:shared_time_skip_move",
+    "cooldown": 300,
+    "distance": 14.0,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.star_platinum_the_world.default.timeskip.description"
+      },
+      "mobility_type": "TELEPORT",
+      "name": {
+        "translate": "jcraft.generic.tp"
+      }
+    },
+    "sounds": [
+      "jcraft:sptimeskip"
+    ]
+  }
+}

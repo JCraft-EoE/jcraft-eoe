@@ -22,6 +22,8 @@ import net.arna.jcraft.api.attack.core.RunMoment;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
@@ -34,6 +36,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -831,8 +834,20 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public static boolean mayBreak(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
                                    @Nullable Predicate<BlockState> pred) {
+        if (user != null) {
+            if (user.getType().is(JTagRegistry.CANT_BREAK_BLOCKS)) {
+                return false;
+            }
+            // special case for brawler attacking training dummy
+            if (user.getType() == JEntityTypeRegistry.BRAWLER_SPEC_USER.get() && user instanceof Mob brawler &&
+                    brawler.getTarget() != null && brawler.getTarget().getType() == JEntityTypeRegistry.TRAINING_DUMMY.get()) {
+                return false;
+            }
+        }
         Predicate<BlockState> isDestructable = state -> {
-            if (state.isAir()) return true;
+            if (state.isAir()) {
+                return true;
+            }
             else {
                 Block block = state.getBlock();
                 float destroyTime = block.defaultDestroyTime();

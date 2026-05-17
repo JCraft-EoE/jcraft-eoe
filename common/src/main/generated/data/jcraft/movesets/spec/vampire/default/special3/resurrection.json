@@ -1,0 +1,43 @@
+{
+  "anim_state": "RESURRECT",
+  "class": "SPECIAL3",
+  "cooldown_type": "SPECIAL3",
+  "crouching_variant": {
+    "class": "SPECIAL3",
+    "cooldown_type": "SPECIAL3",
+    "move": {
+      "type": "jcraft:vampire_night_vision_move",
+      "cooldown": 20,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.vampire.default.toggle_night_vision.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.vampire.default.toggle_night_vision.cr.name"
+        }
+      }
+    }
+  },
+  "move": {
+    "type": "jcraft:vampire_revive_move",
+    "cooldown": 300,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:vampirereanimate"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.vampire.default.resurrection.description"
+      },
+      "name": {
+        "translate": "move.jcraft.vampire.default.resurrection.name"
+      }
+    },
+    "move_distance": 5.0,
+    "windup": 16
+  }
+}

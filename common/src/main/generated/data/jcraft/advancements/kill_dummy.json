@@ -1,0 +1,43 @@
+{
+  "parent": "jcraft:obtain_meteorite_iron_ore",
+  "criteria": {
+    "killed_dummy": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "jcraft:training_dummy"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.jcraft.kill_dummy.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "jcraft:training_dummy"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.kill_dummy.title"
+    }
+  },
+  "requirements": [
+    [
+      "killed_dummy"
+    ]
+  ],
+  "rewards": {
+    "experience": 1000
+  },
+  "sends_telemetry_event": true
+}

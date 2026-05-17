@@ -1,0 +1,29 @@
+{
+  "idle_rotation": 225.0,
+  "info": {
+    "con_count": 3,
+    "free_space": {
+      "translate": "entity.jcraft.mr.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.mr"
+    },
+    "pro_count": 3,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.mr.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.mr.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.mr.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:mrsummon"
+    }
+  }
+}

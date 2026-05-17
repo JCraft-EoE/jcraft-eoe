@@ -1,0 +1,48 @@
+{
+  "anim_state": "BUBBLE",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "crouching_variant": {
+    "anim_state": "BUBBLE_COUNTER",
+    "class": "SPECIAL2",
+    "cooldown_type": "STAND_SP2",
+    "move": {
+      "type": "jcraft:killerqueen_bitesthedust_bubble_counter_attack",
+      "cooldown": 480,
+      "duration": 20,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.killer_queen_bites_the_dust.default.stray_cat_counter.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.killer_queen_bites_the_dust.default.stray_cat_counter.cr.name"
+        }
+      },
+      "move_distance": 1.0,
+      "windup": 5
+    }
+  },
+  "move": {
+    "type": "jcraft:killerqueen_bitesthedust_bubble_attack",
+    "cooldown": 120,
+    "duration": 18,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:kqbtdbubble"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.stray_cat_bubble.description"
+      },
+      "name": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.stray_cat_bubble.name"
+      },
+      "ranged": true
+    },
+    "move_distance": 0.75,
+    "windup": 15
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "idle_distance": 1.0,
+  "idle_rotation": -65.0,
+  "info": {
+    "con_count": 4,
+    "free_space": {
+      "translate": "entity.jcraft.kingcrimson.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.kingcrimson"
+    },
+    "pro_count": 4,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.kingcrimson.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.kingcrimson.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.kingcrimson.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:kcsummon"
+    }
+  }
+}

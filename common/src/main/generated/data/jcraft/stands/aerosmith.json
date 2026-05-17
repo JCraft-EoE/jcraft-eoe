@@ -1,0 +1,30 @@
+{
+  "idle_rotation": -45.0,
+  "info": {
+    "con_count": 0,
+    "free_space": {
+      "translate": "entity.jcraft.aerosmith.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.aerosmith"
+    },
+    "pro_count": 0,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.aerosmith.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.aerosmith.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.aerosmith.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "anim_duration": 48,
+    "sound": {
+      "sound_id": "jcraft:assummon"
+    }
+  }
+}

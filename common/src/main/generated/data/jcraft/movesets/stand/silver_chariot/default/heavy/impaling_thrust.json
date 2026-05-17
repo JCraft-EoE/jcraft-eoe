@@ -1,0 +1,49 @@
+{
+  "anim_state": "HEAVY",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 12,
+      "extra_hit_boxes": [
+        {
+          "forward_offset": 2.0,
+          "size": 1.0,
+          "vertical_offset": 0.1
+        }
+      ],
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_3",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 28,
+    "damage": 8.0,
+    "duration": 28,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:scheavy"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.silver_chariot.default.impaling_thrust.description"
+      },
+      "name": {
+        "translate": "move.jcraft.silver_chariot.default.impaling_thrust.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 1.5,
+    "move_distance": 0.65,
+    "offset": 0.0,
+    "stun": 10,
+    "windup": 20
+  }
+}

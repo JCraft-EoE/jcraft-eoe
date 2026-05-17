@@ -1,0 +1,62 @@
+{
+  "aerial_variant": {
+    "anim_state": "GLIDE",
+    "class": "UTILITY",
+    "cooldown_type": "UTILITY",
+    "move": {
+      "type": "jcraft:thefool_glide_move",
+      "cooldown": 300,
+      "duration": 125,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:foolglide"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_fool.default.glider.air.description"
+        },
+        "mobility_type": "FLIGHT",
+        "name": {
+          "translate": "move.jcraft.the_fool.default.glider.air.name"
+        }
+      },
+      "move_distance": 0.0,
+      "windup": 5
+    }
+  },
+  "anim_state": "SAND_WAVE",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:thefool_sand_wave_attack",
+    "attack_extras": {
+      "block_stun": 3,
+      "hit_animation": "MID",
+      "stun_type": "WINDED"
+    },
+    "cooldown": 340,
+    "damage": 1.0,
+    "duration": 80,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.the_fool.default.sandwave.description"
+      },
+      "mobility_type": "DASH",
+      "name": {
+        "translate": "move.jcraft.the_fool.default.sandwave.name"
+      },
+      "ranged": true
+    },
+    "hitbox_size": 2.0,
+    "interval": 3,
+    "knockback": 0.1,
+    "knockdown_duration": 15,
+    "move_distance": 0.0,
+    "offset": 0.0,
+    "stun": 0,
+    "windup": 0
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:armor_stand",
+    "jcraft:roadroller",
+    "jcraft:sandtornado",
+    "#jcraft:stands"
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "anim_state": "SPIN",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "followup": {
+    "anim_state": "SPIN",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:silverchariot_spin_barrage_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 3,
+        "hit_animation": "MID",
+        "stun_type": "WINDED"
+      },
+      "cooldown": 0,
+      "damage": 1.0,
+      "duration": 24,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:scspin"
+          }
+        ],
+        "conditions": [
+          {
+            "type": "jcraft:holding_anubis"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.silver_chariot.default.divine_blade.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.silver_chariot.default.divine_blade.followup.name"
+        }
+      },
+      "hitbox_size": 2.0,
+      "interval": 2,
+      "knockback": 0.15,
+      "move_distance": 0.65,
+      "offset": -0.2,
+      "stun": 10,
+      "windup": 7
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_barrage_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 3,
+      "hit_animation": "MID",
+      "stun_type": "WINDED"
+    },
+    "cooldown": 100,
+    "damage": 1.0,
+    "duration": 24,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:scspin"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.silver_chariot.default.spinning_blade.description"
+      },
+      "followup_frame": 6,
+      "name": {
+        "translate": "move.jcraft.silver_chariot.default.spinning_blade.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "interval": 2,
+    "knockback": 0.1,
+    "move_distance": 0.65,
+    "offset": -0.2,
+    "stun": 10,
+    "windup": 7
+  }
+}

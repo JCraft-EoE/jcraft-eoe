@@ -1,0 +1,11 @@
+{
+  "description": {
+    "translate": "spec.jcraft.vampire.info.desc"
+  },
+  "free_space": {
+    "translate": "spec.jcraft.vampire.info.details"
+  },
+  "name": {
+    "translate": "spec.jcraft.vampire"
+  }
+}

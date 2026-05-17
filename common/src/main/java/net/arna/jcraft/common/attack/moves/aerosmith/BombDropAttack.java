@@ -75,10 +75,11 @@ public class BombDropAttack extends AbstractMove<BombDropAttack, AerosmithEntity
 
         final var pos = attacker.position();
         final double dx = pos.x - dropLocation.x, dz = pos.z - dropLocation.z;
+        final double horizontalDistSqr = dx * dx + dz * dz;
         final var rangeSqr = dropRange * dropRange;
 
         // drop is always vertical
-        if (dx * dx + dz * dz <= rangeSqr&& pos.y >= dropLocation.y) {
+        if (horizontalDistSqr <= rangeSqr && pos.y >= dropLocation.y && !attacker.isInWall()) {
             // TODO play the animation
             attacker.playSound(JSoundRegistry.AS_BOMB_DROP.get());
             dropBomb(attacker);

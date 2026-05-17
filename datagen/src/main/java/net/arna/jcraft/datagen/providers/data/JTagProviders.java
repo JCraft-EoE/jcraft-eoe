@@ -499,6 +499,37 @@ public class JTagProviders {
             discs.add(JItemRegistry.DISC.get());
             discs.add(JItemRegistry.STAND_DISC.get());
             discs.add(JItemRegistry.SPEC_DISC.get());
+            
+            final var ferrous = getOrCreateTagBuilder(JTagRegistry.FERROUS_ITEMS);
+            ferrous.addOptionalTag(ItemTags.IRON_ORES);
+            ferrous.add(Items.RAW_IRON);
+            ferrous.add(Items.RAW_IRON_BLOCK);
+            ferrous.add(Items.IRON_NUGGET);
+            ferrous.add(Items.IRON_INGOT);
+            ferrous.add(Items.IRON_BLOCK);
+            ferrous.add(Items.IRON_BARS);
+            ferrous.add(Items.IRON_DOOR);
+            ferrous.add(Items.IRON_TRAPDOOR);
+            ferrous.add(Items.CHAIN);
+            ferrous.add(Items.IRON_HELMET);
+            ferrous.add(Items.IRON_CHESTPLATE);
+            ferrous.add(Items.IRON_LEGGINGS);
+            ferrous.add(Items.IRON_BOOTS);
+            ferrous.add(Items.CHAINMAIL_HELMET);
+            ferrous.add(Items.CHAINMAIL_CHESTPLATE);
+            ferrous.add(Items.CHAINMAIL_LEGGINGS);
+            ferrous.add(Items.CHAINMAIL_BOOTS);
+            ferrous.add(Items.IRON_HORSE_ARMOR);
+            ferrous.add(Items.IRON_AXE);
+            ferrous.add(Items.IRON_PICKAXE);
+            ferrous.add(Items.IRON_SHOVEL);
+            ferrous.add(Items.IRON_HOE);
+            ferrous.add(Items.IRON_SWORD);
+            ferrous.add(Items.ANVIL);
+            ferrous.add(JItemRegistry.SCALPEL.getId());
+            ferrous.add(JItemRegistry.KNIFE.getId());
+            ferrous.add(JItemRegistry.KNIFEBUNDLE.getId());
+            ferrous.add(JItemRegistry.ROAD_ROLLER.getId());
         }
     }
 
@@ -662,6 +693,9 @@ public class JTagProviders {
             doesntBreathe.add(EntityType.ARMOR_STAND);
             doesntBreathe.add(JEntityTypeRegistry.ROAD_ROLLER.getId());
             doesntBreathe.addTag(JTagRegistry.STANDS);
+
+            final var cantBreakBlocks = getOrCreateTagBuilder(JTagRegistry.CANT_BREAK_BLOCKS);
+            // empty
 
             addTagsForCompatibilities(arg);
         }

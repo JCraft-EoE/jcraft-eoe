@@ -208,6 +208,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         USER_POSE = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.STRING);
     }
 
+    /**
+     * @return Whether to forward the input to the user's spec regardless of {@link #allowMoveHandling()}.
+     */
+    public boolean forwardInputToSpec(MoveInputType type) {
+        return false;
+    }
+
+    public boolean acceptsUserMoveInit(MoveInputType type) {
+        return true;
+    }
+
     public boolean allowMoveHandling() {
         return true;
     }
@@ -1066,10 +1077,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 final float attackDist = move.getMoveDistance();
 
                 if (!move.isCharge()) {
-                    if (!isRemote) {
+/*                    if (!isRemote) {
                         // TODO: find a cleaner way to slow down the users attack speed
-                        //user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 4, true, false));
-                    }
+                        user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 4, true, false));
+                    }*/
 
                     setAttackRotationOffset();
                     setDistanceOffset(attackDist);

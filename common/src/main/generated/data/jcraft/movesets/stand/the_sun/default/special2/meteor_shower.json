@@ -1,0 +1,33 @@
+{
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "move": {
+    "type": "jcraft:thesun_meteor_shower_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 3,
+      "hit_animation": "MID",
+      "stun_type": "WINDED"
+    },
+    "cooldown": 120,
+    "duration": 110,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:sunshower"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_sun.default.meteor_shower.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_sun.default.meteor_shower.name"
+      },
+      "ranged": true
+    },
+    "interval": 2,
+    "windup": 10
+  }
+}

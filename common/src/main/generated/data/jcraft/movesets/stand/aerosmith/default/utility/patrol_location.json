@@ -1,0 +1,19 @@
+{
+  "anim_state": "ACTIVE",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:aerosmith_patrol_move",
+    "cooldown": 0,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.aerosmith.default.patrol_location.description"
+      },
+      "name": {
+        "translate": "move.jcraft.aerosmith.default.patrol_location.name"
+      }
+    },
+    "radius": 48.0,
+    "range": 67.0
+  }
+}

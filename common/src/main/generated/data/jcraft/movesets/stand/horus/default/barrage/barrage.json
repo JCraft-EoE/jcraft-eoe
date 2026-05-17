@@ -1,0 +1,40 @@
+{
+  "anim_state": "BARRAGE",
+  "class": "BARRAGE",
+  "cooldown_type": "STAND_BARRAGE",
+  "move": {
+    "type": "jcraft:horus_horus_barrage_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 3,
+      "hit_animation": "MID",
+      "stun_type": "WINDED"
+    },
+    "cooldown": 240,
+    "damage": 0.0,
+    "duration": 80,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "on_strike",
+          "sound": "jcraft:horusbarragefire"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.horus.default.barrage.description"
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.horus.default.barrage.name"
+      }
+    },
+    "hitbox_size": 0.0,
+    "interval": 5,
+    "knockback": 0.0,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 0,
+    "windup": 5
+  }
+}

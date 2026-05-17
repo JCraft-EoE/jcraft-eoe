@@ -1,7 +1,3 @@
-plugins {
-    id 'com.gradleup.shadow'
-}
-
 architectury {
     platformSetupLoomIde()
     fabric()
@@ -62,8 +58,21 @@ sourceSets {
     }
 }
 
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
 shadowJar {
     enabled = false // Disable the massive, useless shadow jar that Loom creates by default.
+}
+
+// Loom's Shadow integration would otherwise wire remapJar → shadowJar (which is disabled).
+// Explicitly point remapJar at the plain jar so the published artifact is correctly remapped.
+remapJar {
+    input.set(jar.archiveFile)
 }
 
 dependencies {

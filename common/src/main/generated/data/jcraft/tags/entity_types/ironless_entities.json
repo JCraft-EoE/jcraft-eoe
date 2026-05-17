@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "#jcraft:stands",
+    "minecraft:snow_golem",
+    "jcraft:training_dummy",
+    "jcraft:blockprojectile",
+    "jcraft:hg_net",
+    "jcraft:hamon_wave",
+    "jcraft:lifedetector",
+    "jcraft:redbind",
+    "jcraft:sandtornado",
+    "jcraft:sha"
+  ]
+}

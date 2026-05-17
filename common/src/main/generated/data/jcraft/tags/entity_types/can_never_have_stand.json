@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "#jcraft:stands",
+    "jcraft:sha",
+    "jcraft:lifedetector",
+    "jcraft:gefrog",
+    "jcraft:gebutterfly",
+    "jcraft:gesnake",
+    "jcraft:gerscorpion",
+    "jcraft:playerclone",
+    "jcraft:hg_net",
+    "jcraft:redbind",
+    "jcraft:sandtornado",
+    "jcraft:stand_meteor",
+    "jcraft:roadroller"
+  ]
+}

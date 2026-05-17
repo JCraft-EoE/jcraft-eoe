@@ -12,24 +12,25 @@ import net.arna.jcraft.api.MoveSelectionResult;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.client.particle.BreathParticle;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Random;
 import java.util.Set;
 
 public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<BreathXrayMove<A>, A> {
@@ -117,18 +118,48 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
                     if (!withinScanArc(pos, base.getLookAngle(), target, scanAngle, Mth.DEG_TO_RAD * 30.0)) continue;
 
+                    boolean inLineOfSight = living.hasLineOfSight(base);
                     if (!detected.containsKey(living))
-                        if (living.hasLineOfSight(base))
+                        if (inLineOfSight)
                             doPing = true;
 
                     detected.put(living, 20);
 
-                    displayBreathParticle(serverPlayer, target);
+                    float scale = calculateBreathScale(living, inLineOfSight)/7;
+                    displayBreathParticle(serverPlayer, target, scale);
                 }
             }
 
             if (doPing) playPingSound(serverPlayer);
         }
+    }
+
+    private float calculateBreathScale(LivingEntity entity, boolean inLineOfSight) {
+        float scale = 1f;
+
+        // Incorporate max health (bigger health bar, bigger breath)
+        scale *= Math.min(entity.getMaxHealth() / 10f, 10f);
+
+        // Incorporate lost health (0 health is half size)
+        scale *= entity.getHealth() / entity.getMaxHealth() * 0.5f + 0.5f;
+
+        // Incorporate velocity.
+        // Standing still is 20% reduction.
+        double velocity = entity.getDeltaMovement().length();
+        scale *= (float) (velocity * 5 + 0.8f);
+
+        // Double size if in line of sight
+        scale *= inLineOfSight ? 2f : 1f;
+
+        // Reduce by 75% if the target is sneaking.
+        scale *= entity.isDiscrete() ? 0.25f : 1f;
+
+        // Increase if entity is being ridden, and not a player.
+        scale *= entity.getPassengers().isEmpty() || entity instanceof Player ? 1f : 2f;
+
+        // Distance is already incorporated naturally through perspective.
+
+        return scale;
     }
 
     /**
@@ -155,28 +186,23 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         return Math.abs(angleDiff) <= sweepArc / 2.0;
     }
 
-    public static void displayBreathParticle(@NonNull final ServerPlayer serverPlayer, @NonNull final Vec3 target) {
-        serverPlayer.connection.send(
-                new ClientboundLevelParticlesPacket(
-                        JParticleTypeRegistry.OVERLAP.get(),
-                        true,
-                        target.x, target.y, target.z,
-                        0, 0, 0,
-                        0,
-                        1
-                )
-        );
+    public static void displayBreathParticle(@NonNull final ServerPlayer serverPlayer, @NonNull final Vec3 target,
+                                             final float scale) {
+        serverPlayer.serverLevel().sendParticles(serverPlayer, new BreathParticle.Options(scale),
+                true, target.x, target.y, target.z, 1, 0, 0, 0, 0);
     }
 
     public static void playPingSound(@NonNull final ServerPlayer serverPlayer) {
         final var pos = serverPlayer.position();
-
+        Random random = new Random();
+        float volume = 1 - random.nextFloat() * 0.2f;
+        float pitch = 1 - random.nextFloat() * 0.2f;
         serverPlayer.connection.send(
                 new ClientboundSoundPacket(
                         Holder.direct(JSoundRegistry.AS_RADAR_PING.get()),
                         SoundSource.PLAYERS,
                         pos.x, pos.y, pos.z,
-                        1, 1, 0
+                        volume, pitch, 0
                 )
         );
     }

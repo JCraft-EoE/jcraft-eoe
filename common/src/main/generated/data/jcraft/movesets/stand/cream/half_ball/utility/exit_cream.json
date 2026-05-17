@@ -1,0 +1,27 @@
+{
+  "anim_state": "EXIT",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:cream_ball_mode_exit_move",
+    "cooldown": 40,
+    "duration": 15,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:creamexit"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.cream.half_ball.exit_cream.description"
+      },
+      "name": {
+        "translate": "move.jcraft.cream.half_ball.exit_cream.name"
+      }
+    },
+    "move_distance": 0.0,
+    "windup": 5
+  }
+}

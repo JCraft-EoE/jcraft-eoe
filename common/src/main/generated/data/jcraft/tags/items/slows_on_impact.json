@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:stick",
+    "minecraft:chain",
+    "minecraft:cobweb",
+    "minecraft:bone",
+    "minecraft:blaze_rod"
+  ]
+}

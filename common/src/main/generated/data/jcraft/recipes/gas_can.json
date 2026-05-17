@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "item": "minecraft:iron_nugget"
+    },
+    "B": {
+      "item": "minecraft:water_bucket"
+    },
+    "C": {
+      "item": "minecraft:charcoal"
+    },
+    "D": {
+      "item": "minecraft:coal_block"
+    },
+    "E": {
+      "item": "minecraft:gunpowder"
+    }
+  },
+  "pattern": [
+    "AAA",
+    "ABA",
+    "CDE"
+  ],
+  "result": {
+    "item": "jcraft:gas_can"
+  },
+  "show_notification": true
+}

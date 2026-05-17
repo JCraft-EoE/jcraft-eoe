@@ -1,0 +1,16 @@
+{
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:shared_pilot_mode_move",
+    "cooldown": 20,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.hierophant_green.default.pilot_mode.description"
+      },
+      "name": {
+        "translate": "move.jcraft.hierophant_green.default.pilot_mode.name"
+      }
+    }
+  }
+}

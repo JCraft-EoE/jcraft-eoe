@@ -1,0 +1,19 @@
+{
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:cmoon_gravitational_hop_move",
+    "cooldown": 340,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.c_moon.default.gravitational_hoplocal_gravity_change.description"
+      },
+      "mobility_type": "HIGHJUMP",
+      "name": {
+        "translate": "move.jcraft.c_moon.default.gravitational_hoplocal_gravity_change.name"
+      }
+    },
+    "slow_falling_duration": 60,
+    "weightless_duration": 200
+  }
+}

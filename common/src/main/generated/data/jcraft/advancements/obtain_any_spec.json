@@ -1,0 +1,30 @@
+{
+  "parent": "jcraft:obtain_meteorite_iron_ore",
+  "criteria": {
+    "has_spec": {
+      "conditions": {},
+      "trigger": "jcraft:obtained_spec"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_any_spec.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:boxing_gloves"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_any_spec.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_spec"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

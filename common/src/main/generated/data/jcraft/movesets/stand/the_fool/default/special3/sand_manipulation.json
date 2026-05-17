@@ -1,0 +1,28 @@
+{
+  "anim_state": "CREATE",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:thefool_sand_clone_move",
+    "cooldown": 200,
+    "duration": 11,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "minecraft:block.sand.place"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_fool.default.sand_manipulation.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_fool.default.sand_manipulation.name"
+      },
+      "ranged": true
+    },
+    "move_distance": 1.0,
+    "windup": 7
+  }
+}

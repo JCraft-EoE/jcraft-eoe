@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "tag": "minecraft:buttons"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    }
+  },
+  "pattern": [
+    " B ",
+    " G ",
+    "GGG"
+  ],
+  "result": {
+    "item": "jcraft:blood_bottle"
+  },
+  "show_notification": true
+}
