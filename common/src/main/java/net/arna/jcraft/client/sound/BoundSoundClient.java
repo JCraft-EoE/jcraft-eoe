@@ -55,7 +55,15 @@ public class BoundSoundClient {
                 .mapToLong(Long2ObjectMap.Entry::getLongKey)
                 .collect(LongArrayList::new, LongArrayList::add, LongArrayList::addAll);
 
-        toRemove.forEach(playingSounds::remove);
+        toRemove.forEach(id -> {
+            BoundSoundInstance inst = playingSounds.remove(id);
+            if (inst != null && inst.getBoundEntity() != null && byEntity.containsKey(inst.getBoundEntity().getId())) {
+                List<BoundSoundInstance> entitySounds = byEntity.get(inst.getBoundEntity().getId());
+                entitySounds.remove(inst);
+                if (entitySounds.isEmpty())
+                    byEntity.remove(inst.getBoundEntity().getId());
+            }
+        });
 
         // Tick down removed entities and stop their sounds if the countdown has elapsed.
         IntSet entitiesToRemove = new IntOpenHashSet();
