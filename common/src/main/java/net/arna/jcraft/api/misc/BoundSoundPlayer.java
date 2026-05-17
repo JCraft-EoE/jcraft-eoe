@@ -5,7 +5,9 @@ import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.Synchronized;
 import net.arna.jcraft.api.registry.JPacketRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.sound.BoundSoundClient;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -90,7 +92,12 @@ public class BoundSoundPlayer {
     private static Collection<? extends Player> getListeners(Level level, Vec3 position) {
         AABB box = AABB.ofSize(position, 50, 50, 50);
         return level.players().stream()
-                .filter(p -> box.contains(p.position()))
+                .filter(p -> {
+                    if (box.contains(p.position())) return true;
+
+                    StandEntity<?, ?> stand = JUtils.getStand(p);
+                    return stand != null && box.contains(stand.position());
+                })
                 .toList();
     }
 
