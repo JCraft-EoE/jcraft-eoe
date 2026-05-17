@@ -230,7 +230,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<KingCrimsonEntity> TOSS = new TossMove<KingCrimsonEntity>(0, 1, 1, 0.75f,0.13f)
+    public static final KingCrimsonTossMove TOSS = new KingCrimsonTossMove(0, 1, 1, 0.75f,0.13f)
             .withAnim(KingCrimsonEntity.State.ITEM_TOSS);
     public static final TossChargeMove<KingCrimsonEntity> TOSS_CHARGE = new TossChargeMove<KingCrimsonEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(TOSS);
