@@ -33,12 +33,15 @@ import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -981,15 +984,25 @@ public final class JUtils {
         return player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
 
+    private static final Style runStandAboutStyle = Style.EMPTY
+            .withColor(ChatFormatting.AQUA)
+            .withUnderlined(true)
+            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/stand about"));
+
     public static void maySendStandAboutInfo(final ServerPlayer player) {
         if (!hasAdvancement(player, JCraft.id("obtain_stand"))) {
-            player.sendSystemMessage(Component.translatable("info.jcraft.first_stand"));
+            player.sendSystemMessage(Component.translatable("info.jcraft.first_stand").withStyle(runStandAboutStyle));
         }
     }
 
+    private static final Style runSpecAboutStyle = Style.EMPTY
+            .withColor(ChatFormatting.AQUA)
+            .withUnderlined(true)
+            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/spec about"));
+
     public static void maySendSpecAboutInfo(final ServerPlayer player) {
         if (!hasAdvancement(player, JCraft.id("obtain_any_spec"))) {
-            player.sendSystemMessage(Component.translatable("info.jcraft.first_spec"));
+            player.sendSystemMessage(Component.translatable("info.jcraft.first_spec").withStyle(runSpecAboutStyle));
         }
     }
 
