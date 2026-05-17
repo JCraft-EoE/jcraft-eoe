@@ -132,6 +132,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> KINGCRIMSON_KC_DONUT_ATTACK = register("kingcrimson_kc_donut_attack", KCDonutAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KINGCRIMSON_PREDICTION_MOVE = register("kingcrimson_prediction_move", PredictionMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KINGCRIMSON_TIME_ERASE_MOVE = register("kingcrimson_time_erase_move", TimeEraseMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> KINGCRIMSON_TOSS_MOVE = register("kingcrimson_toss_move", KingCrimsonTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> MADEINHEAVEN_CIRCLE_ATTACK = register("madeinheaven_circle_attack", CircleAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MADEINHEAVEN_FURY_CHOP_ATTACK = register("madeinheaven_fury_chop_attack", FuryChopAttack.Type.INSTANCE);

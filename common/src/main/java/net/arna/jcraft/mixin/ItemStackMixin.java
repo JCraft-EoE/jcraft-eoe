@@ -41,7 +41,7 @@ public abstract class ItemStackMixin {
     private void jcraft$endTEOnUse(final UseOnContext context, final CallbackInfoReturnable<InteractionResult> cir) {
         final Player player = context.getPlayer();
         if (player != null && JUtils.inTimeErase(player) && JUtils.getStand(player) instanceof KingCrimsonEntity kc) {
-            final TimeEraseMove te = kc.getMove(TimeEraseMove.class);
+            final TimeEraseMove te = kc.getTimeEraseMove();
             if (te != null) {
                 te.cancelTE(kc);
             }
