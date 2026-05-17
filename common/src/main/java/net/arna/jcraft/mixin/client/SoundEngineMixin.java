@@ -1,7 +1,6 @@
 package net.arna.jcraft.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.Minecraft;
@@ -23,8 +22,8 @@ public class SoundEngineMixin {
     // the sound is from the player, if the sound is closer to the stand than it is to the player.
 
     // Same expression in two different methods
-    @ModifyExpressionValue(method = {"play"/*, "tickNonPaused"*/}, at = @At(value = "NEW", target = "(DDD)Lnet/minecraft/world/phys/Vec3;"))
-    private Vec3 overrideSoundPositionOnPlay(Vec3 ogSoundPos, @Local(argsOnly = true) SoundInstance sound) {
+    @ModifyExpressionValue(method = {"play", "tickNonPaused"}, at = @At(value = "NEW", target = "(DDD)Lnet/minecraft/world/phys/Vec3;"))
+    private Vec3 overrideSoundPositionOnPlay(Vec3 ogSoundPos) {
         // Check if the camera entity has a stand and whether it's remote.
         Minecraft client = Minecraft.getInstance();
         Entity cam = client.getCameraEntity();
