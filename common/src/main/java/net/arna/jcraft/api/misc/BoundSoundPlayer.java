@@ -42,6 +42,21 @@ public class BoundSoundPlayer {
      */
     public static EntitySoundHandle playSoundFrom(LivingEntity entity, SoundEvent sound, SoundSource category, float volume, float pitch) {
         Collection<? extends Player> listeners = getListeners(entity.level(), entity.position());
+        return playSoundFrom(entity, sound, category, volume, pitch, listeners);
+    }
+
+    /**
+     * Plays the given sound and binds it to the given entity, moving with it and stopping when it dies/is removed.
+     * @param entity The entity to bind to
+     * @param sound The sound to play
+     * @param category The category to use for the sound
+     * @param volume The volume to play at
+     * @param pitch The pitch to play at
+     * @param listeners The players to send this sound to
+     * @return A handle that can be used later to cancel the sound for all listeners
+     */
+    public static EntitySoundHandle playSoundFrom(LivingEntity entity, SoundEvent sound, SoundSource category,
+                                                  float volume, float pitch, Collection<? extends Player> listeners) {
         EntitySoundHandle handle = new EntitySoundHandle(entity, sound, category, volume, pitch, listeners);
         startSoundHandle(entity.level(), handle);
         return handle;
@@ -59,6 +74,22 @@ public class BoundSoundPlayer {
      */
     public static PosSoundHandle playSoundAt(Level level, Vec3 pos, SoundEvent sound, SoundSource category, float volume, float pitch) {
         Collection<? extends Player> listeners = getListeners(level, pos);
+        return playSoundAt(level, pos, sound, category, volume, pitch, listeners);
+    }
+
+    /**
+     * Plays the given sound at the given position.
+     * @param level The level to play the sound in
+     * @param pos The position to play the sound at
+     * @param sound The sound to play
+     * @param category The category to use for the sound
+     * @param volume The volume to play at
+     * @param pitch The pitch to play at
+     * @param listeners The players to send this sound to
+     * @return A handle that can be used later to cancel the sound for all listeners
+     */
+    public static PosSoundHandle playSoundAt(Level level, Vec3 pos, SoundEvent sound, SoundSource category,
+                                             float volume, float pitch, Collection<? extends Player> listeners) {
         PosSoundHandle handle = new PosSoundHandle(level, pos, sound, category, volume, pitch, listeners);
         startSoundHandle(level, handle);
         return handle;
