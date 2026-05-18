@@ -14,13 +14,10 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.particle.BreathParticle;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
-import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -121,10 +118,10 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
                 if (!withinScanArc(pos, base.getLookAngle(), target, scanAngle, Mth.DEG_TO_RAD * 30.0)) continue;
 
-                    boolean inLineOfSight = living.hasLineOfSight(base);
-                    if (!detected.containsKey(living))
-                        if (inLineOfSight)
-                            doPing = true;
+                boolean inLineOfSight = living.hasLineOfSight(base);
+                if (!detected.containsKey(living))
+                    if (inLineOfSight)
+                        doPing = true;
 
                 detected.put(living, 20);
 
