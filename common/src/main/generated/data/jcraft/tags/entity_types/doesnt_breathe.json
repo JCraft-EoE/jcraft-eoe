@@ -3,6 +3,7 @@
   "values": [
     "minecraft:armor_stand",
     "jcraft:roadroller",
-    "#jcraft:stands"
+    "#jcraft:stands",
+    "minecraft:iron_golem"
   ]
 }

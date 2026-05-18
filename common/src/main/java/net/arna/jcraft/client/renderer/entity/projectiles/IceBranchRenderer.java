@@ -54,7 +54,7 @@ public class IceBranchRenderer extends AbstractEntityRenderer<IceBranchProjectil
                     }
                 })
                 .build(),
-                context, ID);
+                context);
     }
 
 }

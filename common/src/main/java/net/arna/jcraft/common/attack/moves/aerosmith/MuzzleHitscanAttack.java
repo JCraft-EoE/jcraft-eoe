@@ -12,12 +12,9 @@ import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.arna.jcraft.common.util.JParticleType;
-import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
@@ -46,19 +43,9 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
         attacker.addOverheat(0.225f);
         spread = Mth.clamp(originalSpread + attacker.getOverheat() / 100, 0f, HALF_PI);
 
-        Vec3 hitPos;
-
-        if (attacker.isRemote()) {
-            hitPos = fire(attacker, user, attacker.position(), attacker.getLookAngle());
-
-            final Vec3 start = user.position().add(GravityChangerAPI.getEyeOffset(user));
-            final HitResult goal = JUtils.raycastAll(user, start, start.add(user.getLookAngle().scale(30.0)), ClipContext.Fluid.NONE);
-            final Vec3 target = goal.getLocation();
-            attacker.setFlyState(AerosmithEntity.FlyState.FLYBY);
-            attacker.setFlyTarget(target);
-        } else {
-            hitPos = fire(attacker, user, user.position().add(GravityChangerAPI.getEyeOffset(user)), user.getLookAngle());
-        }
+        Vec3 hitPos = attacker.isRemote() ?
+                fire(attacker, user, attacker.position(), attacker.getLookAngle()) :
+                fire(attacker, user, user.position().add(GravityChangerAPI.getEyeOffset(user)), user.getLookAngle());
 
         // Ignite any gasoline splatters at the bullet's hit position, but with a slight delay
         JSplatterManager.get(user.level())

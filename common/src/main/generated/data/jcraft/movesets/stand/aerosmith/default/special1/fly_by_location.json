@@ -1,0 +1,17 @@
+{
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:aerosmith_flyby_move",
+    "cooldown": 0,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.aerosmith.default.fly_by_location.description"
+      },
+      "name": {
+        "translate": "move.jcraft.aerosmith.default.fly_by_location.name"
+      }
+    },
+    "range": 67.0
+  }
+}

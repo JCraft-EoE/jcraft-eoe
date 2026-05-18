@@ -13,7 +13,6 @@ import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.renderer.block.CoffinTileRenderer;
-import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.forge.JCraftForge;
 import net.arna.jcraft.forge.capability.impl.entity.GrabCapability;
 import net.arna.jcraft.forge.capability.impl.entity.GravityCapability;
@@ -94,19 +93,14 @@ public class JCraftForgeClient {
         event.registerSpriteSet(JParticleTypeRegistry.AURA_ARC.get(), AuraArcParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.AURA_BLOB.get(), AuraBlobParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.INVERSION.get(), InversionParticle.Factory::new);
-        event.registerSpriteSet(JParticleTypeRegistry.OVERLAP.get(), OverlappingParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.BREATH.get(), BreathParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.SUN_LOCK_ON.get(), BackstabParticle.Factory::new); // 9 frames, reusing
         event.registerSpriteSet(JParticleTypeRegistry.PURPLE_HAZE_CLOUD.get(), PurpleHazeCloudParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.PURPLE_HAZE_PARTICLE.get(), PurpleHazeErraticParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.DAMAGE_NUMBER.get(), DamageNumberParticle.Factory::new);
-        DamageIndicatorManager.setDamageNumberParticle(JParticleTypeRegistry.DAMAGE_NUMBER.get());
         event.registerSpriteSet(JParticleTypeRegistry.HAMON_SPARK.get(), provider -> new HitsparkParticle.Factory(provider, 0.2f, 4));
         event.registerSpriteSet(JParticleTypeRegistry.LEMON.get(), LemonParticle.Factory::new);
-        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_1.get(), MoshParticle.Factory::new);
-        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_2.get(), MoshParticle.Factory::new);
-        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_3.get(), MoshParticle.Factory::new);
-        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_4.get(), MoshParticle.Factory::new);
-        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH_5.get(), MoshParticle.Factory::new);
+        event.registerSpriteSet(JParticleTypeRegistry.METALLICA_MOSH.get(), MoshParticle.Factory::new);
     }
 
     private static void registerClientCapabilityReceivers() {

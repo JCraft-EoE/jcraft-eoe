@@ -28,7 +28,6 @@ import net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust.*;
 import net.arna.jcraft.common.attack.moves.shared.GrabAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
-import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -111,7 +110,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("press the same button to detonate, sending the affected enemy back to their previous location")
             );
     public static final BTDGrabHitAttack GRAB_HIT = new BTDGrabHitAttack(0, 42, 0.75f,
-            5f, 15, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
+            3f, 15, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(

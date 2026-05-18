@@ -68,6 +68,9 @@ dependencies {
     // jjbacosplay
     modImplementation "com.jcraft-eoe.jjbacosplay:jjbacosplay-fabric:${rootProject.jjbacosplay_version}"
 
+    // distant horizons for structure spotting
+    modImplementation "curse.maven:distant-horizons-508933:8037629"
+
     //Modmenu
     modApi "com.terraformersmc:modmenu:7.2.2"
 

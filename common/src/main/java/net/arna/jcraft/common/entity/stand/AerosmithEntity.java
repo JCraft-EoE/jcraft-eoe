@@ -20,6 +20,8 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.common.ai.AttackerBrainInfo;
+import net.arna.jcraft.common.ai.CombatInstantContext;
 import net.arna.jcraft.common.attack.moves.aerosmith.*;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -35,6 +37,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -48,6 +51,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     public static final EntityDataAccessor<Float> OVERHEAT = SynchedEntityData.defineId(AerosmithEntity.class, EntityDataSerializers.FLOAT);
     public static final float OVERHEAT_MAX = 15f;
+    public static final int OVERHEAT_LOSS_COOLDOWN_MAX = 20;
     public static final double SLOW_CRUISE_SPEED = 0.075;
     public static final double CRUISE_SPEED = 0.15;
     public static final double MAX_SPEED = 0.22;
@@ -69,12 +73,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Getter @Setter
     private FlyState flyState = FlyState.NONE;
 
+    private int overheatLossCooldown = 0;
+
     // client-side rotation tracking for rendering
     public float oldPitch = 0.0f, oldYaw = 0.0f, oldRoll = 0.0f;
     public float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
 
     public static final MuzzleHitscanAttack BULLET = new MuzzleHitscanAttack(
-            1, 1, 2, 1.5f, 3.25f, 0, 0.4f, 30f, 0.01f)
+            1, 1, 2, 1.5f, 2f, 0, 0.12f, 30f, 0.01f)
             .withBlockStun(0)
             .withSound(JSoundRegistry.AS_SHOOT)
             .withHitSpark(JParticleType.HIT_SPARK_1)
@@ -96,6 +102,12 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             .withInfo(
                     Component.literal("Bomb Drop"),
                     Component.literal("Orders Aerosmith to drop a bomb above a given location.")
+            );
+
+    public static final FlybyMove FLYBY = new FlybyMove(0, 67f)
+            .withInfo(
+                    Component.literal("Fly by Location"),
+                    Component.literal("Orders Aerosmith to fly to a given location, returning after arriving.")
             );
 
     public static final PatrolMove PATROL = new PatrolMove(0, 67f, 48f)
@@ -233,6 +245,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         moves.registerImmediate(MoveClass.UTILITY, PATROL, State.ACTIVE);
         moves.registerImmediate(MoveClass.BARRAGE, CHARGE, State.CHARGE);
         moves.register(MoveClass.ULTIMATE, ATTACK_ORDER_MOVE);
+        moves.register(MoveClass.SPECIAL1, FLYBY);
         moves.register(MoveClass.SPECIAL3, XRAY);
     }
 
@@ -281,19 +294,25 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         }
 
         final LivingEntity user = getUser();
+
         if (user == null) return;
 
         final AbstractMove<?, ? super AerosmithEntity> currentMove = getCurrentMove();
 
-        if (!(currentMove instanceof MuzzleHitscanAttack) && ++overheatTick % 5 == 0) {
-            addOverheat(-0.4f);
+        boolean isShooting = currentMove instanceof MuzzleHitscanAttack;
+
+        if (isShooting) {
+            overheatLossCooldown = OVERHEAT_LOSS_COOLDOWN_MAX;
+        } else if (overheatLossCooldown-- <= 0) {
+            if (++overheatTick % 5 == 0)
+                addOverheat(-0.4f);
         }
 
         if (isInWall() && patrolRadius > patrolRadius / 2) {
             patrolRadius -= 0.2f;
         }
 
-        if (currentMove == null) {
+        if (currentMove != chargeAttack) {
             switch (flyState) {
                 case PATROL -> {
                     final float theta = tickCount / patrolRadius / 2.0f * patrolDirection.getValue();
@@ -354,6 +373,25 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         }
 
         xRotChangeAllowed = false;
+    }
+
+    @Override
+    public void executePlan(int aiLevel, AttackerBrainInfo info, CombatInstantContext combatCtx) {
+        final LivingEntity user = getUser();
+
+        if (user == null) return;
+
+        if (user instanceof Mob mob) {
+            final var target = mob.getTarget();
+
+            if (target != null)
+                attackOrderMove.setCurrentTarget(target);
+        }
+
+        if (user.distanceToSqr(this) > 64 * 64)
+            info.setDesiredStandOffTime(random.nextInt(40));
+        else
+            info.setDesiredStandOffTime(0);
     }
 
     public void patrol(final Vec3 targetPos, final float radius) {
