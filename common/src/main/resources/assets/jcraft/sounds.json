@@ -1309,7 +1309,10 @@
   },
   "asidle": {
     "sounds": [
-      "jcraft:stands/aerosmith/idle"
+      {
+        "name": "jcraft:stands/aerosmith/idle",
+        "attenuation_distance": 50
+      }
     ]
   },
   "asmaneuver": {
