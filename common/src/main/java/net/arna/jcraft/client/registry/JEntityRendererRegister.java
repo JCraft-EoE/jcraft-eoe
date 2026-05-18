@@ -53,7 +53,7 @@ public interface JEntityRendererRegister {
 
             new RendererData<>(JEntityTypeRegistry.MAGICIANS_RED, MagiciansRedRenderer::new),
 
-            new RendererData<>(JEntityTypeRegistry.THE_FOOL, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.THE_FOOL.get(), 0.7854f, -0.349f, 30f)),
+            new RendererData<>(JEntityTypeRegistry.THE_FOOL, TheFoolRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.GOLD_EXPERIENCE, GoldExperienceRenderer::new),
             new RendererData<>(JEntityTypeRegistry.GE_TREE, GETreeRenderer::new),

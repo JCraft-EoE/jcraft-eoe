@@ -38,9 +38,7 @@ public class ShadowTheWorldRenderer extends StandEntityRenderer<ShadowTheWorldEn
                         .setRenderType(renderType())
                         .setPrerenderEntry(preRenderEntry())
                         .build(),
-                context,
-                model,
-                texture
+                context
         );
     }
 
