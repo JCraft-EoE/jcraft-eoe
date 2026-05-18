@@ -23,6 +23,7 @@
           },
           {
             "type": "jcraft:play_sound",
+            "bind": false,
             "run": "on_hit",
             "sound": "jcraft:impact6"
           }
@@ -66,6 +67,7 @@
         },
         {
           "type": "jcraft:play_sound",
+          "bind": false,
           "run": "on_hit",
           "sound": "jcraft:impact6"
         }

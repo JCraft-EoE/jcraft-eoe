@@ -21,6 +21,7 @@
         "actions": [
           {
             "type": "jcraft:play_sound",
+            "bind": false,
             "run": "on_hit",
             "sound": "jcraft:impact3"
           }
@@ -60,6 +61,7 @@
       "actions": [
         {
           "type": "jcraft:play_sound",
+          "bind": false,
           "run": "on_hit",
           "sound": "minecraft:entity.player.attack.sweep"
         }
