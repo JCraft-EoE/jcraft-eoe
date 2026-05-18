@@ -75,6 +75,7 @@
       "actions": [
         {
           "type": "jcraft:play_sound",
+          "linger": true,
           "run": "at_init",
           "sound": "jcraft:twcharge"
         },

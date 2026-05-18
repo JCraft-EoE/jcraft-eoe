@@ -22,6 +22,7 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.actions.LungeAction;
+import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWChargeAttack;
@@ -199,7 +200,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
     public static final TWChargeAttack CHARGE = new TWChargeAttack(100,
             7, 19, 7.5f, 5f, 20, 1.5f, 0.25f, 0)
             .withCrouchingVariant(LUNGE)
-            .withSound(JSoundRegistry.TW_CHARGE)
+            .withInitAction(PlaySoundAction.playSound(JSoundRegistry.TW_CHARGE).linger())
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
