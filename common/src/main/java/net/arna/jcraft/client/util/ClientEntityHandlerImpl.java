@@ -1,13 +1,13 @@
 package net.arna.jcraft.client.util;
 
 import lombok.NonNull;
-import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.particle.AuraArcParticle;
 import net.arna.jcraft.client.particle.AuraBlobParticle;
 import net.arna.jcraft.client.particle.MoshParticle;
-import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
 import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.entity.vehicle.AbstractGroundVehicleEntity;
@@ -15,7 +15,6 @@ import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.IClientEntityHandler;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -23,7 +22,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
@@ -398,23 +396,23 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
         final var level = aerosmith.level();
         final boolean isRemote = aerosmith.isRemote();
 
-        if (isRemote) {
-            final var localPlayer = Minecraft.getInstance().player;
-            final var localPos = localPlayer.position();
-
-            final double angle = JUtils.angleBetween(aerosmith.getDeltaMovement(), localPos.subtract(pos));
-
-            if (
-                    Math.signum(aerosmith.lastMovementToLocalPlayerAngle) != Math.signum(angle)
-                            && angle < 0
-                            && aerosmith.distanceToSqr(localPlayer) < 35 * 35)
-            { // got close, moving away
-                level.playLocalSound(pos.x, pos.y, pos.z,
-                        JSoundRegistry.AS_FLYBY.get(), SoundSource.PLAYERS,
-                        1.0f, 1.0f, true);
-            }
-
-            aerosmith.lastMovementToLocalPlayerAngle = angle;
-        }
+//        if (isRemote) {
+//            final var localPlayer = Minecraft.getInstance().player;
+//            final var localPos = localPlayer.position();
+//
+//            final double angle = JUtils.angleBetween(aerosmith.getDeltaMovement(), localPos.subtract(pos));
+//
+//            if (
+//                    Math.signum(aerosmith.lastMovementToLocalPlayerAngle) != Math.signum(angle)
+//                            && angle < 0
+//                            && aerosmith.distanceToSqr(localPlayer) < 35 * 35)
+//            { // got close, moving away
+//                level.playLocalSound(pos.x, pos.y, pos.z,
+//                        JSoundRegistry.AS_FLYBY.get(), SoundSource.PLAYERS,
+//                        1.0f, 1.0f, true);
+//            }
+//
+//            aerosmith.lastMovementToLocalPlayerAngle = angle;
+//        }
     }
 }
