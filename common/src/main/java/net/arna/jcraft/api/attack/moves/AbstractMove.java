@@ -663,12 +663,21 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
         // Stop sounds if there are any, unless this move ended naturally (move sound 0),
         // this move has lingering sounds or we switched to this move's finisher or followup.
-        if (sounds == null || sounds.isEmpty() || attacker.getMoveStun() == 0 || isLingeringSounds() ||
-            finisher != null && attacker.getCurrentMove() == finisher.right() ||
-            followup != null && attacker.getCurrentMove() == followup)
-            return;
+        if (sounds != null && !sounds.isEmpty() && shouldCancelSounds(attacker)) {
+            BoundSoundPlayer.stopAll(sounds);
+        }
+    }
 
-        BoundSoundPlayer.stopAll(sounds);
+    /**
+     * Determines whether the sounds from this move should be cancelled when the move is deactivated.
+     * Should be overridden by moves that want sounds to linger under certain conditions.
+     * @param attacker The attacker to check for
+     * @return Whether sounds should be cancelled.
+     */
+    protected boolean shouldCancelSounds(final A attacker) {
+        return attacker.getMoveStun() != 0 && !isLingeringSounds() &&
+                (finisher == null || attacker.getCurrentMove() != finisher.right()) &&
+                (followup == null || attacker.getCurrentMove() != followup);
     }
 
     /**
