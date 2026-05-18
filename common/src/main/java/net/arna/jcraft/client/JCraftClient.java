@@ -34,6 +34,7 @@ import net.arna.jcraft.client.rendering.StandUserPoseLoader;
 import net.arna.jcraft.client.rendering.handler.*;
 import net.arna.jcraft.client.sound.BoundSoundClient;
 import net.arna.jcraft.client.util.BlockBreakerClient;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
 import net.arna.jcraft.common.util.MovementInputType;
@@ -100,6 +101,7 @@ public class JCraftClient {
 
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new DecimalFormatUpdater());
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, StandUserPoseLoader::onReload);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, JShaderRegistry::onReload);
 
         GravityChannelClient.init();
 
@@ -112,17 +114,12 @@ public class JCraftClient {
         JClientEventsRegistry.registerClientEvents();
         JCraftAbilityHud.init();
         PoseModifiers.register();
+        JShaderRegistry.init();
 
         AzArmorRendererRegistry.register(ArmorRenderer.simple("stone_mask"), JItemRegistry.STONE_MASK.get());
         AzArmorRendererRegistry.register(ArmorRenderer.simple("red_hat"), JItemRegistry.RED_HAT.get());
 
         AzItemRendererRegistry.register(JItemRegistry.GAS_CAN.get(), GasCanItemRenderer::new);
-
-        SpecialParticleShaderHandler.INSTANCE.init();
-        ZaWarudoShaderHandler.INSTANCE.init();
-        CrimsonShaderHandler.INSTANCE.init();
-        EpitaphVignetteShaderHandler.INSTANCE.init();
-        MandomRewindShaderHandler.INSTANCE.init();
 
         // Renderer registration
 
@@ -131,7 +128,7 @@ public class JCraftClient {
         AttackHitboxEffectRenderer.init();
         TimeErasePredictionEffectRenderer.init();
     }
-    
+
     public static void registerKeyBindings(@Nullable Consumer<KeyMapping> register) {
         if (register == null) register = KeyMappingRegistry::register;
 

@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.arna.jcraft.client.rendering.handler.SpecialParticleShaderHandler;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -47,8 +47,8 @@ public class JParticleTextureSheet {
         public void begin(final BufferBuilder builder, final @NotNull TextureManager textureManager) {
             // Doesn't seem to work by using a blend function, so we'll use a shader instead.
             // Think that is because of the render order, but I'm not sure.
-            SpecialParticleShaderHandler.getToInvertBuffer().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget()); // Copy depth buffer
-            SpecialParticleShaderHandler.getToInvertBuffer().bindWrite(true); // Render to inversion buffer
+            if (JShaderRegistry.INVERSION == null) return;
+            JShaderRegistry.INVERSION.prepare();
 
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
@@ -72,7 +72,8 @@ public class JParticleTextureSheet {
 
     public static final ParticleRenderType OVERLAP_SHEET = new ParticleRenderType() {
         public void begin(final BufferBuilder builder, final @NotNull TextureManager textureManager) {
-            SpecialParticleShaderHandler.getOverlapBuffer().bindWrite(true); // Render to overlap buffer
+            if (JShaderRegistry.OVERLAP == null) return;
+            JShaderRegistry.OVERLAP.prepare();
 
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest(); // No depth

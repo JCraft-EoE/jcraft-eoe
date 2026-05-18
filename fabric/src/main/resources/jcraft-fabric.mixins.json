@@ -10,8 +10,6 @@
     "gravity.EntityMixin"
   ],
   "client": [
-    "ShaderProgramMixin",
-    "client.GameRendererMixin",
     "client.KeyBindingMixin",
     "client.MultiPlayerGameModeMixin",
     "client.gravity.ScreenEffectRendererMixin"

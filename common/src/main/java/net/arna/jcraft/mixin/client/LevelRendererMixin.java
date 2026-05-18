@@ -6,8 +6,9 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.arna.jcraft.client.rendering.api.callbacks.PostWorldRenderCallback;
-import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.BlockBreakerClient;
+import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
+import net.arna.jcraft.client.rendering.shader.TimestopShaderEffect;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.mixin_logic.StillDepthHolder;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -54,6 +55,9 @@ public class LevelRendererMixin {
     private void hookPostWorldRender(PoseStack matrices, float tickDelta, long nanoTime, boolean renderBlockOutline,
                                      Camera camera, GameRenderer renderer, LightTexture lmTexManager, Matrix4f matrix4f, CallbackInfo ci) {
         ((StillDepthHolder) Minecraft.getInstance().getMainRenderTarget()).jcraft$freezeDepth();
+
+        TimestopShaderEffect.freezeInvTransformMat();
+        if (JShaderRegistry.TIMESTOP_EFFECT != null) JShaderRegistry.TIMESTOP_EFFECT.update(tickDelta);
         PostWorldRenderCallback.EVENT.invoker().onWorldRendered(matrices, camera, tickDelta, nanoTime);
     }
 
@@ -80,16 +84,6 @@ public class LevelRendererMixin {
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void cancelTickInTS(CallbackInfo ci) {
         if (JClientUtils.isInTSRange(Minecraft.getInstance().cameraEntity)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderSky", at = @At("HEAD"), cancellable = true)
-    private void renderSky(PoseStack matrices, Matrix4f matrix4f, float tickDelta, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci) {
-        SkyBoxManager skyboxManager = SkyBoxManager.getInstance();
-        if (skyboxManager.isEnabled() && skyboxManager.getCurrentSkybox() != null) {
-            runnable.run();
-            skyboxManager.renderSkyBox(matrices, matrix4f, tickDelta, camera, bl);
             ci.cancel();
         }
     }

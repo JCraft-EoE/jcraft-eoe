@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.platform.Platform;
-import net.arna.jcraft.client.rendering.shader.ShaderUniformHandler;
 import net.arna.jcraft.client.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -20,7 +19,7 @@ public class RenderHandler {
     public static HashMap<RenderType, BufferBuilder> BUFFERS = new HashMap<>();
     public static boolean LARGER_BUFFER_SOURCES = Platform.isModLoaded("sodium");
 
-    public static HashMap<RenderType, ShaderUniformHandler> UNIFORM_HANDLERS = new HashMap<>();
+//    public static HashMap<RenderType, ShaderUniformHandler> UNIFORM_HANDLERS = new HashMap<>();
     public static MultiBufferSource.BufferSource DELAYED_RENDER;
 
     public static Matrix4f MATRIX4F;
@@ -96,18 +95,18 @@ public class RenderHandler {
     }
 
     public static void draw(final MultiBufferSource.BufferSource source, final HashMap<RenderType, BufferBuilder> buffers) {
-        for (RenderType type : buffers.keySet()) {
-            final ShaderInstance instance = RenderUtils.getShader(type);
-            if (UNIFORM_HANDLERS.containsKey(type)) {
-                ShaderUniformHandler handler = UNIFORM_HANDLERS.get(type);
-                handler.updateShaderData(instance);
-            }
-            source.endBatch(type);
-            if (instance instanceof IJShader jShader) {
-                jShader.setUniformDefaults();
-            }
-        }
-        source.endBatch();
+//        for (RenderType type : buffers.keySet()) {
+//            final ShaderInstance instance = RenderUtils.getShader(type);
+//            if (UNIFORM_HANDLERS.containsKey(type)) {
+//                ShaderUniformHandler handler = UNIFORM_HANDLERS.get(type);
+//                handler.updateShaderData(instance);
+//            }
+//            source.endBatch(type);
+//            if (instance instanceof IJShader jShader) {
+//                jShader.setUniformDefaults();
+//            }
+//        }
+//        source.endBatch();
     }
 
     public static void addRenderLayer(RenderType type) {

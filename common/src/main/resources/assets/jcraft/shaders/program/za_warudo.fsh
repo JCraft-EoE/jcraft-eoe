@@ -6,6 +6,7 @@ uniform vec2 OutSize;
 
 uniform vec3 CameraPosition;
 uniform vec3 Center;
+#define MAX_RADIUS 100.
 uniform float Radius;
 uniform float OuterSat;
 
@@ -52,27 +53,32 @@ void main(){
 
     float pct = distance(pixelPosition, Center);
 
-    float outside = smoothstep(Radius - 1., Radius, pct);
-    float inside = smoothstep(Radius + 1., Radius, pct);
-    float outside2 = smoothstep(Radius - 2.5, Radius - 2., pct);
-    float inside2 = smoothstep(Radius - 1.5, Radius - 2., pct);
+    // TODO: Getting the time from the radius/max radius is garbage and needs to be replaced with a time or lifetime uniform.
+    // Although in the code it looks like the radius can be at maximum 100.
+    float t = clamp(Radius/MAX_RADIUS, 0., 1.);
+    t = clamp(1-pow(2, -10*t), 0., 1.);
+    float rad = MAX_RADIUS * t;
+
+    float outside = smoothstep(rad - 1., rad, pct);
+    float inside = smoothstep(rad + 1., rad, pct);
+    float outside2 = smoothstep(rad - 2.5, rad - 2., pct);
+    float inside2 = smoothstep(rad - 1.5, rad - 2., pct);
     vec2 p = gl_FragCoord.xy / OutSize.x;
     float prop = OutSize.x / OutSize.y;
     vec2 m = vec2(0.5, 0.5 / prop);
     vec2 d = p - m;
     float r = sqrt(dot(d, d));
-    float power = ( 1.0 * 3.141592 / (2.0 * sqrt(dot(m, m))) ) *
-    (inside * -0.2);
+    float power = ( 1.0 * 3.141592 / (2.0 * sqrt(dot(m, m))) ) * (inside * -0.2);
     float bind = (prop < 1.0) ? m.x : m.y;
 
 
     vec2 uv;
-    if (power < 0.0 && Radius > 0)
+    if (power < 0.0 && rad > 0)
     uv = m + normalize(d) * atan(r * -power * 10.0) * bind / atan(-power * bind * 10.0);
     else
     uv = p;
     vec3 color = texture(DiffuseSampler, vec2(uv.x, uv.y * prop)).rgb;
-    if(Radius > 0){
+    if(rad > 0){
         //Change this to modify the color of the "ring"
         color += pow(vec3(1.) * (outside * inside + outside2 * inside2), vec3(3.));
     }

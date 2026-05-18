@@ -78,7 +78,7 @@ public final class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimson
 
         if (user instanceof final ServerPlayer player) {
             // Shader handling
-            ShaderActivationPacket.send(player, attacker, 0, 120, ShaderActivationPacket.Type.CRIMSON);
+            ShaderActivationPacket.send(player, attacker, 0, erasureDuration, ShaderActivationPacket.Type.CRIMSON);
 
             PlayerCloneEntity clone = new PlayerCloneEntity(attacker.level());
             clone.setShouldRenderForMaster(false);
@@ -171,6 +171,8 @@ public final class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimson
                 if (user instanceof ServerPlayer player) {
                     player.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(JSoundRegistry.TIME_ERASE_EXIT.get()),
                             SoundSource.PLAYERS, attacker.getX(), attacker.getY(), attacker.getZ(), 1, 1, 0));
+
+                    ShaderDeactivationPacket.send(player, ShaderActivationPacket.Type.CRIMSON);
                 }
 
                 /* Return targets to position

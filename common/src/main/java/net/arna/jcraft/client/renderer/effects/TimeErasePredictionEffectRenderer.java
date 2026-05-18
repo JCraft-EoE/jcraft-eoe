@@ -7,6 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.architectury.event.events.client.ClientTickEvent;
 import net.arna.jcraft.client.JCraftClient;
+import net.arna.jcraft.client.rendering.api.callbacks.DisplayResizeCallback;
 import net.arna.jcraft.client.util.RenderUtils;
 import net.arna.jcraft.common.attack.moves.kingcrimson.PredictionMove;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,7 @@ import org.joml.Matrix4f;
 
 import java.util.*;
 
-public class TimeErasePredictionEffectRenderer {
+public class TimeErasePredictionEffectRenderer implements DisplayResizeCallback {
     private static int ticksLeft = 0;
     private static final Map<Entity, Vec3> predictions = new WeakHashMap<>();
     private static RenderTarget predictionsBuffer = Minecraft.getInstance().getMainRenderTarget();
@@ -95,12 +96,9 @@ public class TimeErasePredictionEffectRenderer {
             }
 
             final Vec3 pos = prediction.getValue().subtract(camPos);
-            final BlockPos bPos = BlockPos.containing(prediction.getValue());
 
-            final int blockLight = Math.max(entity.isOnFire() ? 15 : entity.level().getBrightness(LightLayer.BLOCK, bPos), 7);
-            final int skyLight = Math.max(entity.level().getBrightness(LightLayer.SKY, bPos), 7);
             entityRenderDispatcher.render(entity, pos.x, pos.y - 0.1, pos.z, entity.getYRot(), tickDelta, stack,
-                    consumers, LightTexture.pack(blockLight, skyLight));
+                    consumers, LightTexture.FULL_BRIGHT);
         }
 
         // Draw entities to predictions buffer
@@ -158,5 +156,10 @@ public class TimeErasePredictionEffectRenderer {
 
     private static void updatePredictions() {
         PredictionMove.updatePredictions(predictions, ticksLeft);
+    }
+
+    @Override
+    public void onResolutionChanged(int width, int height) {
+        predictionsBuffer.resize(width, height, Minecraft.ON_OSX);
     }
 }
