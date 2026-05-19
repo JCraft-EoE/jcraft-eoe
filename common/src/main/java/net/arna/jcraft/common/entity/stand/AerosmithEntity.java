@@ -167,6 +167,12 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Getter
     private final AerosmithAttackOrderMove attackOrderMove;
 
+    // Tracks the move that was active just before cancelMove() was called,
+    // so setMove() can tell apart re-initiating the same move in a continuous loop
+    // (e.g. light attack holding) from actually starting a new move.
+    @Nullable
+    private AbstractMove<?, ? super AerosmithEntity> preCancelMove = null;
+
     public enum PatrolDirection {
         CLOCKWISE(1),
         COUNTER_CLOCKWISE(-1);
@@ -268,6 +274,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Override
     public void cancelMove(boolean offensiveCancel) {
         if (offensiveCancel && isRemote()) return;
+        preCancelMove = getCurrentMove();
         super.cancelMove(offensiveCancel);
     }
 
@@ -392,6 +399,20 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             info.setDesiredStandOffTime(random.nextInt(40));
         else
             info.setDesiredStandOffTime(0);
+    }
+
+    @Override
+    public void setMove(AbstractMove<?, ? super AerosmithEntity> move, @Nullable AerosmithEntity.State animState) {
+        // A "continuation" is when the same move is re-initiated immediately after cancelling itself
+        // (e.g. MuzzleHitscanAttack looping while the button is held). In that case we skip the
+        // maneuver sound so it only plays on genuine new starts.
+        boolean isContinuation = (move == preCancelMove);
+        preCancelMove = null;
+
+        if (isRemote() && !isContinuation)
+            playBoundSound(JSoundRegistry.AS_MANEUVER.get(), 1f, 1f);
+
+        super.setMove(move, animState);
     }
 
     public void patrol(final Vec3 targetPos, final float radius) {
