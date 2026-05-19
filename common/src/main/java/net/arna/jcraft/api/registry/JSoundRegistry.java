@@ -300,6 +300,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> AS_IDLE = register("asidle");
     RegistrySupplier<SoundEvent> AS_FLYBY = register("asflyby");
     RegistrySupplier<SoundEvent> AS_LANDING = register("aslanding");
+    RegistrySupplier<SoundEvent> AS_MANEUVER = register("asmaneuver");
 
     //// SPECS
     // Brawler
