@@ -50,7 +50,7 @@ dependencies {
     modImplementation "dev.architectury:architectury-forge:$architectury_api_version"
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
-    implementation(include("io.github.llamalad7:mixinextras-forge:0.4.1"))
+    implementation(include("io.github.llamalad7:mixinextras-forge:0.5.0"))
 
 
     // AzureLib
