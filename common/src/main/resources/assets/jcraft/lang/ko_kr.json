@@ -698,8 +698,6 @@
   "move.jcraft.aerosmith.default.bomb_drop.name": "폭탄 투하",
   "move.jcraft.aerosmith.default.breath_detection.description": "에어로스미스가 주변의 생명체의 숨결을 찾는다.",
   "move.jcraft.aerosmith.default.breath_detection.name": "호흡 추적",
-  "move.jcraft.aerosmith.default.dive_charge.description": "비원격: 직선 돌진 후, 끝에서 상승. 에어로스미스로 적을 옮긴다.",
-  "move.jcraft.aerosmith.default.dive_charge.name": "다이빙 돌진",
   "move.jcraft.aerosmith.default.item_drop.cr.description": "에어로스미스에게 지정된 위치 위에 아이템을 떨어뜨리도록 명령한다.",
   "move.jcraft.aerosmith.default.item_drop.cr.name": "아이템 운반",
   "move.jcraft.aerosmith.default.patrol_location.description": "에어로스미스에게 지정된 위치 주변을 비행하도록 명령한다.",
