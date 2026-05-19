@@ -31,7 +31,7 @@ public final class SingularityAttack extends AbstractSimpleAttack<SingularityAtt
     protected void processTarget(final TheWorldOverHeavenEntity attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
         damageLogic(attacker.getEntityWorld(), target, new AttackData(
                 kbVec, getStun(), getStunType().ordinal(), true,
-                0, isLift(), getBlockStun(), damageSource, attacker.getUserOrThrow(),
+                getDamage(), isLift(), getBlockStun(), damageSource, attacker.getUserOrThrow(),
                 getHitAnimation(), attacker.getMoveUsage(), true, false)
         );
 

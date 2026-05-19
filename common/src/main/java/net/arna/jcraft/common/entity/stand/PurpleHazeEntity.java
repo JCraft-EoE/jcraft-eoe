@@ -29,6 +29,8 @@ import net.arna.jcraft.common.attack.moves.purplehaze.PHGroundSlamAttack;
 import net.arna.jcraft.common.attack.moves.purplehaze.PHRekkaAttack;
 import net.arna.jcraft.common.attack.moves.purplehaze.PlayMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
+import net.arna.jcraft.common.entity.GEFrogEntity;
+import net.arna.jcraft.common.entity.projectile.JAttackEntity;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -287,24 +289,21 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     @Override
     public void standBlock() {
-        if (!hasUser()) {
-            return;
-        }
+        final var user = getUser();
+        if (user == null) return;
         // Projectile deflection
-        List<Projectile> toDeflect = this.level().getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(0.75f), EntitySelector.ENTITY_STILL_ALIVE);
+        final List<Projectile> toDeflect = level().getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(0.75f), EntitySelector.ENTITY_STILL_ALIVE);
 
         for (Projectile projectile : toDeflect) {
-            if (projectile.getOwner() == getUserOrThrow()) {
-                continue;
-            }
+            if (projectile.getOwner() == user) continue;
             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(-0.5).add(0, -0.1, 0));
             projectile.hurtMarked = true;
         }
 
         if (!isRemote()) {
-            JCraft.stun(getUserOrThrow(), 2, 2);
+            JCraft.stun(user, 2, 2);
         }
-        getUserOrThrow().addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 5, 3, false, false, true));
+        user.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 5, 3, false, false, true));
     }
 
     @Override
@@ -338,7 +337,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                     return;
                 }
 
-                if (getTarget() == null) {
+                if (getTarget() == null && !allowMoveUsage) {
                     wantToBlock = false;
                 }
 
@@ -346,7 +345,11 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 int obedience = getObedience();
 
                 if (allowMoveUsage) {
-                    setObedience(obedience - 1);
+                    setObedience(obedience--);
+
+                    if (obedience <= 0)
+                        allowMoveUsage = false;
+
                     obedienceGainCooldown = MAX_OBEDIENCE_GAIN_COOLDOWN;
                 } else {
                     if (obedienceGainCooldown > 0)
@@ -379,13 +382,15 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                         potentialTargets.sort(distanceComparator);
 
                         for (LivingEntity potentialTarget : potentialTargets) {
-                            if (!hasLineOfSight(potentialTarget)) {
-                                continue;
-                            }
+                            if (potentialTarget instanceof JAttackEntity) continue;
+                            if (potentialTarget instanceof GEFrogEntity) continue;
+                            if (!hasLineOfSight(potentialTarget)) continue;
+
                             if (potentialTarget instanceof StandEntity<?, ?> standEntity && standEntity.hasUser()) {
                                 setTarget(standEntity.getUserOrThrow());
                                 break;
                             }
+
                             if (potentialTarget == user) {
                                 if (tickCount % 20 == 0 && random.nextDouble() * MAX_RAGE <= rage) {
                                     setTarget(user);
@@ -453,7 +458,7 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
         LivingEntity user = getUserOrThrow();
 
         if (getMoveStun() <= 0) {
-            if (JUtils.canAct(user)) {
+            if (JUtils.canAct(user) && JUtils.canAct(this)) {
                 if (f == 0) {
                     if (s > 0) {
                         setStateNoReset(onGround() ? State.RIGHT : State.RIGHT_DASH);

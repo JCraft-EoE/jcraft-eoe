@@ -108,6 +108,21 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Orders Aerosmith to drop a bomb above a given location.")
             );
 
+    public static final MainBarrageAttack<AerosmithEntity> SAWBLADE = new MainBarrageAttack<AerosmithEntity>(280,
+            0, 24, 0.9f, 1f, 13, 1.5f, 0.1f, 0f, 3, Blocks.OAK_LEAVES.defaultDestroyTime())
+            // .withSound(JSoundRegistry.AS_SAWBLADE)
+            .withImpactSound(JSoundRegistry.AS_BARRAGE_HIT)
+            .withInfo(
+                    Component.literal("Propeller Strike"),
+                    Component.literal("A makeshift barrage wielding Aerosmith as a saw-blade.")
+            );
+
+    public static final AerosmithAttackOrderMove ATTACK_ORDER_MOVE = new AerosmithAttackOrderMove(0, 0)
+            .withInfo(
+                    Component.literal("Attack Order"),
+                    Component.literal("Orders Aerosmith to attack the entity at a detected location.")
+            );
+
     public static final AerosmithChargeAttack CHARGE = new AerosmithChargeAttack(
             100, 50, 1.0f, 15, 1.66f, 0.1f, 0.0f,
             IntSet.of(10, 15, 20, 25, 30, 35, 40, 45, 50))
@@ -120,22 +135,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Non-remote: a straight charge, rising at the end. Carries enemies with Aerosmith.")
             );
 
-    public static final MainBarrageAttack<AerosmithEntity> SAWBLADE = new MainBarrageAttack<AerosmithEntity>(280,
-            0, 24, 0.9f, 1f, 13, 1.5f, 0.1f, 0f, 3, Blocks.OAK_LEAVES.defaultDestroyTime())
-            // .withSound(JSoundRegistry.AS_SAWBLADE)
-            .withAerialVariant(CHARGE)
-            .withInfo(
-                    Component.literal("Propeller Strike"),
-                    Component.literal("A makeshift barrage wielding Aerosmith as a saw-blade.")
-            );
-
-    public static final AerosmithAttackOrderMove ATTACK_ORDER_MOVE = new AerosmithAttackOrderMove(0, 0)
-            .withInfo(
-                    Component.literal("Attack Order"),
-                    Component.literal("Orders Aerosmith to attack the entity at a detected location.")
-            );
-
     public static final FlybyMove FLYBY = new FlybyMove(0, 67f)
+            .withCrouchingVariant(CHARGE)
             .withInfo(
                     Component.literal("Fly by Location"),
                     Component.literal("Orders Aerosmith to fly to a given location, returning after arriving.")
@@ -262,8 +263,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     private static void registerDefaultMoves(final @NonNull MoveMap<AerosmithEntity, AerosmithEntity.State> moves) {
         moves.register(MoveClass.LIGHT, BULLET, State.LIGHT);
         moves.register(MoveClass.HEAVY, BOMB_DROP, State.ACTIVE);
-        moves.register(MoveClass.BARRAGE, SAWBLADE, State.SAWBLADE).withAerialVariant(State.CHARGE);
-        moves.register(MoveClass.SPECIAL1, FLYBY);
+        moves.register(MoveClass.BARRAGE, SAWBLADE, State.SAWBLADE);
+        moves.register(MoveClass.SPECIAL1, FLYBY).withCrouchingVariant(State.CHARGE);
         moves.register(MoveClass.SPECIAL2, BOMB_THROW, State.BOMB);
         moves.register(MoveClass.SPECIAL3, XRAY);
         moves.register(MoveClass.ULTIMATE, ATTACK_ORDER_MOVE);
