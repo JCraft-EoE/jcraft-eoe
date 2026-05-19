@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
 public interface JTagRegistry {
@@ -61,6 +62,8 @@ public interface JTagRegistry {
     TagKey<StructureTemplatePool> STONE_BASE = TagKey.create(Registries.TEMPLATE_POOL, JCraft.id("stone_base"));
 
     TagKey<DamageType> STAND_IMMUNE = TagKey.create(Registries.DAMAGE_TYPE, JCraft.id("stand_immune"));
+
+    TagKey<Structure> ON_MONASTERY_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_monastery_maps"));
 
     static void init() {
         // intentionally left empty
