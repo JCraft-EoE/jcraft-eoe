@@ -394,7 +394,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             info.setDesiredStandOffTime(0);
     }
 
-    public void patrol(final Vec3 targetPos, final float radius) {
+    public void patrol(@NonNull final Vec3 targetPos, final float radius) {
         flyState = FlyState.PATROL;
         flyTarget = targetPos;
         patrolRadius = radius;
