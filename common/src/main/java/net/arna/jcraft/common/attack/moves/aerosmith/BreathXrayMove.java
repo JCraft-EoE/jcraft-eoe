@@ -193,7 +193,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
     public static void playPingSound(@NonNull final ServerPlayer serverPlayer) {
         Random random = new Random();
-        float volume = 0.5f - random.nextFloat() * 0.2f;
+        float volume = 0.7f - random.nextFloat() * 0.2f;
         float pitch = 1 - random.nextFloat() * 0.2f;
         BoundSoundPlayer.playSoundFrom(serverPlayer, JSoundRegistry.AS_RADAR_PING.get(), SoundSource.PLAYERS,
                 volume, pitch, List.of(serverPlayer));
