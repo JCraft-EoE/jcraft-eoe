@@ -23,7 +23,8 @@ public class PlayerListMixin {
     @Expression("dx * dx + dy * dy + dz * dz < radius * radius")
     @ModifyExpressionValue(method = "broadcast", at = @At("MIXINEXTRAS:EXPRESSION"))
     private boolean sendSoundsToPlayerIfStandIsInRange(boolean original,
-                                                       @Local(name = "serverPlayer") ServerPlayer serverPlayer,
+                                                       @SuppressWarnings("LocalMayUseName") // doesn't work
+                                                       @Local(ordinal = 0) ServerPlayer serverPlayer,
                                                        @Local(argsOnly = true, ordinal = 0) double soundX,
                                                        @Local(argsOnly = true, ordinal = 1) double soundY,
                                                        @Local(argsOnly = true, ordinal = 2) double soundZ,
