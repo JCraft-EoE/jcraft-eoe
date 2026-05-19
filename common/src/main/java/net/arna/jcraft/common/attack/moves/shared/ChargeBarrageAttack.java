@@ -84,6 +84,7 @@ public final class ChargeBarrageAttack<A extends IAttacker<? extends A, ?>> exte
     public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Set<LivingEntity> targets = super.perform(attacker, user);
         final Entity attackerEntity = attacker.getBaseEntity();
+
         if (targets.isEmpty() || attackerEntity == null) {
             return targets;
         }
@@ -92,9 +93,6 @@ public final class ChargeBarrageAttack<A extends IAttacker<? extends A, ?>> exte
         Vec3 avgPos = Vec3.ZERO;
         float c = 0;
         for (LivingEntity target : targets) {
-            if (target instanceof StandEntity<?, ?>) {
-                continue;
-            }
             avgPos = avgPos.add(target.position());
             c += 1f;
         }

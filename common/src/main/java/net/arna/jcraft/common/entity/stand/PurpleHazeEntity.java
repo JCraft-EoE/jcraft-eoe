@@ -20,6 +20,7 @@ import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.*;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
+import net.arna.jcraft.common.ai.CombatEntityContext;
 import net.arna.jcraft.common.ai.CombatInstantContext;
 import net.arna.jcraft.common.ai.IJAttackerBrain;
 import net.arna.jcraft.common.ai.brain.StandAttackerBrain;
@@ -215,9 +216,9 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     @Override
     public void queueMove(MoveInputType type) {
-        if (!remoteControllable() && queuedMove == MoveInputType.STAND_SUMMON) {
+        if (wantToDesummon)
             return;
-        }
+
         super.queueMove(type);
     }
 
@@ -329,8 +330,16 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             if (!level().isClientSide()) {
 
                 if (wantToDesummon) {
+                    if (queuedMove != null) {
+                        queuedMove = null;
+                    }
+
                     desummon();
                     return;
+                }
+
+                if (getTarget() == null) {
+                    wantToBlock = false;
                 }
 
                 // obedience
@@ -412,6 +421,11 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 }
             }
         }
+    }
+
+    @Override
+    protected boolean doAutoBlocking(Mob mob, int aiLevel, int reactionTime, CombatEntityContext enemyCtx, double distance) {
+        return false;
     }
 
     @Override
