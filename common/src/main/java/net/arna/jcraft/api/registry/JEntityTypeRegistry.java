@@ -281,7 +281,7 @@ public interface JEntityTypeRegistry {
             ).sized(
                     1.2f,
                     0.9f
-            ).clientTrackingRange(100).build("aerosmith"));
+            ).clientTrackingRange(12).build("aerosmith"));
 
     RegistrySupplier<EntityType<GEREntity>> GER = ENTITY_TYPE_REGISTRY.register(JCraft.id("ger"),
             () -> EntityType.Builder.of(
