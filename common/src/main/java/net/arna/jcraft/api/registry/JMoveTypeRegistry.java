@@ -278,6 +278,7 @@ public interface JMoveTypeRegistry {
 
     RegistrySupplier<MoveType<?>> AEROSMITH_BULLET_ATTACK = register("aerosmith_bullet_attack", MuzzleHitscanAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_THROW_ATTACK = register("aerosmith_bomb_throw_attack", BombThrowAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_ITEM_DROP_ATTACK = register("aerosmith_item_drop_attack", ItemDropAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_PATROL_MOVE = register("aerosmith_patrol_move", PatrolMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> AEROSMITH_FLYBY_MOVE = register("aerosmith_flyby_move", FlybyMove.Type.INSTANCE);

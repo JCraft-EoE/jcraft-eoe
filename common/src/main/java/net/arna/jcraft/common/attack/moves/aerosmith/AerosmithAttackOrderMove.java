@@ -33,8 +33,8 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
     @Nullable @Getter @Setter
     private LivingEntity currentTarget = null;
 
-    private Vec3 lastFlyTarget;
-    private FlyState lastFlyState;
+    private Vec3 lastFlyTarget = Vec3.ZERO;
+    private FlyState lastFlyState = FlyState.RETURN;
 
     public AerosmithAttackOrderMove(final int cooldown, final float range) {
         super(cooldown, 0, 0, 0);
