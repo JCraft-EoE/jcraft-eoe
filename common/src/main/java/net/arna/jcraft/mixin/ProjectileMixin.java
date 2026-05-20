@@ -54,15 +54,17 @@ public abstract class ProjectileMixin {
             projectile.playSound(JSoundRegistry.HAMON_SWOOSH.get());
         }
         original.call();
-        if (hasBeenShot && !projectile.level().isClientSide()) {
+        if (!projectile.level().isClientSide()) {
             final Vec3 position = projectile.position();
-            var packet = new ClientboundLevelParticlesPacket(JParticleTypeRegistry.HAMON_SPARK.get(),
-                    false,
-                    position.x(), position.y(), position.z(),
-                    1, 1, 1,
-                    0.2f, 1);
-            for (ServerPlayer tracker : JUtils.tracking(projectile)) {
-                tracker.connection.send(packet);
+            if (hasBeenShot && !projectile.onGround()) {
+                var packet = new ClientboundLevelParticlesPacket(JParticleTypeRegistry.HAMON_SPARK.get(),
+                        false,
+                        position.x(), position.y(), position.z(),
+                        0.1f, 0.1f, 0.1f,
+                        0.2f, 1);
+                for (ServerPlayer tracker : JUtils.tracking(projectile)) {
+                    tracker.connection.send(packet);
+                }
             }
         }
     }
@@ -89,13 +91,14 @@ public abstract class ProjectileMixin {
                     owner, CommonHitPropertyComponent.HitAnimation.CRUSH, null,
                     false, false
             ));
-            var packet = new ClientboundLevelParticlesPacket(JParticleTypeRegistry.HAMON_SPARK.get(),
+            var packet = new ClientboundLevelParticlesPacket(JParticleTypeRegistry.HITSPARK_1.get(),
                     false,
                     living.getX(), living.getY(), living.getZ(),
-                    1, 1, 1,
-                    0.2f, 10);
-            for (ServerPlayer tracker : JUtils.tracking(living))
+                    0f, 0f, 0f,
+                    0f, 1);
+            for (ServerPlayer tracker : JUtils.tracking(living)) {
                 tracker.connection.send(packet);
+            }
         }
     }
 
