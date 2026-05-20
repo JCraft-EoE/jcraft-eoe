@@ -92,7 +92,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         if (prevScanAngle > scanAngle) {
             // Wrap around, play radar scan sound.
             Random random = new Random();
-            float volume = 0.4f - random.nextFloat() * 0.1f;
+            float volume = 0.25f - random.nextFloat() * 0.1f;
             float pitch = 1f - random.nextFloat() * 0.1f;
             BoundSoundPlayer.playSoundFrom(user, JSoundRegistry.AS_RADAR_SCAN.get(), SoundSource.PLAYERS, volume, pitch,
                     List.of(serverPlayer));
@@ -193,7 +193,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
     public static void playPingSound(@NonNull final ServerPlayer serverPlayer) {
         Random random = new Random();
-        float volume = 0.7f - random.nextFloat() * 0.2f;
+        float volume = 0.8f - random.nextFloat() * 0.2f;
         float pitch = 1 - random.nextFloat() * 0.2f;
         BoundSoundPlayer.playSoundFrom(serverPlayer, JSoundRegistry.AS_RADAR_PING.get(), SoundSource.PLAYERS,
                 volume, pitch, List.of(serverPlayer));
