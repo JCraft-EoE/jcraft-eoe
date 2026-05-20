@@ -1,10 +1,14 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.moves.hamon.ImproviserMove;
 import net.arna.jcraft.common.spec.HamonSpec;
 import net.arna.jcraft.common.util.JUtils;
@@ -17,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,6 +31,9 @@ import java.util.Set;
 
 @Mixin(Projectile.class)
 public abstract class ProjectileMixin {
+
+    @Shadow
+    private boolean hasBeenShot;
 
     @Unique
     private HamonSpec jcraft$hamon;
@@ -37,6 +45,26 @@ public abstract class ProjectileMixin {
                 JUtils.getSpec(living) instanceof HamonSpec hamon &&
                 hamon.getCurrentMove() instanceof ImproviserMove) {
             jcraft$hamon = hamon;
+        }
+    }
+
+    @WrapMethod(method = "tick()V")
+    protected void jcraft$hamonTrail(final Operation<Void> original) {
+        final Projectile projectile = (Projectile)(Object)this;
+        if (!hasBeenShot) {
+            PlaySoundAction.playSound(JSoundRegistry.HAMON_SWOOSH);
+        }
+        original.call();
+        if (hasBeenShot) {
+            final Vec3 position = projectile.position();
+            var packet = new ClientboundLevelParticlesPacket(JParticleTypeRegistry.HAMON_SPARK.get(),
+                    false,
+                    position.x(), position.y(), position.z(),
+                    1, 1, 1,
+                    0.2f, 1);
+            for (ServerPlayer tracker : JUtils.tracking(projectile)) {
+                tracker.connection.send(packet);
+            }
         }
     }
 
