@@ -5,8 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.IAttacker;
-import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.KnifeBundleItem;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.Containers;
@@ -64,17 +62,9 @@ public abstract class AbstractTossMove<T extends AbstractTossMove<T, A>, A exten
 
     /**
      * Returns the world-space position from which the item should be spawned.
-     * Defaults to the right-hand position derived from the D4C model's bipedHandRight bone:
-     * 0.75 blocks up, 0.3125 blocks to the right, and 0.0625 blocks forward — all gravity-aware.
      */
     protected @NonNull Vec3 getSpawnPos(@NonNull LivingEntity base) {
-        final Vec3 up = RotationUtil.vecPlayerToWorld(0, 12.0 / 16.0, 0, GravityChangerAPI.getGravityDirection(base));
-        final Vec3 look = base.getLookAngle();
-        final Vec3 right = look.cross(up.normalize());
-        return base.position()
-                .add(up)
-                .add(right.scale(5.0 / 16.0))
-                .add(look.scale(1.0 / 16.0));
+        return base.position().add(JUtils.getEyePos(base));
     }
 
     protected void handleKnifeBundle(final LivingEntity living, final Level level, final ItemStack itemStack, final float velocity, final float spreadMultiplier, final boolean decrement, final @NonNull Vec3 spawnPos) {
