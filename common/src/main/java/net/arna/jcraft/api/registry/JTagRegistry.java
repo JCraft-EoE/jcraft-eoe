@@ -64,6 +64,9 @@ public interface JTagRegistry {
     TagKey<DamageType> STAND_IMMUNE = TagKey.create(Registries.DAMAGE_TYPE, JCraft.id("stand_immune"));
 
     TagKey<Structure> ON_MONASTERY_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_monastery_maps"));
+    TagKey<Structure> ON_VAMPIRE_LAIR_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_vampire_lair_maps"));
+    TagKey<Structure> ON_CINDERELLA_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_cinderella_maps"));
+    TagKey<Structure> ON_METEORITE_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_meteorite_maps"));
 
     static void init() {
         // intentionally left empty
