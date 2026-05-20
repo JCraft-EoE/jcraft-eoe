@@ -441,14 +441,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         boolean isContinuation = (move == preCancelMove);
         preCancelMove = null;
 
-        if (isRemote() && !isContinuation) {
-            playBoundSound(JSoundRegistry.AS_MANEUVER.get(), 1f, 1f);
+        if (!isContinuation) {
+            if (isRemote()) playBoundSound(JSoundRegistry.AS_MANEUVER.get(), 1f, 1f);
 
             if (getUser() != null) {
                 if (move instanceof MuzzleHitscanAttack)
                     volaHandle = BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_VOLA.get(),
                             getUser().getSoundSource(), 1f, 1f);
-                else BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_SHOUT.get(),
+                else if (isRemote()) BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_SHOUT.get(),
                         getUser().getSoundSource(), 1f, 1f);
             }
         }
