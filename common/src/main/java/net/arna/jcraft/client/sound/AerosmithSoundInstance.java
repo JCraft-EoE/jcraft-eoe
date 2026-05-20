@@ -51,8 +51,7 @@ public class AerosmithSoundInstance extends AbstractTickableSoundInstance {
         LocalPlayer player = client.player;
         if (player == null || volume == 0f) return;
 
-        if (!aerosmith.isRemote() && isFlyby || aerosmith.isRemote() &&
-                (player.distanceToSqr(aerosmith) < FLYBY_DISTANCE * FLYBY_DISTANCE) != isFlyby) {
+        if ((player.distanceToSqr(aerosmith) < FLYBY_DISTANCE * FLYBY_DISTANCE) != isFlyby) {
             // Swapping from flyby sound to idle sound or vice versa.
             stop();
             client.getSoundManager().queueTickingSound(new AerosmithSoundInstance(aerosmith, !isFlyby));
