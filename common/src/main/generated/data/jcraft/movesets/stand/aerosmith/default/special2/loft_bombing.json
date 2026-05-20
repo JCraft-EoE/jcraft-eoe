@@ -1,0 +1,26 @@
+{
+  "anim_state": "BOMB",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "move": {
+    "type": "jcraft:aerosmith_bomb_throw_attack",
+    "cooldown": 200,
+    "duration": 42,
+    "extras": {
+      "conditions": [
+        {
+          "type": "jcraft:remote",
+          "requireRemote": false
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.aerosmith.default.loft_bombing.description"
+      },
+      "name": {
+        "translate": "move.jcraft.aerosmith.default.loft_bombing.name"
+      }
+    },
+    "move_distance": 1.2,
+    "windup": 9
+  }
+}

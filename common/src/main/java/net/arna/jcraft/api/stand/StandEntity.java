@@ -1288,6 +1288,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayerSquared) {
+        return false;
+    }
+
+    @Override
     public boolean isHolding() {
         return holding;
     }
@@ -1512,7 +1517,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return user;
     }
 
-    private boolean doAutoBlocking(Mob mob, int aiLevel, int reactionTime, CombatEntityContext enemyCtx, double distance) {
+    protected boolean doAutoBlocking(Mob mob, int aiLevel, int reactionTime, CombatEntityContext enemyCtx, double distance) {
         if (tsTime > 0) return false;
         boolean wantToBlock = this.wantToBlock;
         wantToBlock = this.doCombatBlocking(mob, reactionTime, enemyCtx, distance, wantToBlock);
