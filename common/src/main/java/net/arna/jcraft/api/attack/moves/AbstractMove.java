@@ -665,7 +665,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         List<BoundSoundPlayer.SoundHandle> sounds = activeSounds.remove(attacker);
 
         // Stop sounds if there are any, unless this move ended naturally (move sound 0),
-        // this move has lingering sounds or we switched to this move's finisher or followup.
+        // this move has lingering sounds, or we switched to this move's finisher or followup.
         if (sounds != null && !sounds.isEmpty() && shouldCancelSounds(attacker)) {
             BoundSoundPlayer.stopAll(sounds);
         }

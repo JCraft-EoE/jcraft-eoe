@@ -85,6 +85,14 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
     }
 
     @Override
+    public void onDeactivate(AerosmithEntity attacker) {
+        super.onDeactivate(attacker);
+
+        if (!wantToContinue)
+            attacker.stopVolaSound();
+    }
+
+    @Override
     protected Vec3 hitscanTraceParticleOrigin(final AerosmithEntity attacker) {
         final Vec3 eyes = attacker.getEyePosition();
         final float rot = attacker.getYRot(); // in degrees

@@ -1317,7 +1317,20 @@
   },
   "asmaneuver": {
     "sounds": [
-      "jcraft:stands/aerosmith/maneuver"
+      {
+        "name": "jcraft:stands/aerosmith/maneuver",
+        "attenuation_distance": 50
+      }
+    ]
+  },
+  "asshout": {
+    "sounds": [
+      "jcraft:stands/aerosmith/shout"
+    ]
+  },
+  "asvola": {
+    "sounds": [
+      "jcraft:stands/aerosmith/vola"
     ]
   },
   "aslanding": {

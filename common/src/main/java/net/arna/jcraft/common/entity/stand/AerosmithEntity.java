@@ -11,9 +11,11 @@ import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
@@ -172,6 +174,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     // (e.g. light attack holding) from actually starting a new move.
     @Nullable
     private AbstractMove<?, ? super AerosmithEntity> preCancelMove = null;
+    private BoundSoundPlayer.SoundHandle volaHandle;
 
     public enum PatrolDirection {
         CLOCKWISE(1),
@@ -409,10 +412,24 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         boolean isContinuation = (move == preCancelMove);
         preCancelMove = null;
 
-        if (isRemote() && !isContinuation)
+        if (isRemote() && !isContinuation) {
             playBoundSound(JSoundRegistry.AS_MANEUVER.get(), 1f, 1f);
 
+            if (getUser() != null) {
+                if (move instanceof MuzzleHitscanAttack)
+                    volaHandle = BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_VOLA.get(),
+                            getUser().getSoundSource(), 1f, 1f);
+                else BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_SHOUT.get(),
+                        getUser().getSoundSource(), 1f, 1f);
+            }
+        }
+
         super.setMove(move, animState);
+    }
+
+    @Override
+    public void queueMove(@Nullable MoveInputType type) {
+        if (type != MoveInputType.LIGHT) super.queueMove(type);
     }
 
     public void patrol(final Vec3 targetPos, final float radius) {
@@ -440,6 +457,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         }
 
         super.desummon(playSound);
+    }
+
+    public void stopVolaSound() {
+        if (volaHandle != null) volaHandle.stop();
     }
 
     public void lookAt(final Vec3 target, final float maxYRotIncrease, final float maxXRotIncrease) {
