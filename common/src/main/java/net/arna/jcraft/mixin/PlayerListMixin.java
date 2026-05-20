@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.network.protocol.Packet;
@@ -36,7 +37,7 @@ public class PlayerListMixin {
         if (original || !(packet instanceof ClientboundSoundPacket)) return original;
 
         StandEntity<?, ?> stand = JUtils.getStand(serverPlayer);
-        if (stand == null) return false;
+        if (stand == null || stand.getType().is(JTagRegistry.CANT_HEAR)) return false;
 
         double radiusSq = radius * radius;
         double standDistSq = stand.position().distanceToSqr(soundX, soundY, soundZ);

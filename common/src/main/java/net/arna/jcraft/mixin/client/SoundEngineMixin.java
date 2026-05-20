@@ -1,6 +1,7 @@
 package net.arna.jcraft.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.Minecraft;
@@ -29,8 +30,9 @@ public class SoundEngineMixin {
         Entity cam = client.getCameraEntity();
         StandEntity<?, ?> camStand = cam instanceof LivingEntity le ? JUtils.getStand(le) : null;
 
-        // Camera entity has no stand, or it's not remote, don't modify sound pos.
-        if (camStand == null || !camStand.isRemote()) return ogSoundPos;
+        // Camera entity has no stand, it's not remote, or it can't hear, don't modify sound pos.
+        if (camStand == null || !camStand.isRemote() || camStand.getType().is(JTagRegistry.CANT_HEAR))
+            return ogSoundPos;
 
         // If the sound is closer to the stand than it is to the player,
         // we need to modify the sound position such that dx, dy and dz between the player and the sound
