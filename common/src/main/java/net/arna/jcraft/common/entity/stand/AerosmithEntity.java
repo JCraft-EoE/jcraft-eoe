@@ -22,12 +22,15 @@ import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
 import net.arna.jcraft.common.ai.CombatInstantContext;
+import net.arna.jcraft.common.attack.conditions.RemoteCondition;
 import net.arna.jcraft.common.attack.moves.aerosmith.*;
+import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -40,6 +43,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -104,18 +108,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Orders Aerosmith to drop a bomb above a given location.")
             );
 
-    public static final FlybyMove FLYBY = new FlybyMove(0, 67f)
-            .withInfo(
-                    Component.literal("Fly by Location"),
-                    Component.literal("Orders Aerosmith to fly to a given location, returning after arriving.")
-            );
-
-    public static final PatrolMove PATROL = new PatrolMove(0, 67f, 48f)
-            .withInfo(
-                    Component.literal("Patrol Location"),
-                    Component.literal("Orders Aerosmith to fly around a given location. Use while crouching to invert the patrol direction.")
-            );
-
     public static final AerosmithChargeAttack CHARGE = new AerosmithChargeAttack(
             100, 50, 1.0f, 15, 1.66f, 0.1f, 0.0f,
             IntSet.of(10, 15, 20, 25, 30, 35, 40, 45, 50))
@@ -128,16 +120,44 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Non-remote: a straight charge, rising at the end. Carries enemies with Aerosmith.")
             );
 
+    public static final MainBarrageAttack<AerosmithEntity> SAWBLADE = new MainBarrageAttack<AerosmithEntity>(280,
+            0, 24, 0.9f, 1f, 13, 1.5f, 0.1f, 0f, 3, Blocks.OAK_LEAVES.defaultDestroyTime())
+            // .withSound(JSoundRegistry.AS_SAWBLADE)
+            .withAerialVariant(CHARGE)
+            .withInfo(
+                    Component.literal("Propeller Strike"),
+                    Component.literal("A makeshift barrage wielding Aerosmith as a saw-blade.")
+            );
+
     public static final AerosmithAttackOrderMove ATTACK_ORDER_MOVE = new AerosmithAttackOrderMove(0, 0)
             .withInfo(
                     Component.literal("Attack Order"),
                     Component.literal("Orders Aerosmith to attack the entity at a detected location.")
             );
 
+    public static final FlybyMove FLYBY = new FlybyMove(0, 67f)
+            .withInfo(
+                    Component.literal("Fly by Location"),
+                    Component.literal("Orders Aerosmith to fly to a given location, returning after arriving.")
+            );
+
+    public static final BombThrowAttack BOMB_THROW = new BombThrowAttack(200, 9, 42, 1.2f)
+            .withInfo(
+                    Component.literal("Loft Bombing"),
+                    Component.literal("Orders Aerosmith to throw a bomb in front of the user using its inertia.")
+            )
+            .withCondition(new RemoteCondition(false));
+
     public static final BreathXrayMove<AerosmithEntity> XRAY = new BreathXrayMove<AerosmithEntity>(0, 0, 128, true)
             .withInfo(
                     Component.literal("Breath Detection"),
                     Component.literal("Aerosmith scans the surroundings for the breath of living things.")
+            );
+
+    public static final PatrolMove PATROL = new PatrolMove(0, 67f, 48f)
+            .withInfo(
+                    Component.literal("Patrol Location"),
+                    Component.literal("Orders Aerosmith to fly around a given location. Use while crouching to invert the patrol direction.")
             );
 
     public static final StandData DATA = StandData.builder()
@@ -240,13 +260,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     private static void registerDefaultMoves(final @NonNull MoveMap<AerosmithEntity, AerosmithEntity.State> moves) {
-        moves.registerImmediate(MoveClass.LIGHT, BULLET, State.LIGHT);
-        moves.registerImmediate(MoveClass.HEAVY, BOMB_DROP, State.ACTIVE);
-        moves.registerImmediate(MoveClass.UTILITY, PATROL, State.ACTIVE);
-        moves.registerImmediate(MoveClass.BARRAGE, CHARGE, State.CHARGE);
-        moves.register(MoveClass.ULTIMATE, ATTACK_ORDER_MOVE);
+        moves.register(MoveClass.LIGHT, BULLET, State.LIGHT);
+        moves.register(MoveClass.HEAVY, BOMB_DROP, State.ACTIVE);
+        moves.register(MoveClass.BARRAGE, SAWBLADE, State.SAWBLADE).withAerialVariant(State.CHARGE);
         moves.register(MoveClass.SPECIAL1, FLYBY);
+        moves.register(MoveClass.SPECIAL2, BOMB_THROW, State.BOMB);
         moves.register(MoveClass.SPECIAL3, XRAY);
+        moves.register(MoveClass.ULTIMATE, ATTACK_ORDER_MOVE);
+        moves.register(MoveClass.UTILITY, PATROL, State.ACTIVE);
     }
 
     private boolean xRotChangeAllowed = false;
@@ -257,6 +278,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public void setXRot(float xRot) {
         if (!xRotChangeAllowed) return;
         super.setXRot(xRot);
+    }
+
+    @Override
+    public void lookAt(@NonNull final EntityAnchorArgument.Anchor anchor, @NonNull final Vec3 target) {
+        boolean store = xRotChangeAllowed;
+        xRotChangeAllowed = true;
+        super.lookAt(anchor, target);
+        xRotChangeAllowed = store;
     }
 
     @Override
@@ -394,7 +423,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             info.setDesiredStandOffTime(0);
     }
 
-    public void patrol(final Vec3 targetPos, final float radius) {
+    public void patrol(@NonNull final Vec3 targetPos, final float radius) {
         flyState = FlyState.PATROL;
         flyTarget = targetPos;
         patrolRadius = radius;
@@ -513,7 +542,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         ACTIVE(AzCommand.create(JCraft.BASE_CONTROLLER, "idle", AzPlayBehaviors.LOOP)),
         CHARGE(AzCommand.create(JCraft.BASE_CONTROLLER, "charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         LIGHT(AzCommand.create(JCraft.BASE_CONTROLLER, "burst", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "block", AzPlayBehaviors.LOOP))
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "block", AzPlayBehaviors.LOOP)),
+        SAWBLADE(AzCommand.create(JCraft.BASE_CONTROLLER, "sawblade", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BOMB(AzCommand.create(JCraft.BASE_CONTROLLER, "bomb", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ;
 
         private final AzCommand animator;

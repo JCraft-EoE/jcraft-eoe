@@ -37,34 +37,10 @@ public abstract class AbstractEntityRenderer<T extends Entity> extends AzEntityR
     public static final String ANIMATION_STR_TEMPLATE = "animations/%s.animation.json";
 
     /**
-     * Path to the model to be used for this entity.
-     */
-    protected final @NonNull ResourceLocation model;
-    /**
-     * Path to the texture to be used for this entity.
-     */
-    protected final @NonNull ResourceLocation texture;
-
-    /**
      * Constructs a renderer with a fully customizable config and the given model/texture paths.
      */
-    protected AbstractEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context,
-                                     final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
+    protected AbstractEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context) {
         super(config, context);
-        this.model = model;
-        this.texture = texture;
-    }
-
-    /**
-     * Constructs a renderer with a fully customizable config and model/texture paths based on the specified ID.
-     *
-     * <ul>
-     * <li>Resulting model path will be equivalent to <code>JCraft.id("geo/" + id + ".geo.json")</code></li>
-     * <li>Resulting texture path will be equivalent to <code>JCraft.id("textures/entity/" + id + ".png")</code></li>
-     * </ul>
-     */
-    protected AbstractEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context, final @NonNull String id) {
-        this(config, context, JCraft.id(MODEL_STR_TEMPLATE.formatted(id)), JCraft.id(TEXTURE_STR_TEMPLATE.formatted(id)));
     }
 
     /**
@@ -72,7 +48,7 @@ public abstract class AbstractEntityRenderer<T extends Entity> extends AzEntityR
      */
     protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier,
                                      final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
-        this(AzEntityRendererConfig.<T>builder(model, texture).setAnimatorProvider(animatorSupplier).build(), context, model, texture);
+        this(AzEntityRendererConfig.<T>builder(model, texture).setAnimatorProvider(animatorSupplier).build(), context);
     }
 
     /**
@@ -90,27 +66,29 @@ public abstract class AbstractEntityRenderer<T extends Entity> extends AzEntityR
     /**
      * Constructs a renderer with a config based on the {@link AzAnimator} {@link Supplier} and the {@link mod.azure.azurelib.render.entity.AzEntityRendererConfig.Builder} {@link Function}, and the given model/texture paths.
      */
-    protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs,
+    protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context,
+                                     final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier,
+                                     final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs,
                                      final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
-        this(additionalConfigs.apply(AzEntityRendererConfig.<T>builder(model, texture).setAnimatorProvider(animatorSupplier)).build(), context, model, texture);
+        this(additionalConfigs.apply(AzEntityRendererConfig.<T>builder(model, texture).setAnimatorProvider(animatorSupplier)).build(), context);
     }
 
     /**
-     * Constructs a renderer with a config based on the {@link AzAnimator} {@link Supplier} and the {@link mod.azure.azurelib.render.entity.AzEntityRendererConfig.Builder} {@link Function}, and model/texture paths based on the specified ID.
+     * Constructs a renderer with a config based on the {@link AzAnimator} {@link Supplier} and the
+     * {@link mod.azure.azurelib.render.entity.AzEntityRendererConfig.Builder} {@link Function}, and model/texture paths based on the specified ID.
      *
      * <ul>
      * <li>Resulting model path will be equivalent to <code>JCraft.id("geo/" + id + ".geo.json")</code></li>
      * <li>Resulting texture path will be equivalent to <code>JCraft.id("textures/entity/" + id + ".png")</code></li>
      * </ul>
      */
-    protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs, final @NonNull String id) {
-        this(additionalConfigs.apply(AzEntityRendererConfig.<T>builder(JCraft.id(MODEL_STR_TEMPLATE.formatted(id)), JCraft.id(TEXTURE_STR_TEMPLATE.formatted(id))).setAnimatorProvider(animatorSupplier)).build(),
-                context, JCraft.id(MODEL_STR_TEMPLATE.formatted(id)), JCraft.id(TEXTURE_STR_TEMPLATE.formatted(id)));
-    }
-
-    @Override
-    public @NonNull ResourceLocation getTextureLocation(final @NonNull T entity) {
-        return texture;
+    protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context,
+                                     final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier,
+                                     final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs,
+                                     final @NonNull String id) {
+        this(additionalConfigs.apply(AzEntityRendererConfig.<T>builder(JCraft.id(MODEL_STR_TEMPLATE.formatted(id)),
+                        JCraft.id(TEXTURE_STR_TEMPLATE.formatted(id))).setAnimatorProvider(animatorSupplier)).build(),
+                context);
     }
 
     /**

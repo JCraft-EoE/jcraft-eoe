@@ -39,6 +39,7 @@ import net.arna.jcraft.common.tickable.MoveTickQueue;
 import net.arna.jcraft.common.tickable.PastDimensions;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.villagertrades.VillagerTradesModifier;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
@@ -242,6 +243,7 @@ public final class JCraft {
         MoveTickQueue.registerMoveTickQueue();
         GravityChannel.registerReceivers();
         JBlockBreaker.init();
+        VillagerTradesModifier.init();
 
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);

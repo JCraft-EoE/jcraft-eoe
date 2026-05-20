@@ -3,6 +3,7 @@
   "class": "HEAVY",
   "cooldown_type": "STAND_HEAVY",
   "crouching_variant": {
+    "anim_state": "ACTIVE",
     "class": "HEAVY",
     "cooldown_type": "STAND_HEAVY",
     "move": {
