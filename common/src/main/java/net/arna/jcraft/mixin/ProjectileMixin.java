@@ -42,13 +42,13 @@ public abstract class ProjectileMixin {
 
     @Inject(method = "onHit(Lnet/minecraft/world/phys/HitResult;)V", at = @At("HEAD"))
     protected void jcraft$hamonHit(final HitResult result, final CallbackInfo ci) {
-        if (jcraft$hamon == null) {
+        if (jcraft$hamon == null || result.getType() == HitResult.Type.MISS) {
             return;
         }
         final Projectile projectile = (Projectile)(Object)this;
         final Entity owner = projectile.getOwner();
         final Level level = projectile.level();
-        final Vec3 center = projectile.position();
+        final Vec3 center = result.getLocation();
         final double size = 1.0;
         final Set<LivingEntity> possibleTargets = JUtils.generateHitbox(level, center, size, Set.of());
         for (final LivingEntity living : possibleTargets) {
