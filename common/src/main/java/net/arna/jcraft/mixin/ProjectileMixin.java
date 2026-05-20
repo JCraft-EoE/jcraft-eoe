@@ -8,7 +8,6 @@ import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.moves.hamon.ImproviserMove;
 import net.arna.jcraft.common.spec.HamonSpec;
 import net.arna.jcraft.common.util.JUtils;
@@ -52,10 +51,10 @@ public abstract class ProjectileMixin {
     protected void jcraft$hamonTrail(final Operation<Void> original) {
         final Projectile projectile = (Projectile)(Object)this;
         if (!hasBeenShot) {
-            PlaySoundAction.playSound(JSoundRegistry.HAMON_SWOOSH);
+            projectile.playSound(JSoundRegistry.HAMON_SWOOSH.get());
         }
         original.call();
-        if (hasBeenShot) {
+        if (hasBeenShot && !projectile.level().isClientSide()) {
             final Vec3 position = projectile.position();
             var packet = new ClientboundLevelParticlesPacket(JParticleTypeRegistry.HAMON_SPARK.get(),
                     false,
