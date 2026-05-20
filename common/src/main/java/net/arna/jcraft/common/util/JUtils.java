@@ -210,11 +210,11 @@ public final class JUtils {
     }
 
     // Defaults to LivingEntity
-    public static Set<LivingEntity> generateHitbox(Level world, Vec3 center, double hitboxSize, Set<Entity> except) {
+    public static Set<LivingEntity> generateHitbox(@NonNull Level world, @NonNull Vec3 center, double hitboxSize, @NonNull Set<Entity> except) {
         return generateHitbox(world, center, hitboxSize, e -> !except.contains(e));
     }
 
-    public static Set<LivingEntity> generateHitbox(Level world, Vec3 center, double hitboxSize, Predicate<Entity> predicate) {
+    public static Set<LivingEntity> generateHitbox(@NonNull Level world, @NonNull Vec3 center, double hitboxSize, @NonNull Predicate<Entity> predicate) {
         double size = hitboxSize / 2;
 
         Vec3 v1 = center.subtract(size, size, size);
