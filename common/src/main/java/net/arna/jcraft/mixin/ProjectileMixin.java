@@ -47,8 +47,21 @@ public abstract class ProjectileMixin {
         }
     }
 
+    /**
+     * If the projectile should display hamon particles. Only gets called if the projectile is hamonized.
+     * @return <code>true</code> if particles should be displayed, <code>false</code> otherwise.
+     */
+    @Unique
+    protected boolean jcraft$shouldDisplayHamonParticles() {
+        return hasBeenShot && !((Projectile)(Object)this).onGround();
+    }
+
     @WrapMethod(method = "tick()V")
     protected void jcraft$hamonTrail(final Operation<Void> original) {
+        if (jcraft$hamon == null) {
+            original.call();
+            return;
+        }
         final Projectile projectile = (Projectile)(Object)this;
         if (!hasBeenShot) {
             projectile.playSound(JSoundRegistry.HAMON_SWOOSH.get());
@@ -56,7 +69,7 @@ public abstract class ProjectileMixin {
         original.call();
         if (!projectile.level().isClientSide()) {
             final Vec3 position = projectile.position();
-            if (hasBeenShot && !projectile.onGround()) {
+            if (jcraft$shouldDisplayHamonParticles()) {
                 var packet = new ClientboundLevelParticlesPacket(JParticleTypeRegistry.HAMON_SPARK.get(),
                         false,
                         position.x(), position.y(), position.z(),

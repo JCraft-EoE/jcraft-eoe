@@ -47,6 +47,7 @@
   ],
   "mixins": [
     "AbilitiesMixin",
+    "AbstractArrowMixin",
     "AnvilMenuMixin",
     "BaseSpawnerMixin",
     "BedBlockMixin",
