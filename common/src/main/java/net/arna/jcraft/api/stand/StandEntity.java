@@ -1285,6 +1285,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayerSquared) {
+        return false;
+    }
+
+    @Override
     public boolean isHolding() {
         return holding;
     }
