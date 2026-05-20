@@ -60,7 +60,6 @@ public class AerosmithSoundInstance extends AbstractTickableSoundInstance {
     }
 
     private void update() {
-        volume = !isFlyby && aerosmith.isRemote() ? 0.2f : 1.0f;
         x = aerosmith.getX();
         y = aerosmith.getY();
         z = aerosmith.getZ();
