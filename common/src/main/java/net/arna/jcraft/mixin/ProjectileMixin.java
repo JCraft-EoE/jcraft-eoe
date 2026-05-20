@@ -12,6 +12,7 @@ import net.arna.jcraft.common.attack.moves.hamon.ImproviserMove;
 import net.arna.jcraft.common.spec.HamonSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -104,14 +105,16 @@ public abstract class ProjectileMixin {
                     owner, CommonHitPropertyComponent.HitAnimation.CRUSH, null,
                     false, false
             ));
-            var packet = new ClientboundLevelParticlesPacket(JParticleTypeRegistry.HITSPARK_1.get(),
-                    false,
-                    living.getX(), living.getY(), living.getZ(),
-                    0f, 0f, 0f,
-                    0f, 1);
-            for (ServerPlayer tracker : JUtils.tracking(living)) {
-                tracker.connection.send(packet);
-            }
+        }
+        // add hit particle effect
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(
+                    JParticleTypeRegistry.HITSPARK_1.get(), // Use hitspark_1 for block hits
+                    center.x(), center.y(), center.z(),
+                    1, // particle count
+                    0, 0, 0, // spread
+                    0 // speed
+            );
         }
     }
 
