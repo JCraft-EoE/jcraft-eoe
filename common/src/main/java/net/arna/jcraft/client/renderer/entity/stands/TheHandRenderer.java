@@ -15,7 +15,10 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 public class TheHandRenderer extends StandEntityRenderer<TheHandEntity> {
 
     public TheHandRenderer(final @NonNull EntityRendererProvider.Context context) {
-        super(context, b -> b.addRenderLayer(new HandErasureLayer()), JStandTypeRegistry.THE_HAND.get(), false, false, 0f, 0f, 90f);
+        super(context, b -> b
+                .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
+                .addRenderLayer(new HandErasureLayer()),
+                JStandTypeRegistry.THE_HAND.get(), false, false, 0f, 0f, 90f);
     }
 
 }

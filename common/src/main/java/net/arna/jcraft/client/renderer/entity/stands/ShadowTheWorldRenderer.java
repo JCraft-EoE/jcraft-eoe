@@ -32,6 +32,7 @@ public class ShadowTheWorldRenderer extends StandEntityRenderer<ShadowTheWorldEn
         return StandEntityRenderer.of(
                 AzEntityRendererConfig
                         .<ShadowTheWorldEntity>builder(model, texture)
+                        .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
                         .addRenderLayer(new STWGlowLayer())
                         .setAnimatorProvider(() -> new STWAnimator(animation, false, false, -0.1745329251f, -0.1745329251f, 90f))
                         .setModelRenderer(StandEntityModelRenderer::new)

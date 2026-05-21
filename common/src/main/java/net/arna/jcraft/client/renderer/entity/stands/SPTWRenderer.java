@@ -15,7 +15,11 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 public class SPTWRenderer extends StandEntityRenderer<AbstractStarPlatinumEntity<?, ?>> {
 
     public SPTWRenderer(final @NonNull EntityRendererProvider.Context context) {
-        super(context, b -> b.addRenderLayer(new SPHairLayer()), JStandTypeRegistry.STAR_PLATINUM_THE_WORLD.get(), false, false, 0f, 0f, 90f);
+        super(context, b -> b
+                .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
+                .addRenderLayer(new SPHairLayer()),
+                JStandTypeRegistry.STAR_PLATINUM_THE_WORLD.get(),
+                false, false, 0f, 0f, 90f);
     }
 
 }

@@ -1,23 +1,12 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.arna.jcraft.client.model.entity.stand.StandEntityModel;
 import net.arna.jcraft.common.entity.stand.CMoonEntity;
-import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.gravity.util.RotationUtil;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 /**
@@ -29,7 +18,8 @@ public class CMoonRenderer extends StandEntityRenderer<CMoonEntity> {
     private static final ParticleOptions chargeParticle = new DustParticleOptions(new Vector3f(0.8f, 0.2f, 1.0f), 2.0f);
 
     public CMoonRenderer(final EntityRendererProvider.Context context) {
-        super(context, JStandTypeRegistry.C_MOON.get());
+        super(context, b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                JStandTypeRegistry.C_MOON.get(), 0f, 0f);
     }
 
     /*@Override

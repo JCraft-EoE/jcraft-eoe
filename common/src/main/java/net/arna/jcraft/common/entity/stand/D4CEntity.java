@@ -39,7 +39,6 @@ import org.joml.Vector3f;
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Dirty_Deeds_Done_Dirt_Cheap">Dirty Deeds Done Dirt Cheap</a>.
  * @see JStandTypeRegistry#D4C
- * @see net.arna.jcraft.client.renderer.entity.stands.D4CRenderer D4CRenderer
  * @see CloneSpawnMove
  * @see D4CCounterAttack
  * @see D4CGrabAttack
