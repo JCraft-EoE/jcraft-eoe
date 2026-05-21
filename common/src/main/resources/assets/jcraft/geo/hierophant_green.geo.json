@@ -251,7 +251,7 @@
 					]
 				},
 				{
-					"name": "armRightTentacle2",
+					"name": "prop4",
 					"parent": "armRightTentacle",
 					"pivot": [-5.5, 20.45, -0.5],
 					"cubes": [
@@ -271,7 +271,7 @@
 				},
 				{
 					"name": "armRightTentacle3",
-					"parent": "armRightTentacle2",
+					"parent": "prop4",
 					"pivot": [-5.5, 16.45, -0.5],
 					"cubes": [
 						{
@@ -358,7 +358,7 @@
 					"pivot": [4.8, 13.2, 0.2]
 				},
 				{
-					"name": "leftArmTentacle",
+					"name": "prop",
 					"parent": "armLeft",
 					"pivot": [5.5, 24.45, -0.5],
 					"cubes": [
@@ -378,7 +378,7 @@
 				},
 				{
 					"name": "leftArmTentacle2",
-					"parent": "leftArmTentacle",
+					"parent": "prop",
 					"pivot": [5.5, 20.45, -0.5],
 					"cubes": [
 						{
@@ -623,7 +623,7 @@
 					]
 				},
 				{
-					"name": "legRightTentacle2",
+					"name": "prop3",
 					"parent": "legRightTentacle",
 					"pivot": [-1.5, 8.45, -0.5],
 					"cubes": [
@@ -643,7 +643,7 @@
 				},
 				{
 					"name": "legRightTentacle3",
-					"parent": "legRightTentacle2",
+					"parent": "prop3",
 					"pivot": [-1.5, 4.45, -0.5],
 					"cubes": [
 						{
@@ -745,7 +745,7 @@
 					]
 				},
 				{
-					"name": "legLeftTentacle2",
+					"name": "prop2",
 					"parent": "legLeftTentacle",
 					"pivot": [1.5, 8.45, -0.5],
 					"cubes": [
@@ -765,7 +765,7 @@
 				},
 				{
 					"name": "legLeftTentacle3",
-					"parent": "legLeftTentacle2",
+					"parent": "prop2",
 					"pivot": [1.5, 4.45, -0.5],
 					"cubes": [
 						{
