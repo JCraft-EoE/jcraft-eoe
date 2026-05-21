@@ -5,6 +5,7 @@ import net.arna.jcraft.common.effects.FlammableEffect;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.events.EntityTickEvent;
+import net.arna.jcraft.common.events.JEntityEvents;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.mixin_logic.EntityAddon;
 import net.arna.jcraft.mixin_logic.EntityMixinLogic;
@@ -73,6 +74,11 @@ public abstract class EntityMixin implements EntityAddon {
     private void jcraft$ignoreBlockPushingIfCreaming(CallbackInfo ci) {
         if (CreamEntity.isCreaming((Entity) (Object) this))
             ci.cancel();
+    }
+
+    @Inject(method = "setRemoved", at = @At("RETURN"))
+    private void jcraft$fireRemovedEvent(Entity.RemovalReason removalReason, CallbackInfo ci) {
+        JEntityEvents.REMOVE.invoker().remove((Entity) (Object) this, removalReason);
     }
 
     @Override

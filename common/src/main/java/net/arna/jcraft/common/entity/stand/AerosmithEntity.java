@@ -11,9 +11,11 @@ import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
@@ -187,6 +189,13 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Getter
     private final AerosmithAttackOrderMove attackOrderMove;
 
+    // Tracks the move that was active just before cancelMove() was called,
+    // so setMove() can tell apart re-initiating the same move in a continuous loop
+    // (e.g. light attack holding) from actually starting a new move.
+    @Nullable
+    private AbstractMove<?, ? super AerosmithEntity> preCancelMove = null;
+    private BoundSoundPlayer.SoundHandle volaHandle;
+
     public enum PatrolDirection {
         CLOCKWISE(1),
         COUNTER_CLOCKWISE(-1);
@@ -297,10 +306,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Override
     public void cancelMove(boolean offensiveCancel) {
         if (offensiveCancel && isRemote()) return;
+        preCancelMove = getCurrentMove();
         super.cancelMove(offensiveCancel);
     }
-
-    public double lastMovementToLocalPlayerAngle = 0.0;
 
     @Override
     public void tick() {
@@ -314,17 +322,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         xRotChangeAllowed = true;
 
         resetFallDistance();
-
-        if (!isAlive()) return;
-
-        if (level().isClientSide()) {
-            JCraft.getClientEntityHandler().aerosmithClientTick(this);
-            return;
-        }
-
         final LivingEntity user = getUser();
 
-        if (user == null) return;
+        if (!isAlive() || level().isClientSide() || user == null)
+            return;
 
         final AbstractMove<?, ? super AerosmithEntity> currentMove = getCurrentMove();
 
@@ -423,6 +424,34 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             info.setDesiredStandOffTime(0);
     }
 
+    @Override
+    public void setMove(AbstractMove<?, ? super AerosmithEntity> move, @Nullable AerosmithEntity.State animState) {
+        // A "continuation" is when the same move is re-initiated immediately after cancelling itself
+        // (e.g. MuzzleHitscanAttack looping while the button is held). In that case we skip the
+        // maneuver sound so it only plays on genuine new starts.
+        boolean isContinuation = (move == preCancelMove);
+        preCancelMove = null;
+
+        if (!isContinuation) {
+            if (isRemote()) playBoundSound(JSoundRegistry.AS_MANEUVER.get(), 1f, 1f);
+
+            if (getUser() != null) {
+                if (move instanceof MuzzleHitscanAttack)
+                    volaHandle = BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_VOLA.get(),
+                            getUser().getSoundSource(), 1f, 1f);
+                else if (isRemote()) BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_SHOUT.get(),
+                        getUser().getSoundSource(), 1f, 1f);
+            }
+        }
+
+        super.setMove(move, animState);
+    }
+
+    @Override
+    public void queueMove(@Nullable MoveInputType type) {
+        if (type != MoveInputType.LIGHT) super.queueMove(type);
+    }
+
     public void patrol(@NonNull final Vec3 targetPos, final float radius) {
         flyState = FlyState.PATROL;
         flyTarget = targetPos;
@@ -448,6 +477,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         }
 
         super.desummon(playSound);
+    }
+
+    public void stopVolaSound() {
+        if (volaHandle != null) volaHandle.stop();
     }
 
     public void lookAt(final Vec3 target, final float maxYRotIncrease, final float maxXRotIncrease) {

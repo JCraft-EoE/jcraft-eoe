@@ -294,11 +294,15 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> AS_BOMB_DROP = register("asbombdrop");
     RegistrySupplier<SoundEvent> AS_BOMB_LAND = register("asbombland");
     RegistrySupplier<SoundEvent> AS_RADAR_PING = register("asradarping");
+    RegistrySupplier<SoundEvent> AS_RADAR_SCAN = register("asradarscan");
     RegistrySupplier<SoundEvent> AS_BARRAGE = register("asbarrage");
     RegistrySupplier<SoundEvent> AS_BARRAGE_HIT = register("asbarragehit");
     RegistrySupplier<SoundEvent> AS_IDLE = register("asidle");
     RegistrySupplier<SoundEvent> AS_FLYBY = register("asflyby");
     RegistrySupplier<SoundEvent> AS_LANDING = register("aslanding");
+    RegistrySupplier<SoundEvent> AS_MANEUVER = register("asmaneuver");
+    RegistrySupplier<SoundEvent> AS_SHOUT = register("asshout");
+    RegistrySupplier<SoundEvent> AS_VOLA = register("asvola");
 
     //// SPECS
     // Brawler

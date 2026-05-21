@@ -4,6 +4,7 @@ import dev.architectury.event.events.client.ClientCommandRegistrationEvent;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.common.EntityEvent;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.arna.jcraft.client.events.JClientEvents;
 import net.arna.jcraft.client.gui.screen.MainMenuScreen;
@@ -22,6 +23,7 @@ public interface JClientEventsRegistry {
         ClientTickEvent.CLIENT_LEVEL_POST.register(level -> new SkyBoxManager());
 
         ClientGuiEvent.RENDER_HUD.register(JClientEvents::renderHud);
+        EntityEvent.ADD.register(JClientEvents::onEntityAdd);
 
         MenuRegistry.registerScreenFactory(JMenuRegistry.MAIN_MENU_TYPE.get(), MainMenuScreen::new);
 

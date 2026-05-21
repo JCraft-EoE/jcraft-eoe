@@ -72,4 +72,13 @@ public abstract class MoveActionType<T extends MoveAction<? extends T, ?>> {
             return r;
         };
     }
+
+    protected <R extends MoveAction<?, ?>, T1, T2, T3, T4, T5, T6, T7> Function8<RunMoment, T1, T2, T3, T4, T5, T6, T7, R>
+    apply(Function7<T1, T2, T3, T4, T5, T6, T7, R> func) {
+        return (runMoment, t1, t2, t3, t4, t5, t6, t7) -> {
+            R r = func.apply(t1, t2, t3, t4, t5, t6, t7);
+            r.setRunMoment(runMoment);
+            return r;
+        };
+    }
 }
