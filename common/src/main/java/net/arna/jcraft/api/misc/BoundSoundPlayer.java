@@ -4,6 +4,7 @@ import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.Synchronized;
+import lombok.experimental.UtilityClass;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.sound.BoundSoundClient;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  *
  * @see BoundSoundClient
  */
+@UtilityClass
 public class BoundSoundPlayer {
 
     /**

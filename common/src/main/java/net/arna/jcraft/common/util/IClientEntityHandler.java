@@ -26,6 +26,4 @@ public interface IClientEntityHandler {
     void vehicleMovementTick(AbstractGroundVehicleEntity vehicle);
 
     void spawnGroundedMoshParticles(AbstractArrow projectile);
-
-    void aerosmithClientTick(AerosmithEntity entity);
 }

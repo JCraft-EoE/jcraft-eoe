@@ -5,15 +5,12 @@ import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SoundEngine.class)
 public class SoundEngineMixin {
@@ -47,10 +44,5 @@ public class SoundEngineMixin {
         // Stand is closer to sound than camera, use stand position.
         Vec3 delta = ogSoundPos.subtract(camStand.position());
         return cam.position().add(delta);
-    }
-
-    @Inject(method = "play", at = @At("HEAD"))
-    private void playHead(SoundInstance sound, CallbackInfo ci) {
-
     }
 }

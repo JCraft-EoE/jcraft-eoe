@@ -506,11 +506,23 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    /**
+     * Makes sounds played by this move linger.
+     * I.e., they aren't stopped when the move is cancelled.
+     * @return This move
+     */
     public T withLingeringSounds() {
         return withLingeringSounds(true);
     }
 
+    /**
+     * Makes sounds played by this move linger.
+     * I.e., they aren't stopped when the move is cancelled.
+     * @param lingeringSounds Whether sounds on this move should linger
+     * @return This move
+     */
     public T withLingeringSounds(final boolean lingeringSounds) {
+        this.lingeringSounds = lingeringSounds;
         return getThis();
     }
 

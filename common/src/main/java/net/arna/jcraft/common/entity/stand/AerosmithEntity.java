@@ -310,8 +310,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         super.cancelMove(offensiveCancel);
     }
 
-    public double lastMovementToLocalPlayerAngle = 0.0;
-
     @Override
     public void tick() {
         xRotChangeAllowed = false;
@@ -324,17 +322,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         xRotChangeAllowed = true;
 
         resetFallDistance();
-
-        if (!isAlive()) return;
-
-        if (level().isClientSide()) {
-            JCraft.getClientEntityHandler().aerosmithClientTick(this);
-            return;
-        }
-
         final LivingEntity user = getUser();
 
-        if (user == null) return;
+        if (!isAlive() || level().isClientSide() || user == null)
+            return;
 
         final AbstractMove<?, ? super AerosmithEntity> currentMove = getCurrentMove();
 

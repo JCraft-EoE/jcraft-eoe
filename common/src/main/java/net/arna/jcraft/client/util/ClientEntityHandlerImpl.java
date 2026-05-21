@@ -383,30 +383,4 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
             vehicle.movementTick(w, a, s, d, jump, sneak);
         }
     }
-
-    @Override
-    public void aerosmithClientTick(final AerosmithEntity aerosmith) {
-        final var pos = aerosmith.position();
-        final var level = aerosmith.level();
-        final boolean isRemote = aerosmith.isRemote();
-
-//        if (isRemote) {
-//            final var localPlayer = Minecraft.getInstance().player;
-//            final var localPos = localPlayer.position();
-//
-//            final double angle = JUtils.angleBetween(aerosmith.getDeltaMovement(), localPos.subtract(pos));
-//
-//            if (
-//                    Math.signum(aerosmith.lastMovementToLocalPlayerAngle) != Math.signum(angle)
-//                            && angle < 0
-//                            && aerosmith.distanceToSqr(localPlayer) < 35 * 35)
-//            { // got close, moving away
-//                level.playLocalSound(pos.x, pos.y, pos.z,
-//                        JSoundRegistry.AS_FLYBY.get(), SoundSource.PLAYERS,
-//                        1.0f, 1.0f, true);
-//            }
-//
-//            aerosmith.lastMovementToLocalPlayerAngle = angle;
-//        }
-    }
 }
