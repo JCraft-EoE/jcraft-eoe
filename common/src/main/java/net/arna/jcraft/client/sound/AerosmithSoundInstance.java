@@ -20,7 +20,7 @@ public class AerosmithSoundInstance extends AbstractTickableSoundInstance {
     }
 
     private AerosmithSoundInstance(AerosmithEntity aerosmith, boolean isFlyby) {
-        super(isFlyby ? JSoundRegistry.AS_FLYBY.get() : JSoundRegistry.AS_IDLE.get(), getSoundSourceFor(aerosmith), aerosmith.getRandom());
+        super(isFlyby ? JSoundRegistry.AS_DIST.get() : JSoundRegistry.AS_IDLE.get(), getSoundSourceFor(aerosmith), aerosmith.getRandom());
         this.aerosmith = aerosmith;
         this.isFlyby = isFlyby;
         looping = true;

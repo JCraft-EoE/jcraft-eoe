@@ -115,7 +115,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             IntSet.of(10, 15, 20, 25, 30, 35, 40, 45, 50))
             .withStaticY()
             .withStunType(StunType.LAUNCH)
-            .withSound(JSoundRegistry.AS_BARRAGE)
+            .withSound(JSoundRegistry.AS_MANEUVER)
             .withImpactSound(JSoundRegistry.AS_BARRAGE_HIT)
             .withInfo(
                     Component.literal("Dive Charge"),
@@ -124,7 +124,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     public static final MainBarrageAttack<AerosmithEntity> SAWBLADE = new MainBarrageAttack<AerosmithEntity>(280,
             0, 24, 0.9f, 1f, 13, 1.5f, 0.1f, 0f, 3, Blocks.OAK_LEAVES.defaultDestroyTime())
-            // .withSound(JSoundRegistry.AS_SAWBLADE)
+            .withSound(JSoundRegistry.AS_NAME)
+            .withImpactSound(JSoundRegistry.AS_BARRAGE_HIT)
             .withAerialVariant(CHARGE)
             .withInfo(
                     Component.literal("Propeller Strike"),
@@ -144,6 +145,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             );
 
     public static final BombThrowAttack BOMB_THROW = new BombThrowAttack(200, 9, 42, 1.2f)
+            .withSound(JSoundRegistry.AS_BARRAGE)
             .withInfo(
                     Component.literal("Loft Bombing"),
                     Component.literal("Orders Aerosmith to throw a bomb in front of the user using its inertia.")

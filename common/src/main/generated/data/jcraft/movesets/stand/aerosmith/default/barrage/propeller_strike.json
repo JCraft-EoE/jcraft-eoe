@@ -21,7 +21,7 @@
           {
             "type": "jcraft:play_sound",
             "run": "at_init",
-            "sound": "jcraft:asbarrage"
+            "sound": "jcraft:asmaneuver"
           },
           {
             "type": "jcraft:play_sound",
@@ -71,6 +71,19 @@
     "damage": 1.0,
     "duration": 24,
     "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:asname"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:asbarragehit"
+        }
+      ],
       "description": {
         "translate": "move.jcraft.aerosmith.default.propeller_strike.description"
       },
