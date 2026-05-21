@@ -450,7 +450,7 @@
 					]
 				},
 				{
-					"name": "prop",
+					"name": "redbind",
 					"parent": "lower_armRight",
 					"pivot": [-6, 12, 0],
 					"cubes": [
@@ -471,7 +471,7 @@
 				},
 				{
 					"name": "rope2",
-					"parent": "prop",
+					"parent": "redbind",
 					"pivot": [-6, 6, 0],
 					"cubes": [
 						{
@@ -557,6 +557,11 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "bipedHandRight",
+					"parent": "lower_armRight",
+					"pivot": [-5.8, 13.2, 0.2]
 				},
 				{
 					"name": "armLeft",
@@ -670,6 +675,11 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "bipedHandLeft",
+					"parent": "lower_armLeft",
+					"pivot": [5.8, 13.2, 0.2]
 				}
 			]
 		}
