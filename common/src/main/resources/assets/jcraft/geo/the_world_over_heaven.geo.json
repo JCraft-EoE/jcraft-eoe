@@ -232,7 +232,7 @@
 					]
 				},
 				{
-					"name": "prop",
+					"name": "overwrite",
 					"parent": "lower_armRight",
 					"pivot": [-6, 14, 0],
 					"cubes": [
@@ -252,7 +252,7 @@
 					]
 				},
 				{
-					"name": "prop2",
+					"name": "spiral",
 					"parent": "lower_armRight",
 					"pivot": [-6, 14, 0],
 					"cubes": [
@@ -272,6 +272,11 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "bipedHandRight",
+					"parent": "lower_armRight",
+					"pivot": [-5.8, 15.2, 0.2]
 				},
 				{
 					"name": "armLeft",
@@ -295,6 +300,11 @@
 						{"origin": [4.4, 13.65, -2], "size": [4, 6, 4], "inflate": 0.2, "uv": [58, 36], "mirror": true},
 						{"origin": [8.25, 14.63173, -1.01777], "size": [1, 2, 2], "pivot": [8.75, 15.63173, -0.01777], "rotation": [135, 0, 0], "uv": [42, 65], "mirror": true}
 					]
+				},
+				{
+					"name": "bipedHandLeft",
+					"parent": "lower_armLeft",
+					"pivot": [5.8, 15.2, 0.2]
 				},
 				{
 					"name": "BAM",

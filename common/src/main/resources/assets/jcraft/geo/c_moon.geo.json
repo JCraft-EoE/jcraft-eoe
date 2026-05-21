@@ -144,6 +144,11 @@
 					]
 				},
 				{
+					"name": "bipedHandLeft",
+					"parent": "lower_armLeft",
+					"pivot": [5.8, 12.2, 0.2]
+				},
+				{
 					"name": "BAM",
 					"parent": "base",
 					"pivot": [0, 18, 0]
