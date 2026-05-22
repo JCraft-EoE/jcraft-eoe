@@ -12,6 +12,7 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.pose.PoseWheelState;
 import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
@@ -479,6 +480,10 @@ public class ClientPacketHandler {
                     if (ent instanceof Player player) {
                         ModifierLayer<IAnimation> animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
                         animationContainer.setAnimation(null);
+                        // If this is the local player, clear pose state too
+                        if (player == client.player) {
+                            PoseWheelState.onServerCancel();
+                        }
                     }
                 });
             }

@@ -23,6 +23,8 @@ import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
+import net.arna.jcraft.client.pose.PoseLoader;
+import net.arna.jcraft.client.pose.PoseWheelConfig;
 import net.arna.jcraft.client.registry.JClientEventsRegistry;
 import net.arna.jcraft.client.registry.JRenderLayerRegistry;
 import net.arna.jcraft.client.renderer.armor.ArmorRenderer;
@@ -67,7 +69,7 @@ import java.util.function.Supplier;
 public class JCraftClient {
     // Keybinds
     public static TrackedKeyBinding standSummon, heavyKey, barrageKey, ultKey, special1Key, special2Key, special3Key,
-            comboBreaker, cooldownCancel, utility, dash;
+            comboBreaker, cooldownCancel, utility, dash, poseWheelKey;
     @SuppressWarnings({"ConstantValue", "DataFlowIssue"}) // Not the case here cuz of the lazy getter.
     @Getter(lazy = true)
     private static final Map<TrackedKeyBinding, MoveInputType> bindings = ImmutableMap.<TrackedKeyBinding, MoveInputType>builder()
@@ -99,6 +101,8 @@ public class JCraftClient {
 
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new DecimalFormatUpdater());
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, StandUserPoseLoader::onReload);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, PoseLoader.INSTANCE);
+        PoseWheelConfig.load();
 
         GravityChannelClient.init();
 
@@ -155,6 +159,8 @@ public class JCraftClient {
                 GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft", register);
         dash = TrackedKeyBinding.createAndRegister("key.jcraft.dash", InputConstants.Type.MOUSE,
                 GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft", register);
+        poseWheelKey = TrackedKeyBinding.createAndRegister("key.jcraft.pose_wheel", InputConstants.Type.KEYSYM,
+                GLFW.GLFW_KEY_BACKSLASH, "key.category.jcraft", register);
 
         // todo: actually finish jcraft menu
         // menuKey = new KeyMapping("key.jcraft.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_DIVIDE, "key.category.jcraft");

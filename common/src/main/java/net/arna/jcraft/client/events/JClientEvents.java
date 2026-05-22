@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.client.pose.PoseWheelState;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
@@ -52,6 +53,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import net.minecraft.client.Options;
 import static net.arna.jcraft.client.JCraftClient.*;
 import static net.arna.jcraft.client.gui.hud.JCraftAbilityHud.cooldownTypeToKeybind;
 import static net.arna.jcraft.client.gui.hud.JCraftAbilityHud.getHudX;
@@ -251,7 +253,6 @@ public class JClientEvents {
                 NetworkManager.sendToServer(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket.write(null, heldMoves));
                 //ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket.write(null, heldMoves));
             }
-
         }
 
         // Block
@@ -266,6 +267,25 @@ public class JClientEvents {
         // Cooldown Cancel
         if (cooldownCancel.isPressedThisTick()) {
             NetworkManager.sendToServer(JPacketRegistry.C2S_COOLDOWN_CANCEL, new FriendlyByteBuf(Unpooled.buffer()));
+        }
+
+        // Pose wheel toggle
+        if (poseWheelKey.isPressedThisTick()) {
+            PoseWheelState.toggle();
+        }
+
+        // Tick active pose (windup -> idle transition)
+        PoseWheelState.tick();
+
+        // Cancel pose on movement
+        if (PoseWheelState.hasPose()) {
+            final Options opts = client.options;
+            boolean moving = opts.keyUp.isDown() || opts.keyDown.isDown()
+                    || opts.keyLeft.isDown() || opts.keyRight.isDown()
+                    || opts.keyJump.isDown();
+            if (moving) {
+                PoseWheelState.cancelPose();
+            }
         }
 
         if (client.isPaused() && client.isLocalServer()) {

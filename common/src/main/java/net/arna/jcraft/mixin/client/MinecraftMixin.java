@@ -3,8 +3,10 @@ package net.arna.jcraft.mixin.client;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.platform.Window;
+import net.arna.jcraft.client.pose.PoseWheelState;
 import net.arna.jcraft.client.rendering.api.callbacks.DisplayResizeCallback;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,5 +28,21 @@ public class MinecraftMixin {
     private void ignorePickBlockWhenStandOut(Minecraft instance, Operation<Void> original) {
         if (JUtils.getStand(instance.player) == null)
             original.call(instance);
+    }
+
+    /**
+     * When the pose wheel is open, consume hotbar key presses (1-9) and redirect them
+     * to pose slot execution instead of switching the hotbar selection.
+     */
+    @Inject(method = "handleKeybinds", at = @At("HEAD"))
+    private void jcraft$interceptHotbarForPoseWheel(CallbackInfo ci) {
+        if (!PoseWheelState.isOpen()) return;
+        Minecraft mc = (Minecraft) (Object) this;
+        KeyMapping[] hotbarKeys = mc.options.keyHotbarSlots;
+        for (int i = 0; i < hotbarKeys.length && i < 9; i++) {
+            if (hotbarKeys[i].consumeClick()) {
+                PoseWheelState.executeSlot(i);
+            }
+        }
     }
 }

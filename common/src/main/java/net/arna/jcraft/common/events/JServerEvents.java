@@ -24,6 +24,8 @@ import net.arna.jcraft.common.item.AuMockItem;
 import net.arna.jcraft.common.item.RewindMockItem;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
+import net.arna.jcraft.common.network.c2s.PoseCancelPacket;
+import net.arna.jcraft.common.network.c2s.PoseTriggerPacket;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
 import net.arna.jcraft.common.spec.VampireSpec;
@@ -578,6 +580,12 @@ public class JServerEvents {
         if (damage < 0.01f) return EventResult.pass();
         if (entity.level() instanceof ServerLevel serverWorld) {
             maybeLaunch(entity, source, serverWorld, entity.getEffect(JStatusRegistry.DAZED.get()), source.getEntity());
+        }
+        // Cancel any active pose when the player takes damage
+        if (entity instanceof ServerPlayer serverPlayer) {
+            if (PoseTriggerPacket.ACTIVE_POSES.remove(serverPlayer.getUUID()) != null) {
+                PoseCancelPacket.broadcastCancel(serverPlayer);
+            }
         }
         return EventResult.pass();
     }

@@ -39,4 +39,7 @@ public interface JPacketRegistry {
 
     ResourceLocation S2C_SYNC = JCraft.id("s2c_sync");
     ResourceLocation C2S_SYNC = JCraft.id("c2s_sync");
+
+    ResourceLocation C2S_POSE_TRIGGER = JCraft.id("pose_trig");
+    ResourceLocation C2S_POSE_CANCEL = JCraft.id("pose_cncl");
 }

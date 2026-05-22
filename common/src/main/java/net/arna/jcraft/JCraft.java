@@ -251,6 +251,8 @@ public final class JCraft {
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_REMOTE_STAND_INTERACT, RemoteStandInteractPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PREDICTION_TRIGGER, PredictionTriggerPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_POSE_TRIGGER, PoseTriggerPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_POSE_CANCEL, PoseCancelPacket::handle);
     }
 
     private static void registerAzArmor() {
