@@ -1063,7 +1063,7 @@ public final class JUtils {
     /**
      * Checks if the given entity is currently using KC for Time Erase
      * @param entity the entity to check, can be <code>null</code>
-     * @return <code>true</code> if the entity is using KC and in Time Erase, else false
+     * @return <code>true</code> if the entity is using KC and in Time Erase, else <code>false</code>
      */
     public static boolean inTimeErase(Entity entity) {
         if (!(entity instanceof LivingEntity living)) {
