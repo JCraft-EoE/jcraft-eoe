@@ -4,12 +4,13 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.authlib.GameProfile;
+import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.attack.moves.hamon.SendoAttack;
+import net.arna.jcraft.common.attack.moves.hamon.ImproviserAttack;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.food.IFoodData;
@@ -249,8 +250,11 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
     @Inject(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
     private void jcraft$substituteAttack(final Entity target, final CallbackInfo ci) {
         final Player player = (Player)(Object)this;
-        if (JUtils.getSpec(player) instanceof HamonSpec hamon && hamon.getCharge() > SendoAttack.CHARGE_COST) {
-            ci.cancel();
+        if (player instanceof ServerPlayer && JUtils.getSpec(player) instanceof HamonSpec hamon) {
+            final var moveEntry = hamon.getMoveEntry(MoveClass.LIGHT, false, false);
+            if (moveEntry != null && moveEntry.getMove() instanceof ImproviserAttack) {
+                ci.cancel();
+            }
         }
     }
 

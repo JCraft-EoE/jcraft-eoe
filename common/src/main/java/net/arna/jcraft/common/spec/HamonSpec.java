@@ -186,12 +186,12 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
                     Component.literal("Charge with hamon for Sendo Punch, which knocks the enemy down, and then props them back up with an aftershock of hamon.")
             );
 
-    public static final ImproviserAttack IMPROVISER = new ImproviserAttack(100, 8,
+    public static final ImproviserAttack IMPROVISER = new ImproviserAttack(0, 8,
             19, 1.0f, 6.5f, 12, 1.6f, 2.0f, -0.1f)
             .withLaunch()
             .withSound(JSoundRegistry.HAMON_SURGE)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withCondition(HamonChargeCondition.atLeast(SendoAttack.CHARGE_COST))
+            .withCondition(HamonChargeCondition.atLeast(ImproviserAttack.CHARGE_COST))
             .withCondition(HamonSendoWaveKickGroundedCondition.of(-1)) // in ticks
             .withInfo(
                     Component.literal("Improviser Attack"),

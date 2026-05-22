@@ -8,12 +8,14 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.common.spec.HamonSpec;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 
@@ -30,6 +32,14 @@ public final class ImproviserAttack extends AbstractSimpleAttack<ImproviserAttac
     @Override
     public @NonNull MoveType<ImproviserAttack> getMoveType() {
         return ImproviserAttack.Type.INSTANCE;
+    }
+
+    @Override
+    public boolean conditionsMet(final HamonSpec attacker) {
+        if (!super.conditionsMet(attacker) || !attacker.willUseHamonNext()) {
+            return false;
+        }
+        return attacker.getUser().getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof TieredItem;
     }
 
     @Override
