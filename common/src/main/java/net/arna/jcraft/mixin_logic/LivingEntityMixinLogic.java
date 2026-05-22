@@ -83,33 +83,4 @@ public class LivingEntityMixinLogic {
         return false;
     }
 
-    public static void hamonAfterEffect(final LivingEntity user, final Entity target) {
-        if (JUtils.getSpec(user) instanceof HamonSpec hamon
-                && hamon.willUseHamonNext()
-                && hamon.getCharge() >= SendoAttack.CHARGE_COST
-                && target instanceof LivingEntity livingTarget
-        ) {
-            final Level level = user.level();
-            if (!level.isClientSide()) {
-                final Vec3 position = target.position();
-                hamon.drainCharge(SendoAttack.CHARGE_COST);
-                hamon.setUseHamonNext(false);
-                hamon.processTarget(livingTarget);
-                Attacks.damageLogic(level, livingTarget, new AttackData(
-                        Vec3.ZERO, 10, StunType.BURSTABLE.ordinal(), false,
-                        3f, true, 3, level.damageSources().indirectMagic(user, null),
-                        user, CommonHitPropertyComponent.HitAnimation.CRUSH, null,
-                        false, false
-                ));
-                var packet = new ClientboundLevelParticlesPacket(JParticleTypeRegistry.HAMON_SPARK.get(),
-                        false,
-                        position.x(), position.y(), position.z(),
-                        0.1f, 0.1f, 0.1f,
-                        0.2f, 1);
-                for (ServerPlayer tracker : JUtils.tracking(target)) {
-                    tracker.connection.send(packet);
-                }
-            }
-        }
-    }
 }
