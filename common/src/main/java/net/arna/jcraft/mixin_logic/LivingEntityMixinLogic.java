@@ -7,7 +7,7 @@ import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
-import net.arna.jcraft.common.attack.moves.hamon.ImproviserMove;
+import net.arna.jcraft.common.attack.moves.hamon.SendoAttack;
 import net.arna.jcraft.common.effects.AbstractFluidWalkingEffect;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -85,12 +85,15 @@ public class LivingEntityMixinLogic {
 
     public static void hamonAfterEffect(final LivingEntity user, final Entity target) {
         if (JUtils.getSpec(user) instanceof HamonSpec hamon
-                && hamon.getCurrentMove() instanceof ImproviserMove
+                && hamon.willUseHamonNext()
+                && hamon.getCharge() >= SendoAttack.CHARGE_COST
                 && target instanceof LivingEntity livingTarget
         ) {
             final Level level = user.level();
             if (!level.isClientSide()) {
                 final Vec3 position = target.position();
+                hamon.drainCharge(SendoAttack.CHARGE_COST);
+                hamon.setUseHamonNext(false);
                 hamon.processTarget(livingTarget);
                 Attacks.damageLogic(level, livingTarget, new AttackData(
                         Vec3.ZERO, 10, StunType.BURSTABLE.ordinal(), false,
