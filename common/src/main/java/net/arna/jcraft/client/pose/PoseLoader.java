@@ -74,7 +74,12 @@ public class PoseLoader implements PreparableReloadListener {
 
                     String idleId = name + "_idle";
                     String idleAnimId = lengths.containsKey(idleId) ? idleId : null;
-                    int windupTicks = Math.max(1, (int) Math.ceil(e.getValue() * 20f));
+                    // Fire the idle 1 tick before the windup naturally ends so the idle
+                    // takes over before KeyframeAnimationPlayer decays the windup back to
+                    // identity. Short windups (<= 2 ticks) and idle-less poses use the full
+                    // duration so we don't truncate them.
+                    int rawTicks = Math.max(1, (int) Math.ceil(e.getValue() * 20f));
+                    int windupTicks = (idleAnimId != null && rawTicks > 2) ? rawTicks - 1 : rawTicks;
                     String displayName = buildDisplayName(name);
 
                     result.add(new PoseDefinition(name, windupTicks, idleAnimId, displayName));

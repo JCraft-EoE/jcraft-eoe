@@ -68,6 +68,10 @@ public class JClientEvents {
     // tracks which entities were last seen, cleared after a certain time only
     private static final Map<UUID, Integer> menacingCheckTimes = new HashMap<>();
 
+    // Edge-detection for pose movement-cancel: only cancel on a fresh key press,
+    // not on a key that was already held when the pose started.
+    private static boolean poseMovementWasDown = false;
+
     public static void onLast(final PoseStack matrixStack, final Vec3 cameraPos) {
         matrixStack.pushPose();
         matrixStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
@@ -277,15 +281,19 @@ public class JClientEvents {
         // Tick active pose (windup -> idle transition)
         PoseWheelState.tick();
 
-        // Cancel pose on movement
+        // Cancel pose on movement; edge-triggered so a held key from before the pose
+        // started doesn't immediately cancel it.
         if (PoseWheelState.hasPose()) {
             final Options opts = client.options;
             boolean moving = opts.keyUp.isDown() || opts.keyDown.isDown()
                     || opts.keyLeft.isDown() || opts.keyRight.isDown()
                     || opts.keyJump.isDown();
-            if (moving) {
+            if (moving && !poseMovementWasDown) {
                 PoseWheelState.cancelPose();
             }
+            poseMovementWasDown = moving;
+        } else {
+            poseMovementWasDown = false;
         }
 
         if (client.isPaused() && client.isLocalServer()) {

@@ -11,7 +11,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.Nullable;
 
-/** Client-side state for the pose wheel — open/closed, active pose, windup → idle timer. */
+/**
+ * Shared state that bridges {@code PoseWheelScreen} (input) and {@code PoseWheelOverlay}
+ * (visuals): open flag, hovered slot index, currently active pose, and the windup → idle
+ * countdown timer. Neither side owns the other; both read/write through this.
+ */
 public class PoseWheelState {
 
     @Getter

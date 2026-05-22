@@ -12,6 +12,11 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 
+/**
+ * Input and lifecycle for the pose wheel. handles clicks, number keys (1–9), right-click
+ * to configure, and ESC. Visuals are delegated to {@link PoseWheelOverlay}; shared state
+ * (open, hovered slot, active pose) lives in {@link PoseWheelState}
+ */
 public class PoseWheelScreen extends Screen {
 
     public PoseWheelScreen() {
@@ -27,7 +32,7 @@ public class PoseWheelScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
-        PoseWheelOverlay.render(gui, partialTick);
+        PoseWheelOverlay.INSTANCE.render(gui, partialTick);
     }
 
     @Override
