@@ -24,6 +24,7 @@
           },
           {
             "type": "jcraft:play_sound",
+            "bind": false,
             "run": "on_hit",
             "sound": "minecraft:entity.player.attack.sweep"
           }
@@ -68,6 +69,7 @@
         },
         {
           "type": "jcraft:play_sound",
+          "bind": false,
           "run": "on_hit",
           "sound": "minecraft:entity.player.attack.sweep"
         }

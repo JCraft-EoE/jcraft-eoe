@@ -41,6 +41,7 @@
           },
           {
             "type": "jcraft:play_sound",
+            "bind": false,
             "run": "on_hit",
             "sound": "jcraft:twkickhit"
           }
@@ -74,11 +75,13 @@
       "actions": [
         {
           "type": "jcraft:play_sound",
+          "linger": true,
           "run": "at_init",
           "sound": "jcraft:twcharge"
         },
         {
           "type": "jcraft:play_sound",
+          "bind": false,
           "run": "on_hit",
           "sound": "jcraft:twchargehit"
         }

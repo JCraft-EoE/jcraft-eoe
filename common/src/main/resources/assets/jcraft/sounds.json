@@ -1302,19 +1302,40 @@
       "jcraft:stands/aerosmith/slices"
     ]
   },
-  "asflyby": {
+  "asdist": {
     "sounds": [
-      "jcraft:stands/aerosmith/flyby"
+      "jcraft:stands/aerosmith/idle_dist"
     ]
   },
   "asidle": {
     "sounds": [
-      "jcraft:stands/aerosmith/idle"
+      {
+        "name": "jcraft:stands/aerosmith/idle_close",
+        "attenuation_distance": 50
+      }
     ]
   },
   "asmaneuver": {
     "sounds": [
-      "jcraft:stands/aerosmith/maneuver"
+      {
+        "name": "jcraft:stands/aerosmith/maneuver",
+        "attenuation_distance": 50
+      }
+    ]
+  },
+  "asshout": {
+    "sounds": [
+      "jcraft:stands/aerosmith/shout"
+    ]
+  },
+  "asname": {
+    "sounds": [
+      "jcraft:stands/aerosmith/aerosmith"
+    ]
+  },
+  "asvola": {
+    "sounds": [
+      "jcraft:stands/aerosmith/vola"
     ]
   },
   "aslanding": {

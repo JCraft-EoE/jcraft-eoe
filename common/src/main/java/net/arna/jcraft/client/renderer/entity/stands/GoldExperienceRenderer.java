@@ -18,7 +18,8 @@ public class GoldExperienceRenderer extends StandEntityRenderer<GoldExperienceEn
     private static final ParticleOptions chargeParticle = ParticleTypes.COMPOSTER;
 
     public GoldExperienceRenderer(final @NonNull EntityRendererProvider.Context context) {
-        super(context, JStandTypeRegistry.GOLD_EXPERIENCE.get(), 0, -0.1f);
+        super(context, b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                JStandTypeRegistry.GOLD_EXPERIENCE.get(), 0, -0.1f);
     }
 
     /*

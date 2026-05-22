@@ -7,6 +7,13 @@
     "cooldown": 200,
     "duration": 42,
     "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:asbarrage"
+        }
+      ],
       "conditions": [
         {
           "type": "jcraft:remote",

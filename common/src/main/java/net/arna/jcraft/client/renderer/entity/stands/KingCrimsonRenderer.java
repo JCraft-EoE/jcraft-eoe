@@ -1,15 +1,11 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import lombok.NonNull;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.client.model.entity.stand.KingCrimsonModel;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 /**
@@ -20,7 +16,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 public class KingCrimsonRenderer extends StandEntityRenderer<KingCrimsonEntity> {
 
     public KingCrimsonRenderer(final @NonNull EntityRendererProvider.Context context) {
-        super(context, JStandTypeRegistry.KING_CRIMSON.get());
+        super(context, b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                JStandTypeRegistry.KING_CRIMSON.get(), 0f, 0f);
         //this.addLayer(new KCTELayer(this));
     }
 

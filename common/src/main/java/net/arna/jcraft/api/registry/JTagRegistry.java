@@ -56,6 +56,7 @@ public interface JTagRegistry {
     TagKey<EntityType<?>> PREFERS_GOLD_DRIP = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("prefer_gold_drip"));
     TagKey<EntityType<?>> DOESNT_BREATHE = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("doesnt_breathe"));
     TagKey<EntityType<?>> CANT_BREAK_BLOCKS = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cant_break_blocks"));
+    TagKey<EntityType<?>> CANT_HEAR = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cant_hear"));
 
     TagKey<Biome> METEORS_CAN_FALL = TagKey.create(Registries.BIOME, JCraft.id("meteors_can_fall"));
 
@@ -64,6 +65,9 @@ public interface JTagRegistry {
     TagKey<DamageType> STAND_IMMUNE = TagKey.create(Registries.DAMAGE_TYPE, JCraft.id("stand_immune"));
 
     TagKey<Structure> ON_MONASTERY_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_monastery_maps"));
+    TagKey<Structure> ON_VAMPIRE_LAIR_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_vampire_lair_maps"));
+    TagKey<Structure> ON_CINDERELLA_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_cinderella_maps"));
+    TagKey<Structure> ON_METEORITE_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_meteorite_maps"));
 
     static void init() {
         // intentionally left empty

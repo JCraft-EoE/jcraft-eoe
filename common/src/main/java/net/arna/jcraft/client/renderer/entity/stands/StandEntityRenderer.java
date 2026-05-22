@@ -1,6 +1,8 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
+import com.mojang.math.Axis;
 import lombok.NonNull;
+import mod.azure.azurelib.model.AzBone;
 import mod.azure.azurelib.render.AzRendererPipelineContext;
 import mod.azure.azurelib.render.entity.AzEntityRendererConfig;
 import net.arna.jcraft.JCraft;
@@ -19,6 +21,7 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -261,6 +264,18 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
         @Override
         public void setCustomAnimations(final @NonNull T animatable, final float partialTicks) {
             JClientUtils.animateGenericHumanoid(context(), animatable, flipBody, flipHead, torsoPitchOffset, headPitchOffset, velInfluence);
+        }
+    }
+
+    public static class StandHandItemsRenderLayer<T extends StandEntity<?,?>> extends HandItemsRenderLayer<T> {
+        @Override
+        protected void renderItemForBone(final AzRendererPipelineContext<UUID, T> context, final AzBone bone, final ItemStack stack, final T animatable) {
+            final var poseStack = context.poseStack();
+
+            poseStack.mulPose(Axis.XP.rotationDegrees(bone.getRotX() * 57.29578f));
+            poseStack.mulPose(Axis.XP.rotationDegrees(90f));
+
+            super.renderItemForBone(context, bone, stack, animatable);
         }
     }
 }

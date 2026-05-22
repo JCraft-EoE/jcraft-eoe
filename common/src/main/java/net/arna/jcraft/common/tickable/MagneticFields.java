@@ -101,7 +101,7 @@ public class MagneticFields {
 
                 if (distanceSqr > strength * strength + 25) continue;
 
-                if (entity instanceof AbstractArrow abstractArrow) {
+                if (JUtils.isFerrous(entity) && entity instanceof AbstractArrow abstractArrow) {
                     if (abstractArrow.inGround) {
                         abstractArrow.inGround = false;
                     }

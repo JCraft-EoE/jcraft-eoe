@@ -79,6 +79,8 @@ public class MoveMapImpl<A extends IAttacker<? extends A, S>, S extends Enum<?>>
      * @param entry The entry to register. Will be copied.
      */
     private void register(final MoveMap.Entry<A, S> entry) {
+        if (entry == null) return;
+
         checkFrozen();
         entries.put(entry.getMoveClass(), entry.copy());
     }

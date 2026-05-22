@@ -35,20 +35,20 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownPotion;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -97,14 +97,6 @@ public class ItemTossProjectile extends AbstractArrow {
         if (getItem().is(JTagRegistry.HEAVY_IMPACT)) {
             this.setBaseDamage(2d);
             this.setKnockback(4);
-        } else if (getItem().getItem() instanceof TieredItem) {
-            // deal the item's actual attack damage as a crit
-            final var modifiers = getItem().getAttributeModifiers(EquipmentSlot.MAINHAND);
-            double damage = modifiers.get(Attributes.ATTACK_DAMAGE).stream()
-                    .mapToDouble(AttributeModifier::getAmount)
-                    .sum();
-            this.setBaseDamage(damage > 0 ? damage * 1.5 : 1.0); // 1.5x for crit
-            this.setKnockback(1);
         }
         else {
             this.setBaseDamage(0d);
@@ -205,32 +197,39 @@ public class ItemTossProjectile extends AbstractArrow {
             }
         }
 
-        boolean bl = entity.getType() == EntityType.ENDERMAN;
-        if (this.isOnFire() && !bl) {
+        boolean targetIsEnderman = entity.getType() == EntityType.ENDERMAN;
+
+        if (this.isOnFire() && !targetIsEnderman) {
             entity.setSecondsOnFire(5);
         }
 
-        entity.hurt(damageSource, (float)getBaseDamage());
-        if (bl) {
+        entity.hurt(damageSource, calculateDamage(entity));
+
+        if (targetIsEnderman) {
             return;
+        }
+
+        final int fireSeconds = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FIRE_ASPECT, getItem()) * 4;
+        if (fireSeconds > 0) {
+            entity.setSecondsOnFire(fireSeconds);
         }
 
         boolean effectActivated = false;
 
-        if (entity instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity)entity;
+        if (entity instanceof final LivingEntity livingEntity) {
             // handle knockback
-            if (this.getKnockback() > 0) {
+            float knockback = calculateKnockback();
+            if (knockback > 0) {
                 double d = Math.max(0, 1f - livingEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
-                Vec3 vec3 = this.getDeltaMovement().multiply(1f, 0f, 1f).normalize().scale(getKnockback() * 0.6 * d);
+                Vec3 vec3 = this.getDeltaMovement().multiply(1f, 0f, 1f).normalize().scale(knockback * 0.6 * d);
                 if (vec3.lengthSqr() > 0) {
                     livingEntity.push(vec3.x, 0.1, vec3.z);
                 }
             }
-//            if (!this.level().isClientSide && entity2 instanceof LivingEntity) {
-//                EnchantmentHelper.doPostHurtEffects(livingEntity, entity2);
-//                EnchantmentHelper.doPostDamageEffects((LivingEntity)entity2, livingEntity);
-//            }
+            if (getOwner() instanceof LivingEntity owner) {
+                EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
+                EnchantmentHelper.doPostDamageEffects(owner, livingEntity);
+            }
             this.doPostHurtEffects(livingEntity);
 //            if (entity2 != null && livingEntity != entity2 && livingEntity instanceof Player && entity2 instanceof ServerPlayer && !this.isSilent()) {
 //                ((ServerPlayer)entity2).connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.ARROW_HIT_PLAYER, 0.0F));
@@ -352,6 +351,23 @@ public class ItemTossProjectile extends AbstractArrow {
             }
             this.discard();
         }
+    }
+
+    private float calculateDamage(final Entity target) {
+        float damage = (float)getBaseDamage();
+        if (!(target instanceof final LivingEntity livingTarget)
+                || !(JUtils.getUserIfStand(getOwner()) instanceof final LivingEntity owner)
+                /*|| !(getItem().getItem() instanceof final TieredItem tieredItem)*/) {
+            return damage;
+        }
+        damage = (float)owner.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        damage += EnchantmentHelper.getDamageBonus(getItem(), livingTarget.getMobType());
+        return damage;
+    }
+
+    private float calculateKnockback() {
+        int knockbackLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.KNOCKBACK, getItem());
+        return getKnockback() + 0.5f * knockbackLevel;
     }
 
     @Override
