@@ -57,8 +57,12 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
     public static final MoveSet<HamonSpec, HamonSpec.State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.HAMON, HamonSpec::registerMoves, HamonSpec.State.class);
     public static final SpecData DATA = SpecData.builder()
             .name(Component.translatable("spec.jcraft.hamon"))
-            .description(Component.translatable("spec.jcraft.hamon.info.desc"))
-            .details(Component.translatable("spec.jcraft.hamon.info.details"))
+            .description(Component.literal("Versatility perfected"))
+            .details(Component.literal("""
+                    PASSIVE: Hamon breathing
+                    Your Hamon charges passively while you can breathe, or faster while you actively hold down Charge Hamon.
+                    The speed of charging depends on your health.
+                    You can use Hamon to empower your standard jabs into far more powerful and versatile tools."""))
             .build();
 
     public static final float MAX_CHARGE = 20.0F;
@@ -111,7 +115,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withMobilityType(MobilityType.DASH)
             .withInfo(
                     Component.literal("Zoom Punch"),
-                    Component.literal("")
+                    Component.literal("Slow, hyper-armored punch with great reach, launches victims away.")
             );
 
     public static final SimpleAttack<HamonSpec> STOMP = new SimpleAttack<HamonSpec>(0, 7,
@@ -135,7 +139,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .markRanged()
             .withInfo(
                     Component.literal("Ripple"),
-                    Component.literal("")
+                    Component.literal("Creates an expanding, horizontal wave of Hamon.")
             );
 
     public static final SimpleAttack<HamonSpec> KNEE_THRUST = new SimpleAttack<HamonSpec>(100, 12,
