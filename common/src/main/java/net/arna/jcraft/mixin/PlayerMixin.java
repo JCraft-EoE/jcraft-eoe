@@ -3,6 +3,8 @@ package net.arna.jcraft.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
@@ -17,6 +19,7 @@ import net.arna.jcraft.common.util.IComboCounter;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.mixin_logic.AbilitiesAddon;
+import net.arna.jcraft.mixin_logic.LivingEntityMixinLogic;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -240,7 +243,17 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void setAbilitiesPlayer(Level level, BlockPos pos, float yRot, GameProfile gameProfile, CallbackInfo ci) {
+    private void jcraft$setAbilitiesPlayer(Level level, BlockPos pos, float yRot, GameProfile gameProfile, CallbackInfo ci) {
         ((AbilitiesAddon) abilities).jcraft$setPlayer((Player) (Object) this);
     }
+
+    @WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z", ordinal = 0))
+    private boolean jcraft$hamonAfterEffect(final Entity target, final DamageSource source, final float amount, final Operation<Boolean> original) {
+        final boolean result = original.call(target, source, amount);
+        if (result) {
+            LivingEntityMixinLogic.hamonAfterEffect((LivingEntity)(Object)this, target);
+        }
+        return result;
+    }
+
 }
