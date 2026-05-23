@@ -346,8 +346,10 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 int obedience = getObedience();
 
                 if (allowMoveUsage) {
-                    setObedience(obedience - 1);
+                    setObedience(--obedience);
                     obedienceGainCooldown = MAX_OBEDIENCE_GAIN_COOLDOWN;
+                    if (obedience <= 0)
+                        allowMoveUsage = false;
                 } else {
                     if (obedienceGainCooldown > 0)
                         obedienceGainCooldown--;
