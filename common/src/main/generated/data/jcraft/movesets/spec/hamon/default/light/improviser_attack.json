@@ -13,7 +13,7 @@
       "shockwaves": true,
       "stun_type": "LAUNCH"
     },
-    "cooldown": 100,
+    "cooldown": 0,
     "damage": 6.5,
     "duration": 19,
     "extras": {
@@ -27,7 +27,7 @@
       "conditions": [
         {
           "type": "jcraft:hamon_charge",
-          "min_charge": 6.7
+          "min_charge": 6.0
         },
         {
           "type": "jcraft:hamon_sendo_wave_kick_grounded",

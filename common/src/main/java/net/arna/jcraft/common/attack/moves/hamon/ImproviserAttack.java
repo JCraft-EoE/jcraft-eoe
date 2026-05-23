@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Set;
 
 public final class ImproviserAttack extends AbstractSimpleAttack<ImproviserAttack, HamonSpec> {
-    public static final float CHARGE_COST = 10.0F;
+    public static final float CHARGE_COST = 6.0F;
     public ImproviserAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                             float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
