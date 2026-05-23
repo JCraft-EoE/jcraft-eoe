@@ -254,10 +254,15 @@ public class ClientPacketHandler {
             if (ent instanceof final Player player) {
                 // Animate
                 final ModifierLayer<IAnimation> animationContainer = ((IJCraftAnimatedPlayer) player).jcraft_getModAnimation();
-                final KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(JCraft.id(animID));
+                KeyframeAnimation anim = PlayerAnimationRegistry.getAnimation(JCraft.id(animID));
                 if (anim == null) {
                     JCraft.LOGGER.error(String.format("Tried to play null animation on player: %s, in world %s", player, client.level));
                     return;
+                }
+
+                // Poses always loop until interrupted, regardless of the JSON's loop field.
+                if (net.arna.jcraft.client.pose.PoseLoader.isPose(animID)) {
+                    anim = forceLooped(anim);
                 }
 
                 // Remove last speed modifier, this is rather primitive but will do for now
@@ -283,6 +288,21 @@ public class ClientPacketHandler {
                 animationContainer.setAnimation(new KeyframeAnimationPlayer(anim));
             }
         });
+    }
+
+    /** Returns a copy of {@code source} that loops forever (isLooped + stopTick=MAX). */
+    private static KeyframeAnimation forceLooped(KeyframeAnimation source) {
+        try {
+            KeyframeAnimation.AnimationBuilder builder = source.mutableCopy();
+            builder.isLooped = true;
+            // returnTick must be in [0, endTick] when isLooped is true, or build() throws.
+            builder.returnTick = Math.max(0, Math.min(builder.returnTick, builder.endTick));
+            builder.stopTick = Integer.MAX_VALUE;
+            return builder.build();
+        } catch (Throwable t) {
+            JCraft.LOGGER.warn("forceLooped failed for pose animation, falling back to source", t);
+            return source;
+        }
     }
 
     public static void handleChannelFeedback(final @NonNull Minecraft client, final FriendlyByteBuf buf) {

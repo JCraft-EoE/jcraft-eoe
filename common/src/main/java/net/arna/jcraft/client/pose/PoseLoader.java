@@ -31,6 +31,16 @@ public class PoseLoader implements PreparableReloadListener {
     @Getter
     private static List<PoseDefinition> poses = List.of();
 
+    /** True if the given anim id is registered as a pose (windup OR idle half). */
+    public static boolean isPose(String animId) {
+        if (animId == null) return false;
+        for (PoseDefinition def : poses) {
+            if (animId.equals(def.windupAnimId())) return true;
+            if (animId.equals(def.idleAnimId())) return true;
+        }
+        return false;
+    }
+
     @Override
     public @NotNull CompletableFuture<Void> reload(PreparationBarrier barrier, @NotNull ResourceManager manager,
                                                    @NotNull ProfilerFiller prepareProfiler, @NotNull ProfilerFiller applyProfiler,

@@ -78,8 +78,7 @@ public class PoseWheelOverlay extends AbstractWheelHUD {
         gui.pose().popPose();
     }
 
-    // ---- Wheel-specific behavior ----
-
+    // Wheel-specific behavior
     @Override
     protected boolean isActiveSlot(int index) {
         PoseDefinition def = PoseWheelConfig.getPoseAt(index);
@@ -109,8 +108,7 @@ public class PoseWheelOverlay extends AbstractWheelHUD {
         renderPlayerPreview(gui, cx, cy, player, tickDelta);
     }
 
-    // ---- Static helpers (kept for PoseWheelScreen to call into) ----
-
+    // Static helpers (kept for PoseWheelScreen to call into)
     /** Returns true if the click landed on the configure button (and opens the config screen). */
     public static boolean tryClickConfigButton(Minecraft mc) {
         double ratio = FIXED_GUI_SCALE / mc.getWindow().getGuiScale();
@@ -134,8 +132,7 @@ public class PoseWheelOverlay extends AbstractWheelHUD {
 
     public static void setTickDelta(float td) { PoseWheelOverlay.tickDelta = td; }
 
-    // ---- Player preview ----
-
+    // Player preview
     private static void renderPlayerPreview(GuiGraphics gui, int cx, int cy, Player player, float td) {
         PoseWheelOverlay.tickDelta = td;
         Quaternionf poseRot = new Quaternionf().rotateZ((float) Math.PI);
