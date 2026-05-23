@@ -16,10 +16,10 @@ import org.joml.Matrix4f;
 /**
  * Shared rendering + hit-testing for radial-menu HUDs. Subclasses provide slot count,
  * per-slot color/label/active state, and optional center content (e.g. a player preview).
- *
+ * <p>
  * The wheel renders in a fixed GUI scale (default 2.0) so it's the same physical size
  * regardless of the player's MC GUI scale setting.
- */
+ */ // FIXME yeah that's actually bad that it doesn't scale
 public abstract class AbstractWheelHUD {
 
     protected static final float FIXED_GUI_SCALE = 2f;
@@ -57,6 +57,8 @@ public abstract class AbstractWheelHUD {
 
     /** Second line of label text (e.g. pose name). Return null to skip. */
     protected String labelBottom(int index) { return null; }
+
+    // FIXME ARGB or RGBA, decide on one
 
     /** ARGB for the bottom label. Default highlights hovered/configured slots. */
     protected int labelBottomColor(int index, boolean hovered) {
@@ -213,7 +215,7 @@ public abstract class AbstractWheelHUD {
     }
 
     protected static void drawCircleBorder(Matrix4f m, int cx, int cy, int radius, float r, float g, float b, float a) {
-        int steps = 256;
+        final int steps = 64;
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         Tesselator tess = Tesselator.getInstance();
         BufferBuilder buf = tess.getBuilder();
@@ -231,6 +233,7 @@ public abstract class AbstractWheelHUD {
             float y2i = cy + (radius - thickness) * (float) Math.sin(a2);
             float x2o = cx + radius * (float) Math.cos(a2);
             float y2o = cy + radius * (float) Math.sin(a2);
+            // TODO maybe use RenderUtils
             buf.vertex(m, x1i, y1i, 0).color(r, g, b, a).endVertex();
             buf.vertex(m, x1o, y1o, 0).color(r, g, b, a).endVertex();
             buf.vertex(m, x2o, y2o, 0).color(r, g, b, a).endVertex();

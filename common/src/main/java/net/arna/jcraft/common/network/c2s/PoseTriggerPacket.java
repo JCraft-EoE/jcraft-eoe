@@ -20,13 +20,11 @@ public class PoseTriggerPacket {
     public static FriendlyByteBuf write(String animId, boolean isIdle) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeUtf(animId);
-        buf.writeBoolean(isIdle);
         return buf;
     }
 
     public static void handle(FriendlyByteBuf buf, NetworkManager.PacketContext context) {
         String animId = buf.readUtf();
-        buf.readBoolean(); // isIdle — informational, not needed once we hand off to JUtils
 
         ServerPlayer player = (ServerPlayer) context.getPlayer();
         MinecraftServer server = context.getPlayer().getServer();
