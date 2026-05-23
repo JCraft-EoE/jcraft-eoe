@@ -180,7 +180,7 @@ public final class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends Abs
                             windup(),
                             duration(),
                             moveDistance(),
-                            Codec.DOUBLE.fieldOf("distance").forGetter(TimeSkipMove::getRange),
+                            Codec.DOUBLE.fieldOf("range").forGetter(TimeSkipMove::getRange),
                             Codec.BOOL.optionalFieldOf("particles", false).forGetter(TimeSkipMove::isParticles),
                             JCodecUtils.SOUND_EVENT_SUPPLIER_CODEC.listOf().optionalFieldOf("sounds", List.of()).forGetter(TimeSkipMove::getSounds))
                     .apply(instance, applyExtras(
