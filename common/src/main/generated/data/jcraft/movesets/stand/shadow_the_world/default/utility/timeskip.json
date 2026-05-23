@@ -5,7 +5,6 @@
   "move": {
     "type": "jcraft:shared_time_skip_move",
     "cooldown": 200,
-    "distance": 7.0,
     "duration": 0,
     "extras": {
       "description": {
@@ -17,6 +16,7 @@
       }
     },
     "move_distance": 0.0,
+    "range": 7.0,
     "sounds": [
       "jcraft:timeskip",
       "jcraft:stwzap"
