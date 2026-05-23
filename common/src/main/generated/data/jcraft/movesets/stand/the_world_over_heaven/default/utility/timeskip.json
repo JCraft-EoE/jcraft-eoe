@@ -6,6 +6,7 @@
     "type": "jcraft:shared_time_skip_move",
     "cooldown": 300,
     "distance": 14.0,
+    "duration": 2,
     "extras": {
       "description": {
         "translate": "move.jcraft.the_world_over_heaven.default.timeskip.description"
@@ -15,8 +16,10 @@
         "translate": "move.jcraft.the_world_over_heaven.default.timeskip.name"
       }
     },
+    "move_distance": 1.0,
     "sounds": [
       "jcraft:twohtimeskip"
-    ]
+    ],
+    "windup": 2
   }
 }

@@ -326,7 +326,7 @@ public class JClientEvents {
         final ClientLevel level = client.level;
         final boolean playerWarning = JClientConfig.getInstance().isShowStandUserWarningPlayer();
         final boolean mobWarning = JClientConfig.getInstance().isShowStandUserWarningMob();
-        if (level == null || (!playerWarning && !mobWarning)) {
+        if (level == null || (!playerWarning && !mobWarning) || player.isSpectator() || player.isInvisible()) {
             return;
         }
 

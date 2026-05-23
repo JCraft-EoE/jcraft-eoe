@@ -690,13 +690,13 @@ public final class JUtils {
     public static boolean canHoldMove(ServerPlayer player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
         if (stand != null && stand.allowMoveHandling()) {
-            return stand.canHoldMove(type) || type.isHoldable(stand.isStandby());
+            return stand.canHoldMove(type) || type.isHoldable();
         }
         JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec != null && spec.canHoldMove(type)) {
             return true;
         }
-        return type.isHoldable(stand != null && stand.isStandby());
+        return type.isHoldable();
     }
 
     /**
@@ -1063,7 +1063,7 @@ public final class JUtils {
     /**
      * Checks if the given entity is currently using KC for Time Erase
      * @param entity the entity to check, can be <code>null</code>
-     * @return <code>true</code> if the entity is using KC and in Time Erase, else false
+     * @return <code>true</code> if the entity is using KC and in Time Erase, else <code>false</code>
      */
     public static boolean inTimeErase(Entity entity) {
         if (!(entity instanceof LivingEntity living)) {

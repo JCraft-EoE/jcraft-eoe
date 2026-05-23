@@ -38,13 +38,17 @@ import java.util.function.Supplier;
 @Getter
 public final class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<TimeSkipMove<A>, A> {
     private final List<Supplier<SoundEvent>> sounds = new ArrayList<>();
-    private final double distance;
+    private final double range;
     private boolean particles = false;
 
-    public TimeSkipMove(final int cooldown, final double distance) {
-        super(cooldown, 0, 0, 0);
-        this.distance = distance;
+    public TimeSkipMove(final int cooldown, final double range, final int windup, final int duration, final float distance) {
+        super(cooldown, windup, duration, distance);
+        this.range = range;
         mobilityType = MobilityType.TELEPORT;
+    }
+
+    public TimeSkipMove(final int cooldown, final double range) {
+        this(cooldown, range, 0, 0, 0);
     }
 
     public TimeSkipMove<A> withSound(SoundEvent sound) {
@@ -95,7 +99,7 @@ public final class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends Abs
 
     @Override
     public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
-        doTimeSkip(attacker, user, distance, getSounds().stream().map(Supplier::get).toList());
+        doTimeSkip(attacker, user, range, getSounds().stream().map(Supplier::get).toList());
 
         return Set.of();
     }
@@ -117,11 +121,11 @@ public final class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends Abs
         ServerChannelFeedbackPacket.send(JUtils.around((ServerLevel) attacker.getBaseEntity().level(), pos, 128), buf);
     }
 
-    public static void doTimeSkip(final IAttacker<?, ?> attacker, final LivingEntity user, double distance, final List<SoundEvent> sounds) {
+    public static void doTimeSkip(final IAttacker<?, ?> attacker, final LivingEntity user, double range, final List<SoundEvent> sounds) {
         final boolean hasVehicle = user.isPassenger();
 
         if (hasVehicle) {
-            distance /= 3;
+            range /= 3;
         }
 
         final Vec3 rotVec = user.getLookAngle();
@@ -131,7 +135,7 @@ public final class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends Abs
         HitResult hitResult = attacker.getEntityWorld().clip(
                 new ClipContext(
                         eyePos,
-                        eyePos.add(rotVec.scale(distance)),
+                        eyePos.add(rotVec.scale(range)),
                         ClipContext.Block.COLLIDER,
                         ClipContext.Fluid.NONE, user));
         final Vec3 tpPos = hitResult.getLocation();
@@ -162,7 +166,9 @@ public final class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends Abs
 
     @Override
     public @NonNull TimeSkipMove<A> copy() {
-        return copyExtras(new TimeSkipMove<A>(getCooldown(), distance).withParticles(particles).withSounds(sounds));
+        return copyExtras(new TimeSkipMove<A>(getCooldown(), range, getWindup(), getDuration(), getMoveDistance())
+                .withParticles(particles)
+                .withSounds(sounds));
     }
 
     public static class Type extends AbstractMove.Type<TimeSkipMove<?>> {
@@ -171,11 +177,15 @@ public final class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends Abs
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<TimeSkipMove<?>>, TimeSkipMove<?>> buildCodec(RecordCodecBuilder.Instance<TimeSkipMove<?>> instance) {
             return instance.group(extras(), cooldown(),
-                            Codec.DOUBLE.fieldOf("distance").forGetter(TimeSkipMove::getDistance),
+                            windup(),
+                            duration(),
+                            moveDistance(),
+                            Codec.DOUBLE.fieldOf("range").forGetter(TimeSkipMove::getRange),
                             Codec.BOOL.optionalFieldOf("particles", false).forGetter(TimeSkipMove::isParticles),
                             JCodecUtils.SOUND_EVENT_SUPPLIER_CODEC.listOf().optionalFieldOf("sounds", List.of()).forGetter(TimeSkipMove::getSounds))
-                    .apply(instance, applyExtras((cooldown, distance, particles, sounds) ->
-                            new TimeSkipMove<>(cooldown, distance).withParticles(particles).withSounds(sounds)));
+                    .apply(instance, applyExtras(
+                            (cooldown, windup, duration, moveDistance, distance, particles, sounds) ->
+                                    new TimeSkipMove<>(cooldown, distance, windup, duration, moveDistance).withParticles(particles).withSounds(sounds)));
         }
     }
 }

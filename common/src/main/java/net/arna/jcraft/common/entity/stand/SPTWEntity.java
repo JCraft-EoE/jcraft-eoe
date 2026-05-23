@@ -167,7 +167,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                     Component.translatable("jcraft.generic.ts"),
                     Component.literal("1.75 seconds, extremely low windup")
             );
-    public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(300, 14)
+    public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.STAR_PLATINUM_TIMESKIP)
             .withInfo(
                     Component.translatable("jcraft.generic.tp"),
