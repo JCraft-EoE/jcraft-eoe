@@ -221,7 +221,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Time Erase"),
                     Component.literal("6 seconds duration, cancellable by doing anything with King Crimson")
             );
-    public static final TimeSkipMove<KingCrimsonEntity> TIME_SKIP = new TimeSkipMove<KingCrimsonEntity>(300, 16)
+    public static final TimeSkipMove<KingCrimsonEntity> TIME_SKIP = new TimeSkipMove<KingCrimsonEntity>(300, 16, 2, 2, 1)
             .withSound(JSoundRegistry.TE_TP)
             .withParticles()
             .withInfo(

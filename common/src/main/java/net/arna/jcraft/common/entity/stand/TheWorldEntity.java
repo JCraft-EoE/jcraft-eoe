@@ -179,7 +179,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
                     Component.literal("Donut"),
                     Component.literal("slow, uninterruptible combo starter/extender, 1.5s stun on whiff")
             );
-    public static final TimeSkipMove<TheWorldEntity> TIME_SKIP = new TimeSkipMove<TheWorldEntity>(300, 14)
+    public static final TimeSkipMove<TheWorldEntity> TIME_SKIP = new TimeSkipMove<TheWorldEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.TIME_SKIP)
             .withInfo(
                     Component.literal("Timeskip"),
@@ -245,7 +245,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
         moves.register(MoveClass.SPECIAL3, FEIGN_BARRAGE, State.BARRAGE);
         moves.register(MoveClass.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
-        moves.register(MoveClass.UTILITY, TIME_SKIP, State.IDLE);
+        moves.register(MoveClass.UTILITY, TIME_SKIP, null);
 
         moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }

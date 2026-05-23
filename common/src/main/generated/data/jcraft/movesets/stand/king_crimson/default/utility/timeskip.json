@@ -6,6 +6,7 @@
     "type": "jcraft:shared_time_skip_move",
     "cooldown": 300,
     "distance": 16.0,
+    "duration": 2,
     "extras": {
       "description": {
         "translate": "move.jcraft.king_crimson.default.timeskip.description"
@@ -15,9 +16,11 @@
         "translate": "move.jcraft.king_crimson.default.timeskip.name"
       }
     },
+    "move_distance": 1.0,
     "particles": true,
     "sounds": [
       "jcraft:tetp"
-    ]
+    ],
+    "windup": 2
   }
 }
