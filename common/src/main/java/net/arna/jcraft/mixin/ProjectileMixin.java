@@ -43,7 +43,10 @@ public abstract class ProjectileMixin {
         final Projectile projectile = (Projectile)(Object)this;
         if (projectile.tickCount == 0 && owner instanceof LivingEntity living &&
                 JUtils.getSpec(living) instanceof HamonSpec hamon &&
-                hamon.getCurrentMove() instanceof ImproviserMove) {
+                hamon.getCurrentMove() instanceof ImproviserMove &&
+                hamon.getCharge() >= ImproviserMove.PROJECTILE_IMPROVISER_CHARGE
+        ) {
+            hamon.drainCharge(ImproviserMove.PROJECTILE_IMPROVISER_CHARGE);
             jcraft$hamon = hamon;
         }
     }

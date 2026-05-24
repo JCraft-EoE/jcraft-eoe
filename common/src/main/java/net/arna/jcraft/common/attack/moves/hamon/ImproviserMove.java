@@ -19,6 +19,8 @@ import java.util.Set;
 
 public class ImproviserMove extends AbstractBarrageAttack<ImproviserMove, HamonSpec> {
 
+    public static final float PROJECTILE_IMPROVISER_CHARGE = HamonSpec.MAX_CHARGE / 2;
+
     @Getter
     private final float chargePerTick;
 
