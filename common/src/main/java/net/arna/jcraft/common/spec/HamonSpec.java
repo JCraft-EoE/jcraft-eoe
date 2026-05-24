@@ -265,6 +265,19 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
     }
 
     @Override
+    public boolean handleMove(final MoveClass moveClass) {
+        if (moveClass == MoveClass.LIGHT) {
+            if (curMove instanceof ImproviserMove) {
+                cancelMove(false);
+            }
+            else {
+                return false;
+            }
+        }
+        return super.handleMove(moveClass);
+    }
+
+    @Override
     protected AbstractMove<?, ? super HamonSpec> overrideMoveSelection(AbstractMove<?, ? super HamonSpec> original, boolean crouching, boolean aerial) {
         if (willUseHamonNext()) {
             if (getCurrentMove() instanceof ChargeHamonMove && !(original instanceof ChargeHamonMove)) cancelMove();

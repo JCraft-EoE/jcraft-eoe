@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.authlib.GameProfile;
-import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
@@ -251,8 +250,7 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
     private void jcraft$substituteAttack(final Entity target, final CallbackInfo ci) {
         final Player player = (Player)(Object)this;
         if (player instanceof ServerPlayer && JUtils.getSpec(player) instanceof HamonSpec hamon) {
-            final var moveEntry = hamon.getMoveEntry(MoveClass.LIGHT, false, false);
-            if (moveEntry != null && moveEntry.getMove() instanceof ImproviserAttack) {
+            if (hamon.getCurrentMove() instanceof ImproviserAttack) {
                 ci.cancel();
             }
         }

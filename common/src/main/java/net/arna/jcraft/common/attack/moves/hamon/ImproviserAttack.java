@@ -36,7 +36,7 @@ public final class ImproviserAttack extends AbstractSimpleAttack<ImproviserAttac
 
     @Override
     public boolean conditionsMet(final HamonSpec attacker) {
-        if (!super.conditionsMet(attacker) || !attacker.willUseHamonNext()) {
+        if (!super.conditionsMet(attacker)) {
             return false;
         }
         return attacker.getUser().getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof TieredItem;
