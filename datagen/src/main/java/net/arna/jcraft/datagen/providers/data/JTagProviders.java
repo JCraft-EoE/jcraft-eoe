@@ -694,6 +694,12 @@ public class JTagProviders {
             doesntBreathe.add(JEntityTypeRegistry.ROAD_ROLLER.getId());
             doesntBreathe.addTag(JTagRegistry.STANDS);
 
+            final var cantBreakBlocks = getOrCreateTagBuilder(JTagRegistry.CANT_BREAK_BLOCKS);
+            // empty
+
+            getOrCreateTagBuilder(JTagRegistry.CANT_HEAR)
+                    .add(JEntityTypeRegistry.AEROSMITH.get());
+
             addTagsForCompatibilities(arg);
         }
 

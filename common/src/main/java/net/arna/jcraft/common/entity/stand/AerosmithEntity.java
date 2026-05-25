@@ -11,21 +11,29 @@ import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.common.ai.AttackerBrainInfo;
+import net.arna.jcraft.common.ai.CombatInstantContext;
+import net.arna.jcraft.common.attack.conditions.RemoteCondition;
 import net.arna.jcraft.common.attack.moves.aerosmith.*;
+import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
+import net.arna.jcraft.common.entity.CarbonDioxideRadarEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -35,8 +43,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +58,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     public static final EntityDataAccessor<Float> OVERHEAT = SynchedEntityData.defineId(AerosmithEntity.class, EntityDataSerializers.FLOAT);
     public static final float OVERHEAT_MAX = 15f;
+    public static final int OVERHEAT_LOSS_COOLDOWN_MAX = 20;
     public static final double SLOW_CRUISE_SPEED = 0.075;
     public static final double CRUISE_SPEED = 0.15;
     public static final double MAX_SPEED = 0.22;
@@ -69,12 +80,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Getter @Setter
     private FlyState flyState = FlyState.NONE;
 
+    private int overheatLossCooldown = 0;
+
     // client-side rotation tracking for rendering
     public float oldPitch = 0.0f, oldYaw = 0.0f, oldRoll = 0.0f;
     public float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
 
     public static final MuzzleHitscanAttack BULLET = new MuzzleHitscanAttack(
-            1, 1, 2, 1.5f, 3.25f, 0, 0.4f, 30f, 0.01f)
+            1, 1, 2, 1.5f, 2f, 0, 0.12f, 30f, 0.01f)
             .withBlockStun(0)
             .withSound(JSoundRegistry.AS_SHOOT)
             .withHitSpark(JParticleType.HIT_SPARK_1)
@@ -98,22 +111,26 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Orders Aerosmith to drop a bomb above a given location.")
             );
 
-    public static final PatrolMove PATROL = new PatrolMove(0, 67f, 48f)
-            .withInfo(
-                    Component.literal("Patrol Location"),
-                    Component.literal("Orders Aerosmith to fly around a given location. Use while crouching to invert the patrol direction.")
-            );
-
     public static final AerosmithChargeAttack CHARGE = new AerosmithChargeAttack(
             100, 50, 1.0f, 15, 1.66f, 0.1f, 0.0f,
             IntSet.of(10, 15, 20, 25, 30, 35, 40, 45, 50))
             .withStaticY()
             .withStunType(StunType.LAUNCH)
-            .withSound(JSoundRegistry.AS_BARRAGE)
+            .withSound(JSoundRegistry.AS_MANEUVER)
             .withImpactSound(JSoundRegistry.AS_BARRAGE_HIT)
             .withInfo(
                     Component.literal("Dive Charge"),
                     Component.literal("Non-remote: a straight charge, rising at the end. Carries enemies with Aerosmith.")
+            );
+
+    public static final MainBarrageAttack<AerosmithEntity> SAWBLADE = new MainBarrageAttack<AerosmithEntity>(280,
+            0, 24, 0.9f, 1f, 13, 1.5f, 0.1f, 0f, 3, Blocks.OAK_LEAVES.defaultDestroyTime())
+            .withSound(JSoundRegistry.AS_NAME)
+            .withImpactSound(JSoundRegistry.AS_BARRAGE_HIT)
+            .withAerialVariant(CHARGE)
+            .withInfo(
+                    Component.literal("Propeller Strike"),
+                    Component.literal("A makeshift barrage wielding Aerosmith as a saw-blade.")
             );
 
     public static final AerosmithAttackOrderMove ATTACK_ORDER_MOVE = new AerosmithAttackOrderMove(0, 0)
@@ -122,10 +139,30 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Orders Aerosmith to attack the entity at a detected location.")
             );
 
+    public static final FlybyMove FLYBY = new FlybyMove(0, 67f)
+            .withInfo(
+                    Component.literal("Fly by Location"),
+                    Component.literal("Orders Aerosmith to fly to a given location, returning after arriving.")
+            );
+
+    public static final BombThrowAttack BOMB_THROW = new BombThrowAttack(200, 9, 42, 1.2f)
+            .withSound(JSoundRegistry.AS_BARRAGE)
+            .withInfo(
+                    Component.literal("Loft Bombing"),
+                    Component.literal("Orders Aerosmith to throw a bomb in front of the user using its inertia.")
+            )
+            .withCondition(new RemoteCondition(false));
+
     public static final BreathXrayMove<AerosmithEntity> XRAY = new BreathXrayMove<AerosmithEntity>(0, 0, 128, true)
             .withInfo(
                     Component.literal("Breath Detection"),
                     Component.literal("Aerosmith scans the surroundings for the breath of living things.")
+            );
+
+    public static final PatrolMove PATROL = new PatrolMove(0, 67f, 48f)
+            .withInfo(
+                    Component.literal("Patrol Location"),
+                    Component.literal("Orders Aerosmith to fly around a given location. Use while crouching to invert the patrol direction.")
             );
 
     public static final StandData DATA = StandData.builder()
@@ -155,6 +192,13 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Getter
     private final AerosmithAttackOrderMove attackOrderMove;
 
+    // Tracks the move that was active just before cancelMove() was called,
+    // so setMove() can tell apart re-initiating the same move in a continuous loop
+    // (e.g. light attack holding) from actually starting a new move.
+    @Nullable
+    private AbstractMove<?, ? super AerosmithEntity> preCancelMove = null;
+    private BoundSoundPlayer.SoundHandle volaHandle;
+
     public enum PatrolDirection {
         CLOCKWISE(1),
         COUNTER_CLOCKWISE(-1);
@@ -171,7 +215,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                 return COUNTER_CLOCKWISE;
             return CLOCKWISE;
         }
-    };
+    }
+
     @Getter @Setter
     private PatrolDirection patrolDirection = PatrolDirection.CLOCKWISE;
 
@@ -228,12 +273,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     private static void registerDefaultMoves(final @NonNull MoveMap<AerosmithEntity, AerosmithEntity.State> moves) {
-        moves.registerImmediate(MoveClass.LIGHT, BULLET, State.LIGHT);
-        moves.registerImmediate(MoveClass.HEAVY, BOMB_DROP, State.ACTIVE);
-        moves.registerImmediate(MoveClass.UTILITY, PATROL, State.ACTIVE);
-        moves.registerImmediate(MoveClass.BARRAGE, CHARGE, State.CHARGE);
-        moves.register(MoveClass.ULTIMATE, ATTACK_ORDER_MOVE);
+        moves.register(MoveClass.LIGHT, BULLET, State.LIGHT);
+        moves.register(MoveClass.HEAVY, BOMB_DROP, State.ACTIVE);
+        moves.register(MoveClass.BARRAGE, SAWBLADE, State.SAWBLADE).withAerialVariant(State.CHARGE);
+        moves.register(MoveClass.SPECIAL1, FLYBY);
+        moves.register(MoveClass.SPECIAL2, BOMB_THROW, State.BOMB);
         moves.register(MoveClass.SPECIAL3, XRAY);
+        moves.register(MoveClass.ULTIMATE, ATTACK_ORDER_MOVE);
+        moves.register(MoveClass.UTILITY, PATROL, State.ACTIVE);
     }
 
     private boolean xRotChangeAllowed = false;
@@ -247,6 +294,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     @Override
+    public void lookAt(@NonNull final EntityAnchorArgument.Anchor anchor, @NonNull final Vec3 target) {
+        boolean store = xRotChangeAllowed;
+        xRotChangeAllowed = true;
+        super.lookAt(anchor, target);
+        xRotChangeAllowed = store;
+    }
+
+    @Override
     public boolean canBlock() {
         if (isRemote()) return false;
         return super.canBlock();
@@ -255,10 +310,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @Override
     public void cancelMove(boolean offensiveCancel) {
         if (offensiveCancel && isRemote()) return;
+        preCancelMove = getCurrentMove();
         super.cancelMove(offensiveCancel);
     }
-
-    public double lastMovementToLocalPlayerAngle = 0.0;
 
     @Override
     public void tick() {
@@ -273,29 +327,37 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
         resetFallDistance();
 
-        if (!isAlive()) return;
-
-        if (level().isClientSide()) {
-            JCraft.getClientEntityHandler().aerosmithClientTick(this);
-            return;
-        }
-
-        BulletHeatManager.tick((ServerLevel) level()); //ticks the heat manager (makes bullets give blocks a magma block effect)
-
         final LivingEntity user = getUser();
-        if (user == null) return;
+
+        if (!isAlive() || level().isClientSide() || user == null)
+            return;
+
+        BulletHeatManager.tick((ServerLevel) level());
+
+        // Spawn the radar entity on the first valid server tick so it follows the user.
+        if (tickCount == 1) {
+            final CarbonDioxideRadarEntity radar = new CarbonDioxideRadarEntity(level());
+            radar.setUser(user);
+            radar.setPos(user.getX(), user.getY(), user.getZ());
+            level().addFreshEntity(radar);
+        }
 
         final AbstractMove<?, ? super AerosmithEntity> currentMove = getCurrentMove();
 
-        if (!(currentMove instanceof MuzzleHitscanAttack) && ++overheatTick % 5 == 0) {
-            addOverheat(-0.4f);
+        boolean isShooting = currentMove instanceof MuzzleHitscanAttack;
+
+        if (isShooting) {
+            overheatLossCooldown = OVERHEAT_LOSS_COOLDOWN_MAX;
+        } else if (overheatLossCooldown-- <= 0) {
+            if (++overheatTick % 5 == 0)
+                addOverheat(-0.4f);
         }
 
         if (isInWall() && patrolRadius > patrolRadius / 2) {
             patrolRadius -= 0.2f;
         }
 
-        if (currentMove == null) {
+        if (currentMove != chargeAttack) {
             switch (flyState) {
                 case PATROL -> {
                     final float theta = tickCount / patrolRadius / 2.0f * patrolDirection.getValue();
@@ -303,8 +365,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                             Mth.sin(theta) * patrolRadius, 1.0, Mth.cos(theta) * patrolRadius,
                             GravityChangerAPI.getGravityDirection(this)
                     );
-
-                    JCraft.createParticle((ServerLevel) level(), flyTarget.x + offset.x, flyTarget.y + offset.y, flyTarget.z + offset.z, JParticleType.GO);
 
                     lookAt(flyTarget.add(offset), 6f, 6f);
 
@@ -358,7 +418,54 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         xRotChangeAllowed = false;
     }
 
-    public void patrol(final Vec3 targetPos, final float radius) {
+    @Override
+    public void executePlan(int aiLevel, AttackerBrainInfo info, CombatInstantContext combatCtx) {
+        final LivingEntity user = getUser();
+
+        if (user == null) return;
+
+        if (user instanceof Mob mob) {
+            final var target = mob.getTarget();
+
+            if (target != null)
+                attackOrderMove.setCurrentTarget(target);
+        }
+
+        if (user.distanceToSqr(this) > 64 * 64)
+            info.setDesiredStandOffTime(random.nextInt(40));
+        else
+            info.setDesiredStandOffTime(0);
+    }
+
+    @Override
+    public void setMove(AbstractMove<?, ? super AerosmithEntity> move, @Nullable AerosmithEntity.State animState) {
+        // A "continuation" is when the same move is re-initiated immediately after cancelling itself
+        // (e.g. MuzzleHitscanAttack looping while the button is held). In that case we skip the
+        // maneuver sound so it only plays on genuine new starts.
+        boolean isContinuation = (move == preCancelMove);
+        preCancelMove = null;
+
+        if (!isContinuation) {
+            if (isRemote()) playBoundSound(JSoundRegistry.AS_MANEUVER.get(), 1f, 1f);
+
+            if (getUser() != null) {
+                if (move instanceof MuzzleHitscanAttack)
+                    volaHandle = BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_VOLA.get(),
+                            getUser().getSoundSource(), 1f, 1f);
+                else if (isRemote()) BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_SHOUT.get(),
+                        getUser().getSoundSource(), 1f, 1f);
+            }
+        }
+
+        super.setMove(move, animState);
+    }
+
+    @Override
+    public void queueMove(@Nullable MoveInputType type) {
+        if (type != MoveInputType.LIGHT) super.queueMove(type);
+    }
+
+    public void patrol(@NonNull final Vec3 targetPos, final float radius) {
         flyState = FlyState.PATROL;
         flyTarget = targetPos;
         patrolRadius = radius;
@@ -383,6 +490,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         }
 
         super.desummon(playSound);
+    }
+
+    public void stopVolaSound() {
+        if (volaHandle != null) volaHandle.stop();
     }
 
     public void lookAt(final Vec3 target, final float maxYRotIncrease, final float maxXRotIncrease) {
@@ -477,7 +588,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         ACTIVE(AzCommand.create(JCraft.BASE_CONTROLLER, "idle", AzPlayBehaviors.LOOP)),
         CHARGE(AzCommand.create(JCraft.BASE_CONTROLLER, "charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         LIGHT(AzCommand.create(JCraft.BASE_CONTROLLER, "burst", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "block", AzPlayBehaviors.LOOP))
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "block", AzPlayBehaviors.LOOP)),
+        SAWBLADE(AzCommand.create(JCraft.BASE_CONTROLLER, "sawblade", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BOMB(AzCommand.create(JCraft.BASE_CONTROLLER, "bomb", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ;
 
         private final AzCommand animator;

@@ -222,7 +222,7 @@ public class SheerHeartAttackEntity extends Mob implements IOwnable {
 
         for (final LivingEntity living : hurt) {
             final Vec3 kbVec = living.getEyePosition().subtract(position()).normalize();
-            damageLogic(level(), living, kbVec, 2, 3, true, 20f,
+            damageLogic(level(), living, kbVec, 2, 3, true, 15f,
                     false, 4, damageSource, getMaster(), null, false);
             living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
         }

@@ -235,13 +235,7 @@ public class PlayerInputPacket {
                     }
 
                     // If not handled by Peacemaker, proceed with normal stand logic
-                    StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand == null || !stand.allowMoveHandling()) {
-                        future.complete(false);
-                        return;
-                    }
-
-                    future.complete(initStandMove(stand, MoveInputType.LIGHT));
+                    future.complete(initStandOrSpecMove(player, MoveInputType.LIGHT));
                 }
                 case UTILITY -> {
                     boolean s;
@@ -268,35 +262,42 @@ public class PlayerInputPacket {
 
     private static boolean initStandOrSpecMove(ServerPlayer player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
-        if (stand != null && stand.allowMoveHandling()) {
-            return initStandMove(stand, type);
-        } else {
-            JSpec<?, ?> spec = JUtils.getSpec(player);
-            if (spec == null) {
-                return false;
-            }
 
-            if (spec.initMove(type.getMoveClass())) {
-                return true;
-            }
-            if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT) {
+        boolean standExists = stand != null;
+        boolean forwardToSpec = !standExists || !stand.allowMoveHandling() || stand.forwardInputToSpec(type);
+        boolean success = false;
+        
+        if (standExists && stand.allowMoveHandling()) {
+            success = initStandMove(stand, type);
+        }
+
+        if (forwardToSpec) {
+            JSpec<?, ?> spec = JUtils.getSpec(player);
+
+            if (spec == null) {
+                return success;
+            } else if (spec.initMove(type.getMoveClass())) {
+                success = true;
+            } else if (spec.moveStun > 0 && spec.moveStun < SPEC_QUEUE_MOVESTUN_LIMIT) {
                 spec.queuedMove = type;
             }
-
-            return false;
         }
+
+        return success;
     }
 
     private static boolean initStandMove(StandEntity<?, ?> stand, MoveInputType type) {
         if (!stand.blocking) {
+            if (!stand.acceptsUserMoveInit(type))
+                return false;
+
             int moveStun = stand.getMoveStun();
 
-            if (stand.initMove(type.getMoveClass(stand.isStandby()))) {
+            if (stand.initMove(type.getMoveClass()))
                 return true;
-            }
-            if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT) {
+
+            if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)
                 stand.queueMove(type);
-            }
         }
 
         return false;

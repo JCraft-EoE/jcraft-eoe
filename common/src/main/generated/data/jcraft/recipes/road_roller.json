@@ -14,13 +14,16 @@
     "I": {
       "item": "minecraft:iron_block"
     },
+    "Q": {
+      "item": "jcraft:gas_can"
+    },
     "Y": {
       "item": "minecraft:yellow_dye"
     }
   },
   "pattern": [
     "BYY",
-    "III",
+    "IQI",
     "GFG"
   ],
   "result": {

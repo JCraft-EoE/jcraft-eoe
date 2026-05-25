@@ -144,6 +144,12 @@
 					]
 				},
 				{
+					"name": "bipedHandRight",
+					"parent": "lower_armRight",
+					"pivot": [-5.8, 11.2, 0.2],
+					"rotation": [90, 0, -180]
+				},
+				{
 					"name": "armLeft",
 					"parent": "upperBody",
 					"pivot": [5.6, 22.85, 0.2],
@@ -162,6 +168,12 @@
 						{"origin": [4.8, 10.05, -2], "size": [4, 7, 4], "uv": [52, 19], "mirror": true},
 						{"origin": [4.8, 10.05, -2], "size": [4, 7, 4], "inflate": 0.3, "uv": [52, 46], "mirror": true}
 					]
+				},
+				{
+					"name": "bipedHandLeft",
+					"parent": "lower_armLeft",
+					"pivot": [5.8, 11.2, 0.2],
+					"rotation": [90, 0, -180]
 				},
 				{
 					"name": "prop",

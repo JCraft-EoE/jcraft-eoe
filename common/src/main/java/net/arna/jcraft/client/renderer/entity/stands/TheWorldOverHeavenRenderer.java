@@ -15,7 +15,10 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 public class TheWorldOverHeavenRenderer extends StandEntityRenderer<TheWorldOverHeavenEntity> {
 
     public TheWorldOverHeavenRenderer(final @NonNull EntityRendererProvider.Context context) {
-        super(context, b -> b.addRenderLayer(new TWOHEyesLayer()), JStandTypeRegistry.THE_WORLD_OVER_HEAVEN.get(), -0.1745329251f, -0.31f);
+        super(context, b -> b
+                .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
+                .addRenderLayer(new TWOHEyesLayer()),
+                JStandTypeRegistry.THE_WORLD_OVER_HEAVEN.get(), -0.1745329251f, -0.31f);
     }
 
 }

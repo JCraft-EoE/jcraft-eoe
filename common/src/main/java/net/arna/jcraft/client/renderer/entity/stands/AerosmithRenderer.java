@@ -48,9 +48,7 @@ public class AerosmithRenderer {
                         .setRenderType(renderType())
                         .setPrerenderEntry(preRenderEntry())
                         .build(),
-                context,
-                model,
-                texture
+                context
         );
     }
 

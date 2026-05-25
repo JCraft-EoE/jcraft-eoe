@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
@@ -29,11 +30,11 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
     @Getter
     private float range;
 
-    @Nullable @Getter
+    @Nullable @Getter @Setter
     private LivingEntity currentTarget = null;
 
-    private Vec3 lastFlyTarget;
-    private FlyState lastFlyState;
+    private Vec3 lastFlyTarget = Vec3.ZERO;
+    private FlyState lastFlyState = FlyState.RETURN;
 
     public AerosmithAttackOrderMove(final int cooldown, final float range) {
         super(cooldown, 0, 0, 0);
@@ -170,18 +171,18 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
                     targetPos = targetPos.add(JUtils.getEyePos(currentTarget));
 
                     attacker.setFlyTarget(targetPos);
-
-                    if (JUtils.angleBetween(lookVec, attacker.getLookAngle()) > 0.93)
-                        if (attacker.tickCount % 2 == 0) // fire
-                            attacker.getShootAttack().perform(attacker, user);
-
                 } else {
                     targetPos = targetPos.add(JUtils.getLocalUp(user).scale(16));
 
                     attacker.patrol(targetPos, AerosmithEntity.DEFAULT_PATROL_RADIUS);
                 }
+
+                if (JUtils.angleBetween(lookVec, attacker.getLookAngle()) > 0.93)
+                    if (attacker.tickCount % 2 == 0) // fire
+                        attacker.getShootAttack().perform(attacker, user);
             } else {
                 final var bombTarget = currentTarget.position().add(JUtils.getLocalUp(user).scale(6.7));
+                bombAttack.setDropLocation(bombTarget);
                 attacker.setFlyTarget(bombTarget);
             }
         }

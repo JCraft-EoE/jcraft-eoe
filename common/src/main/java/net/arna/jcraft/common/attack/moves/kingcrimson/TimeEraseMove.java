@@ -14,6 +14,8 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
@@ -148,7 +150,9 @@ public final class TimeEraseMove extends AbstractMove<TimeEraseMove, KingCrimson
         if (teTime > 0) {
             attacker.setTETime(--teTime);
 
-            if (attacker.blocking || attacker.getCurrentMove() != null && attacker.getMoveStun() < attacker.getCurrentMove().getWindupPoint() * 3 / 2) {
+            if (attacker.blocking || (
+                    (attacker.getCurrentMove() != null && !(attacker.getCurrentMove() instanceof TossChargeMove<?>) && !(attacker.getCurrentMove() instanceof TossMove<?>))
+                            && attacker.getMoveStun() < attacker.getCurrentMove().getWindupPoint() * 3 / 2)) {
                 cancelTE(attacker);
             }
 

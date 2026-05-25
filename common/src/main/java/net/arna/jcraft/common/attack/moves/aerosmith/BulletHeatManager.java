@@ -31,26 +31,26 @@ public class BulletHeatManager {
     public static void tick(ServerLevel level) {
         tickCounter++;
 
-        HEATED_BLOCKS.entrySet().removeIf(e -> {
-            int remaining = e.getValue() - 1;
-            if (remaining <= 0) return true;
-            e.setValue(remaining);
+        HEATED_BLOCKS.entrySet().removeIf(entry -> {
+            int ticksRemaining = entry.getValue() - 1;
+            if (ticksRemaining <= 0) return true;
+            entry.setValue(ticksRemaining);
 
-            if (e.getKey().level() != level) return false;
+            if (entry.getKey().level() != level) return false;
 
-            BlockPos pos = e.getKey().pos();
+            BlockPos heatedBlock = entry.getKey().pos();
 
             if (tickCounter % 5 == 0) {
-                double px = pos.getX() + 0.5 + (level.random.nextDouble() - 0.5) * 0.8;
-                double py = pos.getY() + 1.0;
-                double pz = pos.getZ() + 0.5 + (level.random.nextDouble() - 0.5) * 0.8;
-                level.sendParticles(ParticleTypes.SMOKE, px, py, pz, 1, 0.0, 0.05, 0.0, 0.02);
+                double smokeX = heatedBlock.getX() + 0.5 + (level.random.nextDouble() - 0.5) * 0.8;
+                double smokeY = heatedBlock.getY() + 1.0;
+                double smokeZ = heatedBlock.getZ() + 0.5 + (level.random.nextDouble() - 0.5) * 0.8;
+                level.sendParticles(ParticleTypes.SMOKE, smokeX, smokeY, smokeZ, 1, 0.0, 0.05, 0.0, 0.02);
             }
 
             if (tickCounter % 20 == 0) {
                 level.getEntitiesOfClass(LivingEntity.class,
-                        new AABB(pos.above()).inflate(0.2, 0.1, 0.2),
-                        e2 -> e2.isAlive() && !e2.isSpectator() && !e2.fireImmune() && e2.onGround())
+                        new AABB(heatedBlock.above()).inflate(0.2, 0.1, 0.2),
+                        entity -> entity.isAlive() && !entity.isSpectator() && !entity.fireImmune() && entity.onGround())
                     .forEach(entity -> entity.hurt(level.damageSources().hotFloor(), 1.0f));
             }
 

@@ -47,6 +47,8 @@ public class MagneticFields {
             if (explodeTime == EXPLOSION_TICKS / 2)
                 baseStrength *= -1.0f;
 
+            final boolean firstTick = time == TICKS_TO_LIVE;
+
             for (Entity entity : level.getAllEntities()) {
                 if (!JUtils.isFerrous(entity)) continue;
                 if (entity == owner) continue;
@@ -60,7 +62,17 @@ public class MagneticFields {
                 // Hard linear cutoff outside range
                 if (distanceSqr > strength * strength) attraction -= Math.sqrt(distanceSqr) / strength;
 
-                if (explodeTime <= 0 && attraction <= 0.0) continue;
+                if (firstTick && distanceSqr < strength * strength + 25) {
+                    if (entity instanceof AbstractArrow abstractArrow) {
+                        if (abstractArrow.inGround) {
+                            attraction += 0.07;
+                            abstractArrow.inGround = false;
+                            JUtils.setVelocity(entity, Vec3.ZERO);
+                        }
+                    }
+                }
+
+                if (explodeTime <= 0 && attraction <= 0.0001) continue;
 
                 JUtils.addVelocity(entity, pos.subtract(entity.position()).normalize().scale(attraction));
             }
@@ -87,10 +99,11 @@ public class MagneticFields {
                 // Hard linear cutoff outside range
                 if (distanceSqr > strength * strength) attraction -= Math.sqrt(distanceSqr) / strength;
 
-                if (entity instanceof AbstractArrow abstractArrow) {
+                if (distanceSqr > strength * strength + 25) continue;
+
+                if (JUtils.isFerrous(entity) && entity instanceof AbstractArrow abstractArrow) {
                     if (abstractArrow.inGround) {
                         abstractArrow.inGround = false;
-
                     }
                 }
 

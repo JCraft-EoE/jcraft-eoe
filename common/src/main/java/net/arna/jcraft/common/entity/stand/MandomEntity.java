@@ -104,7 +104,7 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
     public void onUserMoveInput(AbstractMove<?, ? super MandomEntity> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
         if (!pressed) return;
 
-        MoveClass moveClass = type.getMoveClass(standby);
+        MoveClass moveClass = type.getMoveClass();
         if (moveClass == null) return;
 
         // Special check for ULTIMATE (Rewind) - only allow if countdown is active

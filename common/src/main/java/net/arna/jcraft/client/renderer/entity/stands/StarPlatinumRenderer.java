@@ -15,7 +15,10 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 public class StarPlatinumRenderer extends StandEntityRenderer<AbstractStarPlatinumEntity<?, ?>> {
 
     public StarPlatinumRenderer(final @NonNull EntityRendererProvider.Context context) {
-        super(context, b -> b.addRenderLayer(new SPHairLayer()), JStandTypeRegistry.STAR_PLATINUM.get(), 0f, 0f);
+        super(context, b -> b
+                .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
+                .addRenderLayer(new SPHairLayer()),
+                JStandTypeRegistry.STAR_PLATINUM.get(), 0f, 0f);
     }
 
 }

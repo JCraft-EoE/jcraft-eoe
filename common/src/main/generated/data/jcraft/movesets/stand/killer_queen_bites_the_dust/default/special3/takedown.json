@@ -28,18 +28,19 @@
       "type": "jcraft:killerqueen_bitesthedust_btd_grab_hit_attack",
       "attack_extras": {
         "backstab": true,
-        "block_stun": 9,
+        "block_stun": 7,
         "hit_animation": "MID",
         "hit_spark": "HIT_SPARK_1",
         "stun_type": "UNBURSTABLE"
       },
       "cooldown": 0,
-      "damage": 5.0,
+      "damage": 3.0,
       "duration": 42,
       "extras": {
         "actions": [
           {
             "type": "jcraft:play_sound",
+            "bind": false,
             "run": "on_hit",
             "sound": "jcraft:impact1"
           }
