@@ -9,6 +9,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.CarbonDioxideRadarEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -40,6 +41,7 @@ public class CarbonDioxideRadarRenderer extends AbstractEntityRenderer<CarbonDio
                 AzEntityRendererConfig.builder(e -> MODEL, CarbonDioxideRadarRenderer::texture)
                         .setAnimatorProvider(RadarAnimator::new)
                         .setAlpha(CarbonDioxideRadarRenderer::alpha)
+                        .setRenderType(e -> RenderType.entityTranslucent(texture(e)))
                         .build(),
                 context
         );
