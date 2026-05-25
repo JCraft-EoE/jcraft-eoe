@@ -281,7 +281,7 @@ public interface JEntityTypeRegistry {
             ).sized(
                     1.2f,
                     0.9f
-            ).build("aerosmith"));
+            ).clientTrackingRange(12).build("aerosmith"));
 
     RegistrySupplier<EntityType<GEREntity>> GER = ENTITY_TYPE_REGISTRY.register(JCraft.id("ger"),
             () -> EntityType.Builder.of(
@@ -710,12 +710,20 @@ public interface JEntityTypeRegistry {
                     MobCategory.CREATURE
             ).sized(0.3f, 0.9f).build("mandom")
     );
+    RegistrySupplier<EntityType<CarbonDioxideRadarEntity>> CO2_RADAR = ENTITY_TYPE_REGISTRY.register(JCraft.id("co2_radar"),
+            () -> EntityType.Builder.of(
+                    WorldOnlyEntityFactory.from(CarbonDioxideRadarEntity::new),
+                    MobCategory.MISC
+            ).sized(0.0f, 0.0f).noSummon().build("co2_radar")
+    );
+
     RegistrySupplier<EntityType<TrainingDummyEntity>> TRAINING_DUMMY = ENTITY_TYPE_REGISTRY.register(JCraft.id("training_dummy"),
             () -> EntityType.Builder.of(
                     (EntityType<TrainingDummyEntity> entityType, Level world) -> new TrainingDummyEntity(entityType, world),
                     MobCategory.CREATURE
             ).sized(0.6f, 1.8f).build("training_dummy")
     );
+
 
 
     @NotNull

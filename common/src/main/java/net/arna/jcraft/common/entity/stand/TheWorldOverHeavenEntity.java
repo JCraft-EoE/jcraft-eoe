@@ -231,8 +231,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                     Component.literal("5 seconds")
             );
 
-    public static final TimeSkipMove<TheWorldOverHeavenEntity> TIME_SKIP = new TimeSkipMove<TheWorldOverHeavenEntity>(
-            300, 14)
+    public static final TimeSkipMove<TheWorldOverHeavenEntity> TIME_SKIP = new TimeSkipMove<TheWorldOverHeavenEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.TWOH_TIMESKIP)
             .withInfo(
                     Component.literal("Timeskip"),
@@ -335,8 +334,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             return;
         }
 
-        playSound(JSoundRegistry.TWOH_SUMMON.get(), 1f, 1f);
-        playSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.TWOH_SUMMON.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
     }
 
     @Override

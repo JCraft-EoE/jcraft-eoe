@@ -235,13 +235,7 @@ public class PlayerInputPacket {
                     }
 
                     // If not handled by Peacemaker, proceed with normal stand logic
-                    StandEntity<?, ?> stand = JUtils.getStand(player);
-                    if (stand == null || !stand.allowMoveHandling()) {
-                        future.complete(false);
-                        return;
-                    }
-
-                    future.complete(initStandMove(stand, MoveInputType.LIGHT));
+                    future.complete(initStandOrSpecMove(player, MoveInputType.LIGHT));
                 }
                 case UTILITY -> {
                     boolean s;
@@ -299,7 +293,7 @@ public class PlayerInputPacket {
 
             int moveStun = stand.getMoveStun();
 
-            if (stand.initMove(type.getMoveClass(stand.isStandby())))
+            if (stand.initMove(type.getMoveClass()))
                 return true;
 
             if (moveStun > 0 && moveStun < QUEUE_MOVESTUN_LIMIT)

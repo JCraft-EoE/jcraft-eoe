@@ -8,19 +8,16 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.NonNull;
-import net.arna.jcraft.api.MoveSelectionResult;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.particle.BreathParticle;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
-import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -30,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -37,6 +35,9 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     @Getter
     private final Object2IntMap<LivingEntity> detected = new Object2IntOpenHashMap<>(32);
     private boolean active = true;
+
+    public boolean isActive() { return active; }
+    @Getter
     private float range;
     private float scanAngle = 0.0f;
     @Getter
@@ -46,10 +47,6 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         super(cooldown, 0, 0, moveDistance);
         this.range = range;
         this.requireRemote = requireRemote;
-    }
-
-    public float getRange() {
-        return range;
     }
 
     public BreathXrayMove<?> withRange(float range) {
@@ -84,54 +81,58 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
             iterator.remove();
         }
 
+        float prevScanAngle = scanAngle;
         scanAngle += 0.1f;
-        scanAngle %= Mth.PI * 2.0;
+        scanAngle %= (float) (Mth.PI * 2.0);
 
-        if (!active) return;
-
-        if (requireRemote && !attacker.isRemote()) return;
+        if (!active || requireRemote && !attacker.isRemote()) return;
 
         final LivingEntity base = attacker.getBaseEntity();
-        if (base == null) return;
-
         final LivingEntity user = attacker.getUser();
-        if (user == null) return;
+        if (base == null || !(user instanceof ServerPlayer serverPlayer)) return;
 
-        if (user instanceof ServerPlayer serverPlayer) {
-            final Vec3 pos = base.position();
+        if (prevScanAngle > scanAngle) {
+            // Wrap around, play radar scan sound.
+            Random random = new Random();
+            float volume = 0.25f - random.nextFloat() * 0.1f;
+            float pitch = 1f - random.nextFloat() * 0.1f;
+            BoundSoundPlayer.playSoundFrom(user, JSoundRegistry.AS_RADAR_SCAN.get(), SoundSource.PLAYERS, volume, pitch,
+                    List.of(serverPlayer));
+        }
 
-            boolean doPing = false;
+        final Vec3 pos = base.position();
 
-            for (Entity entity : base.level().getEntities().getAll()) {
-                if (entity.distanceToSqr(pos) > range * range || entity.getType().is(JTagRegistry.DOESNT_BREATHE)) {
-                    continue;
-                }
-                if (entity == user || entity == base) {
-                    continue;
-                }
-                if (JUtils.inTimeErase(entity)) {
-                    continue;
-                }
+        boolean doPing = false;
 
-                if (entity instanceof LivingEntity living) {
-                    final Vec3 target = living.position().add(GravityChangerAPI.getEyeOffset(living));
+        for (Entity entity : base.level().getEntities().getAll()) {
+            if (entity.distanceToSqr(pos) > range * range || entity.getType().is(JTagRegistry.DOESNT_BREATHE)) {
+                continue;
+            }
+            if (entity == user || entity == base) {
+                continue;
+            }
+            if (JUtils.inTimeErase(entity)) {
+                continue;
+            }
 
-                    if (!withinScanArc(pos, base.getLookAngle(), target, scanAngle, Mth.DEG_TO_RAD * 30.0)) continue;
+            if (entity instanceof LivingEntity living) {
+                final Vec3 target = living.position().add(GravityChangerAPI.getEyeOffset(living));
 
-                    boolean inLineOfSight = living.hasLineOfSight(base);
-                    if (!detected.containsKey(living))
-                        if (inLineOfSight)
-                            doPing = true;
+                if (!withinScanArc(pos, base.getLookAngle(), target, scanAngle, Mth.DEG_TO_RAD * 30.0)) continue;
 
-                    detected.put(living, 20);
+                boolean inLineOfSight = living.hasLineOfSight(base);
+                if (!detected.containsKey(living))
+                    if (inLineOfSight)
+                        doPing = true;
+
+                detected.put(living, 20);
 
                     float scale = calculateBreathScale(living, inLineOfSight)/7;
                     displayBreathParticle(serverPlayer, target, scale);
                 }
             }
 
-            if (doPing) playPingSound(serverPlayer);
-        }
+        if (doPing) playPingSound(serverPlayer);
     }
 
     private float calculateBreathScale(LivingEntity entity, boolean inLineOfSight) {
@@ -193,23 +194,11 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     }
 
     public static void playPingSound(@NonNull final ServerPlayer serverPlayer) {
-        final var pos = serverPlayer.position();
         Random random = new Random();
-        float volume = 1 - random.nextFloat() * 0.2f;
+        float volume = 0.8f - random.nextFloat() * 0.2f;
         float pitch = 1 - random.nextFloat() * 0.2f;
-        serverPlayer.connection.send(
-                new ClientboundSoundPacket(
-                        Holder.direct(JSoundRegistry.AS_RADAR_PING.get()),
-                        SoundSource.PLAYERS,
-                        pos.x, pos.y, pos.z,
-                        volume, pitch, 0
-                )
-        );
-    }
-
-    @Override
-    public MoveSelectionResult specificMoveSelectionCriterion(A attacker, LivingEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
-        return MoveSelectionResult.PASS;
+        BoundSoundPlayer.playSoundFrom(serverPlayer, JSoundRegistry.AS_RADAR_PING.get(), SoundSource.PLAYERS,
+                volume, pitch, List.of(serverPlayer));
     }
 
     @Override

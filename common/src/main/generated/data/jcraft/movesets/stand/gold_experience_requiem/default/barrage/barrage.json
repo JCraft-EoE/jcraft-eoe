@@ -43,6 +43,7 @@
               "actions": [
                 {
                   "type": "jcraft:play_sound",
+                  "bind": false,
                   "run": "on_hit",
                   "sound": "jcraft:twkickhit"
                 }

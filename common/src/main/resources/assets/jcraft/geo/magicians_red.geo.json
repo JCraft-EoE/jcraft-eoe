@@ -559,6 +559,12 @@
 					]
 				},
 				{
+					"name": "bipedHandRight",
+					"parent": "lower_armRight",
+					"pivot": [-5.8, 13.2, 0.2],
+					"rotation": [90, 0, -180]
+				},
+				{
 					"name": "armLeft",
 					"parent": "upperBody",
 					"pivot": [5, 22, 0],
@@ -670,6 +676,12 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "bipedHandLeft",
+					"parent": "lower_armLeft",
+					"pivot": [5.8, 13.2, 0.2],
+					"rotation": [90, 0, -180]
 				}
 			]
 		}

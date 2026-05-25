@@ -37,6 +37,7 @@ public class SilverChariotRenderer extends StandEntityRenderer<SilverChariotEnti
         super(context, b -> b
                         .addRenderLayer(new SCAfterimageLayer())
                         .addRenderLayer(new SCRapierLayer())
+                        .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
                         .setRenderType(SilverChariotRenderer::renderType),
                 sc -> MODEL, SilverChariotRenderer::getTexture,
                 JStandTypeRegistry.SILVER_CHARIOT.get(), false, false, 0f, 0f, 90f);

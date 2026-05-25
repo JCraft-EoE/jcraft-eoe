@@ -2,6 +2,7 @@ package net.arna.jcraft.client.events;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.architectury.event.EventResult;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.registries.RegistrySupplier;
 import io.netty.buffer.Unpooled;
@@ -18,8 +19,10 @@ import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.rendering.RenderHandler;
+import net.arna.jcraft.client.sound.AerosmithSoundInstance;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
+import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
 import net.arna.jcraft.common.tickable.Timestops;
@@ -40,6 +43,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -310,11 +314,19 @@ public class JClientEvents {
         tickMenacing(client, player);
     }
 
+    public static EventResult onEntityAdd(final Entity entity, final Level level) {
+        if (entity instanceof AerosmithEntity aerosmith) {
+            Minecraft.getInstance().getSoundManager().play(new AerosmithSoundInstance(aerosmith));
+        }
+
+        return EventResult.pass();
+    }
+
     private static void tickMenacing(final Minecraft client, final LocalPlayer player) {
         final ClientLevel level = client.level;
         final boolean playerWarning = JClientConfig.getInstance().isShowStandUserWarningPlayer();
         final boolean mobWarning = JClientConfig.getInstance().isShowStandUserWarningMob();
-        if (level == null || (!playerWarning && !mobWarning)) {
+        if (level == null || (!playerWarning && !mobWarning) || player.isSpectator() || player.isInvisible()) {
             return;
         }
 

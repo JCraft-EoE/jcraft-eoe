@@ -34,10 +34,14 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.SPTW, SPTWRenderer::new),
             new RendererData<>(JEntityTypeRegistry.KING_CRIMSON, KingCrimsonRenderer::new),
 
-            new RendererData<>(JEntityTypeRegistry.D4C, D4CRenderer::new),
+            new RendererData<>(JEntityTypeRegistry.D4C, context -> new StandEntityRenderer<>(context,
+                    b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                    JStandTypeRegistry.D4C.get(), 0f, 0f)),
 
             new RendererData<>(JEntityTypeRegistry.CREAM, CreamRenderer::new),
-            new RendererData<>(JEntityTypeRegistry.KILLER_QUEEN, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.KILLER_QUEEN.get(), -0.1745329251f, -0.36f)),
+            new RendererData<>(JEntityTypeRegistry.KILLER_QUEEN, context -> new StandEntityRenderer<>(context,
+                    b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                    JStandTypeRegistry.KILLER_QUEEN.get(), -0.1745329251f, -0.36f)),
             new RendererData<>(JEntityTypeRegistry.KILLER_QUEEN_BITES_THE_DUST, KQBTDRenderer::new),
             new RendererData<>(JEntityTypeRegistry.SHEER_HEART_ATTACK, SheerHeartAttackRenderer::new),
 
@@ -46,7 +50,9 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.MADE_IN_HEAVEN, MadeInHeavenRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.SHADOW_THE_WORLD, ShadowTheWorldRenderer::of),
-            new RendererData<>(JEntityTypeRegistry.THE_WORLD, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.THE_WORLD.get(), -0.1745329251f, -0.1745329251f)),
+            new RendererData<>(JEntityTypeRegistry.THE_WORLD, context -> new StandEntityRenderer<>(context,
+                    b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                    JStandTypeRegistry.THE_WORLD.get(), -0.1745329251f, -0.1745329251f)),
             new RendererData<>(JEntityTypeRegistry.THE_WORLD_OVER_HEAVEN, TheWorldOverHeavenRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.SILVER_CHARIOT, SilverChariotRenderer::new),
@@ -61,17 +67,23 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.GE_SNAKE, GESnakeRenderer::new),
             new RendererData<>(JEntityTypeRegistry.GE_BUTTERFLY, GEButterflyRenderer::new),
 
-            new RendererData<>(JEntityTypeRegistry.HIEROPHANT_GREEN, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.HIEROPHANT_GREEN.get(), 0f, -0.2f)),
+            new RendererData<>(JEntityTypeRegistry.HIEROPHANT_GREEN, context -> new StandEntityRenderer<>(context,
+                    b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                    JStandTypeRegistry.HIEROPHANT_GREEN.get(), 0f, -0.2f)),
             new RendererData<>(JEntityTypeRegistry.EMERALD, context -> new ProjectileRenderer<>(context, "emerald")),
             new RendererData<>(JEntityTypeRegistry.BISECT, BisectRenderer::new),
             new RendererData<>(JEntityTypeRegistry.HG_NET, HGNetRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.THE_SUN, TheSunRenderer::new),
 
-            new RendererData<>(JEntityTypeRegistry.GER, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.GOLD_EXPERIENCE_REQUIEM.get())),
+            new RendererData<>(JEntityTypeRegistry.GER, context -> new StandEntityRenderer<>(context,
+                    b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                    JStandTypeRegistry.GOLD_EXPERIENCE_REQUIEM.get(), 0f, 0f)),
             new RendererData<>(JEntityTypeRegistry.GER_SCORPION, GERScorpionRenderer::new),
 
-            new RendererData<>(JEntityTypeRegistry.PURPLE_HAZE_DISTORTION, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get())),
+            new RendererData<>(JEntityTypeRegistry.PURPLE_HAZE_DISTORTION, context -> new StandEntityRenderer<>(context,
+                    b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                    JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get(), 0f, 0f)),
             new RendererData<>(JEntityTypeRegistry.PURPLE_HAZE, PurpleHazeRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.HORUS, HorusRenderer::new),
@@ -79,7 +91,9 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.LARGE_ICICLE, LargeIcicleRenderer::new),
             new RendererData<>(JEntityTypeRegistry.ICE_BRANCH, IceBranchRenderer::new),
 
-            new RendererData<>(JEntityTypeRegistry.CRAZY_DIAMOND, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.CRAZY_DIAMOND.get())),
+            new RendererData<>(JEntityTypeRegistry.CRAZY_DIAMOND, context -> new StandEntityRenderer<>(context,
+                    b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                    JStandTypeRegistry.CRAZY_DIAMOND.get(), 0f, 0f)),
             new RendererData<>(JEntityTypeRegistry.AEROSMITH, AerosmithRenderer::of),
 
             new RendererData<>(JEntityTypeRegistry.CINDERELLA, context -> new StandEntityRenderer<>(context, JStandTypeRegistry.CINDERELLA.get())),
@@ -129,6 +143,7 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.MANDOM, MandomRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.STAND_METEOR, StandMeteorRenderer::new),
+            new RendererData<>(JEntityTypeRegistry.CO2_RADAR, CarbonDioxideRadarRenderer::new),
             new RendererData<>(JEntityTypeRegistry.TRAINING_DUMMY, TrainingDummyRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE, ItemTossProjectileRenderer::new),

@@ -1,21 +1,11 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import lombok.NonNull;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.common.entity.stand.AbstractPurpleHazeEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShieldItem;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@link StandEntityRenderer} for {@link net.arna.jcraft.common.entity.stand.PurpleHazeEntity PurpleHazeEntity}.
@@ -24,7 +14,8 @@ import org.jetbrains.annotations.Nullable;
 public class PurpleHazeRenderer extends StandEntityRenderer<AbstractPurpleHazeEntity<?, ?>> {
 
     public PurpleHazeRenderer(final @NonNull EntityRendererProvider.Context context) {
-        super(context, JStandTypeRegistry.PURPLE_HAZE.get());
+        super(context, b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                JStandTypeRegistry.PURPLE_HAZE.get(), 0f, 0f);
     }
 
     /*public PurpleHazeRenderer(final EntityRendererProvider.Context context) {
