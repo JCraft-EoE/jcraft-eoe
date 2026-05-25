@@ -280,6 +280,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             return;
         }
 
+        BulletHeatManager.tick((ServerLevel) level()); //ticks the heat manager (makes bullets give blocks a magma block effect)
+
         final LivingEntity user = getUser();
         if (user == null) return;
 

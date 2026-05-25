@@ -13,6 +13,7 @@ import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -58,6 +59,16 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
             attacker.setFlyTarget(target);
         } else {
             hitPos = fire(attacker, user, user.position().add(GravityChangerAPI.getEyeOffset(user)), user.getLookAngle());
+        }
+
+        // Heat the block at the bullet's hit position for the durationTicks
+        // hitPos often lands exactly on a face boundary, so the containing pos resolves to air — fall back one block down
+        BlockPos hitBlock = BlockPos.containing(hitPos);
+        if (user.level().getBlockState(hitBlock).isAir()) {
+            hitBlock = hitBlock.below();
+        }
+        if (!user.level().getBlockState(hitBlock).isAir()) {
+            BulletHeatManager.heatBlock(user.level(), hitBlock, 20); //edit this to change the heated blocks heat time
         }
 
         // Ignite any gasoline splatters at the bullet's hit position, but with a slight delay
