@@ -169,7 +169,7 @@ public class JCraftAbilityHud {
 
     public static String cooldownTypeToKeybind(CooldownType type, boolean makeShort) {
         return switch (type) {
-            case STAND_LIGHT ->                 "M1";
+            case LIGHT, STAND_LIGHT ->          "M1";
             case HEAVY, STAND_HEAVY ->          generateName(heavyKey.getParent(), makeShort);
             case BARRAGE, STAND_BARRAGE ->      generateName(barrageKey.getParent(), makeShort);
             case ULTIMATE, STAND_ULTIMATE ->    generateName(ultKey.getParent(), makeShort);

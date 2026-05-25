@@ -190,12 +190,12 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
                     Component.literal("Charge with hamon for Sendo Punch, which knocks the enemy down, and then props them back up with an aftershock of hamon.")
             );
 
-    public static final ImproviserAttack IMPROVISER = new ImproviserAttack(100, 8,
+    public static final ImproviserAttack IMPROVISER = new ImproviserAttack(0, 8,
             19, 1.0f, 6.5f, 12, 1.6f, 2.0f, -0.1f)
             .withLaunch()
             .withSound(JSoundRegistry.HAMON_SURGE)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withCondition(HamonChargeCondition.atLeast(SendoAttack.CHARGE_COST))
+            .withCondition(HamonChargeCondition.atLeast(ImproviserAttack.CHARGE_COST))
             .withCondition(HamonSendoWaveKickGroundedCondition.of(-1)) // in ticks
             .withInfo(
                     Component.literal("Improviser Attack"),
@@ -206,7 +206,6 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
 
     public static final ImproviserMove IMPROVISER_MOVE = new ImproviserMove(60 * 20, 0.25f, 1)
             .withCondition(HamonChargeCondition.atLeast(0.25f)) // same as charge per tick in the line above
-            .withCrouchingVariant(IMPROVISER)
             .withInfo(
                     Component.literal("Improviser Move"),
                     Component.literal("""
@@ -222,12 +221,12 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
     private final HamonOverdriveCondition overdriveCondition = HamonOverdriveCondition.of(1800);
 
     private static void registerMoves(MoveMap<HamonSpec, HamonSpec.State> moves) {
+        moves.register(MoveClass.LIGHT, IMPROVISER, CooldownType.LIGHT, State.IMPROVISER);
         moves.register(MoveClass.HEAVY, FOCUS_STRIKE, CooldownType.HEAVY, null);
         moves.register(MoveClass.SPECIAL1, STOMP, CooldownType.SPECIAL1, State.STOMP);
         moves.register(MoveClass.SPECIAL2, UPPERCUT, CooldownType.SPECIAL2, State.UPPERCUT)
                 .withAerialVariant(State.SENDO);
-        moves.register(MoveClass.SPECIAL3, IMPROVISER_MOVE, CooldownType.SPECIAL3, null)
-                .withCrouchingVariant(State.IMPROVISER);
+        moves.register(MoveClass.SPECIAL3, IMPROVISER_MOVE, CooldownType.SPECIAL3, null);
 
         moves.register(MoveClass.ULTIMATE, CHARGE_HAMON, CooldownType.ULTIMATE, null);
     }
@@ -263,6 +262,19 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
         }
 
         playAttackerSound(JSoundRegistry.HAMON_SURGE.get(), 1.0f, 1.0f, true, false);
+    }
+
+    @Override
+    public boolean handleMove(final MoveClass moveClass) {
+        if (moveClass == MoveClass.LIGHT) {
+            if (curMove instanceof ImproviserMove) {
+                cancelMove(false);
+            }
+            else {
+                return false;
+            }
+        }
+        return super.handleMove(moveClass);
     }
 
     @Override

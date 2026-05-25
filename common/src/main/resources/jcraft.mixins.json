@@ -51,6 +51,7 @@
   ],
   "mixins": [
     "AbilitiesMixin",
+    "AbstractArrowMixin",
     "AnvilMenuMixin",
     "BaseSpawnerMixin",
     "BedBlockMixin",
@@ -86,6 +87,7 @@
     "PersistentEntitySectionManagerMixin",
     "PlayerListMixin",
     "PlayerMixin",
+    "ProjectileMixin",
     "RandomStrollGoalMixin",
     "ReloadableServerResourcesMixin",
     "RespawnAnchorBlockMixin",
