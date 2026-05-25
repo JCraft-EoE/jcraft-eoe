@@ -35,6 +35,8 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
     @Getter
     private final Object2IntMap<LivingEntity> detected = new Object2IntOpenHashMap<>(32);
     private boolean active = true;
+
+    public boolean isActive() { return active; }
     @Getter
     private float range;
     private float scanAngle = 0.0f;

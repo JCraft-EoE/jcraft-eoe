@@ -27,6 +27,7 @@ import net.arna.jcraft.common.ai.CombatInstantContext;
 import net.arna.jcraft.common.attack.conditions.RemoteCondition;
 import net.arna.jcraft.common.attack.moves.aerosmith.*;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
+import net.arna.jcraft.common.entity.CarbonDioxideRadarEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JParticleType;
@@ -328,6 +329,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
         if (!isAlive() || level().isClientSide() || user == null)
             return;
+
+        // Spawn the radar entity on the first valid server tick so it follows the user.
+        if (tickCount == 1) {
+            final CarbonDioxideRadarEntity radar = new CarbonDioxideRadarEntity(level());
+            radar.setUser(user);
+            radar.setPos(user.getX(), user.getY(), user.getZ());
+            level().addFreshEntity(radar);
+        }
 
         final AbstractMove<?, ? super AerosmithEntity> currentMove = getCurrentMove();
 
