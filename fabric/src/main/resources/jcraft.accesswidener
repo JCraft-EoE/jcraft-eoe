@@ -72,4 +72,5 @@ extendable method net/minecraft/world/entity/Entity discard ()V
 
 mutable field net/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool rawTemplates Ljava/util/List;
 
+accessible class net/minecraft/world/entity/npc/VillagerTrades$TreasureMapForEmeralds
 mutable field net/minecraft/world/entity/npc/VillagerTrades TRADES Ljava/util/Map;
