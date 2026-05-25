@@ -883,8 +883,6 @@
   "move.jcraft.hamon.default.charge_hamon.name": "波紋チャージ",
   "move.jcraft.hamon.default.focus_strike.description": "波紋を帯びたズームパンチで突撃、遅いが射程が長く、相手を吹き飛ばす一撃。一撃を受け止めても動きを止められない。",
   "move.jcraft.hamon.default.focus_strike.name": "セービングストライク",
-  "move.jcraft.hamon.default.improviser_attack.cr.description": "状況に応じた波紋の活用。\n武器を使用する際、波紋を込めた一撃を放つ。（現時点では唯一の選択肢）",
-  "move.jcraft.hamon.default.improviser_attack.cr.name": "即興攻撃",
   "move.jcraft.hamon.default.improviser_move.description": "状況に応じた波紋の活用。\n波紋を使用することで、さまざまな能力を得ることができる。",
   "move.jcraft.hamon.default.improviser_move.name": "即興技",
   "move.jcraft.hamon.default.knee_thrust.air.description": "波紋を帯びた仙道ウェーブキックで、敵をダウンさせ、波紋の余波で敵を再び立ち上がせる。",
