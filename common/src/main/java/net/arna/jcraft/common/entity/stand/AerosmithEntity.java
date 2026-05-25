@@ -37,7 +37,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -214,7 +213,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                 return COUNTER_CLOCKWISE;
             return CLOCKWISE;
         }
-    };
+    }
+
     @Getter @Setter
     private PatrolDirection patrolDirection = PatrolDirection.CLOCKWISE;
 
@@ -352,8 +352,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                             Mth.sin(theta) * patrolRadius, 1.0, Mth.cos(theta) * patrolRadius,
                             GravityChangerAPI.getGravityDirection(this)
                     );
-
-                    JCraft.createParticle((ServerLevel) level(), flyTarget.x + offset.x, flyTarget.y + offset.y, flyTarget.z + offset.z, JParticleType.GO);
 
                     lookAt(flyTarget.add(offset), 6f, 6f);
 
