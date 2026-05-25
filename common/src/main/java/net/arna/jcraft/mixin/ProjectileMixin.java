@@ -68,7 +68,7 @@ public abstract class ProjectileMixin {
         }
         final Projectile projectile = (Projectile)(Object)this;
         if (!hasBeenShot) {
-            projectile.playSound(JSoundRegistry.HAMON_SWOOSH.get());
+            projectile.playSound(JSoundRegistry.HAMON_RING.get());
         }
         original.call();
         if (!projectile.level().isClientSide()) {

@@ -335,6 +335,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> HAMON_CRACKLE_IMPACT = register("hamoncrackleimpact");
     RegistrySupplier<SoundEvent> HAMON_BREATHE = register("hamonbreathe");
     RegistrySupplier<SoundEvent> HAMON_CRACKLES = register("hamoncrackles");
+    RegistrySupplier<SoundEvent> HAMON_EXHALE = register("hamonexhale");
 
     //// OTHER
     RegistrySupplier<SoundEvent> BULLET_RICOCHET = register("bulletricochet");

@@ -1205,6 +1205,11 @@
       "jcraft:specs/hamon/breathe"
     ]
   },
+  "hamonexhale": {
+    "sounds": [
+      "jcraft:specs/hamon/exhale"
+    ]
+  },
   "bulletricochet": {
     "sounds": [
       "jcraft:projectiles/bullet/ricochet"

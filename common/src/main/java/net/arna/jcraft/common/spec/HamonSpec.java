@@ -193,7 +193,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
     public static final ImproviserAttack IMPROVISER = new ImproviserAttack(0, 8,
             19, 1.0f, 6.5f, 12, 1.6f, 2.0f, -0.1f)
             .withLaunch()
-            .withSound(JSoundRegistry.HAMON_SURGE)
+            .withSound(JSoundRegistry.HAMON_RING)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withCondition(HamonChargeCondition.atLeast(ImproviserAttack.CHARGE_COST))
             .withCondition(HamonSendoWaveKickGroundedCondition.of(-1)) // in ticks
@@ -206,6 +206,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
 
     public static final ImproviserMove IMPROVISER_MOVE = new ImproviserMove(60 * 20, 0.25f, 1)
             .withCondition(HamonChargeCondition.atLeast(0.25f)) // same as charge per tick in the line above
+            .withSound(JSoundRegistry.HAMON_EXHALE)
             .withInfo(
                     Component.literal("Improviser Move"),
                     Component.literal("""

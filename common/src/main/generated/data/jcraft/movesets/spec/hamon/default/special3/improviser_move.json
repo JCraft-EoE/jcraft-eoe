@@ -12,6 +12,13 @@
     "chargePerTick": 0.25,
     "duration": 1200,
     "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:hamonexhale"
+        }
+      ],
       "conditions": [
         {
           "type": "jcraft:hamon_charge",
