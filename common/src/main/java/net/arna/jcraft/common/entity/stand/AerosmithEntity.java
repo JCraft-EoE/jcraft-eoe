@@ -198,6 +198,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     private AbstractMove<?, ? super AerosmithEntity> preCancelMove = null;
     private BoundSoundPlayer.SoundHandle volaHandle;
 
+    private static final EntityDataAccessor<Boolean> ALLOW_MOVE_HANDLING = SynchedEntityData.defineId(AerosmithEntity.class, EntityDataSerializers.BOOLEAN);
+    public boolean isAllowingMoveHandling() { return entityData.get(ALLOW_MOVE_HANDLING); }
+
     public enum PatrolDirection {
         CLOCKWISE(1),
         COUNTER_CLOCKWISE(-1);
@@ -330,7 +333,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         if (!isAlive() || level().isClientSide() || user == null)
             return;
 
-        // Spawn the radar entity on the first valid server tick so it follows the user.
+        entityData.set(ALLOW_MOVE_HANDLING, allowMoveHandling());
+
+        // Spawn the radar entity on the first valid server tick, so it follows the user.
         if (tickCount == 1) {
             final CarbonDioxideRadarEntity radar = new CarbonDioxideRadarEntity(level());
             radar.setUser(user);
@@ -542,6 +547,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         super.defineSynchedData();
         float startValue = miscComponent == null ? 0f : miscComponent.getAerosmithOverheat();
         entityData.define(OVERHEAT, startValue);
+        entityData.define(ALLOW_MOVE_HANDLING, false);
     }
 
     public float getOverheat() {
