@@ -317,6 +317,18 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     @Override
+    public boolean hasAlphaOverride() {
+        return super.hasAlphaOverride() || !isRemote();
+    }
+
+    @Override
+    public float getAlphaOverride() {
+        if (!isRemote())
+            return 0.15f;
+        return super.getAlphaOverride();
+    }
+
+    @Override
     public void tick() {
         xRotChangeAllowed = false;
         noPhysics = true;
