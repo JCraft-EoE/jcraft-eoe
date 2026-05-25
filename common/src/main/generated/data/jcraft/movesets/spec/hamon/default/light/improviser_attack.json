@@ -22,6 +22,12 @@
           "type": "jcraft:play_sound",
           "run": "at_init",
           "sound": "jcraft:hamonring"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:hamoncrackleimpact"
         }
       ],
       "conditions": [

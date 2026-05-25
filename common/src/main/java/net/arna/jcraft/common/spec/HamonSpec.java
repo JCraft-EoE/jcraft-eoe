@@ -194,6 +194,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             19, 1.0f, 6.5f, 12, 1.6f, 2.0f, -0.1f)
             .withLaunch()
             .withSound(JSoundRegistry.HAMON_RING)
+            .withImpactSound(JSoundRegistry.HAMON_CRACKLE_IMPACT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withCondition(HamonChargeCondition.atLeast(ImproviserAttack.CHARGE_COST))
             .withCondition(HamonSendoWaveKickGroundedCondition.of(-1)) // in ticks
