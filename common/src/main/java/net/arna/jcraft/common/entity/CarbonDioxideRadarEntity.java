@@ -1,5 +1,6 @@
 package net.arna.jcraft.common.entity;
 
+import dev.architectury.extensions.network.EntitySpawnExtension;
 import dev.architectury.networking.NetworkManager;
 import lombok.NonNull;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
@@ -10,6 +11,7 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -29,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>Lifecycle: spawned by {@link AerosmithEntity} on its first server tick. Discards
  * itself if the user disappears or no longer has Aerosmith as their active stand.
  */
-public class CarbonDioxideRadarEntity extends Entity {
+public class CarbonDioxideRadarEntity extends Entity implements EntitySpawnExtension {
 
     private static final EntityDataAccessor<Integer> USER_ID =
             SynchedEntityData.defineId(CarbonDioxideRadarEntity.class, EntityDataSerializers.INT);
@@ -66,6 +68,15 @@ public class CarbonDioxideRadarEntity extends Entity {
     private static final AzCommand IDLE_ONLY =
             AzCommand.create(JCraft.BASE_CONTROLLER, "idle", AzPlayBehaviors.LOOP);
 
+    /**
+     * Cached user reference so a transient {@code level().getEntity(id)} miss
+     * (e.g. the user briefly out of tracking range) doesn't drop the binding
+     * mid-tick. Cleared when the cached entity is removed or its ID no longer
+     * matches USER_ID (e.g. respawn).
+     */
+    @Nullable
+    private LivingEntity cachedUser;
+
     public CarbonDioxideRadarEntity(final Level level) {
         super(JEntityTypeRegistry.CO2_RADAR.get(), level);
         noPhysics = true;
@@ -74,14 +85,10 @@ public class CarbonDioxideRadarEntity extends Entity {
         setInvisible(true); // start invisible; becomes visible once radar activates
     }
 
-    /**
-     * Always render within a generous range. The entity type is registered with
-     * size 0×0, which would make the default calculation return 0, preventing
-     * any rendering at all.
-     */
+    // Render if the user is being rendererd
     @Override
     public boolean shouldRenderAtSqrDistance(final double distanceSq) {
-        return distanceSq < 4096.0; // 64-block radius, matches default player tracking
+        return getUser() != null && getUser().shouldRenderAtSqrDistance(distanceSq);
     }
 
     // -------------------------------------------------------------------------
@@ -115,8 +122,17 @@ public class CarbonDioxideRadarEntity extends Entity {
     public LivingEntity getUser() {
         final int id = getUserId();
         if (id < 0) return null;
+
+        if (cachedUser != null && !cachedUser.isRemoved() && cachedUser.getId() == id) {
+            return cachedUser;
+        }
+
         final Entity entity = level().getEntity(id);
-        return entity instanceof LivingEntity le ? le : null;
+        if (entity instanceof LivingEntity le) {
+            cachedUser = le;
+            return le;
+        }
+        return null;
     }
 
     @Override
@@ -230,5 +246,22 @@ public class CarbonDioxideRadarEntity extends Entity {
     @Override
     public @NonNull Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkManager.createAddEntityPacket(this);
+    }
+
+    // -------------------------------------------------------------------------
+    // EntitySpawnExtension — write USER_ID into the spawn packet itself so the
+    // client knows the user from frame zero, instead of waiting a tick or two
+    // for the separate synced-data packet. Closes the spawn race that left the
+    // radar parked at the user's foot position with no rotation lerp/alpha.
+    // -------------------------------------------------------------------------
+
+    @Override
+    public void saveAdditionalSpawnData(final @NonNull FriendlyByteBuf buf) {
+        buf.writeVarInt(getUserId());
+    }
+
+    @Override
+    public void loadAdditionalSpawnData(final @NonNull FriendlyByteBuf buf) {
+        entityData.set(USER_ID, buf.readVarInt());
     }
 }
