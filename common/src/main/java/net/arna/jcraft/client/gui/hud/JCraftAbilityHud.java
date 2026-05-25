@@ -10,6 +10,7 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.util.ColorUtils;
 import net.arna.jcraft.common.util.CooldownType;
@@ -147,7 +148,9 @@ public class JCraftAbilityHud {
             int selectedY = isMid ? iconSpacing * 11 : 0;
 
             final JSpec<?, ?> spec = JUtils.getSpec(player);
-            if (stand == null) {
+            if (stand == null || (stand instanceof AerosmithEntity as && spec != null
+                    && (as.getFlyState() == AerosmithEntity.FlyState.FLYBY || as.getFlyState() == AerosmithEntity.FlyState.RETURN))
+            ) {
                 // Render cooldown HUD for specs
                 if (spec != null) {
                     renderIcons(ctx, SPEC_ICONS, selectedX, selectedY, cooldown -> spec.getType().getId());
