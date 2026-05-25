@@ -10,6 +10,10 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.common.attack.moves.aerosmith.AerosmithAttackOrderMove;
+import net.arna.jcraft.common.attack.moves.aerosmith.BombDropAttack;
+import net.arna.jcraft.common.attack.moves.aerosmith.BombThrowAttack;
+import net.arna.jcraft.common.attack.moves.aerosmith.ItemDropAttack;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.util.ColorUtils;
@@ -149,7 +153,10 @@ public class JCraftAbilityHud {
 
             final JSpec<?, ?> spec = JUtils.getSpec(player);
             if (stand == null || (stand instanceof AerosmithEntity as && spec != null
-                    && (as.getFlyState() == AerosmithEntity.FlyState.FLYBY || as.getFlyState() == AerosmithEntity.FlyState.RETURN))
+                    && (as.getCurrentMove() instanceof BombDropAttack
+                        || as.getCurrentMove() instanceof ItemDropAttack
+                        || as.getCurrentMove() instanceof AerosmithAttackOrderMove
+                        || as.getCurrentMove() instanceof BombThrowAttack))
             ) {
                 // Render cooldown HUD for specs
                 if (spec != null) {
