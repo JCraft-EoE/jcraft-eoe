@@ -76,7 +76,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     @NonNull @Getter @Setter
     private Vec3 flyTarget = Vec3.ZERO;
 
-    @Getter @Setter
+    @Getter
     private FlyState flyState = FlyState.NONE;
 
     private int overheatLossCooldown = 0;
@@ -387,7 +387,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     lookAt(flyTarget, 6f, 6f);
 
                     final double distanceSqr = distanceToSqr(flyTarget);
-
                     double cruiseSpeed = distanceSqr <= 49.0 ? SLOW_CRUISE_SPEED : CRUISE_SPEED;
 
                     final var attackTarget = attackOrderMove.getCurrentTarget();
@@ -405,23 +404,21 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     if (distanceToSqr(flyTarget) <= 4.0
                             && bombDropAttack.getDropLocation() == null
                             && itemDropAttack.getDropLocation() == null) {
-                        flyState = hasAttackTarget ? FlyState.PATROL : FlyState.RETURN;
+                        setFlyState(hasAttackTarget ? FlyState.PATROL : FlyState.RETURN);
                     }
                 }
                 case RETURN -> {
                     final Vec3 targetPos = user.position();
-
                     lookAt(targetPos, 6f, 12f);
 
                     final double distanceSqr = distanceToSqr(targetPos);
-
                     final double cruiseSpeed = distanceSqr <= 49.0 ? SLOW_CRUISE_SPEED : CRUISE_SPEED;
 
                     setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(cruiseSpeed)));
 
                     if (distanceSqr <= 6.25) {
                         setRemote(false);
-                        flyState = FlyState.NONE;
+                        setFlyState(FlyState.NONE);
                         playSound(JSoundRegistry.AS_LANDING.get());
                     }
                 }
@@ -429,6 +426,16 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         }
 
         xRotChangeAllowed = false;
+    }
+
+    public void setFlyState(FlyState flyState) {
+        FlyState prev = this.flyState;
+        this.flyState = flyState;
+
+        if (flyState == FlyState.RETURN)
+            setState(State.RECALL);
+        else if (flyState == FlyState.NONE && prev == FlyState.RETURN)
+            setState(State.RECALL_TOUCHDOWN);
     }
 
     @Override
@@ -479,7 +486,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     public void patrol(@NonNull final Vec3 targetPos, final float radius) {
-        flyState = FlyState.PATROL;
+        setFlyState(FlyState.PATROL);
         flyTarget = targetPos;
         patrolRadius = radius;
     }
@@ -495,7 +502,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
             if (isRemote()) {
                 if (flyState != FlyState.RETURN) {
-                    flyState = FlyState.RETURN;
+                    setFlyState(FlyState.RETURN);
                 }
 
                 if (distanceToSqr(user) >= 4.0) return;
@@ -605,7 +612,16 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "block", AzPlayBehaviors.LOOP)),
         SAWBLADE(AzCommand.create(JCraft.BASE_CONTROLLER, "sawblade", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         BOMB(AzCommand.create(JCraft.BASE_CONTROLLER, "bomb", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ;
+        RECALL(AzCommand.controllerBuilder()
+                .playSequence(JCraft.BASE_CONTROLLER, sb -> sb
+                        .queue("recall landing pattern", p -> p.withPlayBehavior(AzPlayBehaviors.PLAY_ONCE))
+                        .queue("recall aproach idle", p -> p.withPlayBehavior(AzPlayBehaviors.LOOP)))
+                .build()),
+        RECALL_TOUCHDOWN(AzCommand.controllerBuilder()
+                .playSequence(JCraft.BASE_CONTROLLER, sb -> sb
+                        .queue("recall touchdown", p -> p.withPlayBehavior(AzPlayBehaviors.PLAY_ONCE))
+                        .queue("idle", p -> p.withPlayBehavior(AzPlayBehaviors.LOOP)))
+                .build());
 
         private final AzCommand animator;
 
@@ -616,6 +632,11 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         @Override
         public void playAnimation(final @NonNull AerosmithEntity attacker) {
             animator.sendForEntity(attacker);
+        }
+
+        @Override
+        public boolean mayLinger() {
+            return this == RECALL || this == RECALL_TOUCHDOWN;
         }
     }
 

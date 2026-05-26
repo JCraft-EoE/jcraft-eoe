@@ -1101,10 +1101,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
                 setStandGauge(Mth.clamp(this.getStandGauge() + 0.5f, 0, maxStandGauge));
 
-                if (getRawState() != 0 || isReset()) {
+                if ((getRawState() != 0 || isReset()) && !getState().mayLinger()) {
                     if (!playSummonAnim) {
-                        setRawState(0);
-                        boxState(0).playAnimation(getThis());
+                        setState(getIdleState());
                         setReset(false);
                     }
 
