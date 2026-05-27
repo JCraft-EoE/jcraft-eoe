@@ -282,6 +282,8 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> METALLICA_INVISIBILITY = register("minvisibility");
     RegistrySupplier<SoundEvent> METALLICA_RAZOR_VOMIT_PREPARE = register("mrazorvomitprepare");
     RegistrySupplier<SoundEvent> METALLICA_BLADE_SWIPE = register("mbladeswipe");
+    RegistrySupplier<SoundEvent> METALLICA_CRY = register("mcry");
+    RegistrySupplier<SoundEvent> METALLICA_TAKETHIS = register("mtakethis");
 
     // Mandom
     RegistrySupplier<SoundEvent> MANDOM_REWIND = register("mandomrewind");
