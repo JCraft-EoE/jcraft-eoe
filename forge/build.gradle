@@ -46,7 +46,7 @@ dependencies {
     forge "net.minecraftforge:forge:$rootProject.forge_version"
 
     // Architectury API
-    modImplementation "dev.architectury:architectury-forge:$architectury_api_version"
+    include modImplementation("dev.architectury:architectury-forge:$architectury_api_version")
 
     // Mixin Extras
     compileOnly annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.4")
