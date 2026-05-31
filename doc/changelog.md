@@ -111,7 +111,7 @@
 * fixed the fish bucket bug
 ## Hamon
 * first spec to have progression (see Commands section to skip those)
-* [insert information about the moves]
+* Tonpetti is a Neutral Boss Mob
 ## Stand Throwing
 * Humanoid Stands can now throw items the player is holding
 * depending on the item and what is hit (block or entity) different things might happen
