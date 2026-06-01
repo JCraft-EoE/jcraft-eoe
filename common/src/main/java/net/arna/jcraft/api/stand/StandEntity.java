@@ -825,22 +825,19 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * Defines what happens while the stand is blocking
      */
     public void standBlock() {
-        if (!hasUser()) {
-            return;
-        }
+        if (user == null) return;
+
         // Projectile deflection
-        List<Projectile> toDeflect = this.level().getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(0.75f), EntitySelector.ENTITY_STILL_ALIVE);
+        final List<Projectile> toDeflect = level().getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(0.75f), EntitySelector.ENTITY_STILL_ALIVE);
 
         for (Projectile projectile : toDeflect) {
-            if (projectile.getOwner() == user) {
-                continue;
-            }
+            if (projectile.getOwner() == user) continue;
             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(-0.5).add(0, -0.1, 0));
             projectile.hurtMarked = true;
         }
 
         JCraft.stun(user, 2, 2);
-        getUserOrThrow().addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 5, 3, false, false, true));
+        user.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 5, 3, false, false, true));
     }
 
     public void tryUnblock() {
@@ -1104,10 +1101,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
                 setStandGauge(Mth.clamp(this.getStandGauge() + 0.5f, 0, maxStandGauge));
 
-                if (getRawState() != 0 || isReset()) {
+                if ((getRawState() != 0 || isReset()) && !getState().mayLinger()) {
                     if (!playSummonAnim) {
-                        setRawState(0);
-                        boxState(0).playAnimation(getThis());
+                        setState(getIdleState());
                         setReset(false);
                     }
 
@@ -1272,14 +1268,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     /**
      * Gets this StandEntity's instance of a specific move class.
+     * @param clazz the move class to check for
+     * @return the first encountered instance of a move of the specified move class (can be a subclass)
+     * or <code>null</code> if none can be found.
      */
-    public @Nullable <T extends AbstractMove<T, ?>> T getMove(Class<T> clazz) {
+    public @Nullable <T extends AbstractMove<T, ?>> T getMove(final @NonNull Class<T> clazz) {
         for (var move : getMoveMap().asMovesList()) {
-            if (move.getClass().isAssignableFrom(clazz)) { // noinspection unchecked
+            if (clazz.isAssignableFrom(move.getClass())) { // noinspection unchecked
                 return (T)move;
             }
         }
-
         return null;
     }
 
@@ -1726,7 +1724,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     hit = false;
                 }
             } else {
-                setStandGauge(getStandGauge() - damage * 2);
+                setStandGauge(getStandGauge() - damage * 3);
             }
         }
 

@@ -1085,6 +1085,16 @@
       "jcraft:stands/metallica/razor_vomit_prepare"
     ]
   },
+  "mcry": {
+    "sounds": [
+      "jcraft:stands/metallica/metallica"
+    ]
+  },
+  "mtakethis": {
+    "sounds": [
+      "jcraft:stands/metallica/takethis"
+    ]
+  },
   "mandomcountdown": {
     "sounds": [
       "jcraft:stands/mandom/countdown"

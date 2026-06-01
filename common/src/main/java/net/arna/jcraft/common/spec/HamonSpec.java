@@ -86,7 +86,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withCondition(HamonBreathCondition.of(1800)) // in ticks
             .withInfo(
                     Component.literal("Charge Hamon"),
-                    Component.literal("")
+                    Component.literal("Hold to charge Hamon. Slows you down while active.")
             );
 
     public static final SimpleAttack<HamonSpec> FOCUS_STRIKE = new SimpleAttack<HamonSpec>(0, 8,
@@ -201,8 +201,8 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withInfo(
                     Component.literal("Improviser Attack"),
                     Component.literal("""
-                            Situational hamon application.
-                            When using a weapon, does a Hamon-infused strike with it. (CURRENTLY ONLY OPTION)""")
+                            When attacking with a weapon, does a Hamon-infused strike with it.
+                            Can infuse projectiles such as arrows and tridents with ripple.""")
             );
 
     public static final ImproviserMove IMPROVISER_MOVE = new ImproviserMove(60 * 20, 0.25f, 1)
@@ -211,8 +211,8 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withInfo(
                     Component.literal("Improviser Move"),
                     Component.literal("""
-                            Situational hamon application.
-                            Using Hamon, you gain different abilities.""")
+                            Exhales, surging hamon  through your body and into your hands, allowing for situational hamon application.
+                            Held input.""")
             );
 
     // These aren't stored in any movemap and have fields that must be unique to them, so we make copies.

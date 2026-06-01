@@ -335,6 +335,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
                             Cannot be queued.""")
             );
     public static final BisectAttack BISECT = new BisectAttack(0, 1, 11, 0.75f)
+            .withSound(JSoundRegistry.METALLICA_CRY)
             .withInitAction(UserAnimationAction.play("mtl.bsc_fire"));
     public static final BisectChargeMove BISECT_CHARGE = new BisectChargeMove(30 * 20, 81, 80, 0.75f, 12)
             .withInfo(
@@ -344,6 +345,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
                             Unblockable.""")
             )
             .withFollowup(BISECT)
+            .withSound(JSoundRegistry.METALLICA_TAKETHIS)
             .withInitAction(UserAnimationAction.play("mtl.bsc"));
     private static final BlockParticleOption FAKE_BLOOD = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.REDSTONE_WIRE.defaultBlockState());
 

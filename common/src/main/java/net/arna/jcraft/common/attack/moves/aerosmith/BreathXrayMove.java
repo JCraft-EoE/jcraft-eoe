@@ -13,6 +13,7 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.client.particle.BreathParticle;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
@@ -21,6 +22,7 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -127,7 +129,7 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
                 detected.put(living, 20);
 
-                    float scale = calculateBreathScale(living, inLineOfSight)/7;
+                    float scale = calculateBreathScale(living, inLineOfSight) / 7;
                     displayBreathParticle(serverPlayer, target, scale);
                 }
             }
@@ -157,6 +159,19 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
 
         // Increase if entity is being ridden, and not a player.
         scale *= entity.getPassengers().isEmpty() || entity instanceof Player ? 1f : 2f;
+
+        // Reduce by 50 % for each level of hypoxia
+        final int hypoxialLevel;
+        MobEffectInstance effect = entity.getEffect(JStatusRegistry.HYPOXIA.get());
+        if (effect != null) {
+            hypoxialLevel = effect.getAmplifier() + 1; // simple active effect means amplifier of 0
+        }
+        else {
+            hypoxialLevel = 0;
+        }
+        for (int i = 0; i < hypoxialLevel; i++) {
+            scale *= 0.5f;
+        }
 
         // Distance is already incorporated naturally through perspective.
 

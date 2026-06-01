@@ -40,4 +40,8 @@ public final class V3 {
     public double lengthSqr() {
         return x * x + y * y + z * z;
     }
+
+    public Vec3 toImmutable() {
+        return new Vec3(x, y, z);
+    }
 }

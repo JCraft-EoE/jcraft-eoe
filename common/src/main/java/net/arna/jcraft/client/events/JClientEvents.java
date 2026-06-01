@@ -150,6 +150,12 @@ public class JClientEvents {
                 CooldownType.Category category = type.getCategory();
 
                 final boolean isSpec = category == CooldownType.Category.SPEC;
+
+                boolean onStandHUD = stand != null;
+
+                if (stand instanceof AerosmithEntity as && !as.allowMoveHandling())
+                    onStandHUD = false;
+
                 final boolean isUniversal = category == CooldownType.Category.UNIVERSAL;
                 float defaultAlpha = 0.65f;
                 int xOffset = 0;
@@ -161,7 +167,10 @@ public class JClientEvents {
                         finalText = "s." + finalText;
                     }
 
-                    if ((isSpec && stand != null) || (!isSpec && stand == null)) {
+                    if (
+                            (isSpec && onStandHUD) ||
+                            (!isSpec && !onStandHUD)
+                    ) {
                         xOffset = 48;
                         defaultAlpha = 0.3f;
                     }

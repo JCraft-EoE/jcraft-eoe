@@ -14,6 +14,7 @@ import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
 import net.arna.jcraft.common.item.BloodBottleItem;
 import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.mixin.BucketItemAccessor;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
@@ -304,6 +305,16 @@ public class ItemTossProjectile extends AbstractArrow {
                 }
             }
         }
+        // force drink potions
+        if (entity instanceof LivingEntity living && getItem().getItem() instanceof PotionItem) {
+            for (MobEffectInstance mobEffectInstance : PotionUtils.getMobEffects(getItem())) {
+                if (mobEffectInstance.getEffect().isInstantenous()) {
+                    mobEffectInstance.getEffect().applyInstantenousEffect(getOwner(), getOwner(), living, mobEffectInstance.getAmplifier(), 1d);
+                } else {
+                    living.addEffect(new MobEffectInstance(mobEffectInstance));
+                }
+            }
+        }
 
         // slab iron on iron golem
         if (entity instanceof IronGolem golem && getItem().is(Items.IRON_INGOT)) {
@@ -450,7 +461,7 @@ public class ItemTossProjectile extends AbstractArrow {
             stickOrDrop(result.getLocation());
         }
         // buckets empty their content if any
-        else if (item.getItem() instanceof BucketItem bucket && bucket.content != Fluids.EMPTY) {
+        else if (item.getItem() instanceof BucketItem bucket && ((BucketItemAccessor) bucket).getContent() != Fluids.EMPTY) {
             if (bucket.emptyContents(null, level(), result.getBlockPos(), result)) {
                 bucket.checkExtraContent(null, level(), item, pos);
                 setItem(Items.BUCKET.getDefaultInstance());
