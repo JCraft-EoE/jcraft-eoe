@@ -720,6 +720,7 @@
   "move.jcraft.aerosmith.default.propeller_strike.name": "Propeller Strike",
   "move.jcraft.anubis.default.aerial_cleave.air.description": "Interruptible, faster recovery.",
   "move.jcraft.anubis.default.aerial_cleave.air.name": "Aerial Cleave",
+  "move.jcraft.anubis.default.cleaving_strikes_2_hits.description": "Two-strike attack",
   "move.jcraft.anubis.default.cleaving_strikes_2_hits.name": "Cleaving Strikes (2 Hits)",
   "move.jcraft.anubis.default.cleaving_strikes_3_hits.description": "Last hit knocks down if on 0 Bloodlust.",
   "move.jcraft.anubis.default.cleaving_strikes_3_hits.name": "Cleaving Strikes (3 Hits)",
