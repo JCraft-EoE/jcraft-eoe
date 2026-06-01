@@ -245,7 +245,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
         moves.register(MoveClass.SPECIAL3, FEIGN_BARRAGE, State.BARRAGE);
         moves.register(MoveClass.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
-        moves.register(MoveClass.UTILITY, TIME_SKIP, null);
+        moves.register(MoveClass.UTILITY, TIME_SKIP, State.TIMESKIP);
 
         moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
