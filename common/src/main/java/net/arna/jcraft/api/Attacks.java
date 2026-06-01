@@ -15,6 +15,7 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.registry.JStatRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -447,7 +448,7 @@ public interface Attacks {
 
         //tryApplyHitstop(attacker, ent, damage);
 
-        if (JServerConfig.HEALTH_TO_DAMAGE_SCALING.getValue()) {
+        if (JServerConfig.HEALTH_TO_DAMAGE_SCALING.getValue() && !ent.getType().is(JTagRegistry.IGNORES_DAMAGE_SCALING)) {
             float healthRatio = ent.getMaxHealth() / 20.0f;
             float damageAdjustment = healthRatio - 1.0f;
 

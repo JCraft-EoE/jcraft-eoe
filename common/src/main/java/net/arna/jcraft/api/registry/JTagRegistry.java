@@ -57,6 +57,8 @@ public interface JTagRegistry {
     TagKey<EntityType<?>> DOESNT_BREATHE = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("doesnt_breathe"));
     TagKey<EntityType<?>> CANT_BREAK_BLOCKS = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cant_break_blocks"));
     TagKey<EntityType<?>> CANT_HEAR = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cant_hear"));
+    TagKey<EntityType<?>> BOSSES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("bosses"));
+    TagKey<EntityType<?>> IGNORES_DAMAGE_SCALING = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("ignores_damage_scaling"));
 
     TagKey<Biome> METEORS_CAN_FALL = TagKey.create(Registries.BIOME, JCraft.id("meteors_can_fall"));
 

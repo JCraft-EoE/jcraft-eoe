@@ -697,8 +697,19 @@ public class JTagProviders {
             final var cantBreakBlocks = getOrCreateTagBuilder(JTagRegistry.CANT_BREAK_BLOCKS);
             // empty
 
-            getOrCreateTagBuilder(JTagRegistry.CANT_HEAR)
-                    .add(JEntityTypeRegistry.AEROSMITH.get());
+            final var cantHear = getOrCreateTagBuilder(JTagRegistry.CANT_HEAR);
+            cantHear.add(JEntityTypeRegistry.AEROSMITH.get());
+
+            final var bosses = getOrCreateTagBuilder(JTagRegistry.BOSSES);
+            bosses.add(EntityType.ENDER_DRAGON);
+            bosses.add(EntityType.WITHER);
+            bosses.add(EntityType.WARDEN);
+            bosses.add(EntityType.ELDER_GUARDIAN);
+            bosses.add(JEntityTypeRegistry.TONPETTY.getId());
+
+            final var ignoresDamageScaling = getOrCreateTagBuilder(JTagRegistry.IGNORES_DAMAGE_SCALING);
+            ignoresDamageScaling.addTag(JTagRegistry.BOSSES);
+            ignoresDamageScaling.add(EntityType.HORSE);
 
             addTagsForCompatibilities(arg);
         }
