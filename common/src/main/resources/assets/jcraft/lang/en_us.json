@@ -881,6 +881,7 @@
   "move.jcraft.gold_experience_requiem.default.punch.name": "Punch",
   "move.jcraft.gold_experience_requiem.default.return_to_zero.description": "initial press: saves the state of every entity in a 4 chunk radius, second press: reverts all states except users\nDoesn't affect player inventories",
   "move.jcraft.gold_experience_requiem.default.return_to_zero.name": "Return to Zero",
+  "move.jcraft.hamon.default.charge_hamon.description": "Hold to charge Hamon. Slows you down while active.",
   "move.jcraft.hamon.default.charge_hamon.name": "Charge Hamon",
   "move.jcraft.hamon.default.focus_strike.description": "Charge with hamon for Zoom Punch, a slow yet far-reaching, launching strike. Can take one hit without being stopped.",
   "move.jcraft.hamon.default.focus_strike.name": "Focus Strike",

@@ -86,7 +86,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             .withCondition(HamonBreathCondition.of(1800)) // in ticks
             .withInfo(
                     Component.literal("Charge Hamon"),
-                    Component.literal("")
+                    Component.literal("Hold to charge Hamon. Slows you down while active.")
             );
 
     public static final SimpleAttack<HamonSpec> FOCUS_STRIKE = new SimpleAttack<HamonSpec>(0, 8,
