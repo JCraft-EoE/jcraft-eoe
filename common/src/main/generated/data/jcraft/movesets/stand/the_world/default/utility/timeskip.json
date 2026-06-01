@@ -1,4 +1,5 @@
 {
+  "anim_state": "TIMESKIP",
   "class": "UTILITY",
   "cooldown_type": "UTILITY",
   "move": {
