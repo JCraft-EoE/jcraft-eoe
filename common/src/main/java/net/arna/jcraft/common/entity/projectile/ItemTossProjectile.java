@@ -39,7 +39,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.*;
@@ -284,25 +283,23 @@ public class ItemTossProjectile extends AbstractArrow {
 
         // force feed
         if (entity instanceof LivingEntity livingEntity && getItem().isEdible()) {
-            // FIXME Vampires can't be force-fed blood bottles
-            if (getItem().getItem() instanceof BloodBottleItem && livingEntity instanceof Player player) {
-                final CommonVampireComponent vampireComponent = JComponentPlatformUtils.getVampirism(player);
-                if (vampireComponent.isVampire()) {
-                    final CompoundTag nbt = getItem().getOrCreateTag();
-                    int blood = (int)Math.floor(nbt.getFloat("Blood"));
-                    vampireComponent.setBlood(Math.min(VampireSpec.MAX_BLOOD, vampireComponent.getBlood() + blood));
-                    effectActivated = true;
+            if (!JComponentPlatformUtils.getVampirism(livingEntity).isVampire()) {
+                livingEntity.eat(level(), getItem());
+                if (getItem().getItem() instanceof BowlFoodItem) {
+                    setItem(Items.BOWL.getDefaultInstance());
+                    dropItem(result.getLocation()); // FIXME doesn't work?
                 }
+                effectActivated = true;
             }
-            else if (livingEntity instanceof Player player) {
-                if (!JComponentPlatformUtils.getVampirism(player).isVampire()) {
-                    livingEntity.eat(level(), getItem());
-                    if (getItem().getItem() instanceof BowlFoodItem) {
-                        setItem(Items.BOWL.getDefaultInstance());
-                        dropItem(result.getLocation()); // FIXME doesn't work?
-                    }
-                    effectActivated = true;
-                }
+        }
+        // force feed blood bottles
+        if (getItem().getItem() instanceof BloodBottleItem && entity instanceof LivingEntity living) {
+            final CommonVampireComponent vampireComponent = JComponentPlatformUtils.getVampirism(living);
+            if (vampireComponent.isVampire()) {
+                final CompoundTag nbt = getItem().getOrCreateTag();
+                int blood = (int)Math.floor(nbt.getFloat("Blood"));
+                vampireComponent.setBlood(Math.min(VampireSpec.MAX_BLOOD, vampireComponent.getBlood() + blood));
+                effectActivated = true;
             }
         }
         // force drink potions
@@ -314,6 +311,7 @@ public class ItemTossProjectile extends AbstractArrow {
                     living.addEffect(new MobEffectInstance(mobEffectInstance));
                 }
             }
+            effectActivated = true;
         }
 
         // slab iron on iron golem
