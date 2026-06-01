@@ -38,6 +38,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -340,6 +341,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         xRotChangeAllowed = true;
 
         resetFallDistance();
+
         final LivingEntity user = getUser();
 
         if (!isAlive() || level().isClientSide() || user == null)
@@ -347,7 +349,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
         entityData.set(ALLOW_MOVE_HANDLING, allowMoveHandling());
 
-        // Spawn the radar entity on the first valid server tick, so it follows the user.
+        BulletHeatManager.tick((ServerLevel) level());
+
+        // Spawn the radar entity on the first valid server tick so it follows the user.
         if (tickCount == 1) {
             final CarbonDioxideRadarEntity radar = new CarbonDioxideRadarEntity(level());
             radar.setUser(user);
