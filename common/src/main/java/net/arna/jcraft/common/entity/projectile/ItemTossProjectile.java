@@ -305,6 +305,16 @@ public class ItemTossProjectile extends AbstractArrow {
                 }
             }
         }
+        // force drink potions
+        if (entity instanceof LivingEntity living && getItem().getItem() instanceof PotionItem) {
+            for (MobEffectInstance mobEffectInstance : PotionUtils.getMobEffects(getItem())) {
+                if (mobEffectInstance.getEffect().isInstantenous()) {
+                    mobEffectInstance.getEffect().applyInstantenousEffect(getOwner(), getOwner(), living, mobEffectInstance.getAmplifier(), 1d);
+                } else {
+                    living.addEffect(new MobEffectInstance(mobEffectInstance));
+                }
+            }
+        }
 
         // slab iron on iron golem
         if (entity instanceof IronGolem golem && getItem().is(Items.IRON_INGOT)) {
