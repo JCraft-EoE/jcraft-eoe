@@ -1268,14 +1268,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     /**
      * Gets this StandEntity's instance of a specific move class.
+     * @param clazz the move class to check for
+     * @return the first encountered instance of a move of the specified move class (can be a subclass)
+     * or <code>null</code> if none can be found.
      */
-    public @Nullable <T extends AbstractMove<T, ?>> T getMove(Class<T> clazz) {
+    public @Nullable <T extends AbstractMove<T, ?>> T getMove(final @NonNull Class<T> clazz) {
         for (var move : getMoveMap().asMovesList()) {
-            if (move.getClass().isAssignableFrom(clazz)) { // noinspection unchecked
+            if (clazz.isAssignableFrom(move.getClass())) { // noinspection unchecked
                 return (T)move;
             }
         }
-
         return null;
     }
 
