@@ -498,8 +498,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             if (dist >= MOVE_EPSILON) {
                 final float yaw = user.getYRot() * Mth.DEG_TO_RAD;
                 final double dot = (dx * -Mth.sin(yaw) + dz * Mth.cos(yaw)) / dist;
-                if (dot > DIRECTION_THRESHOLD) {
-                    forward = true;
+                if (dot > DIRECTION_THRESHOLD && user.isSprinting()) {
+                    forward = true; // only sprinting builds the ramp; walking does not
                 } else if (dot < -DIRECTION_THRESHOLD) {
                     backstep = true;
                 }
