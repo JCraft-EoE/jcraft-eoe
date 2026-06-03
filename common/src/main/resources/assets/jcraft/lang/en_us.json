@@ -291,7 +291,7 @@
   "entity.jcraft.mih.info.con1": "bad defensive options",
   "entity.jcraft.mih.info.con2": "relies on good spacing",
   "entity.jcraft.mih.info.desc": "Lightspeed RUSHDOWN",
-  "entity.jcraft.mih.info.freeSpace": "PASSIVE: Speed I\n\nBNBs:\n    -the flashbang\n    (Donut>Light>)Speed Slice>Low Kick>Fury Chop>Light>Barrage>dash>Light~Light\n",
+  "entity.jcraft.mih.info.freeSpace": "PASSIVE: Acceleration\n    moving forward ramps up to Speed 70 over 1s\n    backstepping cancels the buildup\n    faster movement drains more hunger\n    (backstep drains 2x); autostep is always on\n\nBNBs:\n    -the flashbang\n    (Donut>Light>)Speed Slice>Low Kick>Fury Chop>Light>Barrage>dash>Light~Light\n",
   "entity.jcraft.mih.info.pro1": "best mobility",
   "entity.jcraft.mih.info.pro2": "great mixups",
   "entity.jcraft.mih.info.pro3": "good pressure",
