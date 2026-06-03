@@ -634,6 +634,7 @@
   "jcraft.serverconfig.option.mandomAffectsBlocks": "Mandom affects Blocks",
   "jcraft.serverconfig.option.meteorSpawnRate": "Meteor Spawn Rate (%)",
   "jcraft.serverconfig.option.mihAccelerateTicks": "Made in Heaven time accel duration",
+  "jcraft.serverconfig.option.mihSprintHungerMultiplier": "Made in Heaven Sprint Hunger Multiplier",
   "jcraft.serverconfig.option.mihTimeAccelerationDuration": "Made in Heaven Time Accel Duration",
   "jcraft.serverconfig.option.miningBarrage": "Barrage Mining",
   "jcraft.serverconfig.option.playerVampsDieToHamon": "Vampire Players Weak to Hamon",

@@ -525,7 +525,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     player.causeFoodExhaustion((float) dist * SPRINT_EXHAUSTION * 2f);
                 } else if (forward && speedRamp > 0) {
                     final float frac = speedRamp / (float) RAMP_TICKS;
-                    player.causeFoodExhaustion((float) dist * SPRINT_EXHAUSTION * 5f * frac);
+                    final float multiplier = JServerConfig.MIH_SPRINT_HUNGER_MULTIPLIER.getValue();
+                    player.causeFoodExhaustion((float) dist * SPRINT_EXHAUSTION * multiplier * frac);
                 }
             }
         }

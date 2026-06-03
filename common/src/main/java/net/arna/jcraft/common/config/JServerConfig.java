@@ -44,6 +44,7 @@ public class JServerConfig {
     public static final IntOption STW_TIME_STOP_DURATION = new IntOption("stwTimeStopDuration", BALANCE, 50, 0);
     public static final IntOption TWOH_TIME_STOP_DURATION = new IntOption("twohTimeStopDuration", BALANCE, 100, 0);
     public static final IntOption MIH_TIME_ACCELERATION_DURATION = new IntOption("mihTimeAccelerationDuration", BALANCE, 300, 0);
+    public static final FloatOption MIH_SPRINT_HUNGER_MULTIPLIER = new FloatOption("mihSprintHungerMultiplier", BALANCE, 5.0f, 0f);
     public static final BooleanOption KILL_VAMPIRISM = new BooleanOption("killVampirism", BALANCE, false);
     /*
     public static final IntOption KC_TIME_ERASURE_DURATION = new IntOption("kcTimeErasureDuration", BALANCE, 120, 0);
