@@ -4,15 +4,12 @@ import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
-import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
-import net.arna.jcraft.common.item.BloodBottleItem;
-import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.mixin.BucketItemAccessor;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -289,16 +286,6 @@ public class ItemTossProjectile extends AbstractArrow {
                     setItem(Items.BOWL.getDefaultInstance());
                     dropItem(result.getLocation()); // FIXME doesn't work?
                 }
-                effectActivated = true;
-            }
-        }
-        // force feed blood bottles
-        if (getItem().getItem() instanceof BloodBottleItem && entity instanceof LivingEntity living) {
-            final CommonVampireComponent vampireComponent = JComponentPlatformUtils.getVampirism(living);
-            if (vampireComponent.isVampire()) {
-                final CompoundTag nbt = getItem().getOrCreateTag();
-                int blood = (int)Math.floor(nbt.getFloat("Blood"));
-                vampireComponent.setBlood(Math.min(VampireSpec.MAX_BLOOD, vampireComponent.getBlood() + blood));
                 effectActivated = true;
             }
         }
