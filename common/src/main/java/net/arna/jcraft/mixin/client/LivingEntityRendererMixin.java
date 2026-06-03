@@ -1,6 +1,7 @@
 package net.arna.jcraft.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.client.rendering.AlphaFadeBufferSource;
 import net.arna.jcraft.client.rendering.MihAfterimageTrail;
 import net.arna.jcraft.client.renderer.features.ArmoredMoveFeatureRenderer;
@@ -18,7 +19,10 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -88,13 +92,31 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 
         // Record where the user is this tick, then draw copies along the recent path.
         final MihAfterimageTrail trail = MihAfterimageTrail.get(entity, MIH_AFTERIMAGE_MAX_COPIES + 2);
-        trail.sample(entity.tickCount, entity.position());
+        final boolean newSample = trail.sample(entity.tickCount, entity.position());
 
         final int copies = Mth.ceil(intensity * MIH_AFTERIMAGE_MAX_COPIES);
         if (copies <= 0) {
             return;
         }
         final Vec3 current = entity.getPosition(partialTicks); // smoothed render position this frame
+
+        // Speed particles on the player and each afterimage, once per tick, while accelerating.
+        if (newSample) {
+            final Level level = entity.level();
+            final RandomSource random = entity.getRandom();
+            jcraft$spawnSpeedParticles(level, random, entity.getBoundingBox());
+            final Vec3 tickPos = entity.position();
+            for (int k = 1; k <= copies; k++) {
+                final Vec3 sample = trail.at(k);
+                if (sample == null) {
+                    continue;
+                }
+                final double ox = (sample.x - tickPos.x) * MIH_AFTERIMAGE_SPREAD;
+                final double oy = (sample.y - tickPos.y) * MIH_AFTERIMAGE_SPREAD;
+                final double oz = (sample.z - tickPos.z) * MIH_AFTERIMAGE_SPREAD;
+                jcraft$spawnSpeedParticles(level, random, entity.getBoundingBox().move(ox, oy, oz));
+            }
+        }
 
         jcraft$renderingAfterimage = true;
         for (int k = copies; k >= 1; k--) { // farthest first so nearer copies/the real body draw on top
@@ -123,9 +145,20 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     }
 
     @Unique
+    private static void jcraft$spawnSpeedParticles(final Level level, final RandomSource random, final AABB box) {
+        for (int i = 0; i < box.getSize(); i++) {
+            level.addParticle(JParticleTypeRegistry.SPEED_PARTICLE.get(),
+                    random.nextDouble() * box.getXsize() + box.minX,
+                    random.nextDouble() * box.getYsize() + box.minY,
+                    random.nextDouble() * box.getZsize() + box.minZ,
+                    0, 0, 0);
+        }
+    }
+
+    @Unique
     private static final int MIH_AFTERIMAGE_MAX_COPIES = 8; // max copies at full ramp
     @Unique
-    private static final double MIH_AFTERIMAGE_SPREAD = 1.0; // >1 exaggerates spacing along the path
+    private static final double MIH_AFTERIMAGE_SPREAD = 0.85; // <1 shortens spacing along the path
     @Unique
     private static final float MIH_AFTERIMAGE_BASE_ALPHA = 0.55f; // alpha of the nearest copy
 

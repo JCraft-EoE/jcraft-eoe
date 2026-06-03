@@ -26,10 +26,13 @@ public class MihAfterimageTrail {
         return TRAILS.computeIfAbsent(entity, e -> new MihAfterimageTrail(capacity));
     }
 
-    /** Records the position once per tick; a gap in ticks (stopped ramping) restarts the trail to avoid a stale streak. */
-    public void sample(final int tick, final Vec3 position) {
+    /**
+     * Records the position once per tick; a gap in ticks (stopped ramping) restarts the trail to avoid a stale streak.
+     * @return true if a new sample was recorded this call (i.e. the game tick advanced), false otherwise.
+     */
+    public boolean sample(final int tick, final Vec3 position) {
         if (tick == lastTick) {
-            return;
+            return false;
         }
         if (lastTick != Integer.MIN_VALUE && tick - lastTick != 1) {
             size = 0;
@@ -42,6 +45,7 @@ public class MihAfterimageTrail {
         if (size < positions.length) {
             size++;
         }
+        return true;
     }
 
     /** @return the position {@code index} ticks ago, or null if the trail isn't that long yet. */
