@@ -50,6 +50,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -488,8 +489,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         lastUserX = curX;
         lastUserZ = curZ;
 
-        if (user.hasEffect(JStatusRegistry.DAZED.get())) {
-            speedRamp = 0; // being dazed cancels the buildup
+        if (user.hasEffect(JStatusRegistry.DAZED.get()) || isEatingFood(user)) {
+            speedRamp = 0; // being dazed or eating cancels the buildup
         } else {
             final double dist = Math.sqrt(dx * dx + dz * dz);
 
@@ -556,6 +557,10 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             speed.addTransientModifier(new AttributeModifier(RAMP_SPEED_UUID, "MiH acceleration", bonus,
                     AttributeModifier.Operation.MULTIPLY_TOTAL));
         }
+    }
+
+    private static boolean isEatingFood(LivingEntity user) {
+        return user.isUsingItem() && user.getUseItem().getUseAnimation() == UseAnim.EAT;
     }
 
     private void clearRampSpeed(LivingEntity user) {
