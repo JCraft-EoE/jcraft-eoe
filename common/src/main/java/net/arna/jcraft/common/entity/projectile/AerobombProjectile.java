@@ -73,7 +73,8 @@ public class AerobombProjectile extends AbstractArrow {
             final DamageSource damageSource = ownerStand == null ? level().damageSources().explosion(owner, this) : JDamageSources.stand(ownerStand);
 
             for (final LivingEntity living : hurt) {
-                if (living == owner || living == ownerStand) {
+                if (living == owner || living instanceof StandEntity<?,?>) {
+                    // Don't damage stands, their users are already in the set, we'll damage those instead.
                     continue;
                 }
 
