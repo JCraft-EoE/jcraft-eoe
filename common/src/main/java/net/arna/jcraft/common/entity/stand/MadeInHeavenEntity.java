@@ -239,7 +239,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final int MAXIMUM_SPEEDOMETER = 30;
 
     // Acceleration passive: ramps movement speed up to Speed 70 over RAMP_TICKS while moving forward.
-    private static final int RAMP_TICKS = 60; // 1 second to reach max speed
+    private static final int RAMP_TICKS = 120; // 1 second to reach max speed
     private static final double MAX_SPEED_BONUS = 0.2 * 70; // MULTIPLY_TOTAL bonus equal to Speed 70
     private static final UUID RAMP_SPEED_UUID = UUID.fromString("7a3b2c1d-0e9f-4a8b-9c7d-1e2f3a4b5c6d");
     private static final float AUTOSTEP_HEIGHT = 1.0f; // walk straight up full blocks
