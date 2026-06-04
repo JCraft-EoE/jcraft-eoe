@@ -118,7 +118,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
         if (currentTarget == null) return;
 
-        if (!currentTarget.isAlive()) {
+        if (!currentTarget.isAlive() || currentTarget.isSpectator()) {
             currentTarget = null;
 
             attacker.setFlyTarget(lastFlyTarget);
