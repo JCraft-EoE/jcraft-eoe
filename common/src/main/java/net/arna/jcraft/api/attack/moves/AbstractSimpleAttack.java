@@ -572,11 +572,11 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     protected final Set<LivingEntity> attackBoxes(final A attacker, final Set<AABB> boxes, final DamageSource damageSource, final Vec3 center) {
         JUtils.displayHitboxes(attacker.getEntityWorld(), boxes);
 
-        // Break blocks
-        breakBlocks(attacker, boxes);
-
         Set<LivingEntity> targets = findHits(attacker, boxes, damageSource, mayHitUser);
         if (targets.isEmpty()) {
+            // Break blocks
+            breakBlocks(attacker, boxes);
+
             return Set.of();
         }
 

@@ -80,7 +80,7 @@ public class JServerConfig {
     public static final BooleanOption CREAM_ITEM_ERASE = new BooleanOption("creamItemErase", INTERACTION, true);
     public static final BooleanOption ROLLER_FLATTENING = new BooleanOption("rollerFlattening", INTERACTION, true);
     public static final BooleanOption ROLLER_DESTROYING = new BooleanOption("rollerDestroying", INTERACTION, true);
-    public static final BooleanOption PLAYER_VAMPS_DIE_TO_HAMON = new BooleanOption("playerVampsDieToHamon", INTERACTION, false);
+    public static final BooleanOption PLAYER_VAMPS_DIE_TO_HAMON = new BooleanOption("playerVampsDieToHamon", INTERACTION, true);
     public static final BooleanOption MANDOM_AFFECTS_BLOCKS = new BooleanOption("mandomAffectsBlocks", INTERACTION, true);
     public static final BooleanOption WS_STEAL_STANDS_FROM_PLAYERS = new BooleanOption("wsStealStandsFromPlayers", INTERACTION, false);
     public static final BooleanOption GRAVITY_ONLY_AFFECTS_PLAYERS = new BooleanOption("gravityOnlyAffectsPlayers", INTERACTION, false);

@@ -107,32 +107,26 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         boolean doPing = false;
 
         for (Entity entity : base.level().getEntities().getAll()) {
-            if (entity.distanceToSqr(pos) > range * range || entity.getType().is(JTagRegistry.DOESNT_BREATHE)) {
-                continue;
-            }
-            if (entity == user || entity == base) {
-                continue;
-            }
-            if (JUtils.inTimeErase(entity)) {
+            if (entity.distanceToSqr(pos) > range * range || entity.getType().is(JTagRegistry.DOESNT_BREATHE) ||
+                    entity == user || entity == base || JUtils.inTimeErase(entity) || entity.isSpectator() ||
+                    !(entity instanceof LivingEntity living)) {
                 continue;
             }
 
-            if (entity instanceof LivingEntity living) {
-                final Vec3 target = living.position().add(GravityChangerAPI.getEyeOffset(living));
+            final Vec3 target = living.position().add(GravityChangerAPI.getEyeOffset(living));
 
-                if (!withinScanArc(pos, base.getLookAngle(), target, scanAngle, Mth.DEG_TO_RAD * 30.0)) continue;
+            if (!withinScanArc(pos, base.getLookAngle(), target, scanAngle, Mth.DEG_TO_RAD * 30.0)) continue;
 
-                boolean inLineOfSight = living.hasLineOfSight(base);
-                if (!detected.containsKey(living))
-                    if (inLineOfSight)
-                        doPing = true;
+            boolean inLineOfSight = living.hasLineOfSight(base);
+            if (!detected.containsKey(living))
+                if (inLineOfSight)
+                    doPing = true;
 
-                detected.put(living, 20);
+            detected.put(living, 20);
 
-                    float scale = calculateBreathScale(living, inLineOfSight) / 7;
-                    displayBreathParticle(serverPlayer, target, scale);
-                }
-            }
+            float scale = calculateBreathScale(living, inLineOfSight) / 7;
+            displayBreathParticle(serverPlayer, target, scale);
+        }
 
         if (doPing) playPingSound(serverPlayer);
     }
