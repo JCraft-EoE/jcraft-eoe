@@ -337,6 +337,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         if (isRemote()) wantToBlock = false;
         super.tick();
 
+        if (flyState == FlyState.RETURN && getState() != State.RECALL)
+            setState(State.RECALL);
+
         noPhysics = false;
         xRotChangeAllowed = true;
 
@@ -436,9 +439,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         FlyState prev = this.flyState;
         this.flyState = flyState;
 
-        if (flyState == FlyState.RETURN)
-            setState(State.RECALL);
-        else if (flyState == FlyState.NONE && prev == FlyState.RETURN)
+        if (flyState == FlyState.NONE && prev == FlyState.RETURN)
             setState(State.RECALL_TOUCHDOWN);
     }
 
