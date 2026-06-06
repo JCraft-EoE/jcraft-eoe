@@ -87,6 +87,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     private boolean forcedReturn = false;
 
+    @Getter
+    private boolean inLineOfSight = false;
+
     private int overheatLossCooldown = 0;
 
     // client-side rotation tracking for rendering
@@ -358,6 +361,11 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     @Override
+    public boolean isCurrentlyGlowing() {
+        return level().isClientSide() && isInLineOfSight() || super.isCurrentlyGlowing();
+    }
+
+    @Override
     public void tick() {
         xRotChangeAllowed = false;
         noPhysics = true;
@@ -375,8 +383,13 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
         final LivingEntity user = getUser();
 
-        if (!isAlive() || level().isClientSide() || user == null)
+        if (!isAlive() || user == null)
             return;
+
+        if (level().isClientSide()) {
+            inLineOfSight = isRemote() && hasUser() && user.hasLineOfSight(this);
+            return;
+        }
 
         entityData.set(ALLOW_MOVE_HANDLING, allowMoveHandling());
 
