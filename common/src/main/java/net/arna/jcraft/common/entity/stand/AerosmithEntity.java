@@ -14,6 +14,7 @@ import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
@@ -30,6 +31,7 @@ import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.entity.CarbonDioxideRadarEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
+import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -38,7 +40,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -63,6 +67,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public static final double CRUISE_SPEED = 0.15;
     public static final double MAX_SPEED = 0.22;
     public static final float DEFAULT_PATROL_RADIUS = 48.0f;
+    public static final int FORCED_RETURN_ULT_COOLDOWN = 30 * 20;
 
     public enum FlyState {
         NONE,
@@ -79,6 +84,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     @Getter
     private FlyState flyState = FlyState.NONE;
+
+    private boolean forcedReturn = false;
 
     private int overheatLossCooldown = 0;
 
@@ -260,6 +267,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     @Override
     public boolean allowMoveHandling() {
+        if (forcedReturn) return false;
         return getCurrentMove() == shootAttack ||
                 (
                 getCurrentMove() == null &&
@@ -268,6 +276,18 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                 itemDropAttack.getDropLocation() == null &&
                 attackOrderMove.getCurrentTarget() == null
                 );
+    }
+
+    public void triggerForcedReturn() {
+        forcedReturn = true;
+        bombDropAttack.clearDropLocation();
+        itemDropAttack.clearDropLocation();
+        cancelMove(false);
+        setFlyState(FlyState.RETURN);
+
+        if (!hasUser()) return;
+        CommonCooldownsComponent cooldowns = JComponentPlatformUtils.getCooldowns(getUserOrThrow());
+        cooldowns.setCooldown(CooldownType.ULTIMATE, FORCED_RETURN_ULT_COOLDOWN);
     }
 
     @Override
@@ -318,6 +338,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     @Override
+    public boolean hurt(@NotNull DamageSource source, float amount) {
+        if (!level().isClientSide()) {
+            attackOrderMove.onHitTarget(this, attackOrderMove.getCurrentTarget());
+        }
+        return super.hurt(source, amount);
+    }
+
+    @Override
     public boolean hasAlphaOverride() {
         return super.hasAlphaOverride() || !isRemote();
     }
@@ -351,6 +379,14 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             return;
 
         entityData.set(ALLOW_MOVE_HANDLING, allowMoveHandling());
+
+        if (forcedReturn) {
+            final ServerLevel serverLevel = (ServerLevel) level();
+            final Vec3 behind = position().subtract(getLookAngle().scale(0.4));
+            serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE,
+                    behind.x, behind.y, behind.z,
+                    2, 0.15, 0.15, 0.15, 0.02);
+        }
 
         BulletHeatManager.tick((ServerLevel) level());
 
@@ -439,8 +475,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         FlyState prev = this.flyState;
         this.flyState = flyState;
 
-        if (flyState == FlyState.NONE && prev == FlyState.RETURN)
+        if (flyState == FlyState.NONE && prev == FlyState.RETURN) {
             setState(State.RECALL_TOUCHDOWN);
+            forcedReturn = false;
+        }
     }
 
     @Override
@@ -501,6 +539,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         final LivingEntity user = getUser();
 
         if (user != null) {
+            forcedReturn = false;
             bombDropAttack.clearDropLocation();
             itemDropAttack.clearDropLocation();
             attackOrderMove.clearCurrentTarget();
