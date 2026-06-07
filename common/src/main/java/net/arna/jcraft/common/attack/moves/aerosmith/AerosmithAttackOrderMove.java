@@ -33,6 +33,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
     @Nullable @Getter @Setter
     private LivingEntity currentTarget = null;
 
+    private int lockedHitCount = 0;
     private Vec3 lastFlyTarget = Vec3.ZERO;
     private FlyState lastFlyState = FlyState.RETURN;
 
@@ -48,6 +49,16 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
     public void clearCurrentTarget() {
         currentTarget = null;
+        lockedHitCount = 0;
+    }
+
+    public void onHitTarget(AerosmithEntity attacker, LivingEntity target) {
+        if (currentTarget == null || target != currentTarget) return;
+        if (++lockedHitCount >= 3) {
+            lockedHitCount = 0;
+            currentTarget = null;
+            attacker.triggerForcedReturn();
+        }
     }
 
     @Override
@@ -118,7 +129,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
         if (currentTarget == null) return;
 
-        if (!currentTarget.isAlive()) {
+        if (!currentTarget.isAlive() || currentTarget.isSpectator()) {
             currentTarget = null;
 
             attacker.setFlyTarget(lastFlyTarget);

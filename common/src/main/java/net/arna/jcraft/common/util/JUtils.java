@@ -228,9 +228,8 @@ public final class JUtils {
                 EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(predicate));
         Set<LivingEntity> toReturn = new HashSet<>(hit);
         for (LivingEntity l : hit)
-        //JCraft.LOGGER.info("Stand: " + stand);
         {
-            if (l instanceof StandEntity<?, ?> stand && stand.hasUser()) {
+            if (l instanceof StandEntity<?, ?> stand && stand.hasUser() && predicate.test(stand.getUser())) {
                 toReturn.add(stand.getUserOrThrow());
             }
         }

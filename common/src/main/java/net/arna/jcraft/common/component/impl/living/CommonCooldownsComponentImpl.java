@@ -46,7 +46,7 @@ public class CommonCooldownsComponentImpl implements CommonCooldownsComponent {
         }
 
         if (type.isOverrideNoCooldowns() || JServerConfig.ENABLE_MOVE_COOLDOWNS.getValue()) {
-            duration *= JServerConfig.COOLDOWN_MULTIPLIER.getValue();
+            duration = (int) (duration * JServerConfig.COOLDOWN_MULTIPLIER.getValue());
             cooldowns.put(type, duration);
             initialDurations.put(type, duration);
             sync(entity);
