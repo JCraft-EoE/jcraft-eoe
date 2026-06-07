@@ -431,7 +431,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         }
 
         if (currentMove != chargeAttack) {
-            final boolean isStunned = hasEffect(JStatusRegistry.DAZED.get());
+            final boolean isStunned = user.hasEffect(JStatusRegistry.DAZED.get());
             final float turnMult = isStunned ? STUN_TURN_RATE_MULTIPLIER : 1f;
             final float speedMult = isStunned ? STUN_SPEED_MULTIPLIER : 1f;
 
