@@ -102,15 +102,22 @@ public class BoundSoundClient {
     }
 
     /**
-     * Stops a bound sound by its id if it's still active and cleans up after.
+     * Stops a bound sound by its id and cleans up after.
      * @param id The id of the sound to stop.
      */
     private static void stopBoundSound(long id) {
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
         BoundSoundInstance inst = playingSounds.remove(id);
-        if (inst == null || !soundManager.isActive(inst)) return;
+        if (inst == null) return;
 
+        // Always mark the instance as stopped so the SoundEngine won't start it even
+        // if it is still in the ticking-sounds queue (queueTickingSound was called but
+        // the engine hasn't ticked yet). Without this, spamming quickly causes the stop
+        // packet to arrive while the sound is queued-but-not-active, isActive() returns
+        // false, and the guard above used to bail out, leaving the sound to play forever.
+        inst.cancel();
         soundManager.stop(inst);
+
         LivingEntity entity = inst.getBoundEntity();
         if (entity == null) return;
 
