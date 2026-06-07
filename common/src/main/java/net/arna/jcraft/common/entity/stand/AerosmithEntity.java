@@ -70,8 +70,8 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public static final float DEFAULT_PATROL_RADIUS = 48.0f;
     public static final int FORCED_RETURN_ULT_COOLDOWN = 30 * 20;
 
-    private static final float STUN_TURN_RATE_MULTIPLIER = 0.3f;
-    private static final float STUN_SPEED_MULTIPLIER = 0.4f;
+    private static final float STUN_TURN_RATE_MULTIPLIER = 0.7f;
+    private static final float STUN_SPEED_MULTIPLIER = 0.9f;
 
     public enum FlyState {
         NONE,
