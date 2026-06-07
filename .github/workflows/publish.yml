@@ -60,6 +60,15 @@ jobs:
             -Psigning.keyId="${{ secrets.SIGNING_KEY_ID }}" \
             -Psigning.password="${{ secrets.SIGNING_PASSWORD }}"
 
+      - name: Find previous tag
+        if: steps.tag_check.outputs.exists == 'false'
+        id: prev_tag
+        run: |
+          PREV=$(git tag --sort=-version:refname \
+            | grep -v "^${{ steps.version.outputs.tag }}$" \
+            | head -1)
+          echo "value=$PREV" >> "$GITHUB_OUTPUT"
+
       - name: Create and push tag
         if: steps.tag_check.outputs.exists == 'false'
         run: |
@@ -92,3 +101,15 @@ jobs:
             fabric/build/libs/*.jar
             forge/build/libs/*.jar
           fail_on_unmatched_files: false
+
+      - name: Send Discord notification
+        if: steps.tag_check.outputs.exists == 'false'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_AVATAR_URL: ${{ vars.DISCORD_AVATAR_URL }}
+          DISCORD_USERNAME: ${{ vars.DISCORD_USERNAME }}
+          DISCORD_MESSAGE_FORMAT: ${{ vars.DISCORD_MESSAGE_FORMAT }}
+        run: |
+          ./gradlew sendDiscordWebhook \
+            -PdiscordPrevTag="${{ steps.prev_tag.outputs.value }}" \
+            -PdiscordGithubRepo="${{ github.repository }}"

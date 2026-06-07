@@ -10,6 +10,7 @@
 /forge/.gradle/*
 /common/.gradle/*
 /build/*
+/lib/
 
 # gradle
 
