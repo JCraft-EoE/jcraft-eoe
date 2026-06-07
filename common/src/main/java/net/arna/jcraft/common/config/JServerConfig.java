@@ -83,7 +83,6 @@ public class JServerConfig {
     public static final BooleanOption MANDOM_AFFECTS_BLOCKS = new BooleanOption("mandomAffectsBlocks", INTERACTION, true);
     public static final BooleanOption WS_STEAL_STANDS_FROM_PLAYERS = new BooleanOption("wsStealStandsFromPlayers", INTERACTION, false);
     public static final BooleanOption GRAVITY_ONLY_AFFECTS_PLAYERS = new BooleanOption("gravityOnlyAffectsPlayers", INTERACTION, false);
-    public static final BooleanOption SHOW_ALL_COSPLAY = new BooleanOption("showAllCosplay", INTERACTION, false);
     /*
     public static final BooleanOption UNIVERSAL_ABILITIES = new BooleanOption("universalAbilities", INTERACTION, true);
     public static final BooleanOption STAND_GRIEFING = new BooleanOption("standGriefing", INTERACTION, true);
