@@ -515,13 +515,15 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     @Override
     public void setMove(AbstractMove<?, ? super AerosmithEntity> move, @Nullable AerosmithEntity.State animState) {
+        super.setMove(move, animState);
+
         // A "continuation" is when the same move is re-initiated immediately after cancelling itself
         // (e.g. MuzzleHitscanAttack looping while the button is held). In that case we skip the
         // maneuver sound so it only plays on genuine new starts.
         boolean isContinuation = (move == preCancelMove);
         preCancelMove = null;
 
-        if (!isContinuation) {
+        if (!isContinuation && !(move instanceof BreathXrayMove)) {
             if (isRemote()) playBoundSound(JSoundRegistry.AS_MANEUVER.get(), 1f, 1f);
 
             if (getUser() != null) {
@@ -532,8 +534,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                         getUser().getSoundSource(), 1f, 1f);
             }
         }
-
-        super.setMove(move, animState);
     }
 
     @Override
@@ -560,6 +560,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             if (isRemote()) {
                 if (flyState != FlyState.RETURN) {
                     setFlyState(FlyState.RETURN);
+                    playBoundSound(JSoundRegistry.AS_MANEUVER.get(), 1f, 1f);
+
+                    if (hasUser()) BoundSoundPlayer.playSoundFrom(getUser(), JSoundRegistry.AS_SHOUT.get(),
+                            getUser().getSoundSource(), 1f, 1f);
                 }
 
                 if (distanceToSqr(user) >= 4.0) return;
