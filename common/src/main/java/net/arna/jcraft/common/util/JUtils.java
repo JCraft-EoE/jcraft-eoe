@@ -689,7 +689,20 @@ public final class JUtils {
     public static boolean canHoldMove(ServerPlayer player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
         if (stand != null && stand.allowMoveHandling()) {
-            return stand.canHoldMove(type) || type.isHoldable();
+            if (!stand.canHoldMove(type) && !type.isHoldable()) {
+                return false;
+            }
+            // If the stand forwards this input to the spec, only treat it as
+            // holdable if the spec also considers it holdable. Otherwise, the
+            // held-tick loop would call spec.initMove() every tick even for
+            // discrete (non-hold) spec actions.
+            if (stand.forwardInputToSpec(type)) {
+                JSpec<?, ?> spec = JUtils.getSpec(player);
+                if (spec != null && !spec.canHoldMove(type)) {
+                    return false;
+                }
+            }
+            return true;
         }
         JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec != null && spec.canHoldMove(type)) {

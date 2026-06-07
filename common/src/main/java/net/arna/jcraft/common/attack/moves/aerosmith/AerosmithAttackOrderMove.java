@@ -23,6 +23,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,6 +34,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
     @Nullable @Getter @Setter
     private LivingEntity currentTarget = null;
 
+    private int lockedHitCount = 0;
     private Vec3 lastFlyTarget = Vec3.ZERO;
     private FlyState lastFlyState = FlyState.RETURN;
 
@@ -48,34 +50,30 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
 
     public void clearCurrentTarget() {
         currentTarget = null;
+        lockedHitCount = 0;
+    }
+
+    public void onHitTarget(AerosmithEntity attacker, LivingEntity target) {
+        if (currentTarget == null || target != currentTarget) return;
+        if (++lockedHitCount >= 3) {
+            lockedHitCount = 0;
+            currentTarget = null;
+            attacker.triggerForcedReturn();
+        }
+    }
+
+    @Override
+    public boolean conditionsMet(AerosmithEntity attacker) {
+        return super.conditionsMet(attacker) && !getTargets(attacker).isEmpty();
     }
 
     @Override
     public void onInitiate(final AerosmithEntity attacker) {
         final LivingEntity user = attacker.getUser();
-
         if (user == null) return;
 
         final Vec3 pos = user.position();
-
-        final Vec3 rotVec = user.getLookAngle();
-
-        final BreathXrayMove<AerosmithEntity> xrayMove = attacker.getBreathXrayMove();
-
-        if (xrayMove == null) return;
-
-        final var targets = xrayMove.getDetected().object2IntEntrySet();
-
-        final Set<LivingEntity> potentialTargets = new HashSet<>();
-
-        for (var targetEntry : targets) {
-            final LivingEntity target = targetEntry.getKey();
-            final Vec3 lookVec = target.position().subtract(pos).normalize();
-
-            if (JUtils.angleBetween(lookVec, rotVec) < 0.95) continue;
-
-            potentialTargets.add(target);
-        }
+        final Set<LivingEntity> targets = getTargets(attacker);
 
         if (targets.isEmpty()) {
             currentTarget = null;
@@ -83,7 +81,7 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
             LivingEntity closest = null;
             double minDistanceSq = Double.MAX_VALUE;
 
-            for (LivingEntity entity : potentialTargets) {
+            for (LivingEntity entity : targets) {
                 double distanceSq = entity.position().distanceToSqr(pos);
                 if (distanceSq < minDistanceSq) {
                     minDistanceSq = distanceSq;
@@ -108,6 +106,30 @@ public class AerosmithAttackOrderMove extends AbstractMove<AerosmithAttackOrderM
                         targetPosition.x, targetPosition.y, targetPosition.z, 0, 0, 0, 0, 1));
             }
         }
+    }
+
+    private Set<LivingEntity> getTargets(final AerosmithEntity attacker) {
+        LivingEntity user = attacker.getUserOrThrow();
+
+        final Vec3 pos = user.position();
+        final Vec3 rotVec = user.getLookAngle();
+
+        final BreathXrayMove<AerosmithEntity> xrayMove = attacker.getBreathXrayMove();
+        if (xrayMove == null) return Collections.emptySet();
+
+        final var detected = xrayMove.getDetected().object2IntEntrySet();
+        final Set<LivingEntity> targets = new HashSet<>();
+
+        for (var targetEntry : detected) {
+            final LivingEntity target = targetEntry.getKey();
+            final Vec3 lookVec = target.position().subtract(pos).normalize();
+
+            if (JUtils.angleBetween(lookVec, rotVec) < 0.95) continue;
+
+            targets.add(target);
+        }
+
+        return targets;
     }
 
     @Override

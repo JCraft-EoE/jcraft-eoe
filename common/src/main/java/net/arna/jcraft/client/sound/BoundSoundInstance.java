@@ -71,4 +71,13 @@ public class BoundSoundInstance extends AbstractTickableSoundInstance {
         y = pos.y;
         z = pos.z;
     }
+
+    @Override
+    public boolean canPlaySound() {
+        return !isStopped();
+    }
+
+    public void cancel() {
+        stop();
+    }
 }

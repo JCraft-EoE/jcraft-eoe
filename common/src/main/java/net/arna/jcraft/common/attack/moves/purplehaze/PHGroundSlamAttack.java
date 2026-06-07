@@ -28,6 +28,7 @@ public class PHGroundSlamAttack extends AbstractSimpleAttack<PHGroundSlamAttack,
 
         final PurpleHazeCloudEntity cloud = new PurpleHazeCloudEntity(attacker.level(), 3.0f, attacker.getPoisonType());
         cloud.copyPosition(attacker);
+        cloud.setOwner(user);
         attacker.level().addFreshEntity(cloud);
 
         return targets;

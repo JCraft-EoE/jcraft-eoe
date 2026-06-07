@@ -884,6 +884,8 @@
   "move.jcraft.gold_experience_requiem.default.return_to_zero.name": "Return to Zero",
   "move.jcraft.hamon.default.charge_hamon.description": "Hold to charge Hamon. Slows you down while active.",
   "move.jcraft.hamon.default.charge_hamon.name": "Charge Hamon",
+  "move.jcraft.hamon.default.empower_move.description": "Empowers your standard jabs into far more powerful and versatile tools.",
+  "move.jcraft.hamon.default.empower_move.name": "Empower Move",
   "move.jcraft.hamon.default.focus_strike.description": "Charge with hamon for Zoom Punch, a slow yet far-reaching, launching strike. Can take one hit without being stopped.",
   "move.jcraft.hamon.default.focus_strike.name": "Focus Strike",
   "move.jcraft.hamon.default.improviser_attack.description": "When attacking with a weapon, does a Hamon-infused strike with it.\nCan infuse projectiles such as arrows and tridents with ripple.",

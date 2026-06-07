@@ -50,6 +50,9 @@ public class PHCapsuleProjectile extends AbstractArrow {
 
         final PurpleHazeCloudEntity cloud = new PurpleHazeCloudEntity(level(), 2.0f, poisonType);
         cloud.copyPosition(this);
+        if (getOwner() instanceof LivingEntity owner) {
+            cloud.setOwner(owner);
+        }
         level().addFreshEntity(cloud);
         discard();
     }

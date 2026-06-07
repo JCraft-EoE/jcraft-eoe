@@ -1,0 +1,94 @@
+name: Publish
+
+on:
+  push:
+    paths: [gradle.properties]
+
+jobs:
+  publish:
+    name: Tag, Build & Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read mod version
+        id: version
+        run: |
+          VERSION=$(grep -Po '(?<=mod_version = )[\S]+' gradle.properties)
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check if tag already exists
+        id: tag_check
+        run: |
+          if git ls-remote --tags origin "refs/tags/${{ steps.version.outputs.tag }}" | grep -q .; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Java 21
+        if: steps.tag_check.outputs.exists == 'false'
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: Set up Gradle
+        if: steps.tag_check.outputs.exists == 'false'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Decode signing keyfile
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          echo "${{ secrets.SIGNING_KEY_FILE }}" | base64 --decode > "$RUNNER_TEMP/signing.gpg"
+
+      - name: Build & Publish
+        if: steps.tag_check.outputs.exists == 'false'
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+        run: |
+          ./gradlew publish \
+            -Psigning.secretKeyRingFile="$RUNNER_TEMP/signing.gpg" \
+            -Psigning.keyId="${{ secrets.SIGNING_KEY_ID }}" \
+            -Psigning.password="${{ secrets.SIGNING_PASSWORD }}"
+
+      - name: Create and push tag
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Collect release artifacts
+        if: steps.tag_check.outputs.exists == 'false'
+        id: artifacts
+        run: |
+          # Gather fabric and forge jars, excluding -dev, -sources, and -shadow jars
+          FILES=$(find fabric/build/libs forge/build/libs -name "*.jar" \
+            ! -name "*-dev.jar" \
+            ! -name "*-sources.jar" \
+            ! -name "*-shadow.jar" \
+            2>/dev/null | tr '\n' '\n')
+          echo "Found artifacts:"
+          echo "$FILES"
+
+      - name: Create GitHub Release
+        if: steps.tag_check.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          files: |
+            fabric/build/libs/*.jar
+            forge/build/libs/*.jar
+          fail_on_unmatched_files: false

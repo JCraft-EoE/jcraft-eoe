@@ -37,6 +37,7 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
     @Override
     public void onInitiate(AerosmithEntity attacker) {
         super.onInitiate(attacker);
+        wantToContinue = true;
     }
 
     @Override
@@ -80,8 +81,11 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
     @Override
     public void onUserMoveInput(final AerosmithEntity attacker, final MoveInputType type, final boolean pressed, final boolean moveInitiated) {
         super.onUserMoveInput(attacker, type, pressed, moveInitiated);
-        if (getMoveClass() == type.getMoveClass()) {
-            wantToContinue = pressed;
+        // Only handle release here. The press is handled by onInitiate() to avoid a multiplayer
+        // race condition where the thenAccept callback in PlayerInputPacket queues onUserMoveInput(true)
+        // after the release's onUserMoveInput(false) has already run, re-locking the attack on.
+        if (getMoveClass() == type.getMoveClass() && !pressed) {
+            wantToContinue = false;
         }
     }
 

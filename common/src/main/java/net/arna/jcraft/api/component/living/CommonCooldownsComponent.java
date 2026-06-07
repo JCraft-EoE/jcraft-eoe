@@ -25,7 +25,7 @@ public interface CommonCooldownsComponent extends JComponent {
      * Sets the cooldown for the given type.
      *
      * @param type     The type to set a cooldown for
-     * @param duration The duration of the cooldown
+     * @param duration The duration of the cooldown in ticks
      */
     void setCooldown(final CooldownType type,final  int duration);
 
