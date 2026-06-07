@@ -31,6 +31,7 @@ import net.arna.jcraft.common.attack.conditions.HamonSendoWaveKickGroundedCondit
 import net.arna.jcraft.common.attack.conditions.HamonWaveCondition;
 import net.arna.jcraft.common.attack.conditions.HamonZoomPunchCondition;
 import net.arna.jcraft.common.attack.moves.hamon.*;
+import net.arna.jcraft.common.attack.moves.shared.NoOpMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.util.CooldownType;
@@ -215,6 +216,13 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
                             Held input.""")
             );
 
+    // Actual logic is implemented in initMove, this is just for spec about.
+    public static final NoOpMove<HamonSpec> EMPOWER = new NoOpMove<HamonSpec>()
+            .withInfo(
+                    Component.literal("Empower Move"),
+                    Component.literal("Empowers your standard jabs into far more powerful and versatile tools.")
+            );
+
     // These aren't stored in any movemap and have fields that must be unique to them, so we make copies.
     private final ZoomPunchAttack zoomPunchAttack = ZOOM_PUNCH.copy();
     private final RippleAttack rippleAttack = RIPPLE_ATTACK.copy();
@@ -225,6 +233,7 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
     private static void registerMoves(MoveMap<HamonSpec, HamonSpec.State> moves) {
         moves.register(MoveClass.LIGHT, IMPROVISER, CooldownType.LIGHT, State.IMPROVISER);
         moves.register(MoveClass.HEAVY, FOCUS_STRIKE, CooldownType.HEAVY, null);
+        moves.register(MoveClass.BARRAGE, EMPOWER, CooldownType.BARRAGE, null);
         moves.register(MoveClass.SPECIAL1, STOMP, CooldownType.SPECIAL1, State.STOMP);
         moves.register(MoveClass.SPECIAL2, UPPERCUT, CooldownType.SPECIAL2, State.UPPERCUT)
                 .withAerialVariant(State.SENDO);
