@@ -18,6 +18,7 @@ import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -68,6 +69,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public static final double MAX_SPEED = 0.22;
     public static final float DEFAULT_PATROL_RADIUS = 48.0f;
     public static final int FORCED_RETURN_ULT_COOLDOWN = 30 * 20;
+
+    private static final float STUN_TURN_RATE_MULTIPLIER = 0.3f;
+    private static final float STUN_SPEED_MULTIPLIER = 0.4f;
 
     public enum FlyState {
         NONE,
@@ -427,6 +431,10 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         }
 
         if (currentMove != chargeAttack) {
+            final boolean isStunned = hasEffect(JStatusRegistry.DAZED.get());
+            final float turnMult = isStunned ? STUN_TURN_RATE_MULTIPLIER : 1f;
+            final float speedMult = isStunned ? STUN_SPEED_MULTIPLIER : 1f;
+
             switch (flyState) {
                 case PATROL -> {
                     final float theta = tickCount / patrolRadius / 2.0f * patrolDirection.getValue();
@@ -435,12 +443,12 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                             GravityChangerAPI.getGravityDirection(this)
                     );
 
-                    lookAt(flyTarget.add(offset), 6f, 6f);
+                    lookAt(flyTarget.add(offset), 6f * turnMult, 6f * turnMult);
 
-                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(SLOW_CRUISE_SPEED)));
+                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(SLOW_CRUISE_SPEED * speedMult)));
                 }
                 case FLYBY -> {
-                    lookAt(flyTarget, 6f, 6f);
+                    lookAt(flyTarget, 6f * turnMult, 6f * turnMult);
 
                     final double distanceSqr = distanceToSqr(flyTarget);
                     double cruiseSpeed = distanceSqr <= 49.0 ? SLOW_CRUISE_SPEED : CRUISE_SPEED;
@@ -455,7 +463,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                         }
                     }
 
-                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(cruiseSpeed)));
+                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(cruiseSpeed * speedMult)));
 
                     if (distanceToSqr(flyTarget) <= 4.0
                             && bombDropAttack.getDropLocation() == null
@@ -465,12 +473,12 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                 }
                 case RETURN -> {
                     final Vec3 targetPos = user.position();
-                    lookAt(targetPos, 6f, 12f);
+                    lookAt(targetPos, 6f * turnMult, 12f * turnMult);
 
                     final double distanceSqr = distanceToSqr(targetPos);
                     final double cruiseSpeed = distanceSqr <= 49.0 ? SLOW_CRUISE_SPEED : CRUISE_SPEED;
 
-                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(cruiseSpeed)));
+                    setDeltaMovement(getDeltaMovement().scale(0.9).add(getLookAngle().scale(cruiseSpeed * speedMult)));
 
                     if (distanceSqr <= 6.25) {
                         setRemote(false);
