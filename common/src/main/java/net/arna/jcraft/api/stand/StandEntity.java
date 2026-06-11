@@ -8,10 +8,7 @@ import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.MoveUsage;
-import net.arna.jcraft.api.attack.IAttacker;
-import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.MoveSet;
-import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.attack.*;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
@@ -20,6 +17,7 @@ import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.itfs.ICustomDamageHandler;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatRegistry;
@@ -1729,14 +1727,15 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         if (hit) {
-            damageLogic(
-                    level(),
-                    user,
-                    new AttackData(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, moveUsage, canBackstab, unblockable)
-            );
+            AttackData attackData = new AttackData(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun,
+                    source, attacker, hitAnimation, moveUsage, canBackstab, unblockable);
+            onJCraftDamageReceived(attackData);
+            damageLogic(level(), user, attackData);
         }
         return false;
     }
+
+    protected void onJCraftDamageReceived(AttackData attackData) {}
 
     /**
      * Needed because the super constructor invokes some things that need this.

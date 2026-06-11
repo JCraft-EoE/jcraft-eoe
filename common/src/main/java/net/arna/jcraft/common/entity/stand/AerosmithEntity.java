@@ -7,6 +7,7 @@ import lombok.Setter;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
@@ -18,8 +19,8 @@ import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
@@ -37,15 +38,15 @@ import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -350,6 +351,11 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             attackOrderMove.onHitTarget(this, attackOrderMove.getCurrentTarget());
         }
         return super.hurt(source, amount);
+    }
+
+    @Override
+    protected void onJCraftDamageReceived(AttackData attackData) {
+        attackOrderMove.onHitTarget(this, attackOrderMove.getCurrentTarget());
     }
 
     @Override

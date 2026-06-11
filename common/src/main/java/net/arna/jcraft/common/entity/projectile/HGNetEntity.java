@@ -11,7 +11,7 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.util.ICustomDamageHandler;
+import net.arna.jcraft.api.itfs.ICustomDamageHandler;
 import net.arna.jcraft.common.util.IOwnable;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.nbt.CompoundTag;
