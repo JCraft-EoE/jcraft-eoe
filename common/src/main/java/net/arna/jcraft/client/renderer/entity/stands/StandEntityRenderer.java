@@ -267,6 +267,14 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
         }
     }
 
+    /**
+     * The opacity that a held item should be rendered with so it matches the stand's first-person transparency.
+     * Returns {@code 1f} (fully opaque) whenever the first-person fade does not apply.
+     */
+    public static float getItemRenderAlpha(final StandEntity<?, ?> stand, final float partialTick) {
+        return shouldApplyAlpha(stand) ? getAlpha(stand, partialTick) : 1f;
+    }
+
     public static class StandHandItemsRenderLayer<T extends StandEntity<?,?>> extends HandItemsRenderLayer<T> {
         @Override
         protected void renderItemForBone(final AzRendererPipelineContext<UUID, T> context, final AzBone bone, final ItemStack stack, final T animatable) {
@@ -276,6 +284,11 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
             poseStack.mulPose(Axis.XP.rotationDegrees(90f));
 
             super.renderItemForBone(context, bone, stack, animatable);
+        }
+
+        @Override
+        protected float getItemAlpha(final AzRendererPipelineContext<UUID, T> context, final T animatable) {
+            return getItemRenderAlpha(animatable, context.partialTick());
         }
     }
 }
