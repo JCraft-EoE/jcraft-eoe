@@ -371,11 +371,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     }
 
     @Override
-    public boolean isCurrentlyGlowing() {
-        return level().isClientSide() && isInLineOfSight() || super.isCurrentlyGlowing();
-    }
-
-    @Override
     public void tick() {
         xRotChangeAllowed = false;
         noPhysics = true;
