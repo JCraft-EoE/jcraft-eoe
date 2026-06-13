@@ -82,6 +82,7 @@
     "LivingEntityMixin",
     "MinecraftServerAccessor",
     "MinecraftServerMixin",
+    "MobEffectInstanceMixin",
     "MobEffectMixin",
     "MobEntityMixin",
     "NetherPortalBlockMixin",
