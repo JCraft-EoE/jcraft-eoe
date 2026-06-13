@@ -614,6 +614,8 @@
   "jcraft.serverconfig.option.barrageMiningSpeed": "Barrage Mining Speed",
   "jcraft.serverconfig.option.baseAILevel": "Base AI Level",
   "jcraft.serverconfig.option.baseAILevel.tooltip": "Default skill level given to JCraft-controlled\nenemies. Higher values make them fight more\ncompetently.",
+  "jcraft.serverconfig.option.blockBreakageMultiplier": "Block Breakage Multiplier",
+  "jcraft.serverconfig.option.blockBreakageMultiplier.tooltip": "Multiplies the damage attacks do to blocks when\nnot hitting an entity.",
   "jcraft.serverconfig.option.cmoonUltRange": "C-moon Ult Range",
   "jcraft.serverconfig.option.cmoonUtilDuration": "C-moon Util Duration",
   "jcraft.serverconfig.option.cooldownMultiplier": "Cooldown Duration Multiplier",
