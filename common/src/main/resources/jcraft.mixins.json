@@ -67,6 +67,7 @@
     "EntityTypeMixin",
     "ExplosionMixin",
     "FallbackResourceManagerMixin",
+    "FoodDataMixin",
     "GrindstoneScreenHandlerAnon2and3Mixin",
     "GrindstoneScreenHandlerMixin",
     "HungerManagerMixin",
