@@ -85,12 +85,12 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
                 if (health < entity.getMaxHealth() && blood >= MIN_REGEN_BLOOD && --regenTick < 1) {
                     if (exhaustion == null || healCount % ExhaustionEffect.MAX_LEVEL > exhaustion.getAmplifier()) {
                         entity.heal(1f);
-                    }
-                    healCount++;
+                        healCount++;
 
-                    // Every third heal takes away a blood unit
-                    if (healCount % 3 == 0) {
-                        blood--;
+                        // Every third heal takes away a blood unit
+                        if (healCount % 3 == 0) {
+                            blood--;
+                        }
                     }
 
                     regenTick = 10;
