@@ -22,6 +22,7 @@ import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.core.data.AttackMoveExtras;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.ExtraProducts;
@@ -631,11 +632,11 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
 
     protected float getBreakage(A attacker, Level level, BlockPos pos, AABB box) {
         double distance = pos.getCenter().distanceTo(box.getCenter());
-        double distanceMult = Mth.clamp(1.5 - distance, 0, 1);
-        distanceMult *= distanceMult;
+        double mult = Mth.clamp(1.5 - distance, 0, 1);
+        mult *= mult;
 
-        float strength = getBlockDestructionMultiplier(attacker);
-        return (float) (JBlockBreaker.calcBreakage(level, pos, strength) * distanceMult);
+        float strength = getBlockDestructionMultiplier(attacker) * JServerConfig.BLOCK_BREAKAGE_MULTIPLIER.getValue();
+        return (float) (JBlockBreaker.calcBreakage(level, pos, strength) * mult);
     }
 
     /**
