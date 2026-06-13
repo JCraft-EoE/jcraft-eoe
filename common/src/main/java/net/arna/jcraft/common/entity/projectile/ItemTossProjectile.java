@@ -411,10 +411,13 @@ public class ItemTossProjectile extends AbstractArrow {
         // blocks get placed if possible
         final BlockPos pos = result.getBlockPos().relative(result.getDirection());
         if (item.getItem() instanceof BlockItem block) {
+            final LivingEntity placer = JUtils.getUserIfStand(getOwner()) instanceof LivingEntity living ? living : null;
             if (item.is(JTagRegistry.BRITTLE) && hardness >= Blocks.STONE.defaultDestroyTime()) {
                 // brittle things get destroyed
-            }
-            else if ((!(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) &&
+            } else if (!JUtils.mayAlter(level(), placer, pos, null)) {
+                // the stand's user may not build where the block landed, so drop it as an item instead of placing
+                dropItem(result.getLocation());
+            } else if ((!(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) &&
                     InteractionResult.SUCCESS != block.place(new BlockPlaceContext(new UseOnContext(level(), null, InteractionHand.MAIN_HAND, item, result)))) {
                 dropItem(result.getLocation());
             }
