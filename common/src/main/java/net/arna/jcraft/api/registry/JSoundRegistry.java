@@ -24,6 +24,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> ARMORED_HIT = register("armoredhit");
     RegistrySupplier<SoundEvent> COMBO_BREAK = register("combobreak");
     RegistrySupplier<SoundEvent> COOLDOWN_CANCEL = register("cooldowncancel");
+    RegistrySupplier<SoundEvent> WHIFF = register("whiff");
     RegistrySupplier<SoundEvent> IMPACT_1 = register("impact1");
     RegistrySupplier<SoundEvent> IMPACT_2 = register("impact2");
     RegistrySupplier<SoundEvent> IMPACT_3 = register("impact3");
