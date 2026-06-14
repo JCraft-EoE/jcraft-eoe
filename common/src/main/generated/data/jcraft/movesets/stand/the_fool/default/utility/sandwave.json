@@ -19,6 +19,7 @@
           "translate": "move.jcraft.the_fool.default.glider.air.description"
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "mobility_type": "FLIGHT",
         "name": {
           "translate": "move.jcraft.the_fool.default.glider.air.name"
@@ -46,6 +47,7 @@
         "translate": "move.jcraft.the_fool.default.sandwave.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "mobility_type": "DASH",
       "name": {
         "translate": "move.jcraft.the_fool.default.sandwave.name"

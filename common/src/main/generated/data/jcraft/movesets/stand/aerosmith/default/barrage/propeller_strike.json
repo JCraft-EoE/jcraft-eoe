@@ -33,6 +33,7 @@
         "description": {
           "translate": "move.jcraft.aerosmith.default.dive_charge.air.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.aerosmith.default.dive_charge.air.name"
         }
@@ -88,6 +89,7 @@
         "translate": "move.jcraft.aerosmith.default.propeller_strike.description"
       },
       "is_holdable": true,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.aerosmith.default.propeller_strike.name"
       }

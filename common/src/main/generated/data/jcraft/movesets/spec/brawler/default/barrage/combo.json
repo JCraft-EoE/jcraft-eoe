@@ -25,6 +25,7 @@
       "description": {
         "translate": "move.jcraft.brawler.default.combo.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.brawler.default.combo.name"
       }

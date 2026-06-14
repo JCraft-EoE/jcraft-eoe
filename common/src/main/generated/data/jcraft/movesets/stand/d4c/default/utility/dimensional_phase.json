@@ -18,6 +18,7 @@
         "translate": "move.jcraft.d4c.default.dimensional_phase.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "mobility_type": "HIGHJUMP",
       "name": {
         "translate": "move.jcraft.d4c.default.dimensional_phase.name"

@@ -11,6 +11,7 @@
         "translate": "move.jcraft.star_platinum_the_world.default.timeskip.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "mobility_type": "TELEPORT",
       "name": {
         "translate": "jcraft.generic.tp"

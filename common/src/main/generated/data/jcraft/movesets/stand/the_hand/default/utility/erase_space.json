@@ -31,6 +31,7 @@
       "description": {
         "translate": "move.jcraft.the_hand.default.erase_space.description"
       },
+      "look_tracking_reach": 3.5,
       "mobility_type": "DASH",
       "name": {
         "translate": "move.jcraft.the_hand.default.erase_space.name"

@@ -30,6 +30,7 @@
       "description": {
         "translate": "move.jcraft.anubis.default.cleaving_strikes_2_hits.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.anubis.default.cleaving_strikes_2_hits.name"
       }

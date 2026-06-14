@@ -32,6 +32,7 @@
         "description": {
           "translate": "move.jcraft.hamon.default.knee_thrust.air.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.hamon.default.knee_thrust.air.name"
         }
@@ -75,6 +76,7 @@
       "description": {
         "translate": "move.jcraft.hamon.default.uppercut.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.hamon.default.uppercut.name"
       }

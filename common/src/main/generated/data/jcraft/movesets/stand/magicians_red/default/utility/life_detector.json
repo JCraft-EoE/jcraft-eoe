@@ -17,6 +17,7 @@
       "description": {
         "translate": "move.jcraft.magicians_red.default.life_detector.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.magicians_red.default.life_detector.name"
       },

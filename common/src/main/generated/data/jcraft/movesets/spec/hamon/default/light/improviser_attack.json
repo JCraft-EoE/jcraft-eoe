@@ -43,6 +43,7 @@
       "description": {
         "translate": "move.jcraft.hamon.default.improviser_attack.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.hamon.default.improviser_attack.name"
       }

@@ -15,6 +15,7 @@
           "translate": "move.jcraft.king_crimson.default.epitaph.cr.description"
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.king_crimson.default.epitaph.cr.name"
         }
@@ -39,6 +40,7 @@
         "translate": "move.jcraft.king_crimson.default.predictionmove_cancel.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.king_crimson.default.predictionmove_cancel.name"
       }

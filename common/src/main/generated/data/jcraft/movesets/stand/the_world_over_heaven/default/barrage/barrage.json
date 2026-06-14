@@ -32,6 +32,7 @@
         "translate": "move.jcraft.the_world_over_heaven.default.barrage.description"
       },
       "is_holdable": true,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_world_over_heaven.default.barrage.name"
       }

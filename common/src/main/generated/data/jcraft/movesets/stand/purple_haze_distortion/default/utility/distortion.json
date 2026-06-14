@@ -11,6 +11,7 @@
         "description": {
           "translate": "move.jcraft.purple_haze_distortion.default.pilot_mode.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.purple_haze_distortion.default.pilot_mode.cr.name"
         }
@@ -24,6 +25,7 @@
       "description": {
         "translate": "move.jcraft.purple_haze_distortion.default.distortion.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.purple_haze_distortion.default.distortion.name"
       }

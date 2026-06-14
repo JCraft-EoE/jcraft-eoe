@@ -13,6 +13,7 @@
         "description": {
           "translate": "move.jcraft.killer_queen.default.detonate.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.killer_queen.default.detonate.cr.name"
         }
@@ -52,6 +53,7 @@
           "description": {
             "translate": "move.jcraft.killer_queen.default.low_punch.followup.description"
           },
+          "look_tracking_reach": 3.5,
           "name": {
             "translate": "move.jcraft.killer_queen.default.low_punch.followup.name"
           }
@@ -87,6 +89,7 @@
         "description": {
           "translate": "move.jcraft.killer_queen.default.second_punch.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.killer_queen.default.second_punch.followup.name"
         }
@@ -122,6 +125,7 @@
       "description": {
         "translate": "move.jcraft.killer_queen.default.punch.description"
       },
+      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.killer_queen.default.punch.name"

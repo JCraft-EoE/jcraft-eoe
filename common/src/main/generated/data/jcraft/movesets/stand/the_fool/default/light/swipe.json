@@ -28,6 +28,7 @@
         "description": {
           "translate": "move.jcraft.the_fool.default.drill.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_fool.default.drill.cr.name"
         }
@@ -80,6 +81,7 @@
         "description": {
           "translate": "move.jcraft.the_fool.default.swipe.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_fool.default.swipe.followup.name"
         }
@@ -121,6 +123,7 @@
       "description": {
         "translate": "move.jcraft.the_fool.default.swipe.description"
       },
+      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.the_fool.default.swipe.name"

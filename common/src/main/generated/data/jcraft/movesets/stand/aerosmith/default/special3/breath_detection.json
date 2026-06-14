@@ -8,6 +8,7 @@
       "description": {
         "translate": "move.jcraft.aerosmith.default.breath_detection.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.aerosmith.default.breath_detection.name"
       }

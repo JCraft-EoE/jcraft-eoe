@@ -26,6 +26,7 @@
         "translate": "move.jcraft.the_world.default.barrage.description"
       },
       "is_holdable": true,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_world.default.barrage.name"
       }

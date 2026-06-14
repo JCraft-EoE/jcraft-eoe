@@ -21,6 +21,7 @@
         "description": {
           "translate": "move.jcraft.anubis.default.null.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.anubis.default.null.followup.name"
         }
@@ -64,6 +65,7 @@
       "description": {
         "translate": "move.jcraft.anubis.default.cleaving_strikes_3_hits.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.anubis.default.cleaving_strikes_3_hits.name"
       }

@@ -36,6 +36,7 @@
           "description": {
             "translate": "move.jcraft.silver_chariot.possessed.god_of_death_final_hit.followup.description"
           },
+          "look_tracking_reach": 3.5,
           "name": {
             "translate": "move.jcraft.silver_chariot.possessed.god_of_death_final_hit.followup.name"
           }
@@ -74,6 +75,7 @@
         "description": {
           "translate": "move.jcraft.silver_chariot.possessed.god_of_death_hit.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.silver_chariot.possessed.god_of_death_hit.followup.name"
         }
@@ -106,6 +108,7 @@
         "translate": "move.jcraft.silver_chariot.possessed.god_of_death.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.silver_chariot.possessed.god_of_death.name"
       }

@@ -31,6 +31,7 @@
       "description": {
         "translate": "move.jcraft.cream.default.vertical_chop.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.cream.default.vertical_chop.name"
       }

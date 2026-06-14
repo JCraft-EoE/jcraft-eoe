@@ -41,6 +41,7 @@
           "description": {
             "translate": "move.jcraft.purple_haze_distortion.default.rekka_final_hit.followup.description"
           },
+          "look_tracking_reach": 3.5,
           "name": {
             "translate": "move.jcraft.purple_haze_distortion.default.rekka_final_hit.followup.name"
           }
@@ -82,6 +83,7 @@
         "description": {
           "translate": "move.jcraft.purple_haze_distortion.default.rekka_2nd_hit.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.purple_haze_distortion.default.rekka_2nd_hit.followup.name"
         }
@@ -127,6 +129,7 @@
       "description": {
         "translate": "move.jcraft.purple_haze_distortion.default.rekka_series.description"
       },
+      "look_tracking_reach": 3.5,
       "mobility_type": "DASH",
       "name": {
         "translate": "move.jcraft.purple_haze_distortion.default.rekka_series.name"

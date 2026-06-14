@@ -10,6 +10,7 @@
       "description": {
         "translate": "move.jcraft.star_platinum.default.inhale.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "jcraft.starplatinum.ult"
       }

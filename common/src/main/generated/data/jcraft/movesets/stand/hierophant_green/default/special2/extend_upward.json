@@ -60,6 +60,7 @@
             "damage": 5.0,
             "duration": 21,
             "extras": {
+              "look_tracking_reach": 3.5,
               "name": {
                 "text": "Extend (Forward, Second Hit)"
               }
@@ -73,6 +74,7 @@
           },
           "tick": 12
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.hierophant_green.default.extend_forward.cr.name"
         }
@@ -139,6 +141,7 @@
           "damage": 5.0,
           "duration": 21,
           "extras": {
+            "look_tracking_reach": 3.5,
             "name": {
               "text": "Extend (Upward, Second Hit)"
             }
@@ -152,6 +155,7 @@
         },
         "tick": 12
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.hierophant_green.default.extend_upward.name"
       }

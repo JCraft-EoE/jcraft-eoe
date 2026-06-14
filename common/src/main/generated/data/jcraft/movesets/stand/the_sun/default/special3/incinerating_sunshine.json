@@ -11,6 +11,7 @@
       "description": {
         "translate": "move.jcraft.the_sun.default.incinerating_sunshine.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_sun.default.incinerating_sunshine.name"
       },

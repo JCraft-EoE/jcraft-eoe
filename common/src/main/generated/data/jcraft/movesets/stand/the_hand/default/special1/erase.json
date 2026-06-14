@@ -37,6 +37,7 @@
         "description": {
           "translate": "move.jcraft.the_hand.default.erase.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_hand.default.erase.cr.name"
         }
@@ -79,6 +80,7 @@
       "description": {
         "translate": "move.jcraft.the_hand.default.erase.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_hand.default.erase.name"
       }

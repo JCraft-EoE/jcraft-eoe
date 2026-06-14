@@ -22,6 +22,7 @@
           "translate": "move.jcraft.metallica.default.explode_magnetic_field.cr.description"
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.metallica.default.explode_magnetic_field.cr.name"
         }
@@ -64,6 +65,7 @@
         "translate": "move.jcraft.metallica.default.grab.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.metallica.default.grab.name"
       }
@@ -131,6 +133,7 @@
                 }
               ],
               "look_tracking": false,
+              "look_tracking_reach": 3.5,
               "name": {
                 "text": "Grab (Final Hit)"
               }
@@ -145,6 +148,7 @@
           "tick": 14
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "name": {
           "text": "Grab (Second Hit)"
         }

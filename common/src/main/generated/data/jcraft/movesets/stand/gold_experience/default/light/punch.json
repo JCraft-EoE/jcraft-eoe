@@ -30,6 +30,7 @@
           "translate": "move.jcraft.gold_experience.default.place_berry_bush.cr.description"
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.gold_experience.default.place_berry_bush.cr.name"
         }
@@ -78,6 +79,7 @@
         "description": {
           "translate": "move.jcraft.gold_experience.default.punch.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.gold_experience.default.punch.followup.name"
         }
@@ -113,6 +115,7 @@
       "description": {
         "translate": "move.jcraft.gold_experience.default.punch.description"
       },
+      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.gold_experience.default.punch.name"

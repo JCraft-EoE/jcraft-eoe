@@ -40,6 +40,7 @@
         "description": {
           "translate": "move.jcraft.made_in_heaven.default.leg_crusher.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.made_in_heaven.default.leg_crusher.cr.name"
         }
@@ -87,6 +88,7 @@
       "description": {
         "translate": "move.jcraft.made_in_heaven.default.low_kick.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.made_in_heaven.default.low_kick.name"
       }

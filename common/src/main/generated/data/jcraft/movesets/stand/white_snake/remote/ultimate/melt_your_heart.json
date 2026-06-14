@@ -35,6 +35,7 @@
       "description": {
         "translate": "move.jcraft.white_snake.remote.melt_your_heart.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.white_snake.remote.melt_your_heart.name"
       }

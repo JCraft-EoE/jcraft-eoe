@@ -32,6 +32,7 @@
         "description": {
           "translate": "move.jcraft.anubis.default.aerial_cleave.air.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.anubis.default.aerial_cleave.air.name"
         }
@@ -77,6 +78,7 @@
       "description": {
         "translate": "move.jcraft.anubis.default.slash.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.anubis.default.slash.name"
       }

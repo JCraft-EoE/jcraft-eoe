@@ -33,6 +33,7 @@
       "description": {
         "translate": "move.jcraft.killer_queen_bites_the_dust.default.elbow.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.killer_queen_bites_the_dust.default.elbow.name"
       }

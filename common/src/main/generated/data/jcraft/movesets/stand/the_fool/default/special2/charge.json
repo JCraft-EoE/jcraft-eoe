@@ -18,6 +18,7 @@
         "description": {
           "translate": "move.jcraft.the_fool.default.sand_tornado.air.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_fool.default.sand_tornado.air.name"
         },
@@ -60,6 +61,7 @@
       "description": {
         "translate": "move.jcraft.the_fool.default.charge.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_fool.default.charge.name"
       },

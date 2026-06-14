@@ -22,6 +22,7 @@
       "description": {
         "translate": "move.jcraft.the_sun.default.meteor_shower.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_sun.default.meteor_shower.name"
       },

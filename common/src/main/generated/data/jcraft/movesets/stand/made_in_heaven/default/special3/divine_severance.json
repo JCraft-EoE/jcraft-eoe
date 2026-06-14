@@ -22,6 +22,7 @@
           "translate": "move.jcraft.made_in_heaven.default.heavens_judgement.cr.description"
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "mobility_type": "DASH",
         "name": {
           "translate": "move.jcraft.made_in_heaven.default.heavens_judgement.cr.name"
@@ -54,6 +55,7 @@
         "translate": "move.jcraft.made_in_heaven.default.divine_severance.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.made_in_heaven.default.divine_severance.name"
       }

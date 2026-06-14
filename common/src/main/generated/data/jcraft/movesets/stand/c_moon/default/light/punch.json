@@ -36,6 +36,7 @@
         "description": {
           "translate": "move.jcraft.c_moon.default.inversion_punch.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "loop_prevention": false,
         "name": {
           "translate": "move.jcraft.c_moon.default.inversion_punch.cr.name"
@@ -92,6 +93,7 @@
         "description": {
           "translate": "move.jcraft.c_moon.default.punch.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.c_moon.default.punch.followup.name"
         }
@@ -134,6 +136,7 @@
       "description": {
         "translate": "move.jcraft.c_moon.default.punch.description"
       },
+      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.c_moon.default.punch.name"

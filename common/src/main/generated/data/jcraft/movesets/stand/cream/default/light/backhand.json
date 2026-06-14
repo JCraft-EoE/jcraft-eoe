@@ -39,6 +39,7 @@
         "description": {
           "translate": "move.jcraft.cream.default.bite.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.cream.default.bite.cr.name"
         }
@@ -87,6 +88,7 @@
         "description": {
           "translate": "move.jcraft.cream.default.chop.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.cream.default.chop.followup.name"
         }
@@ -122,6 +124,7 @@
       "description": {
         "translate": "move.jcraft.cream.default.backhand.description"
       },
+      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.cream.default.backhand.name"

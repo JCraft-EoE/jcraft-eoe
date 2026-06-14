@@ -33,6 +33,7 @@
           "translate": "move.jcraft.metallica.default.invisibility.cr.description"
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.metallica.default.invisibility.cr.name"
         }
@@ -55,6 +56,7 @@
       },
       "is_holdable": true,
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.metallica.default.harvest_iron.name"
       }

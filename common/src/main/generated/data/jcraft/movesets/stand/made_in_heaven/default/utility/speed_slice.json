@@ -19,6 +19,7 @@
         "translate": "move.jcraft.made_in_heaven.default.speed_slice.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "mobility_type": "TELEPORT",
       "name": {
         "translate": "move.jcraft.made_in_heaven.default.speed_slice.name"

@@ -11,6 +11,7 @@
         "translate": "move.jcraft.the_world_over_heaven.default.timeskip.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "mobility_type": "TELEPORT",
       "name": {
         "translate": "move.jcraft.the_world_over_heaven.default.timeskip.name"

@@ -22,6 +22,7 @@
           "translate": "move.jcraft.gold_experience_requiem.default.life_beam.followup.description"
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.gold_experience_requiem.default.life_beam.followup.name"
         },
@@ -48,6 +49,7 @@
       },
       "is_holdable": true,
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.gold_experience_requiem.default.life_beam.name"
       }

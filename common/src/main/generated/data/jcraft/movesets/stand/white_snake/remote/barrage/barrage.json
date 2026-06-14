@@ -32,6 +32,7 @@
         "translate": "move.jcraft.white_snake.remote.barrage.description"
       },
       "is_holdable": true,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.white_snake.remote.barrage.name"
       }

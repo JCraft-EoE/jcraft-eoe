@@ -36,6 +36,7 @@
       "description": {
         "translate": "move.jcraft.metallica.default.barrage.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.metallica.default.barrage.name"
       }

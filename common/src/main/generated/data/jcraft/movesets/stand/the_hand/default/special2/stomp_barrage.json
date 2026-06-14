@@ -65,6 +65,7 @@
             "description": {
               "text": "Lifts knocked down enemies off the ground."
             },
+            "look_tracking_reach": 3.5,
             "name": {
               "text": "Stomp Barrage (Last Hit)"
             }
@@ -79,6 +80,7 @@
         },
         "tick": 23
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_hand.default.stomp_barrage.name"
       }

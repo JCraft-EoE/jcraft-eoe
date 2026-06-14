@@ -24,6 +24,7 @@
       "description": {
         "translate": "move.jcraft.horus.default.perfect_freeze.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.horus.default.perfect_freeze.name"
       }

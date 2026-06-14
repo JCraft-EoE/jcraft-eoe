@@ -30,6 +30,7 @@
       "description": {
         "translate": "move.jcraft.white_snake.remote.leg_crusher.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.white_snake.remote.leg_crusher.name"
       }

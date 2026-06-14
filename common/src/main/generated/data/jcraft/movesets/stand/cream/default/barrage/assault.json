@@ -30,6 +30,7 @@
       "description": {
         "translate": "move.jcraft.cream.default.assault.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.cream.default.assault.name"
       }

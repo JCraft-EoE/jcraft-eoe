@@ -35,6 +35,7 @@
       "description": {
         "translate": "move.jcraft.silver_chariot.possessed.impaling_thrust.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.silver_chariot.possessed.impaling_thrust.name"
       }

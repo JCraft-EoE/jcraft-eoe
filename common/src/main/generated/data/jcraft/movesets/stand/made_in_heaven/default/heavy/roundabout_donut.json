@@ -32,6 +32,7 @@
         "translate": "move.jcraft.made_in_heaven.default.roundabout_donut.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.made_in_heaven.default.roundabout_donut.name"
       }

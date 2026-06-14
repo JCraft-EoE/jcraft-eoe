@@ -12,6 +12,7 @@
         "description": {
           "translate": "move.jcraft.vampire.default.toggle_night_vision.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.vampire.default.toggle_night_vision.cr.name"
         }
@@ -33,6 +34,7 @@
       "description": {
         "translate": "move.jcraft.vampire.default.resurrection.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.vampire.default.resurrection.name"
       }

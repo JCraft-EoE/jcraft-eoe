@@ -40,6 +40,7 @@
         "translate": "move.jcraft.c_moon.default.ground_slam.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.c_moon.default.ground_slam.name"
       }

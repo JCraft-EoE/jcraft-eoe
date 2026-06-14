@@ -28,6 +28,7 @@
       "description": {
         "translate": "move.jcraft.purple_haze_distortion.default.uppercut.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.purple_haze_distortion.default.uppercut.name"
       }

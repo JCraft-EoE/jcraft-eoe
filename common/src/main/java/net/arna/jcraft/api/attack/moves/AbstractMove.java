@@ -81,7 +81,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * {@link #lookTracking} is enabled, before being clamped by blocks/entities in the way. This is independent
      * of {@link #moveDistance}, which only offsets the hitbox relative to the (already-extended) body.
      */
-    private float lookTrackingReach = 5f;
+    private float lookTrackingReach = 3.5f;
     /**
      * This move's assigned animation
      */

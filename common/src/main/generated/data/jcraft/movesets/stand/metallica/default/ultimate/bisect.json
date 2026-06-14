@@ -27,6 +27,7 @@
           "translate": "move.jcraft.metallica.default.null.followup.description"
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.metallica.default.null.followup.name"
         }
@@ -57,6 +58,7 @@
       },
       "is_holdable": true,
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.metallica.default.bisect.name"
       }

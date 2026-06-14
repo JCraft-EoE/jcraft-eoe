@@ -14,6 +14,7 @@
         "description": {
           "translate": "move.jcraft.silver_chariot.default.last_shot.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.silver_chariot.default.last_shot.cr.name"
         },
@@ -53,6 +54,7 @@
         "description": {
           "translate": "move.jcraft.silver_chariot.default.slash.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.silver_chariot.default.slash.followup.name"
         }
@@ -87,6 +89,7 @@
       "description": {
         "translate": "move.jcraft.silver_chariot.default.stab.description"
       },
+      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.silver_chariot.default.stab.name"

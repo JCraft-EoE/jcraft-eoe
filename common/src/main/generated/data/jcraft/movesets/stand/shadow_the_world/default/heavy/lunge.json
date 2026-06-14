@@ -38,6 +38,7 @@
         "description": {
           "translate": "move.jcraft.shadow_the_world.default.shoulder_bash.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.shadow_the_world.default.shoulder_bash.cr.name"
         }
@@ -81,6 +82,7 @@
       "description": {
         "translate": "move.jcraft.shadow_the_world.default.lunge.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.shadow_the_world.default.lunge.name"
       },

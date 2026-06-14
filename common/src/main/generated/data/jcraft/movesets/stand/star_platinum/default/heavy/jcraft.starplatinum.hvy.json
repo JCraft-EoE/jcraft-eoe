@@ -43,6 +43,7 @@
         "description": {
           "translate": "move.jcraft.star_platinum.default.ground_breaker.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "jcraft.starplatinum.crhvy"
         }
@@ -92,6 +93,7 @@
       "description": {
         "translate": "move.jcraft.star_platinum.default.star_breaker.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "jcraft.starplatinum.hvy"
       }

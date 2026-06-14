@@ -37,6 +37,7 @@
         "description": {
           "translate": "move.jcraft.gold_experience_requiem.default.overhead_kick.air.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.gold_experience_requiem.default.overhead_kick.air.name"
         }
@@ -89,6 +90,7 @@
       "description": {
         "translate": "move.jcraft.gold_experience_requiem.default.overhead_smash.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.gold_experience_requiem.default.overhead_smash.name"
       }

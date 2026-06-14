@@ -34,6 +34,7 @@
         "description": {
           "translate": "move.jcraft.white_snake.default.give_stand_disk.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.white_snake.default.give_stand_disk.cr.name"
         }
@@ -87,6 +88,7 @@
       "description": {
         "translate": "move.jcraft.white_snake.default.take_stand_disk.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.white_snake.default.take_stand_disk.name"
       }

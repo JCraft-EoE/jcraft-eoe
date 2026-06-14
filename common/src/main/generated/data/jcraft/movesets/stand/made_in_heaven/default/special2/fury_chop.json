@@ -30,6 +30,7 @@
       "description": {
         "translate": "move.jcraft.made_in_heaven.default.fury_chop.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.made_in_heaven.default.fury_chop.name"
       }

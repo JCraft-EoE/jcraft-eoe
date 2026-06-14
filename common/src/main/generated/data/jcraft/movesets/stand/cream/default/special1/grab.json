@@ -27,6 +27,7 @@
         "translate": "move.jcraft.cream.default.grab.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.cream.default.grab.name"
       }
@@ -55,6 +56,7 @@
             "sound": "jcraft:impact1"
           }
         ],
+        "look_tracking_reach": 3.5,
         "name": {
           "text": "Grab (Hit)"
         }

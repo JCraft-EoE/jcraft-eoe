@@ -31,6 +31,7 @@
         "translate": "move.jcraft.star_platinum_the_world.default.time_strike.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "jcraft.sptw.sp1"
       }

@@ -26,6 +26,7 @@
         "translate": "move.jcraft.star_platinum_the_world.default.barrage.description"
       },
       "is_holdable": true,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "jcraft.generic.barrage"
       }

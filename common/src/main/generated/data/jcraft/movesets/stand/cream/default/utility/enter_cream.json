@@ -18,6 +18,7 @@
         "translate": "move.jcraft.cream.default.enter_cream.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "mobility_type": "FLIGHT",
       "name": {
         "translate": "move.jcraft.cream.default.enter_cream.name"

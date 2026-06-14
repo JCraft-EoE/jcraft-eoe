@@ -14,6 +14,7 @@
         "description": {
           "translate": "move.jcraft.king_crimson.default.blood_throw.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.king_crimson.default.blood_throw.cr.name"
         },
@@ -68,6 +69,7 @@
       "description": {
         "translate": "move.jcraft.king_crimson.default.eye_chop.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.king_crimson.default.eye_chop.name"
       }

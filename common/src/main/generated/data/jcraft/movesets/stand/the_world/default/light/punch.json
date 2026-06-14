@@ -34,6 +34,7 @@
         "description": {
           "translate": "move.jcraft.the_world.default.low_kick.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_world.default.low_kick.cr.name"
         }
@@ -81,6 +82,7 @@
         "description": {
           "translate": "move.jcraft.the_world.default.punch.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_world.default.punch.followup.name"
         }
@@ -116,6 +118,7 @@
       "description": {
         "translate": "move.jcraft.the_world.default.punch.description"
       },
+      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.the_world.default.punch.name"

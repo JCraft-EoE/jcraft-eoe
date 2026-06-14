@@ -14,6 +14,7 @@
         "description": {
           "translate": "move.jcraft.the_sun.default.fire_sunbeam.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_sun.default.fire_sunbeam.cr.name"
         },
@@ -31,6 +32,7 @@
       "description": {
         "translate": "move.jcraft.the_sun.default.fire_meteor.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_sun.default.fire_meteor.name"
       },

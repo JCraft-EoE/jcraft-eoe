@@ -22,6 +22,7 @@
           "translate": "move.jcraft.magicians_red.default.redirect.cr.description"
         },
         "look_tracking": false,
+        "look_tracking_reach": 3.5,
         "mobility_type": "TELEPORT",
         "name": {
           "translate": "move.jcraft.magicians_red.default.redirect.cr.name"
@@ -61,6 +62,7 @@
         "description": {
           "translate": "move.jcraft.magicians_red.default.punch.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.magicians_red.default.punch.followup.name"
         }
@@ -96,6 +98,7 @@
       "description": {
         "translate": "move.jcraft.magicians_red.default.punch.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.magicians_red.default.punch.name"
       }

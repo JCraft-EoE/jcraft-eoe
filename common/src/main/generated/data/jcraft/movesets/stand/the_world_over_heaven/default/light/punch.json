@@ -43,6 +43,7 @@
           "description": {
             "translate": "move.jcraft.the_world_over_heaven.default.lunge.followup.description"
           },
+          "look_tracking_reach": 3.5,
           "name": {
             "translate": "move.jcraft.the_world_over_heaven.default.lunge.followup.name"
           },
@@ -79,6 +80,7 @@
         "description": {
           "translate": "move.jcraft.the_world_over_heaven.default.low_kick.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "loop_prevention": false,
         "name": {
           "translate": "move.jcraft.the_world_over_heaven.default.low_kick.cr.name"
@@ -128,6 +130,7 @@
         "description": {
           "translate": "move.jcraft.the_world_over_heaven.default.roundhouse.followup.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_world_over_heaven.default.roundhouse.followup.name"
         }
@@ -163,6 +166,7 @@
       "description": {
         "translate": "move.jcraft.the_world_over_heaven.default.punch.description"
       },
+      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.the_world_over_heaven.default.punch.name"

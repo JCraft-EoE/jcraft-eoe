@@ -31,6 +31,7 @@
       "description": {
         "translate": "move.jcraft.vampire.default.blood_suck.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.vampire.default.blood_suck.name"
       }
@@ -50,6 +51,7 @@
       "damage": 4.0,
       "duration": 25,
       "extras": {
+        "look_tracking_reach": 3.5,
         "name": {
           "text": "Blood Suck (Hit)"
         }

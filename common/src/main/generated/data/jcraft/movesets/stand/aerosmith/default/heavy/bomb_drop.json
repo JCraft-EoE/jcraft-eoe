@@ -13,6 +13,7 @@
         "description": {
           "translate": "move.jcraft.aerosmith.default.item_drop.cr.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.aerosmith.default.item_drop.cr.name"
         }
@@ -27,6 +28,7 @@
       "description": {
         "translate": "move.jcraft.aerosmith.default.bomb_drop.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.aerosmith.default.bomb_drop.name"
       }

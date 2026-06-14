@@ -8,6 +8,7 @@
       "description": {
         "translate": "move.jcraft.killer_queen.default.explosive_dash.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.killer_queen.default.explosive_dash.name"
       }

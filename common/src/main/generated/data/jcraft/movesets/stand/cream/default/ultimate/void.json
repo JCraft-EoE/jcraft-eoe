@@ -25,6 +25,7 @@
         "translate": "move.jcraft.cream.default.void.description"
       },
       "look_tracking": false,
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.cream.default.void.name"
       },

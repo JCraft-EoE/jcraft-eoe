@@ -18,6 +18,7 @@
         "description": {
           "translate": "move.jcraft.the_fool.default.burn_rubber.air.description"
         },
+        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_fool.default.burn_rubber.air.name"
         }
@@ -63,6 +64,7 @@
       "description": {
         "translate": "move.jcraft.the_fool.default.3hit_combo.description"
       },
+      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_fool.default.3hit_combo.name"
       }
