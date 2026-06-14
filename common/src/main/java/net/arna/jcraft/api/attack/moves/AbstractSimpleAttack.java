@@ -482,9 +482,13 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         Vec3 rotVec = (staticY || attacker.isRemote()) ? getRotVec(attacker) : userRotVec;
         final Vec3 upVec = new Vec3(gravDir.step()).scale(-1.0);
 
-        if (staticY) {
-            rotVec = rotVec.with(gravDir.getAxis(), 0);
-        }
+
+        // Temporarily disabled: let staticY attacks follow the user's look pitch instead of flattening the
+        // hitbox to the horizontal plane, so the hitbox tracks where the player is looking.
+
+        // if (staticY) {
+        //     rotVec = rotVec.with(gravDir.getAxis(), 0);
+        // }
 
         final Vec3 fPos = getOffsetForwardPos(attacker, hPos, upVec, rotVec);
 
