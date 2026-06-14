@@ -441,6 +441,11 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
     }
 
     @Override
+    public boolean allowsLookTracking() {
+        return false;
+    }
+
+    @Override
     public boolean initMove(MoveClass moveClass) {
         if (tryFollowUp(moveClass, MoveClass.LIGHT)) return true;
         if (tryFollowUp(moveClass, MoveClass.HEAVY)) return true;

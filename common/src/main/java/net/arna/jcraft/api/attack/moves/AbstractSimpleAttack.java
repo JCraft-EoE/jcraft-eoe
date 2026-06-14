@@ -479,16 +479,29 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         }
 
         final Vec3 hPos = getOffsetHeightPos(attacker);
-        Vec3 rotVec = (staticY || attacker.isRemote()) ? getRotVec(attacker) : userRotVec;
         final Vec3 upVec = new Vec3(gravDir.step()).scale(-1.0);
 
-
-        // Temporarily disabled: let staticY attacks follow the user's look pitch instead of flattening the
-        // hitbox to the horizontal plane, so the hitbox tracks where the player is looking.
-
-        // if (staticY) {
-        //     rotVec = rotVec.with(gravDir.getAxis(), 0);
-        // }
+        final Vec3 rotVec;
+        if (isLookTracking(attacker)) {
+            // Use the aim committed when the move started (matches the stand body), so the hitbox doesn't
+            // re-aim mid-move. Falls back to the live look for non-stand attackers.
+            if (attacker.getBaseEntity() instanceof final StandEntity<?, ?> stand) {
+                Vec3 lockedVec = Vec3.directionFromRotation(stand.getLockedAimPitch(), stand.getLockedAimYaw());
+                if (gravDir == Direction.UP) {
+                    lockedVec = new Vec3(lockedVec.x, -lockedVec.y, lockedVec.z);
+                }
+                rotVec = lockedVec;
+            } else {
+                rotVec = userRotVec;
+            }
+        } else {
+            // Classic behaviour: staticY moves flatten the hitbox onto the horizontal plane.
+            Vec3 classicRotVec = (staticY || attacker.isRemote()) ? getRotVec(attacker) : userRotVec;
+            if (staticY) {
+                classicRotVec = classicRotVec.with(gravDir.getAxis(), 0);
+            }
+            rotVec = classicRotVec;
+        }
 
         final Vec3 fPos = getOffsetForwardPos(attacker, hPos, upVec, rotVec);
 
@@ -669,6 +682,9 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     }
 
     protected Vec3 getOffsetForwardPos(final A attacker, final Vec3 offsetHeightPos, final Vec3 upVec, final Vec3 rotVec) {
+        // The hitbox is offset from the stand's body by the move distance. The body itself is what extends
+        // toward the user's aim for look-tracked moves (see StandEntity tick / EntityMixinLogic), so the hitbox
+        // rides along with it automatically.
         return offsetHeightPos.add(rotVec.scale(getMoveDistance())).add(upVec.scale(-offset));
     }
 

@@ -324,6 +324,43 @@ public final class JUtils {
         return bHit;
     }
 
+    /**
+     * How far short of a hit (entity or block) a look-tracked stand stops, in blocks, so its body sits in
+     * front of the target rather than inside it.
+     */
+    public static final double LOOK_TRACK_MARGIN = 1.0;
+
+    /**
+     * Clamps a desired stand reach so it stops along the aim direction instead of clipping through the world:
+     * <ul>
+     *     <li>extends to {@code maxReach} when nothing is in the way,</li>
+     *     <li>stops {@link #LOOK_TRACK_MARGIN} blocks short of the first entity or block hit, and</li>
+     *     <li>never collapses below {@code minReach}, so the stand always detaches (and clips a little into
+     *     anything closer than that) rather than snapping back into the user.</li>
+     * </ul>
+     * The ray starts at {@code origin} and follows {@code lookDir}. Used by look-tracked stand attacks to keep
+     * the stand's body (and hitbox) attached to where the user is aiming.
+     *
+     * @param user     the stand's user, providing the level and self-ignore for the raycast
+     * @param origin   the ray origin (typically the user's eye position)
+     * @param lookDir  the (normalized) aim direction to cast along
+     * @param ignore   an entity the ray should pass through (typically the stand itself); may be {@code null}
+     * @param minReach the minimum reach distance in blocks (the stand never gets closer than this)
+     * @param maxReach the maximum reach distance in blocks
+     * @return the clamped reach distance in blocks, within {@code [minReach, maxReach]}
+     */
+    public static double clampReachToLook(final LivingEntity user, final Vec3 origin, final Vec3 lookDir,
+                                          final @Nullable Entity ignore, final double minReach, final double maxReach) {
+        final Vec3 end = origin.add(lookDir.scale(maxReach));
+        final HitResult hit = raycastAll(user, origin, end, ClipContext.Fluid.NONE, ignore == null ? null : e -> e != ignore);
+        if (hit.getType() == HitResult.Type.MISS) {
+            return maxReach;
+        }
+
+        final double dist = hit.getLocation().distanceTo(origin) - LOOK_TRACK_MARGIN;
+        return Mth.clamp(dist, minReach, maxReach);
+    }
+
     public static Direction getLookDirection(Entity entity) {
         Vec3 rotVec = entity.getLookAngle();
 

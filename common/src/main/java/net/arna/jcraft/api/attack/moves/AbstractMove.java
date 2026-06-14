@@ -70,6 +70,19 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private int windup, duration;
     private float moveDistance;
     /**
+     * Whether this move should follow the user's aim in 3D: the stand extends toward where the user is
+     * looking (up to {@link #moveDistance}, clamped by blocks/entities in the way) instead of pivoting at a
+     * fixed distance. Defaults to {@code true}; disable with {@link #withoutLookTracking()} for moves that
+     * should keep the classic flat-pivot behaviour (e.g. Metallica's blade moves).
+     */
+    private boolean lookTracking = true;
+    /**
+     * The maximum distance (in blocks) the stand's body extends toward the user's aim for this move when
+     * {@link #lookTracking} is enabled, before being clamped by blocks/entities in the way. This is independent
+     * of {@link #moveDistance}, which only offsets the hitbox relative to the (already-extended) body.
+     */
+    private float lookTrackingReach = 5f;
+    /**
      * This move's assigned animation
      */
     private Enum<?> animation;
@@ -174,6 +187,56 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     public T withMoveDistance(final float moveDistance) {
         this.moveDistance = moveDistance;
         return getThis();
+    }
+
+    /**
+     * Disables look-tracking for this move, restoring the classic flat-pivot behaviour where the stand sits
+     * at a fixed {@link #getMoveDistance() move distance} regardless of the user's pitch.
+     *
+     * @return This move
+     * @see #lookTracking
+     */
+    public T withoutLookTracking() {
+        return withLookTracking(false);
+    }
+
+    /**
+     * Sets whether this move follows the user's aim in 3D. Defaults to {@code true}.
+     *
+     * @param lookTracking whether the stand should extend toward the user's aim during this move
+     * @return This move
+     * @see #lookTracking
+     */
+    public T withLookTracking(final boolean lookTracking) {
+        this.lookTracking = lookTracking;
+        return getThis();
+    }
+
+    /**
+     * Sets how far the stand's body extends toward the user's aim for this move (before clamping to
+     * blocks/entities). Defaults to {@code 5}. Only takes effect when {@link #isLookTracking() look-tracking}
+     * is enabled.
+     *
+     * @param lookTrackingReach the maximum reach in blocks
+     * @return This move
+     * @see #lookTrackingReach
+     */
+    public T withLookTrackingReach(final float lookTrackingReach) {
+        this.lookTrackingReach = lookTrackingReach;
+        return getThis();
+    }
+
+    /**
+     * Whether this move should follow the user's aim for the given attacker, combining this move's
+     * {@link #isLookTracking() flag} with the attacker's {@link StandEntity#allowsLookTracking() stand-level
+     * opt-out} (e.g. Metallica disables it for all of its moves at once).
+     *
+     * @param attacker the attacker performing this move
+     * @return whether look-tracking is effectively enabled
+     */
+    public boolean isLookTracking(final IAttacker<?, ?> attacker) {
+        return lookTracking
+                && (!(attacker.getBaseEntity() instanceof final StandEntity<?, ?> stand) || stand.allowsLookTracking());
     }
 
     /**
@@ -1019,6 +1082,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         cast.animation = animation;
         cast.mayHitUser = mayHitUser;
         cast.loopPrevention = loopPrevention;
+        cast.lookTracking = lookTracking;
+        cast.lookTrackingReach = lookTrackingReach;
         copiedExtras = true;
         return base;
     }

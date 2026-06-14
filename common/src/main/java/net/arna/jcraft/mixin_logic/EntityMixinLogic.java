@@ -40,21 +40,27 @@ public class EntityMixinLogic {
                 return;
             }
 
+            // During a look-tracked move, plant the stand at the world point it committed to when the move
+            // started (see StandEntity tick), so it stays put instead of following the user or sinking into the
+            // ground. Other states (and moves that opt out, see AbstractMove#isLookTracking) keep the classic
+            // relative pivot below.
+            if (stand.isLookTracking()) {
+                final Vec3 locked = stand.getLockedPos();
+                positionUpdater.accept(passenger, locked.x, locked.y, locked.z);
+                info.cancel();
+                return;
+            }
+
             final double dist = stand.getDistanceOffset();
 
             float y = thisEntity.getYRot() + stand.getRotationOffset();
             y *= (float) Math.PI / 180;
 
-            // When the stand should track the user's look pitch (i.e. during attacks), position it along the
-            // full look direction at `dist` so it follows where the user is looking, instead of staying at a
-            // fixed horizontal distance with only a small vertical nudge.
-            final float pitch = stand.shouldOffsetHeight() ? thisEntity.getXRot() * Mth.DEG_TO_RAD : 0f;
-            final double horizontalDist = dist * Mth.cos(pitch);
-            final double heightOffset = -dist * Mth.sin(pitch);
+            final double heightOffset = stand.shouldOffsetHeight() ? Vec3.directionFromRotation(thisEntity.getXRot(), thisEntity.getYRot()).y : 0;
             final Vec3 adjustedOffset = RotationUtil.vecPlayerToWorld(
-                    Mth.cos(y) * horizontalDist,
+                    Mth.cos(y) * dist,
                     passenger.getMyRidingOffset() + heightOffset + stand.getYDistanceOffset(),
-                    Mth.sin(y) * horizontalDist,
+                    Mth.sin(y) * dist,
                     GravityChangerAPI.getGravityDirection(thisEntity)
             );
             positionUpdater.accept(passenger, thisEntity.getX() + adjustedOffset.x, thisEntity.getY() + adjustedOffset.y, thisEntity.getZ() + adjustedOffset.z);

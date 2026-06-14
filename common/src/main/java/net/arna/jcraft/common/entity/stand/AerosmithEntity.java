@@ -586,6 +586,11 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         if (volaHandle != null) volaHandle.stop();
     }
 
+    @Override
+    public boolean allowsLookTracking() {
+        return false;
+    }
+
     public void lookAt(final Vec3 target, final float maxYRotIncrease, final float maxXRotIncrease) {
         double d = target.x - getX();
         double e = target.z - getZ();
