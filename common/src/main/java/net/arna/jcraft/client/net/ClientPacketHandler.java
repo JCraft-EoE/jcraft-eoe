@@ -12,8 +12,6 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.sound.BoundSoundClient;
-import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.splatter.Splatter;
@@ -28,8 +26,10 @@ import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.MandomRewindShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.sound.BoundSoundClient;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.common.config.ConfigOption;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
@@ -653,7 +653,7 @@ public class ClientPacketHandler {
         final boolean editable = buf.readBoolean();
         final boolean show = buf.readBoolean();
 
-        ConfigOption.readOptions(buf);
+        JServerConfig.readOptions(buf);
 
         if (show) {
             client.execute(() -> ServerConfigUI.show(editable));

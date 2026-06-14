@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.config.IntOption;
+import net.arna.jcraft.api.serverconfig.IntOption;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.registry.JStatRegistry;
