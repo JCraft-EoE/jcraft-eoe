@@ -28,6 +28,7 @@ import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
 import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.effects.ExhaustionEffect;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
@@ -43,7 +44,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -237,6 +237,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     private static final EntityDataAccessor<Integer> SPEED_RAMP = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.INT);
 
     public static final int MAXIMUM_SPEEDOMETER = 30;
+    public static final int EXHAUSTION_DURATION = 20 * 5; // 5 seconds
 
     // Acceleration passive: ramps movement speed up to Speed 70 over RAMP_TICKS while moving forward.
     private static final int RAMP_TICKS = 120; // 6 second to reach max speed
@@ -429,8 +430,12 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         final LivingEntity user = getUserOrThrow();
         final int aTime = getAccelTime();
 
-        // Autostep: always on while summoned. Set on both sides so the local player's client-side stepping works.
-        user.setMaxUpStep(AUTOSTEP_HEIGHT);
+        if (user.isSprinting()) {
+            user.setMaxUpStep(AUTOSTEP_HEIGHT);
+        }
+        else {
+            user.setMaxUpStep(DEFAULT_STEP_HEIGHT);
+        }
 
         if (aTime > 0 && !user.hasEffect(JStatusRegistry.DAZED.get())) {
             int amplifier = speedometer / 3;
@@ -528,6 +533,12 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     final float frac = speedRamp / (float) RAMP_TICKS;
                     final float multiplier = JServerConfig.MIH_SPRINT_HUNGER_MULTIPLIER.getValue();
                     player.causeFoodExhaustion((float) dist * SPRINT_EXHAUSTION * multiplier * frac);
+                    for (int amplifier = ExhaustionEffect.MAX_LEVEL - 1; amplifier >= 0; amplifier--) {
+                        if (speedRamp >= 20 * amplifier) {
+                            player.addEffect(new MobEffectInstance(JStatusRegistry.EXHAUSTION.get(), EXHAUSTION_DURATION, amplifier));
+                            break;
+                        }
+                    }
                 }
             }
         }
