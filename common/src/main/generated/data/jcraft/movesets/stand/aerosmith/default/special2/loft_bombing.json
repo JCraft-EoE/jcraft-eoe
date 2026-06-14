@@ -28,7 +28,7 @@
         "translate": "move.jcraft.aerosmith.default.loft_bombing.name"
       }
     },
-    "move_distance": 1.2,
+    "move_distance": 0.0,
     "windup": 9
   }
 }
