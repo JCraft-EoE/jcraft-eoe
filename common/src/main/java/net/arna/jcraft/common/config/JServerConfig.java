@@ -58,7 +58,7 @@ public class JServerConfig {
     public static final IntOption STW_TIME_STOP_DURATION = new IntOption(JCraft.id("stw_time_stop_duration"), BALANCE, 50, 0);
     public static final IntOption TWOH_TIME_STOP_DURATION = new IntOption(JCraft.id("twoh_time_stop_duration"), BALANCE, 100, 0);
     public static final IntOption MIH_TIME_ACCELERATION_DURATION = new IntOption(JCraft.id("mih_time_acceleration_duration"), BALANCE, 300, 0);
-    public static final FloatOption MIH_SPRINT_HUNGER_MULTIPLIER = new FloatOption(JCraft.id("mihSprintHungerMultiplier"), BALANCE, 1.25f, 0f);
+    public static final FloatOption MIH_SPRINT_HUNGER_MULTIPLIER = new FloatOption(JCraft.id("mih_sprint_hunger_multiplier"), BALANCE, 1.25f, 0f);
     public static final BooleanOption KILL_VAMPIRISM = new BooleanOption(JCraft.id("kill_vampirism"), BALANCE, false);
     /*
     public static final IntOption KC_TIME_ERASURE_DURATION = new IntOption(JCraft.id("kc_time_erasure_duration"), BALANCE, 120, 0);
