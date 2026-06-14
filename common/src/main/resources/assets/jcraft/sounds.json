@@ -51,6 +51,16 @@
       "jcraft:generic/cooldown_cancel"
     ]
   },
+  "whiff": {
+    "sounds": [
+      "jcraft:generic/whiff1",
+      "jcraft:generic/whiff2",
+      "jcraft:generic/whiff3",
+      "jcraft:generic/whiff4",
+      "jcraft:generic/whiff5",
+      "jcraft:generic/whiff6"
+    ]
+  },
   "impact1": {
     "sounds": [
       "jcraft:generic/impact1"
