@@ -29,6 +29,7 @@ import net.arna.jcraft.common.ai.CombatEntityContext;
 import net.arna.jcraft.common.ai.CombatInstantContext;
 import net.arna.jcraft.common.ai.IJAttackerBrain;
 import net.arna.jcraft.common.attack.core.MoveMapImpl;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.attack.core.itfs.AttackRotationOffsetOverride;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.PurpleHazeEntity;
@@ -1182,8 +1183,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         // collapsing back into the user; it clips a little into anything closer.
                         final Vec3 eye = user.getEyePosition();
                         final Vec3 aim = user.getLookAngle();
-                        final double reach = JUtils.clampReachToLook(
-                                user, eye, aim, this, move.getMoveDistance(), move.getLookTrackingReach());
+                        // With distance adjustment on, the reach is clamped to blocks/entities each tick. With it
+                        // off, the stand stays at a constant distance (the move's full reach) while the move is out.
+                        final double reach = JServerConfig.STAND_DISTANCE_ADJUSTMENT.getValue()
+                                ? JUtils.clampReachToLook(user, eye, aim, this, move.getMoveDistance(), move.getLookTrackingReach())
+                                : move.getLookTrackingReach();
                         // Centre the stand on the aim point (subtract half its height so it isn't planted by its
                         // feet, which would float it a body-height too high / sink it into the ground).
                         final Vec3 aimPoint = eye.add(aim.scale(reach)).subtract(0, getBbHeight() * 0.5, 0);

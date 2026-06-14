@@ -270,7 +270,9 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
 
     @Override
     public boolean shouldOffsetHeight() {
-        return getState() == State.IDLE || getState() == State.BLOCK;
+        // IDLE/BLOCK hover and the light should tilt the whole stand to follow the user's pitch,
+        // so the model aims up/down with the player's head instead of staying level.
+        return getState() == State.IDLE || getState() == State.BLOCK || getState() == State.LIGHT;
     }
 
     @Override
