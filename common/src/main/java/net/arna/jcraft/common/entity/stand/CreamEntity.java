@@ -224,6 +224,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Overhead Smash"),
                     Component.literal("slow, uninterruptible launcher"));
