@@ -39,6 +39,7 @@
         "description": {
           "translate": "move.jcraft.the_world_over_heaven.default.overwrite_hit.followup.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.the_world_over_heaven.default.overwrite_hit.followup.name"
         }
@@ -66,6 +67,7 @@
       "description": {
         "translate": "move.jcraft.the_world_over_heaven.default.reality_overwrite.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.the_world_over_heaven.default.reality_overwrite.name"
       }

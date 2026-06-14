@@ -82,6 +82,7 @@
       "description": {
         "translate": "move.jcraft.silver_chariot.possessed.split.description"
       },
+      "look_tracking": false,
       "mobility_type": "DASH",
       "name": {
         "translate": "move.jcraft.silver_chariot.possessed.split.name"

@@ -32,6 +32,7 @@
       "description": {
         "translate": "move.jcraft.the_hand.default.rage.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.the_hand.default.rage.name"
       }

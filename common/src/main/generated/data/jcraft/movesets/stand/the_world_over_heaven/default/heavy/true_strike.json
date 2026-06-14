@@ -38,6 +38,7 @@
         "description": {
           "translate": "move.jcraft.the_world_over_heaven.default.overhead_kick.air.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.the_world_over_heaven.default.overhead_kick.air.name"
         }
@@ -130,6 +131,7 @@
       "description": {
         "translate": "move.jcraft.the_world_over_heaven.default.true_strike.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.the_world_over_heaven.default.true_strike.name"
       }

@@ -175,6 +175,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withBlockStun(16)
             .withExtraHitBox(1, 1, 1)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Split"),
                     Component.literal("Anubis Chariot and the user charge forward, low stun, high blockstun.")
@@ -197,6 +198,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     Component.literal("Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender")
             );
     public static final SCCounterAttack COUNTER = new SCCounterAttack(480, 4, 34, 0.5f)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Counter"),
                     Component.literal("0.2s windup, 1.5s duration, stuns when hit")
@@ -224,6 +226,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             0.65f, 4f, 40, 1.75f, 0f, 0f)
             .withFollowup(GOD_OF_DEATH_HIT)
             .withStunType(StunType.UNBURSTABLE)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("God of Death"),
                     Component.literal("high-damage beatdown, 1.5s stun on whiff, cannot be combo broken")

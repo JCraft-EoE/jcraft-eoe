@@ -155,6 +155,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Launch"),
                     Component.literal("uninterruptible, slow, vertically launching uppercut")
@@ -191,6 +192,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             );
     public static final GlideMove GLIDE = new GlideMove(300, 5, 125, 0f)
             .withSound(JSoundRegistry.FOOL_GLIDE)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Glider"),
                     Component.literal("turns The Fool into a glider for 6s")
@@ -199,6 +201,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             1f, 0, 2f, 0.1f, 0f, 3, 15)
             .withAerialVariant(GLIDE)
             .withBackstab(false)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Sandwave"),
                     Component.literal("The Fool turns into a quick sandwave that knocks anything it touches down")

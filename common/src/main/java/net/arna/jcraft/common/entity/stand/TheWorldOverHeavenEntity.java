@@ -146,6 +146,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withExtraHitBox(1, 0.75, 1)
             .withExtraHitBox(1, -0.5, 1)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Overhead Kick"),
                     Component.literal("High damage, good reach, launches down.")
@@ -160,6 +161,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("True Strike"),
                     Component.literal("Good stun, high blockstun, medium windup.")
@@ -191,6 +193,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withHitSpark(JParticleType.HIT_SPARK_3)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Overwrite (Hit)"),
                     Component.empty()
@@ -199,6 +202,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             360, 71, 70, 1f, 20)
             .withFollowup(OVERWRITE)
             .withSound(JSoundRegistry.TWOH_CHARGE_OVERWRITE)
+            .withoutLookTracking()
             .withInfo(Component.literal("Reality Overwrite"), Component.literal("""
                     Charges (for a minimum of 1s) an unblockable punch that changes the reality of the hit victims.
                     While charging, finish overwrite by pressing:
@@ -211,6 +215,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withSound(JSoundRegistry.TWOH_KNIFETHROW)
             .withBlockStun(6)
             .withoutLookTracking()
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Aerial Divine Finisher"),
                     Component.literal("Briefly stalls mid-air. Knives explode on contact.")
@@ -221,6 +226,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withSound(JSoundRegistry.TWOH_KNIFESUMMON)
             .withoutLookTracking()
             .withBlockStun(6)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Divine Finisher"),
                     Component.literal("Fires 4 stunning knives that launch at a delay.")

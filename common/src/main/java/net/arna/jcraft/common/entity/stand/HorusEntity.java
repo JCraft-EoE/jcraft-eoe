@@ -197,6 +197,7 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
                     ));
     // Special 3
     public static final ChasingFreezeAttack PLACE = new ChasingFreezeAttack(200, 8, 14, 0.75f)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Chasing Freeze"),
                     Component.empty()

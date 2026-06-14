@@ -105,6 +105,7 @@
       "description": {
         "translate": "move.jcraft.silver_chariot.possessed.god_of_death.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.silver_chariot.possessed.god_of_death.name"
       }

@@ -214,6 +214,7 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
             .withSound(JSoundRegistry.THE_HAND_RAGE)
             .withImpactSound(JSoundRegistry.IMPACT_12)
             .withHyperArmor()
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Rage"),
                     Component.literal("""
