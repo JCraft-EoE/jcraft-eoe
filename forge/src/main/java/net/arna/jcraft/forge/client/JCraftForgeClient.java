@@ -95,6 +95,7 @@ public class JCraftForgeClient {
         event.registerSpriteSet(JParticleTypeRegistry.INVERSION.get(), InversionParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.BREATH.get(), BreathParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.SUN_LOCK_ON.get(), BackstabParticle.Factory::new); // 9 frames, reusing
+        event.registerSpriteSet(JParticleTypeRegistry.LOCK_ON.get(), LockOnParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.PURPLE_HAZE_CLOUD.get(), PurpleHazeCloudParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.PURPLE_HAZE_PARTICLE.get(), PurpleHazeErraticParticle.Factory::new);
         event.registerSpriteSet(JParticleTypeRegistry.DAMAGE_NUMBER.get(), DamageNumberParticle.Factory::new);

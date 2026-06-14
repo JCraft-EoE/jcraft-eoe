@@ -271,6 +271,7 @@ public class JCraftClient {
         ParticleProviderRegistry.register(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.BREATH, BreathParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.SUN_LOCK_ON, BackstabParticle.Factory::new); // 9 frames, reusing
+        ParticleProviderRegistry.register(JParticleTypeRegistry.LOCK_ON, LockOnParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.PURPLE_HAZE_CLOUD, PurpleHazeCloudParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.PURPLE_HAZE_PARTICLE, PurpleHazeErraticParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.DAMAGE_NUMBER, DamageNumberParticle.Factory::new);
