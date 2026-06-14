@@ -883,6 +883,8 @@
   "move.jcraft.gold_experience_requiem.default.return_to_zero.name": "ゼロへの回帰",
   "move.jcraft.hamon.default.charge_hamon.description": "長押しで波紋をチャージする。発動中は移動速度が低下する。",
   "move.jcraft.hamon.default.charge_hamon.name": "波紋チャージ",
+  "move.jcraft.hamon.default.empower_move.description": "通常の小パンをはるかに強力で多用途な選択肢へと変える。",
+  "move.jcraft.hamon.default.empower_move.name": "エンパワームーブ",
   "move.jcraft.hamon.default.focus_strike.description": "波紋を帯びたズームパンチで突撃、遅いが射程が長く、相手を吹き飛ばす一撃。一撃を受け止めても動きを止められない。",
   "move.jcraft.hamon.default.focus_strike.name": "セービングストライク",
   "move.jcraft.hamon.default.improviser_attack.description": "武器を使用する際、波紋を込めた一撃を放つ。\n矢やトライデントなどの飛び道具に波紋を付与することができる。",

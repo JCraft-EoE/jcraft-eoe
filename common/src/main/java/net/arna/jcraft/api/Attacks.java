@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehavior;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.itfs.ICustomDamageHandler;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;

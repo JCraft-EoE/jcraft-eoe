@@ -14,7 +14,7 @@ import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.entity.spec.BrawlerSpecUser;
 import net.arna.jcraft.common.network.s2c.DamageNumberPacket;
-import net.arna.jcraft.common.util.ICustomDamageHandler;
+import net.arna.jcraft.api.itfs.ICustomDamageHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;

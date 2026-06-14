@@ -13,8 +13,11 @@ import mod.azure.azurelib.render.entity.AzEntityRenderer;
 import mod.azure.azurelib.render.entity.AzEntityRendererConfig;
 import mod.azure.azurelib.render.layer.AzBlockAndItemLayer;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.util.AlphaMultiBufferSource;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -178,11 +181,52 @@ public abstract class AbstractEntityRenderer<T extends Entity> extends AzEntityR
                 }
             }
 
-            super.renderItemForBone(context, bone, itemStack, animatable);
+            renderItemStack(context, bone, itemStack, animatable);
         }
 
         protected void superRenderItemForBone(final AzRendererPipelineContext<UUID, T> context, final AzBone bone, final ItemStack itemStack, final T animatable) {
-            super.renderItemForBone(context, bone, itemStack, animatable);
+            renderItemStack(context, bone, itemStack, animatable);
+        }
+
+        /**
+         * Renders the held item through the vanilla {@link net.minecraft.client.renderer.entity.ItemRenderer},
+         * fading it by {@link #getItemAlpha} so it matches a translucent (e.g. first-person) stand. The alpha is
+         * baked into the item's vertex colours via {@link AlphaMultiBufferSource}; see
+         * {@link net.arna.jcraft.client.util.AlphaVertexConsumer} for why a shader colour set here would not survive
+         * the buffer being flushed later.
+         * <p>
+         * This mirrors the {@link AzBlockAndItemLayer#renderItemForBone} living-entity branch ({@code T extends Mob}
+         * is always a {@link net.minecraft.world.entity.LivingEntity}).
+         */
+        private void renderItemStack(final AzRendererPipelineContext<UUID, T> context, final AzBone bone, final ItemStack itemStack, final T animatable) {
+            final float alpha = getItemAlpha(context, animatable);
+            MultiBufferSource bufferSource = context.multiBufferSource();
+            if (alpha < 1f) {
+                bufferSource = new AlphaMultiBufferSource(bufferSource, alpha);
+            }
+
+            Minecraft.getInstance()
+                    .getItemRenderer()
+                    .renderStatic(
+                            animatable,
+                            itemStack,
+                            getTransformTypeForStack(bone, itemStack, animatable),
+                            false,
+                            context.poseStack(),
+                            bufferSource,
+                            animatable.level(),
+                            context.packedLight(),
+                            context.packedOverlay(),
+                            animatable.getId()
+                    );
+        }
+
+        /**
+         * The opacity to render held items with. Defaults to fully opaque; overridden (e.g. for stands) so the
+         * item fades together with a transparent owner.
+         */
+        protected float getItemAlpha(final AzRendererPipelineContext<UUID, T> context, final T animatable) {
+            return 1f;
         }
     }
 }

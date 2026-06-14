@@ -1,4 +1,4 @@
-package net.arna.jcraft.common.util;
+package net.arna.jcraft.api.itfs;
 
 import net.arna.jcraft.api.MoveUsage;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;

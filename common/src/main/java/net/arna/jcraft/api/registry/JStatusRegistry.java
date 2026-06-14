@@ -20,6 +20,7 @@ public interface JStatusRegistry {
     RegistrySupplier<MobEffect> HYPOXIA = EFFECTS.register("hypoxia", HypoxiaEffect::new);
     RegistrySupplier<WaterWalkingEffect> WATER_WALKING = EFFECTS.register("water_walking", WaterWalkingEffect::new);
     RegistrySupplier<MobEffect> FLAMMABLE = EFFECTS.register("flammable", FlammableEffect::new);
+    RegistrySupplier<MobEffect> EXHAUSTION = EFFECTS.register("exhaustion", ExhaustionEffect::new);
 
     static void init() {
         // intentionally left empty

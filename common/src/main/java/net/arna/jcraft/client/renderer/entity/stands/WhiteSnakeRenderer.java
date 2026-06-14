@@ -50,5 +50,10 @@ public class WhiteSnakeRenderer extends StandEntityRenderer<WhiteSnakeEntity> {
 
             super.superRenderItemForBone(context, bone, itemStack, animatable);
         }
+
+        @Override
+        protected float getItemAlpha(final AzRendererPipelineContext<UUID, WhiteSnakeEntity> context, final WhiteSnakeEntity animatable) {
+            return StandEntityRenderer.getItemRenderAlpha(animatable, context.partialTick());
+        }
     }
 }
