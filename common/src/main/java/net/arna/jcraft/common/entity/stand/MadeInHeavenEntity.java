@@ -114,7 +114,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(SPEED_CHOP)
             .withImpactSound(SoundEvents.TRIDENT_HIT)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Slice"),
                     Component.literal("quick combo starter")
