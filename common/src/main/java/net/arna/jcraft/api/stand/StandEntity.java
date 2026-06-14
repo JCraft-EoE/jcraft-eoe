@@ -117,6 +117,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static final EntityDataAccessor<Float> LOCKED_POS_X;
     private static final EntityDataAccessor<Float> LOCKED_POS_Y;
     private static final EntityDataAccessor<Float> LOCKED_POS_Z;
+    private static final EntityDataAccessor<Float> LOCKED_DISTANCE;
 
     private static final EntityDataAccessor<String> USER_POSE;
 
@@ -213,6 +214,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         LOCKED_POS_X = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
         LOCKED_POS_Y = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
         LOCKED_POS_Z = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
+        LOCKED_DISTANCE = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
 
         FREEX = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
         FREEY = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
@@ -403,6 +405,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         this.entityData.set(LOCKED_POS_X, (float) pos.x);
         this.entityData.set(LOCKED_POS_Y, (float) pos.y);
         this.entityData.set(LOCKED_POS_Z, (float) pos.z);
+    }
+
+    public float getLockedDistance() {
+        return this.entityData.get(LOCKED_DISTANCE);
+    }
+
+    public void setLockedDistance(final float distance) {
+        this.entityData.set(LOCKED_DISTANCE, distance);
     }
 
     /**
@@ -678,6 +688,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (prevMove != null) prevMove.onDeactivate(getThis());
         if (curMove != null) {
             moveUsage = new MoveUsage(tickCount, curMove);
+            setLockedDistance(-1f);
         }
     }
 
@@ -747,6 +758,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         entityData.define(LOCKED_POS_X, 0f);
         entityData.define(LOCKED_POS_Y, 0f);
         entityData.define(LOCKED_POS_Z, 0f);
+        entityData.define(LOCKED_DISTANCE, 1f);
 
         entityData.define(FREEX, 0f);
         entityData.define(FREEY, 0f);
@@ -1177,6 +1189,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         final Vec3 aimPoint = eye.add(aim.scale(reach)).subtract(0, getBbHeight() * 0.5, 0);
                         setLockedPos(aimPoint);
                         attackDist = (float) reach;
+                        if (getLockedDistance() < 0f) {
+                            setLockedDistance(attackDist);
+                        }
                         // LOCKED_POS is valid now: tell the client to plant the stand there.
                         setLookTracking(true);
                     }

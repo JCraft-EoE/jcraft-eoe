@@ -2,6 +2,7 @@ package net.arna.jcraft.mixin_logic;
 
 import com.google.common.collect.ImmutableList;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JUtils;
@@ -46,7 +47,15 @@ public class EntityMixinLogic {
             // relative pivot below.
             if (stand.isLookTracking()) {
                 final Vec3 locked = stand.getLockedPos();
-                positionUpdater.accept(passenger, locked.x, locked.y, locked.z);
+                if (JServerConfig.STAND_DISTANCE_ADJUSTMENT.getValue()) {
+                    positionUpdater.accept(passenger, locked.x, locked.y, locked.z);
+                } else {
+                    final Vec3 offset = locked.subtract(thisEntity.position());
+                    final Vec3 adjusted = offset.lengthSqr() < 1.0E-7
+                            ? locked
+                            : thisEntity.position().add(offset.normalize().scale(stand.getLockedDistance()));
+                    positionUpdater.accept(passenger, adjusted.x, adjusted.y, adjusted.z);
+                }
                 info.cancel();
                 return;
             }

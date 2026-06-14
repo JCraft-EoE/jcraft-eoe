@@ -99,6 +99,7 @@ public class JServerConfig {
     public static final BooleanOption EXCLUSIVE_STANDS = new BooleanOption("exclusiveStands", GAMEPLAY, false);
     public static final BooleanOption STAND_USER_SIGHT = new BooleanOption("standUserSight", GAMEPLAY, false);
     public static final BooleanOption SPAWNER_STANDS = new BooleanOption("spawnerStands", GAMEPLAY, true);
+    public static final BooleanOption STAND_DISTANCE_ADJUSTMENT = new BooleanOption("standDistanceAdjustment", GAMEPLAY, true);
 
     // TODO list options
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();

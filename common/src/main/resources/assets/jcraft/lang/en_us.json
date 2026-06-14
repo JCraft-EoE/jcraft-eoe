@@ -675,6 +675,8 @@
   "jcraft.serverconfig.option.standArrowSpawnRate": "Stand Arrow Spawn Rate",
   "jcraft.serverconfig.option.standArrowSpawnRate.tooltip": "Chance (0-1) that a mob spawning with a Stand also\nholds a Stand Arrow, which it always drops on\ndeath.",
   "jcraft.serverconfig.option.standDamageMultiplier": "Stand Damage Multiplier",
+  "jcraft.serverconfig.option.standDistanceAdjustment": "Stand Distance Adjustment",
+  "jcraft.serverconfig.option.standDistanceAdjustment.tooltip": "When enabled, active look-tracked Stand moves stay\nat their target position. Disable to keep the\nmove's starting Stand range for its duration.",
   "jcraft.serverconfig.option.standGriefing": "Stand Griefing",
   "jcraft.serverconfig.option.standUserSight": "Only Stand Users See Stands",
   "jcraft.serverconfig.option.standUserSight.tooltip": "When enabled, only players who have a Stand can\nsee Stands rendered in the world.",
