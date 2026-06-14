@@ -17,6 +17,7 @@
       "description": {
         "translate": "move.jcraft.the_world_over_heaven.default.timestop.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.the_world_over_heaven.default.timestop.name"
       }

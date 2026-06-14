@@ -34,6 +34,7 @@
       "description": {
         "translate": "move.jcraft.king_crimson.default.donut.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.king_crimson.default.donut.name"
       }

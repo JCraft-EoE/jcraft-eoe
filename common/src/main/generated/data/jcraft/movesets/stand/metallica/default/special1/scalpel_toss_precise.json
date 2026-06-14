@@ -29,6 +29,7 @@
         "description": {
           "translate": "move.jcraft.metallica.default.scalpel_toss_wide.air.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.metallica.default.scalpel_toss_wide.air.name"
         },
@@ -66,6 +67,7 @@
         "description": {
           "translate": "move.jcraft.metallica.default.scalpel_toss_remote.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.metallica.default.scalpel_toss_remote.cr.name"
         },
@@ -101,6 +103,7 @@
       "description": {
         "translate": "move.jcraft.metallica.default.scalpel_toss_precise.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.metallica.default.scalpel_toss_precise.name"
       },

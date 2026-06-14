@@ -90,6 +90,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     public static final RedirectAttack REDIRECT = new RedirectAttack(0, 7, 10, 0.75f)
             .withAnim(State.REDIRECT)
             .withSound(JSoundRegistry.MR_REDIRECT)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Redirect"),
                     Component.literal("redirects all the users ankhs to where they're looking")
@@ -153,18 +154,21 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             );
     public static final CrossfireAttack CROSSFIRE = new CrossfireAttack(100, 8, 10, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Crossfire"),
                     Component.literal("fires 3 stunning ankhs")
             );
     public static final CrossfireVariationAttack CROSSFIRE_VARIATION = new CrossfireVariationAttack(600, 12, 17, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Crossfire Variation"),
                     Component.literal("summons 6 ankhs that orbit around the user, crouch as they come out to increase orbit distance")
             );
     public static final CrossfireHurricaneAttack CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack(800, 18, 22, 0.75f)
             .withSound(JSoundRegistry.MR_ULT)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Crossfire Hurricane"),
                     Component.literal("summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything")
@@ -186,8 +190,10 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     // TODO add move info x2
     // TODO balance x2
     public static final MagiciansRedTossMove TOSS = new MagiciansRedTossMove(0, 1, 1, 0.75f)
+            .withoutLookTracking()
             .withAnim(MagiciansRedEntity.State.ITEM_TOSS);
     public static final TossChargeMove<MagiciansRedEntity> TOSS_CHARGE = new TossChargeMove<MagiciansRedEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withoutLookTracking()
             .withFollowup(TOSS);
 
     public MagiciansRedEntity(Level worldIn) {

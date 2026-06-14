@@ -125,6 +125,7 @@
       "description": {
         "translate": "move.jcraft.made_in_heaven.default.slice.description"
       },
+      "look_tracking": false,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.made_in_heaven.default.slice.name"

@@ -196,6 +196,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Donut"),
                     Component.literal("slow, uninterruptable, extremely damaging launcher")
@@ -209,6 +210,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     public static final PredictionMove PREDICTION = new PredictionMove(160, 4, 104, -1f)
             .withCrouchingVariant(EPITAPH)
             .withSound(JSoundRegistry.KC_EPITAPH)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Prediction/Move Cancel"),
                     Component.literal("""
@@ -218,6 +220,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                             Move Cancel - Using Special 3 during any move cancels it and puts Time Erase on a 7s cooldown. (But does not require TE to be usable)""")
             );
     public static final TimeEraseMove TIME_ERASE = new TimeEraseMove(1000, 5, 15, 1f, 120)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Time Erase"),
                     Component.literal("6 seconds duration, cancellable by doing anything with King Crimson")

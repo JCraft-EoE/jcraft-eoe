@@ -17,6 +17,7 @@
       "description": {
         "translate": "move.jcraft.shadow_the_world.default.timestop.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.shadow_the_world.default.timestop.name"
       }

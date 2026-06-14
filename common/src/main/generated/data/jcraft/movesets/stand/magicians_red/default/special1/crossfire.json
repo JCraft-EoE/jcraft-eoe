@@ -17,6 +17,7 @@
       "description": {
         "translate": "move.jcraft.magicians_red.default.crossfire.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.magicians_red.default.crossfire.name"
       },

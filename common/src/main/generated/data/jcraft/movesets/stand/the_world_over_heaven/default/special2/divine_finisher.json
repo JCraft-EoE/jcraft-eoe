@@ -25,6 +25,7 @@
         "description": {
           "translate": "move.jcraft.the_world_over_heaven.default.aerial_divine_finisher.air.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.the_world_over_heaven.default.aerial_divine_finisher.air.name"
         },
@@ -63,6 +64,7 @@
       "description": {
         "translate": "move.jcraft.the_world_over_heaven.default.divine_finisher.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.the_world_over_heaven.default.divine_finisher.name"
       },

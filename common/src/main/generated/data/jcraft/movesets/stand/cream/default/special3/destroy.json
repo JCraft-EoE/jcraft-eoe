@@ -45,6 +45,7 @@
         "description": {
           "translate": "move.jcraft.cream.default.charge.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.cream.default.charge.cr.name"
         },
@@ -93,6 +94,7 @@
       "description": {
         "translate": "move.jcraft.cream.default.destroy.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.cream.default.destroy.name"
       }

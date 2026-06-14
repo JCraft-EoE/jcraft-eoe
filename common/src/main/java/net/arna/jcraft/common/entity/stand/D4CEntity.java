@@ -111,18 +111,21 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Charge"),
                     Component.literal("user & stand charge forward, uninterruptible launcher"));
     public static final DimensionalHopMove DIM_HOP = new DimensionalHopMove(1200, 40, 60,
             1f, 0f, 0, 1.75f, 0f, 0f, 300)
             .withSound(JSoundRegistry.D4C_DIMHOP)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Dimensional Hop"),
                     Component.literal("travels to a random dimension at exact coordinates, " +
                             "if user was hit in the last 30s, he is forced back, certified death button"));
     public static final GiveGunMove GIVE_GUN = new GiveGunMove(280, 10, 14, 0.75f)
             .withSound(JSoundRegistry.D4C_THROW)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Summon Gun"),
                     Component.literal("gives the user a revolver"));
@@ -131,6 +134,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab (Final Hit)"),
                     Component.empty());
@@ -141,6 +145,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withAction(PlaySoundAction.playSound(JSoundRegistry.REVOLVER_FIRE))
             .withStunType(StunType.UNBURSTABLE)
             .withFinisher(17, GRAB_HIT_FINAL)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab (Final Hit)"),
                     Component.empty());
@@ -148,15 +153,18 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             0f, 40, 1.5f, 0f, 0f, GRAB_HIT, 25, 1)
             .withCrouchingVariant(GIVE_GUN)
             .withSound(JSoundRegistry.D4C_THROW)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab"),
                     Component.literal("unblockable, combo finisher"));
     public static final D4CCounterAttack COUNTER = new D4CCounterAttack(300, 5, 35, 0.75f)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Counter"),
                     Component.literal("0.25s startup, 1.5s duration, high damage, knocks back when hit"));
     public static final CloneSpawnMove CLONE_SPAWN = new CloneSpawnMove(300, 40, 50, 1f)
             .withSound(JSoundRegistry.D4C_DIMHOP)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Dimensional Clone"),
                     Component.literal("""
@@ -168,14 +176,17 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                             SPECIAL 3 - None"""));
     public static final FlagMove FLAG = new FlagMove(200, 10, 60, 0f)
             .withSound(JSoundRegistry.D4C_UTILITY)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Dimensional Phase"),
                     Component.literal("hides in a flag in an un-stunnable, floating state"));
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<D4CEntity> TOSS = new TossMove<D4CEntity>(0, 1, 1, 0.75f,0.13f)
+            .withoutLookTracking()
             .withAnim(D4CEntity.State.ITEM_TOSS);
     public static final TossChargeMove<D4CEntity> TOSS_CHARGE = new TossChargeMove<D4CEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
+            .withoutLookTracking()
             .withFollowup(TOSS);
 
     public D4CEntity(Level worldIn) {

@@ -18,6 +18,7 @@
       "description": {
         "translate": "move.jcraft.cream.half_ball.destroy.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.cream.half_ball.destroy.name"
       }

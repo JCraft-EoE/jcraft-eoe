@@ -17,6 +17,7 @@
       "description": {
         "translate": "move.jcraft.cream.default.surprise.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.cream.default.surprise.name"
       }

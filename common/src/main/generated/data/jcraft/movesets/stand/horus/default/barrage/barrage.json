@@ -25,6 +25,7 @@
         "translate": "move.jcraft.horus.default.barrage.description"
       },
       "is_holdable": true,
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.horus.default.barrage.name"
       }

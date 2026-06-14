@@ -53,6 +53,7 @@
         "description": {
           "translate": "move.jcraft.metallica.default.sweep.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.metallica.default.sweep.cr.name"
         }

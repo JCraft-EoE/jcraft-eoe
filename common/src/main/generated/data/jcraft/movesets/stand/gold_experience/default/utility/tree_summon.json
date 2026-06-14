@@ -30,6 +30,7 @@
       "description": {
         "translate": "move.jcraft.gold_experience.default.tree_summon.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.gold_experience.default.tree_summon.name"
       }

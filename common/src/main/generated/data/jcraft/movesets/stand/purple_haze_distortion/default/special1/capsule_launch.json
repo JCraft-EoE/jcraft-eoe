@@ -21,6 +21,7 @@
         "description": {
           "translate": "move.jcraft.purple_haze_distortion.default.triple_capsule_launch.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.purple_haze_distortion.default.triple_capsule_launch.cr.name"
         },
@@ -45,6 +46,7 @@
       "description": {
         "translate": "move.jcraft.purple_haze_distortion.default.capsule_launch.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.purple_haze_distortion.default.capsule_launch.name"
       },

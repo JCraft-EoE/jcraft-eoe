@@ -10,6 +10,7 @@
       "description": {
         "translate": "move.jcraft.d4c.default.counter.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.d4c.default.counter.name"
       }

@@ -90,6 +90,7 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab (Final Hit)"),
                     Component.empty()
@@ -99,6 +100,7 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
             .withFinisher(19, GRAB_HIT_FINAL)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab (Final Hit)"),
                     Component.empty()
@@ -116,8 +118,10 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<PurpleHazeDistortionEntity> TOSS = new TossMove<PurpleHazeDistortionEntity>(0, 1, 1, 0.75f)
+            .withoutLookTracking()
             .withAnim(PurpleHazeDistortionEntity.State.ITEM_TOSS);
     public static final TossChargeMove<PurpleHazeDistortionEntity> TOSS_CHARGE = new TossChargeMove<PurpleHazeDistortionEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withoutLookTracking()
             .withFollowup(TOSS);
 
     public PurpleHazeDistortionEntity(Level worldIn) {

@@ -27,6 +27,7 @@
         "description": {
           "translate": "move.jcraft.metallica.default.give_scalpel.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.metallica.default.give_scalpel.cr.name"
         }

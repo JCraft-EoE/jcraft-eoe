@@ -96,6 +96,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
 
     public static final LaunchCapsulesAttack LAUNCH_CAPSULES = new LaunchCapsulesAttack(6 * 20, 9, 18, 0.75f)
             .withSound(JSoundRegistry.PH_CAPSULE2)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Triple Capsule Launch"),
                     Component.literal("launches 3 capsules close by")
@@ -104,6 +105,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
     public static final LaunchCapsuleAttack LAUNCH_CAPSULE = new LaunchCapsuleAttack(6 * 20, 7, 14, 0.75f)
             .withSound(JSoundRegistry.PH_CAPSULE1)
             .withCrouchingVariant(LAUNCH_CAPSULES)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Capsule Launch"),
                     Component.literal("launches a single, fast capsule at the aimed location")

@@ -61,12 +61,14 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
 
     public static final CountdownMove COUNTDOWN = new CountdownMove(6, 10, 120, 0f, 64, 600, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
             .withSound(JSoundRegistry.MANDOM_COUNTDOWN)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Countdown"),
                     Component.literal("Saves position data of all entities in a 64 block radius for 30 seconds. Must be active to use Rewind."));
 
     public static final RewindMove REWIND = new RewindMove(6, 5, 10, 0f, 200)
             .withSound(JSoundRegistry.MANDOM_REWIND)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Rewind"),
                     Component.literal("Returns all entities to their saved positions. Requires Countdown to be active."));

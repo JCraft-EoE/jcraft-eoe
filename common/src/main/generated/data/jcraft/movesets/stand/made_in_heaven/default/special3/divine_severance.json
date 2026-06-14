@@ -21,6 +21,7 @@
         "description": {
           "translate": "move.jcraft.made_in_heaven.default.heavens_judgement.cr.description"
         },
+        "look_tracking": false,
         "mobility_type": "DASH",
         "name": {
           "translate": "move.jcraft.made_in_heaven.default.heavens_judgement.cr.name"
@@ -52,6 +53,7 @@
       "description": {
         "translate": "move.jcraft.made_in_heaven.default.divine_severance.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.made_in_heaven.default.divine_severance.name"
       }

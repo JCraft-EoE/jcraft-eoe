@@ -31,6 +31,7 @@
         "translate": "move.jcraft.shadow_the_world.default.impaling_thrust.description"
       },
       "is_holdable": true,
+      "look_tracking": false,
       "mobility_type": "TELEPORT",
       "name": {
         "translate": "move.jcraft.shadow_the_world.default.impaling_thrust.name"

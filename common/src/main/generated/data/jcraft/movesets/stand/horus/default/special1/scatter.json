@@ -21,6 +21,7 @@
         "description": {
           "translate": "move.jcraft.horus.default.ice_lance.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.horus.default.ice_lance.cr.name"
         },
@@ -45,6 +46,7 @@
       "description": {
         "translate": "move.jcraft.horus.default.scatter.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.horus.default.scatter.name"
       },

@@ -84,6 +84,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("fast, short-range knockback, very low blockstun")
             );
     public static final BubbleCounterAttack BUBBLE_COUNTER = new BubbleCounterAttack(480, 5, 20, 1f)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Stray Cat Counter"),
                     Component.literal("0.25s windup counter, turns opponent into your primary bomb")
@@ -91,6 +92,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public static final BubbleAttack BUBBLE = new BubbleAttack(120, 15, 18, 0.75f)
             .withCrouchingVariant(BUBBLE_COUNTER)
             .withSound(JSoundRegistry.KQBTD_BUBBLE)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Stray Cat Bubble"),
                     Component.literal("launches an explosive bubble guided by your view rotation")
@@ -113,6 +115,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             3f, 15, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Takedown (hit)"),
                     Component.empty()
@@ -120,6 +123,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     public static final GrabAttack<KQBTDEntity, State> GRAB = new GrabAttack<>(220,
             12, 28,0.75f, 0f, 20, 1.75f, 0.1f, 0f, GRAB_HIT,
             StateContainer.of(State.GRAB_HIT), 31, 1)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Takedown"),
                     Component.literal("high damage grab")
@@ -127,8 +131,10 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
     // TODO add move info x2
     // TODO balance x2
     public static final KQTossMove TOSS = new KQTossMove(0, 1, 1, 0.75f)
+            .withoutLookTracking()
             .withAnim(KQBTDEntity.State.ITEM_TOSS);
     public static final TossChargeMove<KQBTDEntity> TOSS_CHARGE = new TossChargeMove<KQBTDEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withoutLookTracking()
             .withFollowup(TOSS);
 
     // Light chain implementation

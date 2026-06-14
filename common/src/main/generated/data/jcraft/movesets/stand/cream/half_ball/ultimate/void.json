@@ -24,6 +24,7 @@
       "description": {
         "translate": "move.jcraft.cream.half_ball.void.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.cream.half_ball.void.name"
       },

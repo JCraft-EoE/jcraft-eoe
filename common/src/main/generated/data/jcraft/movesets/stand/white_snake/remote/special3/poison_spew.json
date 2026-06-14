@@ -22,6 +22,7 @@
         "description": {
           "translate": "move.jcraft.white_snake.remote.poison_spew.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.white_snake.remote.poison_spew.cr.name"
         },
@@ -51,6 +52,7 @@
       "description": {
         "translate": "move.jcraft.white_snake.remote.poison_spew.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.white_snake.remote.poison_spew.name"
       },

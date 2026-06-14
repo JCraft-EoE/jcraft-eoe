@@ -31,6 +31,7 @@
         "description": {
           "translate": "move.jcraft.star_platinum_the_world.default.ground_slam.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "jcraft.sptw.crm1"
         }

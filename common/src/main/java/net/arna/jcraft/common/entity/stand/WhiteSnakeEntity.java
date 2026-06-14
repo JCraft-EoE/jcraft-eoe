@@ -182,6 +182,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(160,
             20, 26, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Poison Spew"),
                     Component.literal("fires a spread of 5 acid projectiles that slow enemies and persist on the surface they hits for 5s")
@@ -190,6 +191,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             10, 14, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withCrouchingVariant(CHARGED_SPEW)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Poison Spew"),
                     Component.literal("fires an acid projectile that slows enemies and persists on the surface it hits for 5s")
@@ -213,8 +215,10 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<WhiteSnakeEntity> TOSS = new TossMove<WhiteSnakeEntity>(0, 1, 1, 0.75f,0.13f,1f)
+            .withoutLookTracking()
             .withAnim(WhiteSnakeEntity.State.ITEM_TOSS);
     public static final TossChargeMove<WhiteSnakeEntity> TOSS_CHARGE = new TossChargeMove<WhiteSnakeEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
+            .withoutLookTracking()
             .withFollowup(TOSS);
 
     public WhiteSnakeEntity(Level worldIn) {

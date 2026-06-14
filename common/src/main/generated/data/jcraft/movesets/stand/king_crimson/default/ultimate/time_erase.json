@@ -11,6 +11,7 @@
       "description": {
         "translate": "move.jcraft.king_crimson.default.time_erase.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.king_crimson.default.time_erase.name"
       }

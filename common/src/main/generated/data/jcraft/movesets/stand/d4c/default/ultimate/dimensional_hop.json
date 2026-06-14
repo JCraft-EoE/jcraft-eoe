@@ -25,6 +25,7 @@
       "description": {
         "translate": "move.jcraft.d4c.default.dimensional_hop.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.d4c.default.dimensional_hop.name"
       }

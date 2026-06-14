@@ -17,6 +17,7 @@
       "description": {
         "translate": "move.jcraft.d4c.default.dimensional_clone.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.d4c.default.dimensional_clone.name"
       },

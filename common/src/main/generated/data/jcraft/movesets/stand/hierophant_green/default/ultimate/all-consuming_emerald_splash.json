@@ -24,6 +24,7 @@
       "description": {
         "translate": "move.jcraft.hierophant_green.default.allconsuming_emerald_splash.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.hierophant_green.default.allconsuming_emerald_splash.name"
       },

@@ -64,6 +64,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withLaunchNoShockwave()
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withoutLookTracking()
             .withInfo(
                     Component.translatable("jcraft.sptw.crm1"),
                     Component.literal("low hitbox, decent damage, launches")
@@ -100,6 +101,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             7, 11, 0.75f, 5f, 12, 1.5f, 0.6f, -0.25f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(1f)
+            .withoutLookTracking()
             .withInfo(
                     Component.translatable("jcraft.sptw.sp1"),
                     Component.literal("""
@@ -113,6 +115,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withExtraHitBox(1f)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withoutLookTracking()
             .withInfo(
                     Component.translatable("jcraft.sptw.sp2"),
                     Component.literal("fast poke, great stun")
@@ -133,6 +136,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withSound(JSoundRegistry.SPTW_GRAB)
             .withImpactSound(JSoundRegistry.SPTW_GRABHIT)
             .withHitAnimation(null)
+            .withoutLookTracking()
             .withInfo(
                     Component.translatable("jcraft.sptw.sp3"),
                     Component.literal("grab, high damage combo-finishing knockdown")
@@ -146,6 +150,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withHyperArmor()
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withoutLookTracking()
             .withInfo(
                     Component.translatable("jcraft.sptw.sp3hit"),
                     Component.empty()
@@ -156,6 +161,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withSound(JSoundRegistry.SPTW_GRAB)
             .withImpactSound(JSoundRegistry.SPTW_GRABHIT)
             .withHitAnimation(null)
+            .withoutLookTracking()
             .withInfo(
                     Component.translatable("jcraft.sptw.sp3"),
                     Component.literal("grab, combo-starting uppercut")
@@ -163,12 +169,14 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     public static final TimeStopMove<SPTWEntity> TIME_STOP = new TimeStopMove<SPTWEntity>(600, 5, 10,
             Either.right(JServerConfig.SPTW_TIME_STOP_DURATION))
             .withSound(JSoundRegistry.STAR_PLATINUM_THE_WORLD)
+            .withoutLookTracking()
             .withInfo(
                     Component.translatable("jcraft.generic.ts"),
                     Component.literal("1.75 seconds, extremely low windup")
             );
     public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.STAR_PLATINUM_TIMESKIP)
+            .withoutLookTracking()
             .withInfo(
                     Component.translatable("jcraft.generic.tp"),
                     Component.literal("14m range")
@@ -176,8 +184,10 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<SPTWEntity> TOSS = new TossMove<SPTWEntity>(0, 1, 1, 0.75f, 0.15f)
+            .withoutLookTracking()
             .withAnim(SPTWEntity.State.ITEM_TOSS);
     public static final TossChargeMove<SPTWEntity> TOSS_CHARGE = new TossChargeMove<SPTWEntity>(70, 1 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withoutLookTracking()
             .withFollowup(TOSS);
 
     public SPTWEntity(Level worldIn) {

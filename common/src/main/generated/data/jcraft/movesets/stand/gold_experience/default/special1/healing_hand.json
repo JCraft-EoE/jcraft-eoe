@@ -61,6 +61,7 @@
       "description": {
         "translate": "move.jcraft.gold_experience.default.healing_hand.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.gold_experience.default.healing_hand.name"
       }

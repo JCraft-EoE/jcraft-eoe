@@ -10,6 +10,7 @@
       "description": {
         "translate": "move.jcraft.shadow_the_world.default.counter.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.shadow_the_world.default.counter.name"
       }

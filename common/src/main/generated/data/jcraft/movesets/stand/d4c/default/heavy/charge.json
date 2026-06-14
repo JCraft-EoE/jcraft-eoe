@@ -41,6 +41,7 @@
       "description": {
         "translate": "move.jcraft.d4c.default.charge.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.d4c.default.charge.name"
       }

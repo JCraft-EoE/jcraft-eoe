@@ -37,6 +37,7 @@
       "description": {
         "translate": "move.jcraft.c_moon.default.block_launch.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.c_moon.default.block_launch.name"
       },

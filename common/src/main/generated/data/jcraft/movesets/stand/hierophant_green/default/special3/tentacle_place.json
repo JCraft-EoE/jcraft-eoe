@@ -17,6 +17,7 @@
       "description": {
         "translate": "move.jcraft.hierophant_green.default.tentacle_place.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.hierophant_green.default.tentacle_place.name"
       }

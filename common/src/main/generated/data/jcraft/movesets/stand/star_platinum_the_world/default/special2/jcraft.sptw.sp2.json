@@ -35,6 +35,7 @@
       "description": {
         "translate": "move.jcraft.star_platinum_the_world.default.backhand.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "jcraft.sptw.sp2"
       }

@@ -19,6 +19,7 @@
       "description": {
         "translate": "move.jcraft.killer_queen_bites_the_dust.default.takedown.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.killer_queen_bites_the_dust.default.takedown.name"
       }
@@ -45,6 +46,7 @@
             "sound": "jcraft:impact1"
           }
         ],
+        "look_tracking": false,
         "name": {
           "text": "Takedown (hit)"
         }

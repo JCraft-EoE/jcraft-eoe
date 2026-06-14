@@ -21,6 +21,7 @@
         "description": {
           "translate": "move.jcraft.d4c.default.summon_gun.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "move.jcraft.d4c.default.summon_gun.cr.name"
         }
@@ -53,6 +54,7 @@
       "description": {
         "translate": "move.jcraft.d4c.default.grab.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.d4c.default.grab.name"
       }
@@ -108,6 +110,7 @@
                   "sound": "jcraft:impact1"
                 }
               ],
+              "look_tracking": false,
               "name": {
                 "text": "Grab (Final Hit)"
               }
@@ -121,6 +124,7 @@
           },
           "tick": 17
         },
+        "look_tracking": false,
         "name": {
           "text": "Grab (Final Hit)"
         }

@@ -21,6 +21,7 @@
         "description": {
           "translate": "move.jcraft.magicians_red.default.redirect.cr.description"
         },
+        "look_tracking": false,
         "mobility_type": "TELEPORT",
         "name": {
           "translate": "move.jcraft.magicians_red.default.redirect.cr.name"

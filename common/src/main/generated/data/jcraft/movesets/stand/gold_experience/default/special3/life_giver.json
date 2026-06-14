@@ -17,6 +17,7 @@
       "description": {
         "translate": "move.jcraft.gold_experience.default.life_giver.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "move.jcraft.gold_experience.default.life_giver.name"
       },

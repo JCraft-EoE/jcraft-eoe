@@ -72,6 +72,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             16, 20, 1.25f, 4f, 5, 1.5f, 0.75f, 0.2f)
             .withAnim(State.LIFE_GIVER)
             .withImpactSound(JSoundRegistry.IMPACT_4)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Place Berry Bush"),
                     Component.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down")
@@ -128,6 +129,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             14, 1f, 0, 0, 4f, HealMove.HealTarget.USER, false)
             .withCrouchingVariant(HEAL_OTHERS)
             .withSound(JSoundRegistry.GE_HEAL)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Healing Hand"),
                     Component.literal("standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs")
@@ -136,12 +138,14 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             15, 1.75f, 0.2f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withSound(JSoundRegistry.GE_TREE)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Tree Summon"),
                     Component.literal("two-hitting launch")
             );
     public static final LifeGiverAttack LIFE_GIVER = new LifeGiverAttack(300, 16, 25, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Life Giver"),
                     Component.literal("""
@@ -195,8 +199,10 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<GoldExperienceEntity> TOSS = new TossMove<GoldExperienceEntity>(0, 1, 1, 0.75f,0.13f)
+            .withoutLookTracking()
             .withAnim(GoldExperienceEntity.State.ITEM_TOSS);
     public static final TossChargeMove<GoldExperienceEntity> TOSS_CHARGE = new TossChargeMove<GoldExperienceEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
+            .withoutLookTracking()
             .withFollowup(TOSS);
 
     public GoldExperienceEntity(Level worldIn) {

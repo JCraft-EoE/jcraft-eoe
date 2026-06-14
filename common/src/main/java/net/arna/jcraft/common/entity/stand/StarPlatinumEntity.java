@@ -194,6 +194,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             );
     public static final JumpMove<StarPlatinumEntity> JUMP = new JumpMove<StarPlatinumEntity>(300, 5,
             14, 1f, 1.5f)
+            .withoutLookTracking()
             .withInfo(
                     Component.translatable("jcraft.starplatinum.util"),
                     Component.literal("Jumps in looked direction with slight upward bias, you must stay on the ground until Star Platinum jumps.")

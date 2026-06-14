@@ -36,6 +36,7 @@
         "description": {
           "translate": "move.jcraft.star_platinum_the_world.default.what_an_ugly_watch.cr.description"
         },
+        "look_tracking": false,
         "name": {
           "translate": "jcraft.sptw.sp3"
         }
@@ -118,6 +119,7 @@
       "description": {
         "translate": "move.jcraft.star_platinum_the_world.default.what_an_ugly_watch.description"
       },
+      "look_tracking": false,
       "name": {
         "translate": "jcraft.sptw.sp3"
       }
@@ -166,6 +168,7 @@
           }
         ],
         "armor": 2147483647,
+        "look_tracking": false,
         "name": {
           "translate": "jcraft.sptw.sp3hit"
         }
