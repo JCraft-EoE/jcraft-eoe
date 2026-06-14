@@ -1,9 +1,16 @@
-package net.arna.jcraft.common.config;
+package net.arna.jcraft.api.serverconfig;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import lombok.Getter;
+import me.shedaniel.clothconfig2.api.ConfigBuilder;
+import me.shedaniel.clothconfig2.impl.builders.AbstractFieldBuilder;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+
 import java.util.Arrays;
 
 @Getter
@@ -12,8 +19,8 @@ public class EnumOption<E extends Enum<?>> extends ConfigOption {
     private E value;
     private final E defaultValue;
 
-    public EnumOption(final String key, final String category, final Class<E> clazz, final E value) {
-        super(Type.ENUM, key, category);
+    public EnumOption(final ResourceLocation key, final ResourceLocation category, final Class<E> clazz, final E value) {
+        super(key, category);
         this.clazz = clazz;
         this.value = this.defaultValue = value;
     }
@@ -48,5 +55,16 @@ public class EnumOption<E extends Enum<?>> extends ConfigOption {
                 .filter(e -> e.name().equals(name))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    @Override
+    @Environment(EnvType.CLIENT)
+    public AbstractFieldBuilder<?, ?, ?> createField(ConfigBuilder builder, Component name, Runnable markDirty) {
+        return builder.entryBuilder().startEnumSelector(name, getClazz(), getValue())
+                .setDefaultValue(getDefaultValue())
+                .setSaveConsumer(e -> {
+                    setValue(e.ordinal());
+                    markDirty.run();
+                });
     }
 }

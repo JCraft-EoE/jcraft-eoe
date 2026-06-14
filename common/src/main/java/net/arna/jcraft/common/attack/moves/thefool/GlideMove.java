@@ -35,6 +35,9 @@ public final class GlideMove extends AbstractMove<GlideMove, TheFoolEntity> {
 
         user.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 4, 4, true, false));
         double yVel = attacker.getRemoteJumpInput() ? 0.07 : 0;
+        if (user.isFallFlying())
+            yVel *= 0.1;
+
         final Vec3 rotVec = user.getLookAngle().scale(0.04);
         user.push(rotVec.x, yVel, rotVec.z);
         user.hurtMarked = true;
