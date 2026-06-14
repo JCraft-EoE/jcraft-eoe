@@ -114,7 +114,7 @@ public class JServerConfig {
     public static final BooleanOption EXCLUSIVE_STANDS = new BooleanOption(JCraft.id("exclusive_stands"), GAMEPLAY, false);
     public static final BooleanOption STAND_USER_SIGHT = new BooleanOption(JCraft.id("stand_user_sight"), GAMEPLAY, false);
     public static final BooleanOption SPAWNER_STANDS = new BooleanOption(JCraft.id("spawner_stands"), GAMEPLAY, true);
-    public static final BooleanOption STAND_DISTANCE_ADJUSTMENT = new BooleanOption(JCraft.id("standDistanceAdjustment"), GAMEPLAY, true);
+    public static final BooleanOption STAND_DISTANCE_ADJUSTMENT = new BooleanOption(JCraft.id("stand_distance_adjustment"), GAMEPLAY, true);
 
     // TODO list options
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
