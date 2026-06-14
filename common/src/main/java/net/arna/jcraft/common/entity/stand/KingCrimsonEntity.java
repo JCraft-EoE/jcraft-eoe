@@ -201,6 +201,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("slow, uninterruptable, extremely damaging launcher")
             );
     public static final EpitaphAttack EPITAPH = new EpitaphAttack(480, 4, 34, -1f)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Epitaph"),
                     Component.literal("0.2s windup, 1.5s counter, combo starter. Cannot be buffered.")

@@ -325,16 +325,18 @@ public final class JUtils {
     }
 
     /**
-     * How far short of a hit (entity or block) a look-tracked stand stops, in blocks, so its body sits in
-     * front of the target rather than inside it.
+     * How far short of a hit a look-tracked stand stops, in blocks, so its body sits in front of the target
+     * rather than inside it. Entities use a smaller margin than blocks.
      */
-    public static final double LOOK_TRACK_MARGIN = 1.0;
+    public static final double LOOK_TRACK_ENTITY_MARGIN = 0.75;
+    public static final double LOOK_TRACK_BLOCK_MARGIN = 1.0;
 
     /**
      * Clamps a desired stand reach so it stops along the aim direction instead of clipping through the world:
      * <ul>
      *     <li>extends to {@code maxReach} when nothing is in the way,</li>
-     *     <li>stops {@link #LOOK_TRACK_MARGIN} blocks short of the first entity or block hit, and</li>
+     *     <li>stops {@link #LOOK_TRACK_ENTITY_MARGIN}/{@link #LOOK_TRACK_BLOCK_MARGIN} blocks short of the
+     *     first entity/block hit, and</li>
      *     <li>never collapses below {@code minReach}, so the stand always detaches (and clips a little into
      *     anything closer than that) rather than snapping back into the user.</li>
      * </ul>
@@ -357,7 +359,8 @@ public final class JUtils {
             return maxReach;
         }
 
-        final double dist = hit.getLocation().distanceTo(origin) - LOOK_TRACK_MARGIN;
+        final double margin = hit.getType() == HitResult.Type.ENTITY ? LOOK_TRACK_ENTITY_MARGIN : LOOK_TRACK_BLOCK_MARGIN;
+        final double dist = hit.getLocation().distanceTo(origin) - margin;
         return Mth.clamp(dist, minReach, maxReach);
     }
 

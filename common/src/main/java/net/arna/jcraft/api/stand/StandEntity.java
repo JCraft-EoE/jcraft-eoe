@@ -147,10 +147,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     @Getter
     private MoveUsage moveUsage;
     public AbstractMove<?, ? super E> prevMove;
-    // Look-tracking reach is locked once per move activation so the stand doesn't keep re-adjusting its
-    // distance while the move is out. Keyed on the MoveUsage, which is recreated each time a move is initiated.
-    private MoveUsage lockedReachUsage;
-    private float lockedLookTrackReach;
     public int armorPoints;
     private boolean performedThisTick;
 
@@ -1166,25 +1162,21 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     // since it is offset from the stand's body. Other moves keep the classic fixed pivot.
                     float attackDist = move.getMoveDistance();
                     if (move.isLookTracking(getThis())) {
-                        // Commit the whole stand to a world point once when the move starts, so it plants there
-                        // and doesn't follow the user or re-adjust while the move is out.
-                        if (lockedReachUsage != moveUsage) {
-                            lockedReachUsage = moveUsage;
-                            setLockedAim(user.getYRot(), user.getXRot());
-                            // Cast from the eye so a slight downward look doesn't instantly hit the floor at the
-                            // user's feet. The minimum reach (the move's normal distance) keeps the stand from
-                            // ever collapsing back into the user; it clips a little into anything closer.
-                            final Vec3 eye = user.getEyePosition();
-                            final Vec3 aim = user.getLookAngle();
-                            final double reach = JUtils.clampReachToLook(
-                                    user, eye, aim, this, move.getMoveDistance(), move.getLookTrackingReach());
-                            // Centre the stand on the aim point (subtract half its height so it isn't planted by
-                            // its feet, which would float it a body-height too high / sink it into the ground).
-                            final Vec3 aimPoint = eye.add(aim.scale(reach)).subtract(0, getBbHeight() * 0.5, 0);
-                            setLockedPos(aimPoint);
-                            lockedLookTrackReach = (float) reach;
-                        }
-                        attackDist = lockedLookTrackReach;
+                        // While the move is active, position the whole stand at where the user is currently
+                        // aiming, so it follows the crosshair instead of committing to the start aim.
+                        setLockedAim(user.getYRot(), user.getXRot());
+                        // Cast from the eye so a slight downward look doesn't instantly hit the floor at the
+                        // user's feet. The minimum reach (the move's normal distance) keeps the stand from ever
+                        // collapsing back into the user; it clips a little into anything closer.
+                        final Vec3 eye = user.getEyePosition();
+                        final Vec3 aim = user.getLookAngle();
+                        final double reach = JUtils.clampReachToLook(
+                                user, eye, aim, this, move.getMoveDistance(), move.getLookTrackingReach());
+                        // Centre the stand on the aim point (subtract half its height so it isn't planted by its
+                        // feet, which would float it a body-height too high / sink it into the ground).
+                        final Vec3 aimPoint = eye.add(aim.scale(reach)).subtract(0, getBbHeight() * 0.5, 0);
+                        setLockedPos(aimPoint);
+                        attackDist = (float) reach;
                         // LOCKED_POS is valid now: tell the client to plant the stand there.
                         setLookTracking(true);
                     }

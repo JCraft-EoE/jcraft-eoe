@@ -56,7 +56,11 @@ public class BaseMoveExtras {
 
             Codec.BOOL.optionalFieldOf("loop_prevention", true).forGetter(BaseMoveExtras::isLoopPrevention),
 
-            Codec.BOOL.optionalFieldOf("lingering_sounds", false).forGetter(BaseMoveExtras::isLingeringSounds)
+            Codec.BOOL.optionalFieldOf("lingering_sounds", false).forGetter(BaseMoveExtras::isLingeringSounds),
+
+            Codec.BOOL.optionalFieldOf("look_tracking", true).forGetter(BaseMoveExtras::isLookTracking),
+
+            Codec.FLOAT.optionalFieldOf("look_tracking_reach", 5f).forGetter(BaseMoveExtras::getLookTrackingReach)
     ).apply(instance, BaseMoveExtras::new));
     private Component name = Component.empty();
     private Component description = Component.empty();
@@ -71,12 +75,15 @@ public class BaseMoveExtras {
     private OptionalInt followupFrame = OptionalInt.empty();
     private boolean loopPrevention = true;
     private boolean lingeringSounds = false;
+    private boolean lookTracking = true;
+    private float lookTrackingReach = 5f;
 
     private BaseMoveExtras(final Component name, final Component description, final List<MoveCondition<?, ?>> conditions,
                            final List<MoveAction<?, ?>> actions,
                            final int armor, Optional<MobilityType> mobilityType, final Optional<Boolean> isHoldable, final boolean ranged,
                            final boolean mayHitUser, final Optional<IntObjectPair<AbstractMove<?, ?>>> finisher,
-                           final OptionalInt followupFrame, final boolean loopPrevention, final boolean lingeringSounds) {
+                           final OptionalInt followupFrame, final boolean loopPrevention, final boolean lingeringSounds,
+                           final boolean lookTracking, final float lookTrackingReach) {
         this.name = name;
         this.description = description;
         this.conditions.addAll(conditions);
@@ -90,6 +97,8 @@ public class BaseMoveExtras {
         this.followupFrame = followupFrame;
         this.loopPrevention = loopPrevention;
         this.lingeringSounds = lingeringSounds;
+        this.lookTracking = lookTracking;
+        this.lookTrackingReach = lookTrackingReach;
     }
 
     @SuppressWarnings({"unchecked", "RedundantCast", "rawtypes"})
@@ -98,7 +107,8 @@ public class BaseMoveExtras {
                 (List<MoveAction<?, ?>>) (List) move.getActions(),
                 move.getArmor(), Optional.ofNullable(move.getMobilityType()), Optional.ofNullable(move.getIsHoldable()),
                 move.isRanged(), move.isMayHitUser(), Optional.ofNullable((IntObjectPair<AbstractMove<?, ?>>) (IntObjectPair) move.getFinisher()),
-                move.getFollowupFrame(), move.isLoopPrevention(), move.isLingeringSounds());
+                move.getFollowupFrame(), move.isLoopPrevention(), move.isLingeringSounds(),
+                move.isLookTracking(), move.getLookTrackingReach());
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"}) // generic types and (de)serialization don't mix well
@@ -111,7 +121,9 @@ public class BaseMoveExtras {
                 .withConditionsRaw(conditions)
                 .withActionsRaw(actions)
                 .withInitActionsRaw(initActions)
-                .withFollowupFrame(followupFrame);
+                .withFollowupFrame(followupFrame)
+                .withLookTracking(lookTracking)
+                .withLookTrackingReach(lookTrackingReach);
         if (ranged) move.markRanged();
         if (mayHitUser) move.allowHitUser();
         if (!loopPrevention) move.noLoopPrevention();
