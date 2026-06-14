@@ -18,13 +18,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Lock-on indicator particle. Behaves like {@link BreathParticle} in that it renders to the
  * {@link JParticleTextureSheet#OVERLAP_SHEET} so it draws on top of everything, but instead of rising
- * it stays bound to an entity and renders a fixed number of blocks above it (see {@link #BLOCKS_ABOVE}).
+ * it stays bound to an entity, rendering on top of it.
  */
 public class LockOnParticle extends TextureSheetParticle {
-
-    /** How many blocks above the bound entity the particle renders. */
-    public static final double BLOCKS_ABOVE = 3.0;
-
     private final SpriteSet spriteProvider;
     private final Entity parent;
 
@@ -53,7 +49,7 @@ public class LockOnParticle extends TextureSheetParticle {
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;
-        this.setPos(parent.getX(), parent.getY() + BLOCKS_ABOVE, parent.getZ());
+        this.setPos(parent.getX(), parent.getY(), parent.getZ());
     }
 
     @Override
