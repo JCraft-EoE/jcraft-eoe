@@ -65,6 +65,6 @@ public class MinecraftMixin {
 
     @ModifyReturnValue(method = "shouldEntityAppearGlowing", at = @At("RETURN"))
     private boolean jcraft$makeAerosmithGlowWhenNotInLos(boolean original, @Local(argsOnly = true) Entity entity) {
-        return original || entity instanceof AerosmithEntity as && !as.isInLineOfSight() && as.getUser() == player;
+        return original || entity instanceof AerosmithEntity as && as.isRemote() && !as.isInLineOfSight() && as.getUser() == player;
     }
 }
