@@ -629,6 +629,11 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         return targets;
     }
 
+    @Override
+    protected boolean shouldPlayWhiffSound(final A attacker) {
+        return hitboxSize > 0 || !extraHitBoxes.isEmpty();
+    }
+
     private void breakBlocks(final A attacker, final Set<AABB> boxes) {
         Level level = attacker.getEntityWorld();
 

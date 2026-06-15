@@ -25,6 +25,7 @@ import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
@@ -36,6 +37,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
@@ -834,6 +836,9 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
         Set<LivingEntity> targets = perform(attacker, user);
         boolean hit = !targets.isEmpty();
+        if (!hit) {
+            playWhiffSound(attacker);
+        }
 
         for (final MoveAction<?, ? super A> action : actions) {
             if (action.getRunMoment() == RunMoment.ON_STRIKE || hit && action.getRunMoment() == RunMoment.ON_HIT) {
@@ -841,6 +846,21 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
             }
         }
         attacker.onPerform(this, targets);
+    }
+
+    protected boolean shouldPlayWhiffSound(final A attacker) {
+        return false;
+    }
+
+    private void playWhiffSound(final A attacker) {
+        if (!shouldPlayWhiffSound(attacker) || attacker.getEntityWorld().isClientSide || attacker.getCurrentMove() != this) {
+            return;
+        }
+
+        final RandomSource random = attacker.getBaseEntity().getRandom();
+        final float volume = 0.6f + random.nextFloat() * 0.35f;
+        final float pitch = 0.85f + random.nextFloat() * 0.3f;
+        attacker.playAttackerSound(JSoundRegistry.WHIFF.get(), volume, pitch, false, true);
     }
 
     /**

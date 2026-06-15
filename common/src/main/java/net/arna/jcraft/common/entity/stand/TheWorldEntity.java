@@ -212,6 +212,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
     public static final TimeStopMove<TheWorldEntity> TIME_STOP = new TimeStopMove<TheWorldEntity>(1400,
             45, 52, Either.right(JServerConfig.TW_TIME_STOP_DURATION))
             .withSound(JSoundRegistry.TW_TS)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Timestop"),
                     Component.literal("4 seconds")

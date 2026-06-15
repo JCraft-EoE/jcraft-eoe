@@ -213,6 +213,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             14, 0.5f, 5f, 20, 2f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Swipe"),
                     Component.literal("quick air-to-ground poke"));
@@ -223,6 +224,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Overhead Smash"),
                     Component.literal("slow, uninterruptible launcher"));

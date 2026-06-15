@@ -2,6 +2,7 @@ package net.arna.jcraft.api.registry;
 
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.client.particle.BreathParticle;
+import net.arna.jcraft.client.particle.LockOnParticle;
 import net.arna.jcraft.client.particle.MoshParticle;
 import net.minecraft.core.particles.SimpleParticleType;
 
@@ -31,6 +32,7 @@ public interface JParticleTypeRegistry {
     RegistrySupplier<SimpleParticleType> INVERSION = PARTICLES.register("inversion", () -> new SimpleParticleType(false));
     RegistrySupplier<BreathParticle.Type> BREATH = PARTICLES.register("breath", () -> BreathParticle.Type.INSTANCE);
     RegistrySupplier<SimpleParticleType> SUN_LOCK_ON = PARTICLES.register("sun_lock_on", () -> new SimpleParticleType(false));
+    RegistrySupplier<LockOnParticle.Type> LOCK_ON = PARTICLES.register("lock_on", () -> LockOnParticle.Type.INSTANCE);
     RegistrySupplier<SimpleParticleType> PURPLE_HAZE_CLOUD = PARTICLES.register("purple_haze_cloud", () -> new SimpleParticleType(false));
     RegistrySupplier<SimpleParticleType> PURPLE_HAZE_PARTICLE = PARTICLES.register("purple_haze_particle", () -> new SimpleParticleType(false));
     RegistrySupplier<SimpleParticleType> DAMAGE_NUMBER = PARTICLES.register("damage_number", () -> new SimpleParticleType(false));

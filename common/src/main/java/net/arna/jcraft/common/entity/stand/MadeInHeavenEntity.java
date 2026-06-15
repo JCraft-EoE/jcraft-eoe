@@ -28,6 +28,7 @@ import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
 import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.effects.ExhaustionEffect;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
@@ -45,6 +46,11 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -52,6 +58,7 @@ import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Made_in_Heaven">Made In Heaven</a>.
@@ -74,8 +81,12 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     .proCount(4)
                     .conCount(2)
                     .freeSpace(Component.literal("""
-                        PASSIVE: Speed I
-                        
+                        PASSIVE: Acceleration
+                            moving forward ramps up to Speed 70 over 1s
+                            backstepping cancels the buildup
+                            faster movement drains more hunger
+                            (backstep drains 2x); autostep is always on
+
                         BNBs:
                             -the flashbang
                             (Donut>Light>)Speed Slice>Low Kick>Fury Chop>Light>Barrage>dash>Light~Light
@@ -114,7 +125,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(SPEED_CHOP)
             .withImpactSound(SoundEvents.TRIDENT_HIT)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Slice"),
                     Component.literal("quick combo starter")
@@ -230,10 +240,30 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     private static final EntityDataAccessor<Integer> SPEEDOMETER = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> AFTER_IMAGE = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> CIRCLING_TARGET = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.INT);
+    // Speed-ramp progress synced to all clients so the afterimage renders the same for every observer.
+    private static final EntityDataAccessor<Integer> SPEED_RAMP = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.INT);
 
     public static final int MAXIMUM_SPEEDOMETER = 30;
+    public static final int EXHAUSTION_DURATION = 20 * 5; // 5 seconds
+
+    // Acceleration passive: ramps movement speed up to Speed 70 over RAMP_TICKS while moving forward.
+    private static final int RAMP_TICKS = 120; // 6 second to reach max speed
+    private static final double MAX_SPEED_BONUS = 0.2 * 70; // MULTIPLY_TOTAL bonus equal to Speed 70
+    private static final UUID RAMP_SPEED_UUID = UUID.fromString("7a3b2c1d-0e9f-4a8b-9c7d-1e2f3a4b5c6d");
+    private static final float AUTOSTEP_HEIGHT = 1.0f; // walk straight up full blocks
+    private static final float DEFAULT_STEP_HEIGHT = 0.6f; // vanilla player/mob step height
+    private static final float SPRINT_EXHAUSTION = 0.1f; // vanilla sprint exhaustion per meter
+    private static final double MOVE_EPSILON = 0.003; // minimum horizontal movement to count as moving
+    private static final double DIRECTION_THRESHOLD = 0.3; // dot threshold for forward/backstep classification
+    private static final int RAMP_GRACE_TICKS = 3; // idle/strafe ticks tolerated before the ramp resets (absorbs glitches)
 
     private int speedometer = 0;
+    private int speedRamp = 0;
+    private int rampIdleTicks = 0; // consecutive non-forward ticks, for the reset grace window
+    private int lastAppliedRamp = 0; // ramp value last written to the speed attribute, to skip redundant resyncs
+    // Self-tracked previous user position for reliable per-tick movement (server xo/yo/zo are not dependable for players).
+    private double lastUserX = Double.NaN;
+    private double lastUserZ = Double.NaN;
 
     public MadeInHeavenEntity(Level worldIn) {
         super(JStandTypeRegistry.MADE_IN_HEAVEN.get(), worldIn);
@@ -304,6 +334,14 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         entityData.set(SPEEDOMETER, this.speedometer = speedometer);
     }
 
+    /**
+     * @return how far the user is into the Acceleration speed ramp, 0..1. Synced to all clients, so the afterimage
+     * renders identically for every observer.
+     */
+    public float getRampIntensity() {
+        return Mth.clamp(entityData.get(SPEED_RAMP) / (float) RAMP_TICKS, 0f, 1f);
+    }
+
     public boolean getAfterimage() {
         return entityData.get(AFTER_IMAGE);
     }
@@ -327,6 +365,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         getEntityData().define(SPEEDOMETER, 0);
         getEntityData().define(AFTER_IMAGE, false);
         getEntityData().define(CIRCLING_TARGET, -1);
+        getEntityData().define(SPEED_RAMP, 0);
     }
 
     @Override
@@ -365,6 +404,30 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     }
 
     @Override
+    public void remove(RemovalReason reason) {
+        onStandRemoved(); // server-side removal (desummon, switching stands, death, ...)
+        super.remove(reason);
+    }
+
+    @Override
+    public void onClientRemoval() {
+        onStandRemoved(); // client-side removal goes through here instead of remove()
+        super.onClientRemoval();
+    }
+
+    /**
+     * Restores the user's autostep and clears the ramp speed. Called on both sides so the local player's client-side
+     * step height (which governs actual stepping) is reverted, not just the server copy.
+     */
+    private void onStandRemoved() {
+        if (hasUser()) {
+            final LivingEntity user = getUserOrThrow();
+            user.setMaxUpStep(DEFAULT_STEP_HEIGHT);
+            clearRampSpeed(user);
+        }
+    }
+
+    @Override
     public void tick() {
         super.tick();
 
@@ -374,15 +437,17 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
         final LivingEntity user = getUserOrThrow();
         final int aTime = getAccelTime();
 
+        if (user.isSprinting()) {
+            user.setMaxUpStep(AUTOSTEP_HEIGHT);
+        }
+        else {
+            user.setMaxUpStep(DEFAULT_STEP_HEIGHT);
+        }
 
-        if (!user.hasEffect(JStatusRegistry.DAZED.get())) {
-            if (aTime > 0) {
-                int amplifier = speedometer / 3;
-                user.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 20, amplifier, true, false));
-                user.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 20, amplifier, true, false));
-            } else {
-                user.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 0, true, false));
-            }
+        if (aTime > 0 && !user.hasEffect(JStatusRegistry.DAZED.get())) {
+            int amplifier = speedometer / 3;
+            user.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 20, amplifier, true, false));
+            user.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 20, amplifier, true, false));
         }
 
         if (level().isClientSide) {
@@ -412,8 +477,117 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             return;
         }
 
+        // Acceleration passive
+        tickSpeedRamp(user);
+
         // Tracking
         setSpeedometer(speedometer);
+    }
+
+    /**
+     * Acceleration passive: ramps {@link MobEffects#MOVEMENT_SPEED} up to Speed 70 over {@link #RAMP_TICKS} while the
+     * user moves forward, cancels it when backstepping, and drains hunger proportionally to the ramp.
+     * <p>
+     * Movement direction is inferred from the user's actual horizontal displacement this tick (reliable server-side)
+     * relative to their look yaw, since the server cannot see which movement keys a player holds in this version.
+     */
+    private void tickSpeedRamp(LivingEntity user) {
+        // Sample the user's per-tick displacement from our own previous sample, so it stays reliable for server players.
+        final double curX = user.getX();
+        final double curZ = user.getZ();
+        final boolean firstSample = Double.isNaN(lastUserX);
+        final double dx = firstSample ? 0.0 : curX - lastUserX;
+        final double dz = firstSample ? 0.0 : curZ - lastUserZ;
+        lastUserX = curX;
+        lastUserZ = curZ;
+
+        if (user.hasEffect(JStatusRegistry.DAZED.get()) || isEatingFood(user)) {
+            speedRamp = 0; // being dazed or eating cancels the buildup
+        } else {
+            final double dist = Math.sqrt(dx * dx + dz * dz);
+
+            boolean forward = false;
+            boolean backstep = false;
+            if (dist >= MOVE_EPSILON) {
+                final float yaw = user.getYRot() * Mth.DEG_TO_RAD;
+                final double dot = (dx * -Mth.sin(yaw) + dz * Mth.cos(yaw)) / dist;
+                if (dot > DIRECTION_THRESHOLD && user.isSprinting()) {
+                    forward = true; // only sprinting builds the ramp; walking does not
+                } else if (dot < -DIRECTION_THRESHOLD) {
+                    backstep = true;
+                }
+            }
+
+            if (forward) {
+                speedRamp = Math.min(RAMP_TICKS, speedRamp + 1);
+                rampIdleTicks = 0;
+            } else if (backstep) {
+                speedRamp = 0; // backstepping cancels buildup immediately
+                rampIdleTicks = 0;
+            } else {
+                // Idle or strafing. Tolerate a few ticks first: a single server tick can read no movement (packet
+                // timing) or briefly misjudge direction mid-turn, and a hard reset there wipes the whole ramp.
+                if (++rampIdleTicks >= RAMP_GRACE_TICKS) {
+                    speedRamp = 0;
+                }
+            }
+
+            // Hunger drain (players only; mobs do not use FoodData). Scaled from vanilla sprint exhaustion (0.1/meter).
+            if (user instanceof Player player) {
+                if (backstep) {
+                    player.causeFoodExhaustion((float) dist * SPRINT_EXHAUSTION * 2f);
+                } else if (forward && speedRamp > 0) {
+                    final float frac = speedRamp / (float) RAMP_TICKS;
+                    final float multiplier = JServerConfig.MIH_SPRINT_HUNGER_MULTIPLIER.getValue();
+                    player.causeFoodExhaustion((float) dist * SPRINT_EXHAUSTION * multiplier * frac);
+                    for (int amplifier = ExhaustionEffect.MAX_LEVEL - 1; amplifier >= 0; amplifier--) {
+                        if (speedRamp >= 20 * amplifier) {
+                            player.addEffect(new MobEffectInstance(JStatusRegistry.EXHAUSTION.get(), EXHAUSTION_DURATION, amplifier));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        applyRampSpeed(user);
+        entityData.set(SPEED_RAMP, speedRamp); // sync to clients for afterimage rendering
+    }
+
+    /**
+     * Drives the {@link Attributes#MOVEMENT_SPEED} attribute directly from {@link #speedRamp} via a transient modifier.
+     * Unlike a potion effect this gives a stable speed while ramping and an instant drop to zero, and it leaves any
+     * other speed sources (potions, Time Acceleration) untouched.
+     */
+    private void applyRampSpeed(LivingEntity user) {
+        if (speedRamp == lastAppliedRamp) {
+            return; // unchanged since last tick; avoid needless attribute resyncs
+        }
+        lastAppliedRamp = speedRamp;
+
+        final AttributeInstance speed = user.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speed == null) {
+            return;
+        }
+        speed.removeModifier(RAMP_SPEED_UUID);
+        if (speedRamp > 0) {
+            final double bonus = MAX_SPEED_BONUS * (speedRamp / (double) RAMP_TICKS);
+            speed.addTransientModifier(new AttributeModifier(RAMP_SPEED_UUID, "MiH acceleration", bonus,
+                    AttributeModifier.Operation.MULTIPLY_TOTAL));
+        }
+    }
+
+    private static boolean isEatingFood(LivingEntity user) {
+        return user.isUsingItem() && user.getUseItem().getUseAnimation() == UseAnim.EAT;
+    }
+
+    private void clearRampSpeed(LivingEntity user) {
+        final AttributeInstance speed = user.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speed != null) {
+            speed.removeModifier(RAMP_SPEED_UUID);
+        }
+        speedRamp = 0;
+        lastAppliedRamp = 0;
     }
 
     // Copied from Entity#lookAt(EntityAnchor, Vec3d), but doesn't set prevYaw, prevPitch and prevHeadYaw to get rid of jitter.
