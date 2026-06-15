@@ -340,19 +340,54 @@ public final class JUtils {
      *     <li>never collapses below {@code minReach}, so the stand always detaches (and clips a little into
      *     anything closer than that) rather than snapping back into the user.</li>
      * </ul>
-     * The ray starts at {@code origin} and follows {@code lookDir}. Used by look-tracked stand attacks to keep
-     * the stand's body (and hitbox) attached to where the user is aiming.
+     * <p>
+     * This is a <b>volumetric</b> cast: rather than a single centre line, it fires a bundle of parallel rays
+     * offset to the corners of the stand's cross-section (perpendicular to {@code lookDir}) and takes the
+     * nearest hit, so the reach accounts for the stand's actual width/height instead of threading the needle
+     * past obstacles just off the crosshair.
      *
      * @param user     the stand's user, providing the level and self-ignore for the raycast
      * @param origin   the ray origin (typically the user's eye position)
      * @param lookDir  the (normalized) aim direction to cast along
-     * @param ignore   an entity the ray should pass through (typically the stand itself); may be {@code null}
+     * @param ignore   the stand entity; rays pass through it and its bounding box sizes the bundle. May be
+     *                 {@code null}, in which case a single thin ray is used.
      * @param minReach the minimum reach distance in blocks (the stand never gets closer than this)
      * @param maxReach the maximum reach distance in blocks
      * @return the clamped reach distance in blocks, within {@code [minReach, maxReach]}
      */
     public static double clampReachToLook(final LivingEntity user, final Vec3 origin, final Vec3 lookDir,
                                           final @Nullable Entity ignore, final double minReach, final double maxReach) {
+        double reach = singleReach(user, origin, lookDir, ignore, maxReach);
+
+        if (ignore != null) {
+            final double halfWidth = ignore.getBbWidth() * 0.5;
+            final double halfHeight = ignore.getBbHeight() * 0.5;
+
+            // Two axes perpendicular to the aim, forming the plane of the stand's cross-section.
+            final Vec3 reference = Math.abs(lookDir.y) > 0.999 ? new Vec3(1.0, 0.0, 0.0) : new Vec3(0.0, 1.0, 0.0);
+            final Vec3 right = lookDir.cross(reference).normalize();
+            final Vec3 up = right.cross(lookDir).normalize();
+
+            // Sample the four corners of that cross-section; the nearest of all rays is where the stand's body
+            // (not just its centre line) first makes contact. Stop early once we've already hit the minimum.
+            for (int sx = -1; sx <= 1 && reach > minReach; sx += 2) {
+                for (int sy = -1; sy <= 1 && reach > minReach; sy += 2) {
+                    final Vec3 offsetOrigin = origin.add(right.scale(sx * halfWidth)).add(up.scale(sy * halfHeight));
+                    reach = Math.min(reach, singleReach(user, offsetOrigin, lookDir, ignore, maxReach));
+                }
+            }
+        }
+
+        return Mth.clamp(reach, minReach, maxReach);
+    }
+
+    /**
+     * Casts a single thin ray for {@link #clampReachToLook} and returns the distance to the first block/entity
+     * hit (less the relevant margin), or {@code maxReach} when nothing is in the way. Not yet clamped to a
+     * minimum.
+     */
+    private static double singleReach(final LivingEntity user, final Vec3 origin, final Vec3 lookDir,
+                                      final @Nullable Entity ignore, final double maxReach) {
         final Vec3 end = origin.add(lookDir.scale(maxReach));
         final HitResult hit = raycastAll(user, origin, end, ClipContext.Fluid.NONE, ignore == null ? null : e -> e != ignore);
         if (hit.getType() == HitResult.Type.MISS) {
@@ -360,8 +395,7 @@ public final class JUtils {
         }
 
         final double margin = hit.getType() == HitResult.Type.ENTITY ? LOOK_TRACK_ENTITY_MARGIN : LOOK_TRACK_BLOCK_MARGIN;
-        final double dist = hit.getLocation().distanceTo(origin) - margin;
-        return Mth.clamp(dist, minReach, maxReach);
+        return hit.getLocation().distanceTo(origin) - margin;
     }
 
     public static Direction getLookDirection(Entity entity) {
