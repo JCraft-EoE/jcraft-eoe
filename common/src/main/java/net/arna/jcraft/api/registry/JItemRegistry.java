@@ -28,6 +28,13 @@ public interface JItemRegistry {
     RegistrySupplier<Item> STAND_DISC = register("stand_disc", () -> new StandDiscItem(settings().fireResistant().stacksTo(1)));
     RegistrySupplier<Item> SPEC_DISC = register("spec_disc", () -> new SpecDiscItem(settings().fireResistant().stacksTo(1)));
 
+    RegistrySupplier<Item> DISC_CASE = register("disc_case", () -> new DiscCaseItem(settings(), 2));
+    RegistrySupplier<Item> DISC_CASE_COPPER = register("disc_case_copper", () -> new DiscCaseItem(settings(), 4));
+    RegistrySupplier<Item> DISC_CASE_IRON = register("disc_case_iron", () -> new DiscCaseItem(settings(), 6));
+    RegistrySupplier<Item> DISC_CASE_GOLD = register("disc_case_gold", () -> new DiscCaseItem(settings(), 8));
+    RegistrySupplier<Item> DISC_CASE_EMERALD = register("disc_case_emerald", () -> new DiscCaseItem(settings(), 10));
+    RegistrySupplier<Item> DISC_CASE_DIAMOND = register("disc_case_diamond", () -> new DiscCaseItem(settings(), 12));
+
     RegistrySupplier<Item> FV_REVOLVER = register("fv_revolver", () -> new FVRevolverItem(settings().rarity(Rarity.UNCOMMON).durability(1200)));
     RegistrySupplier<Item> PEACEMAKER = register("peacemaker", () -> new Peacemaker(settings().rarity(Rarity.RARE).stacksTo(1)));
 

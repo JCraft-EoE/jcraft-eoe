@@ -60,6 +60,12 @@ public class JModelProvider extends FabricModelProvider {
         generator.generateFlatItem(JItemRegistry.DISC.get(), ModelTemplates.FLAT_ITEM);
         generateSpecDiscModels(generator);
         generateStandDiscModels(generator);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_COPPER.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_IRON.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_GOLD.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_EMERALD.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_DIAMOND.get(), ModelTemplates.FLAT_ITEM);
 
         generator.generateFlatItem(JItemRegistry.STELLAR_IRON_INGOT.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.STONE_MASK.get(), ModelTemplates.FLAT_ITEM);
