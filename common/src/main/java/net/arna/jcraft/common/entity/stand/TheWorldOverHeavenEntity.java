@@ -171,6 +171,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withSound(JSoundRegistry.TWOH_SMITE)
             .withBlockStun(13)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("You won't run away!"),
                     Component.literal("Summons a weaker lightning bolt at the aimed position.")
@@ -181,6 +182,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withSound(JSoundRegistry.TWOH_SMITE)
             .withBlockStun(13)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
+            .withoutLookTracking()
             .withInfo(
                     Component.literal("Evaporate"),
                     Component.literal("Summons a powerful lightning bolt that deals high damage and stun, and lifts up on hit.")
