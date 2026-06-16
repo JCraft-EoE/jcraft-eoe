@@ -236,13 +236,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withInitAction(UserAnimationAction.play("mtl.pt"))
             .withCondition(MetallicaIronCondition.atLeast(ScalpelProjectile.IRON_COST));
 
-    public static final ExplodeMagneticFieldMove EXPLODE_MAGNETIC_FIELD = new ExplodeMagneticFieldMove(140, 10, 20)
-            .withInfo(
-                    Component.literal("Explode Magnetic Field"),
-                    Component.literal("""
-                            Reverses the polarity of the nearest aimed magnetic field, then detonates it.""")
-            )
-            .withInitAction(UserAnimationAction.play("mtl.emf"));
     public static final RazorCoughAttack RAZOR_COUGH_ATTACK = new RazorCoughAttack(140, 10, 20)
             .withInfo(
                     Component.literal("Internal Attack"),
@@ -251,6 +244,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
                             Increases Hypoxia for all affected entities.""")
             )
             .withInitAction(UserAnimationAction.play("mtl.rca"));
+
     public static final CreateMagneticFieldMove CREATE_MAGNETIC_FIELD = new CreateMagneticFieldMove(200, 5, 15)
             .withCrouchingVariant(RAZOR_COUGH_ATTACK)
             // .withAerialVariant(EXPLODE_MAGNETIC_FIELD)
@@ -276,6 +270,15 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
                             This attack does not interrupt other moves.""")
             )
             .withInitAction(UserAnimationAction.play("mtl.ita")); */
+
+    public static final ExplodeMagneticFieldMove EXPLODE_MAGNETIC_FIELD = new ExplodeMagneticFieldMove(0, 10, 20)
+            .withInfo(
+                    Component.literal("Explode Magnetic Field"),
+                    Component.literal("""
+                            Reverses the polarity of the nearest aimed magnetic field, then detonates it.""")
+            )
+            .withInitAction(UserAnimationAction.play("mtl.emf"));
+
     public static final SimpleAttack<MetallicaEntity> GRAB_HIT_FINAL = new SimpleAttack<MetallicaEntity>(0,
             18, 24, 0.5f, 4f, 9, 2f, 1.2f, 0f)
             // .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -306,6 +309,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
                             Restores 30 iron.
                             Cannot be used alongside spec moves and will override them.""")
             )
+            .withCrouchingVariant(EXPLODE_MAGNETIC_FIELD)
             .withImpactSound(JSoundRegistry.IMPACT_9)
             .withInitAction(CancelSpecMoveAction.cancelSpecMove())
             .withInitAction(UserAnimationAction.play("mtl.grab"));
@@ -331,6 +335,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
                             Cannot be queued.""")
             );
     public static final BisectAttack BISECT = new BisectAttack(0, 1, 11, 0.75f)
+            .withSound(JSoundRegistry.METALLICA_CRY)
             .withInitAction(UserAnimationAction.play("mtl.bsc_fire"));
     public static final BisectChargeMove BISECT_CHARGE = new BisectChargeMove(30 * 20, 81, 80, 0.75f, 12)
             .withInfo(
@@ -340,6 +345,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
                             Unblockable.""")
             )
             .withFollowup(BISECT)
+            .withSound(JSoundRegistry.METALLICA_TAKETHIS)
             .withInitAction(UserAnimationAction.play("mtl.bsc"));
     private static final BlockParticleOption FAKE_BLOOD = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.REDSTONE_WIRE.defaultBlockState());
 
@@ -425,7 +431,9 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
         sp1.withAerialVariant(State.FAN_TOSS);
 
         moves.register(MoveClass.SPECIAL2, CREATE_MAGNETIC_FIELD, State.NONE).withCrouchingVariant(State.NONE);
-        moves.register(MoveClass.SPECIAL3, GRAB, State.NONE);
+
+        var sp3 = moves.register(MoveClass.SPECIAL3, GRAB, State.NONE);
+        sp3.withCrouchingVariant(State.NONE);
 
         moves.register(MoveClass.ULTIMATE, BISECT_CHARGE, State.BISECT).withFollowup(State.NONE);
 

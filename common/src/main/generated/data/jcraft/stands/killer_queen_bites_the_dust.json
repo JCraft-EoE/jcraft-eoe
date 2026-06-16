@@ -1,0 +1,30 @@
+{
+  "evolution": true,
+  "idle_rotation": -30.0,
+  "info": {
+    "con_count": 2,
+    "free_space": {
+      "translate": "entity.jcraft.kqbtd.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.kqbtd"
+    },
+    "pro_count": 4,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.kqbtd.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.kqbtd.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.kqbtd.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:kqbtdsummon"
+    }
+  }
+}

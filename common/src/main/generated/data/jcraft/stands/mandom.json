@@ -1,0 +1,31 @@
+{
+  "block_distance": 0.0,
+  "idle_distance": 0.0,
+  "idle_rotation": 0.0,
+  "info": {
+    "con_count": 4,
+    "free_space": {
+      "translate": "entity.jcraft.mandom.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.mandom"
+    },
+    "pro_count": 2,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.mandom.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.mandom.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.mandom.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:mandomsummon"
+    }
+  }
+}

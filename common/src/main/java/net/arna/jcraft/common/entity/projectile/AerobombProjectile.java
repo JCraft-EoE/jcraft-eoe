@@ -73,11 +73,14 @@ public class AerobombProjectile extends AbstractArrow {
             final DamageSource damageSource = ownerStand == null ? level().damageSources().explosion(owner, this) : JDamageSources.stand(ownerStand);
 
             for (final LivingEntity living : hurt) {
-                if (hurt == owner) continue;
+                if (living == owner || living instanceof StandEntity<?,?>) {
+                    // Don't damage stands, their users are already in the set, we'll damage those instead.
+                    continue;
+                }
 
                 final Vec3 kbVec = JUtils.getEyePos(living).subtract(position()).normalize();
 
-                damageLogic(level(), living, kbVec, 2, 3, true, 15f, false, 4, damageSource, owner, null);
+                damageLogic(level(), living, kbVec, 2, 3, true, 12f, false, 4, damageSource, owner, null);
 
                 living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
             }

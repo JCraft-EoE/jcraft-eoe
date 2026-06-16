@@ -1,0 +1,71 @@
+{
+  "anim_state": "GRAB",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:shared_grab_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 4,
+      "blockable_type": "NON_BLOCKABLE",
+      "hit_spark": "HIT_SPARK_1",
+      "override_stun": true,
+      "stun_type": "UNBURSTABLE"
+    },
+    "cooldown": 220,
+    "damage": 0.0,
+    "duration": 28,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.takedown.description"
+      },
+      "name": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.takedown.name"
+      }
+    },
+    "grab_duration": 31,
+    "hit_move": {
+      "type": "jcraft:killerqueen_bitesthedust_btd_grab_hit_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 7,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1",
+        "stun_type": "UNBURSTABLE"
+      },
+      "cooldown": 0,
+      "damage": 3.0,
+      "duration": 42,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "name": {
+          "text": "Takedown (hit)"
+        }
+      },
+      "hit_moments": [
+        8,
+        22,
+        32
+      ],
+      "hitbox_size": 2.0,
+      "knockback": 0.0,
+      "move_distance": 0.75,
+      "offset": 0.5,
+      "stun": 15
+    },
+    "hit_state": "GRAB_HIT",
+    "hitbox_size": 1.75,
+    "knockback": 0.1,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 20,
+    "windup": 12
+  }
+}

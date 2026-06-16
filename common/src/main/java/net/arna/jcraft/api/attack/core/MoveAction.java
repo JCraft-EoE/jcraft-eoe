@@ -18,4 +18,14 @@ public abstract class MoveAction<T extends MoveAction<? extends T, A>, A extends
     public abstract void perform(final A attacker, final LivingEntity user, final Set<LivingEntity> targets);
 
     public abstract @NonNull MoveActionType<T> getType();
+
+    /**
+     * Sets the run moment of the given action to that of this action.
+     * @param target The action whose run moment to set
+     * @return The given action
+     */
+    protected T copyRunMoment(T target) {
+        target.setRunMoment(runMoment);
+        return target;
+    }
 }

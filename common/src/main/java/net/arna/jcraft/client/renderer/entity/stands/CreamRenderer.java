@@ -18,6 +18,7 @@ public class CreamRenderer extends StandEntityRenderer<CreamEntity> {
     public CreamRenderer(final @NonNull EntityRendererProvider.Context context) {
         super(context, b -> b
                 .setRenderType(CreamRenderer::renderType)
+                .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
                 .addRenderLayer(new CreamVoidLayer()),
                 JStandTypeRegistry.CREAM.get(), -0.1745329251f, -0.1f);
     }

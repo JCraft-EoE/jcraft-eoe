@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:on_fire",
+    "minecraft:in_fire",
+    "minecraft:lava",
+    "minecraft:falling_block",
+    "minecraft:drown",
+    "minecraft:in_wall"
+  ]
+}

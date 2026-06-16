@@ -1,0 +1,163 @@
+{
+  "anim_state": "NONE",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "crouching_variant": {
+    "anim_state": "NONE",
+    "class": "SPECIAL3",
+    "cooldown_type": "STAND_SP3",
+    "move": {
+      "type": "jcraft:metallica_explode_magnetic_field_move",
+      "cooldown": 0,
+      "duration": 20,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:user_animation",
+            "animation": "mtl.emf",
+            "run": "at_init"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.metallica.default.explode_magnetic_field.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.metallica.default.explode_magnetic_field.cr.name"
+        }
+      },
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_grab_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 4,
+      "blockable_type": "NON_BLOCKABLE",
+      "hit_spark": "HIT_SPARK_1",
+      "override_stun": true,
+      "stun_type": "UNBURSTABLE"
+    },
+    "cooldown": 280,
+    "damage": 0.0,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact9"
+        },
+        {
+          "type": "jcraft:cancel_spec_move",
+          "run": "at_init"
+        },
+        {
+          "type": "jcraft:user_animation",
+          "animation": "mtl.grab",
+          "run": "at_init"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.metallica.default.grab.description"
+      },
+      "name": {
+        "translate": "move.jcraft.metallica.default.grab.name"
+      }
+    },
+    "grab_duration": 17,
+    "grab_offset": 0.4,
+    "hit_move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 8,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1",
+        "stun_type": "UNBURSTABLE"
+      },
+      "cooldown": 0,
+      "damage": 4.0,
+      "duration": 24,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:metallica_add_iron",
+            "iron": 10.0,
+            "run": "on_strike"
+          },
+          {
+            "type": "jcraft:user_animation",
+            "animation": "mtl.grab_hit",
+            "force": true,
+            "run": "at_init"
+          }
+        ],
+        "finisher": {
+          "move": {
+            "type": "jcraft:shared_simple_attack",
+            "attack_extras": {
+              "backstab": true,
+              "block_stun": 8,
+              "hit_animation": "LAUNCH",
+              "hit_spark": "HIT_SPARK_2",
+              "override_stun": true,
+              "shockwaves": true,
+              "stun_type": "LAUNCH"
+            },
+            "cooldown": 0,
+            "damage": 4.0,
+            "duration": 24,
+            "extras": {
+              "actions": [
+                {
+                  "type": "jcraft:effect",
+                  "effects": [
+                    {
+                      "amplifier": 0,
+                      "duration": 200,
+                      "effect": "jcraft:hypoxia"
+                    }
+                  ],
+                  "run": "on_strike"
+                },
+                {
+                  "type": "jcraft:metallica_add_iron",
+                  "iron": 15.0,
+                  "run": "on_strike"
+                }
+              ],
+              "name": {
+                "text": "Grab (Final Hit)"
+              }
+            },
+            "hitbox_size": 2.0,
+            "knockback": 1.2,
+            "move_distance": 0.5,
+            "offset": 0.0,
+            "stun": 9,
+            "windup": 18
+          },
+          "tick": 14
+        },
+        "name": {
+          "text": "Grab (Second Hit)"
+        }
+      },
+      "hitbox_size": 2.0,
+      "knockback": 0.0,
+      "move_distance": 0.5,
+      "offset": 0.0,
+      "stun": 10,
+      "windup": 13
+    },
+    "hit_state": "GRAB_HIT",
+    "hitbox_size": 1.5,
+    "knockback": 0.0,
+    "move_distance": 0.5,
+    "offset": 0.0,
+    "stun": 15,
+    "windup": 9
+  }
+}

@@ -43,7 +43,7 @@ public class ProjectileRenderer<T extends AbstractArrow> extends AbstractEntityR
     }
 
     protected ProjectileRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context, final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
-        super(config, context, model, texture);
+        super(config, context);
     }
 
     protected ProjectileRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context, final @NonNull String id) {

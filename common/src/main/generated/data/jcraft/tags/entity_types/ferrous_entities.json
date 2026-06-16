@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:iron_golem",
+    "minecraft:fishing_bobber",
+    "minecraft:minecart",
+    "minecraft:chest_minecart",
+    "minecraft:furnace_minecart",
+    "minecraft:hopper_minecart",
+    "minecraft:command_block_minecart",
+    "minecraft:tnt_minecart",
+    "minecraft:spawner_minecart",
+    "minecraft:trident",
+    "jcraft:knife",
+    "jcraft:scalpel",
+    "jcraft:bisect",
+    "minecraft:arrow",
+    "minecraft:spectral_arrow",
+    "jcraft:standarrowprojectile",
+    "jcraft:razor"
+  ]
+}

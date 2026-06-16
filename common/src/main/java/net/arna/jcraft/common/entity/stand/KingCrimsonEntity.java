@@ -205,7 +205,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Epitaph"),
                     Component.literal("0.2s windup, 1.5s counter, combo starter. Cannot be buffered.")
             );
-    public static final PredictionMove PREDICTION = new PredictionMove(480, 4, 104, -1f)
+    public static final PredictionMove PREDICTION = new PredictionMove(160, 4, 104, -1f)
             .withCrouchingVariant(EPITAPH)
             .withSound(JSoundRegistry.KC_EPITAPH)
             .withInfo(
@@ -221,7 +221,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Time Erase"),
                     Component.literal("6 seconds duration, cancellable by doing anything with King Crimson")
             );
-    public static final TimeSkipMove<KingCrimsonEntity> TIME_SKIP = new TimeSkipMove<KingCrimsonEntity>(300, 16)
+    public static final TimeSkipMove<KingCrimsonEntity> TIME_SKIP = new TimeSkipMove<KingCrimsonEntity>(300, 16, 2, 2, 1)
             .withSound(JSoundRegistry.TE_TP)
             .withParticles()
             .withInfo(
@@ -230,7 +230,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<KingCrimsonEntity> TOSS = new TossMove<KingCrimsonEntity>(0, 1, 1, 0.75f,0.13f)
+    public static final KingCrimsonTossMove TOSS = new KingCrimsonTossMove(0, 1, 1, 0.75f,0.13f)
             .withAnim(KingCrimsonEntity.State.ITEM_TOSS);
     public static final TossChargeMove<KingCrimsonEntity> TOSS_CHARGE = new TossChargeMove<KingCrimsonEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(TOSS);

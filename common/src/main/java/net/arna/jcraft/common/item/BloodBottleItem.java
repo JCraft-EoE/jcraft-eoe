@@ -44,20 +44,23 @@ public class BloodBottleItem extends Item {
     }
 
     public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
-        Player playerEntity = user instanceof Player ? (Player) user : null;
+        final Player playerEntity = user instanceof Player ? (Player) user : null;
 
-        CompoundTag nbt = stack.getOrCreateTag();
+        final CompoundTag nbt = stack.getOrCreateTag();
+
         float blood = nbt.getFloat("Blood");
 
         if (blood >= 0.5f) {
             CommonVampireComponent vampireComponent = JComponentPlatformUtils.getVampirism(playerEntity);
 
             if (vampireComponent.isVampire()) {
-                boolean full = blood >= 1.0f;
+                // boolean full = blood >= 1.0f;
+
                 if (playerEntity != null) {
                     playerEntity.awardStat(Stats.ITEM_USED.get(this));
                     if (!playerEntity.getAbilities().instabuild && vampireComponent.getBlood() < 20) {
-                        nbt.putFloat("Blood", Math.max(--blood, 0));
+                        blood -= 0.5f;
+                        nbt.putFloat("Blood", Math.max(blood, 0));
                     }
                 }
 
@@ -65,7 +68,7 @@ public class BloodBottleItem extends Item {
                     if (playerEntity instanceof ServerPlayer) {
                         CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) playerEntity, stack);
                     }
-                    vampireComponent.setBlood(vampireComponent.getBlood() + (full ? 2 : 1));
+                    vampireComponent.setBlood(vampireComponent.getBlood() + 1.0f); // (full ? 2 : 1)
                 }
 
                 user.gameEvent(GameEvent.DRINK);
@@ -108,6 +111,7 @@ public class BloodBottleItem extends Item {
         }
 
         float bloodMult = JUtils.getBloodMult(entity);
+
         if (bloodMult <= 0) {
             return InteractionResult.PASS;
         }
@@ -117,11 +121,18 @@ public class BloodBottleItem extends Item {
         if (!user.level().isClientSide()) {
             entity.hurt(user.level().damageSources().playerAttack(user), 2);
             CompoundTag nbtCompound = stack.getOrCreateTag();
-            float newBlood = nbtCompound.getFloat("Blood") + bloodMult;
-            if (newBlood > MAX_BLOOD) {
+
+            float blood = nbtCompound.getFloat("Blood");
+
+            float newBlood = blood + bloodMult;
+
+            // A significantly overfilled blood bottle is probably intentionally made, so we allow it to be filled indefinitely.
+            if (blood <= MAX_BLOOD * 2 && newBlood > MAX_BLOOD) {
                 newBlood = MAX_BLOOD;
             }
+
             nbtCompound.putFloat("Blood", newBlood);
+
             user.setItemInHand(hand, stack);
         }
 

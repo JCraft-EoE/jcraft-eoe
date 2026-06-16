@@ -1,0 +1,194 @@
+{
+  "anim_state": "SMASH",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "crouching_variant": {
+    "anim_state": "SWEEP",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:shared_knockdown_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "extra_hit_boxes": [
+          {
+            "forward_offset": 1.75,
+            "size": 0.85,
+            "vertical_offset": -0.4
+          }
+        ],
+        "hit_animation": "LOW",
+        "hit_spark": "SWEEP_ATTACK",
+        "static_height": true
+      },
+      "cooldown": 0,
+      "damage": 5.0,
+      "duration": 14,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:mbladeswipe"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "minecraft:entity.player.attack.sweep"
+          },
+          {
+            "type": "jcraft:user_animation",
+            "animation": "mtl.swp",
+            "run": "at_init"
+          }
+        ],
+        "conditions": [
+          {
+            "type": "jcraft:metallica_iron",
+            "min_iron": 20.0
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.metallica.default.sweep.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.metallica.default.sweep.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.3,
+      "knockdown_duration": 35,
+      "move_distance": 0.75,
+      "offset": 0.4,
+      "stun": 8,
+      "windup": 7
+    }
+  },
+  "followup": {
+    "anim_state": "CLEAVE",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 10,
+        "extra_hit_boxes": [
+          {
+            "forward_offset": 3.0,
+            "size": 1.5,
+            "vertical_offset": 0.5
+          }
+        ],
+        "hit_animation": "CRUSH",
+        "hit_spark": "HIT_SPARK_3",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 0,
+      "damage": 6.5,
+      "duration": 21,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:d4clight"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          },
+          {
+            "type": "jcraft:user_animation",
+            "animation": "mtl.clv",
+            "run": "at_init"
+          }
+        ],
+        "conditions": [
+          {
+            "type": "jcraft:metallica_iron",
+            "min_iron": 40.0
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.metallica.default.cleave.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.metallica.default.cleave.followup.name"
+        }
+      },
+      "hitbox_size": 2.5,
+      "knockback": 2.0,
+      "move_distance": 1.5,
+      "offset": 0.2,
+      "stun": 11,
+      "windup": 12
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_uppercut_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 11,
+      "extra_hit_boxes": [
+        {
+          "forward_offset": 2.0,
+          "size": 1.5,
+          "vertical_offset": 0.5
+        }
+      ],
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_3"
+    },
+    "cooldown": 0,
+    "damage": 7.5,
+    "duration": 21,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:d4clight"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        },
+        {
+          "type": "jcraft:user_animation",
+          "animation": "mtl.sms",
+          "run": "at_init"
+        }
+      ],
+      "armor": 2147483647,
+      "conditions": [
+        {
+          "type": "jcraft:metallica_iron",
+          "min_iron": 40.0
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.metallica.default.smash.description"
+      },
+      "name": {
+        "translate": "move.jcraft.metallica.default.smash.name"
+      },
+      "ranged": true
+    },
+    "hitbox_size": 2.0,
+    "knockback": 2.0,
+    "move_distance": 1.0,
+    "offset": 0.2,
+    "strength": -0.5,
+    "stun": 18,
+    "windup": 11
+  }
+}

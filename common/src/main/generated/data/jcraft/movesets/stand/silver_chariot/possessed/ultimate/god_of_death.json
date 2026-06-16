@@ -1,0 +1,119 @@
+{
+  "anim_state": "BEAT_DOWN_START",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "followup": {
+    "anim_state": "BEAT_DOWN_START",
+    "class": "ULTIMATE",
+    "cooldown_type": "STAND_ULTIMATE",
+    "followup": {
+      "anim_state": "BEAT_DOWN_START",
+      "class": "ULTIMATE",
+      "cooldown_type": "STAND_ULTIMATE",
+      "move": {
+        "type": "jcraft:shared_simple_multi_hit_attack",
+        "attack_extras": {
+          "backstab": true,
+          "block_stun": 10,
+          "hit_animation": "LAUNCH",
+          "hit_spark": "HIT_SPARK_3",
+          "override_stun": true,
+          "shockwaves": true,
+          "stun_type": "LAUNCH"
+        },
+        "cooldown": 0,
+        "damage": 6.0,
+        "duration": 59,
+        "extras": {
+          "actions": [
+            {
+              "type": "jcraft:play_sound",
+              "bind": false,
+              "run": "on_hit",
+              "sound": "jcraft:twkickhit"
+            }
+          ],
+          "description": {
+            "translate": "move.jcraft.silver_chariot.possessed.god_of_death_final_hit.followup.description"
+          },
+          "name": {
+            "translate": "move.jcraft.silver_chariot.possessed.god_of_death_final_hit.followup.name"
+          }
+        },
+        "hit_moments": [
+          54
+        ],
+        "hitbox_size": 2.5,
+        "knockback": 1.25,
+        "move_distance": 0.65,
+        "offset": 0.0,
+        "stun": 20
+      }
+    },
+    "move": {
+      "type": "jcraft:silverchariot_god_of_death_hit_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 8,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1",
+        "stun_type": "UNBURSTABLE"
+      },
+      "cooldown": 0,
+      "damage": 4.5,
+      "duration": 59,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.silver_chariot.possessed.god_of_death_hit.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.silver_chariot.possessed.god_of_death_hit.followup.name"
+        }
+      },
+      "hit_moments": [
+        13,
+        23
+      ],
+      "hitbox_size": 2.0,
+      "knockback": 0.25,
+      "move_distance": 0.65,
+      "offset": 0.0,
+      "stun": 32
+    }
+  },
+  "move": {
+    "type": "jcraft:silverchariot_god_of_death_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "MID",
+      "hit_spark": "SWEEP_ATTACK",
+      "stun_type": "UNBURSTABLE"
+    },
+    "cooldown": 1000,
+    "damage": 4.0,
+    "duration": 28,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.silver_chariot.possessed.god_of_death.description"
+      },
+      "name": {
+        "translate": "move.jcraft.silver_chariot.possessed.god_of_death.name"
+      }
+    },
+    "hitbox_size": 1.75,
+    "knockback": 0.0,
+    "move_distance": 0.65,
+    "offset": 0.0,
+    "stun": 40,
+    "windup": 23
+  }
+}

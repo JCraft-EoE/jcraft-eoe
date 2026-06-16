@@ -13,11 +13,14 @@ import net.arna.jcraft.client.renderer.entity.StandEntityModelRenderer;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
 
@@ -45,13 +48,33 @@ public class AerosmithRenderer {
                         .setAnimatorProvider(() -> new AerosmithAnimator(animation))
                         .setModelRenderer((ctx, layerRenderer) ->
                                 new AerosmithModelRenderer(ctx, layerRenderer, context.getItemRenderer()))
-                        .setRenderType(renderType())
+                        .setRenderType(AerosmithRenderer::aerosmithRenderType)
                         .setPrerenderEntry(preRenderEntry())
                         .build(),
-                context,
-                model,
-                texture
+                context
         );
+    }
+
+    /**
+     * Selects the render type for Aerosmith.
+     * <p>
+     * Normally defers to the standard stand logic (entityNoOutline in first-person to avoid
+     * the stand obscuring the camera, entityTranslucent otherwise). However, when the local
+     * player is Aerosmith's user AND the stand is flying remotely out of line-of-sight,
+     * entityNoOutline is replaced with entityTranslucent so that the vanilla
+     * OutlineBufferSource can capture the geometry and produce the glow effect.
+     */
+    private static RenderType aerosmithRenderType(AerosmithEntity stand) {
+        final ResourceLocation texture = StandEntityRenderer.getTextureLocation(stand);
+        final Player player = Minecraft.getInstance().player;
+        if (StandEntityRenderer.standIsFirstPersonViewers(stand)) {
+            if (stand.isRemote() && !stand.isInLineOfSight() && stand.getUser() == player) {
+                // Glow-outline case: use entityTranslucent so the outline buffer captures us.
+                return RenderType.entityTranslucent(texture);
+            }
+            return RenderType.entityNoOutline(texture);
+        }
+        return RenderType.entityTranslucent(texture);
     }
 
     public static class AerosmithAnimator extends StandAnimator<AerosmithEntity> {

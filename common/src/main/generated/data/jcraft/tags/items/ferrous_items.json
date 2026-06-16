@@ -1,0 +1,37 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#minecraft:iron_ores",
+      "required": false
+    },
+    "minecraft:raw_iron",
+    "minecraft:raw_iron_block",
+    "minecraft:iron_nugget",
+    "minecraft:iron_ingot",
+    "minecraft:iron_block",
+    "minecraft:iron_bars",
+    "minecraft:iron_door",
+    "minecraft:iron_trapdoor",
+    "minecraft:chain",
+    "minecraft:iron_helmet",
+    "minecraft:iron_chestplate",
+    "minecraft:iron_leggings",
+    "minecraft:iron_boots",
+    "minecraft:chainmail_helmet",
+    "minecraft:chainmail_chestplate",
+    "minecraft:chainmail_leggings",
+    "minecraft:chainmail_boots",
+    "minecraft:iron_horse_armor",
+    "minecraft:iron_axe",
+    "minecraft:iron_pickaxe",
+    "minecraft:iron_shovel",
+    "minecraft:iron_hoe",
+    "minecraft:iron_sword",
+    "minecraft:anvil",
+    "jcraft:scalpel",
+    "jcraft:knife",
+    "jcraft:knife_bundle",
+    "jcraft:road_roller"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "anim_state": "COUNTER",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:shadowtheworld_counter_attack",
+    "cooldown": 400,
+    "duration": 20,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.shadow_the_world.default.counter.description"
+      },
+      "name": {
+        "translate": "move.jcraft.shadow_the_world.default.counter.name"
+      }
+    },
+    "move_distance": 0.75,
+    "windup": 5
+  }
+}

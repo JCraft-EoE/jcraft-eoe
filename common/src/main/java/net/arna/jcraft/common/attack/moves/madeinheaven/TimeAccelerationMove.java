@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.common.config.IntOption;
+import net.arna.jcraft.api.serverconfig.IntOption;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;

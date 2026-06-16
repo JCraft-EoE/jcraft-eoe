@@ -27,7 +27,7 @@ public class BackhandAttack extends AbstractUppercutAttack<BackhandAttack, Abstr
         super.processTarget(attacker, target, kbVec, damageSource);
         boolean stillBlocking = JUtils.isBlocking(target);
         if (!stillBlocking) {
-            AbstractPurpleHazeEntity.infect(target, 3 * 20);
+            AbstractPurpleHazeEntity.infect(target, 3 * 20, attacker.getUser());
         }
     }
 

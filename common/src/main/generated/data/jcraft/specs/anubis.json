@@ -1,0 +1,11 @@
+{
+  "description": {
+    "translate": "spec.jcraft.anubis.info.desc"
+  },
+  "free_space": {
+    "translate": "spec.jcraft.anubis.info.details"
+  },
+  "name": {
+    "translate": "spec.jcraft.anubis"
+  }
+}

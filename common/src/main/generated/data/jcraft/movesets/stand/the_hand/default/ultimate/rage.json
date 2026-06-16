@@ -1,0 +1,49 @@
+{
+  "anim_state": "RAGE",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:thehand_rage_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 10,
+      "blockable_type": "NON_BLOCKABLE",
+      "hit_animation": "MID",
+      "hit_spark": "INVERTED_HIT_SPARK_3"
+    },
+    "cooldown": 600,
+    "damage": 6.0,
+    "duration": 57,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:thrage"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact12"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.the_hand.default.rage.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_hand.default.rage.name"
+      }
+    },
+    "hit_moments": [
+      26,
+      40
+    ],
+    "hitbox_size": 2.0,
+    "knockback": 0.2,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 20
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:experience_bottle"
+    },
+    "D": {
+      "item": "jcraft:disc"
+    }
+  },
+  "pattern": [
+    "DA"
+  ],
+  "result": {
+    "item": "jcraft:spec_disc"
+  },
+  "show_notification": true
+}

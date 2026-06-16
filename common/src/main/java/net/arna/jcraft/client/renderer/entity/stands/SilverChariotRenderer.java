@@ -2,6 +2,7 @@ package net.arna.jcraft.client.renderer.entity.stands;
 
 import lombok.NonNull;
 import mod.azure.azurelib.render.AzRendererPipelineContext;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.client.renderer.entity.layer.AbstractRenderLayer;
 import net.arna.jcraft.client.renderer.entity.layer.SCRapierLayer;
@@ -9,9 +10,12 @@ import net.arna.jcraft.common.entity.stand.SilverChariotEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -20,19 +24,39 @@ import java.util.UUID;
  */
 @Environment(EnvType.CLIENT)
 public class SilverChariotRenderer extends StandEntityRenderer<SilverChariotEntity> {
+    public static final ResourceLocation MODEL = JCraft.id("geo/silver_chariot.geo.json");
+    private static final ResourceLocation ARMORLESS_TEXTURE = JCraft.id("textures/entity/stands/silver_chariot/no_armor.png");
+    private static final ResourceLocation[] POSSESSED_TEXTURES = new ResourceLocation[] {
+            JCraft.id("textures/entity/stands/silver_chariot/possessed0.png"),
+            JCraft.id("textures/entity/stands/silver_chariot/possessed1.png"),
+            JCraft.id("textures/entity/stands/silver_chariot/possessed2.png"),
+            JCraft.id("textures/entity/stands/silver_chariot/possessed3.png")
+    };
+
     public SilverChariotRenderer(final @NonNull EntityRendererProvider.Context context) {
         super(context, b -> b
                         .addRenderLayer(new SCAfterimageLayer())
-                        .addRenderLayer(new SCRapierLayer()),
-                /*
-                entity -> JCraft.id(MODEL_STR_TEMPLATE.formatted(JStandTypeRegistry.SILVER_CHARIOT.get().getId().getPath())),
-                entity -> switch(entity.getMode()) {
-                    case ARMORLESS -> NO_ARMOR_TEXTURE;
-                    case POSSESSED -> POSSESSED_TEXTURE;
-                    default -> StandEntityRenderer.getTextureLocation(entity);
-                },
-                 */
+                        .addRenderLayer(new SCRapierLayer())
+                        .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
+                        .setRenderType(SilverChariotRenderer::renderType),
+                sc -> MODEL, SilverChariotRenderer::getTexture,
                 JStandTypeRegistry.SILVER_CHARIOT.get(), false, false, 0f, 0f, 90f);
+    }
+
+    private static @NotNull RenderType renderType(final @NonNull SilverChariotEntity sc) {
+        return renderTypeOf(sc, getTexture(sc));
+    }
+
+    private static ResourceLocation getTexture(final SilverChariotEntity sc) {
+        final SilverChariotEntity.Mode mode = sc.getMode();
+
+        if (mode == SilverChariotEntity.Mode.ARMORLESS) {
+            return ARMORLESS_TEXTURE;
+        } else if (mode == SilverChariotEntity.Mode.POSSESSED) {
+            return POSSESSED_TEXTURES[sc.getSkin()];
+        }
+
+        return StandEntityRenderer.getTextureLocation(sc);
     }
 
     private static class SCAfterimageLayer extends AbstractRenderLayer<SilverChariotEntity> {

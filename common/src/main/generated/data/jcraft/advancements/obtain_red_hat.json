@@ -1,0 +1,39 @@
+{
+  "parent": "jcraft:find_stone_mask",
+  "criteria": {
+    "has_hat": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:red_hat"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_red_hat.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:red_hat",
+      "nbt": "{Damage:0,az_id:[I;-1769601921,-1838403176,-1352127053,753423702]}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_red_hat.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_hat"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

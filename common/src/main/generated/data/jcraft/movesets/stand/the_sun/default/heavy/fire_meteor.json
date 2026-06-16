@@ -1,0 +1,47 @@
+{
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "crouching_variant": {
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:thesun_fire_sun_beam_attack",
+      "beams": 1,
+      "cooldown": 20,
+      "divergence": 0.0,
+      "duration": 10,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.the_sun.default.fire_sunbeam.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_sun.default.fire_sunbeam.cr.name"
+        },
+        "ranged": true
+      },
+      "windup": 5
+    }
+  },
+  "move": {
+    "type": "jcraft:thesun_fire_meteor_attack",
+    "cooldown": 20,
+    "duration": 10,
+    "explosive_if_max": true,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.the_sun.default.fire_meteor.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_sun.default.fire_meteor.name"
+      },
+      "ranged": true
+    },
+    "hit_moments": [
+      5
+    ],
+    "meteor_divergence": 0.0,
+    "meteor_speed": 2.5,
+    "meteor_velocity": 1.0,
+    "meteors": 1
+  }
+}

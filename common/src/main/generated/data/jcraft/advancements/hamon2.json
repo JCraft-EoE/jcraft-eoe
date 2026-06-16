@@ -1,0 +1,31 @@
+{
+  "parent": "jcraft:hamon1",
+  "criteria": {
+    "toggled": {
+      "conditions": {},
+      "trigger": "jcraft:hamon2"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.jcraft.hamon2.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:spec_disc",
+      "nbt": "{SpecID:\"jcraft:hamon\"}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.hamon2.title"
+    }
+  },
+  "requirements": [
+    [
+      "toggled"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

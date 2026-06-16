@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "jcraft:block/meteorite_iron_ore_block"
+    }
+  }
+}

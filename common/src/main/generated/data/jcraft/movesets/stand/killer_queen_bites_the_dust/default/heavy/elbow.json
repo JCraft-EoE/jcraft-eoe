@@ -1,0 +1,47 @@
+{
+  "anim_state": "HEAVY",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "move": {
+    "type": "jcraft:killerqueen_bitesthedust_elbow_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 3,
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_2",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 0,
+    "damage": 7.5,
+    "duration": 9,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:kqbtdelbow"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact4"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.elbow.description"
+      },
+      "name": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.elbow.name"
+      }
+    },
+    "hitbox_size": 1.0,
+    "knockback": 1.1,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 10,
+    "windup": 5
+  }
+}

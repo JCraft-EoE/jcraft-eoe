@@ -1,0 +1,28 @@
+{
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:thesun_fire_meteor_attack",
+    "cooldown": 40,
+    "duration": 24,
+    "explosive_if_max": false,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.the_sun.default.starburst.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_sun.default.starburst.name"
+      },
+      "ranged": true
+    },
+    "hit_moments": [
+      8,
+      16,
+      24
+    ],
+    "meteor_divergence": 10.0,
+    "meteor_speed": 2.5,
+    "meteor_velocity": 1.75,
+    "meteors": 3
+  }
+}

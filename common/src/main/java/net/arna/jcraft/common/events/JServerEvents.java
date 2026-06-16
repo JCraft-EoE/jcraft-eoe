@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
@@ -241,9 +242,10 @@ public class JServerEvents {
                 case BLOCK_ATTRACTION -> {
                     BlockPos attractionBlockPos = interest.getAttractionBlockPos();
                     if (entity.distanceToSqr(attractionBlockPos.getX(), attractionBlockPos.getY(), attractionBlockPos.getZ()) < 4) {
-                        boolean griefing = serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING);
-                        dimensionalExplosion(serverWorld, griefing, entity);
-                        if (griefing) {
+                        // Only grief (and remove the attracted block) where the responsible entity is allowed to.
+                        boolean mayBreak = AbstractMove.mayBreak(serverWorld, attractionUser(entity), attractionBlockPos, null);
+                        dimensionalExplosion(serverWorld, mayBreak, entity);
+                        if (mayBreak) {
                             serverWorld.setBlockAndUpdate(attractionBlockPos, Blocks.AIR.defaultBlockState());
                         }
                     } else {
@@ -273,7 +275,12 @@ public class JServerEvents {
                                 entity.hurtMarked = true;
 
                                 if (item2.distanceTo(entity) <= 1.0) {
-                                    dimensionalExplosion(serverWorld, serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING), entity, item2);
+                                    // The annihilation happens at the midpoint between the two items; only grief there if allowed.
+                                    Vec3 midPos = item.position().add(item2.position()).scale(0.5);
+                                    LivingEntity user = attractionUser(item);
+                                    if (user == null) user = attractionUser(item2);
+                                    boolean mayBreak = AbstractMove.mayBreak(serverWorld, user, BlockPos.containing(midPos), null);
+                                    dimensionalExplosion(serverWorld, mayBreak, entity, item2);
                                     saveForNextIteration = false;
                                 }
                             }
@@ -294,6 +301,17 @@ public class JServerEvents {
             AttackerDataPacket.send(server.getPlayerList().getPlayers());
             AttackerDataLoader.setDirty(false);
         }
+    }
+
+    /**
+     * Resolves the {@link LivingEntity} responsible for an attracted entity (the thrower of the item),
+     * used as the claim/protection subject when deciding whether the annihilation may break blocks.
+     * Returns {@code null} when no living owner is known, in which case only the mob-griefing/spawn-protection
+     * rules apply.
+     */
+    @Nullable
+    private static LivingEntity attractionUser(Entity entity) {
+        return entity instanceof ItemEntity item && item.getOwner() instanceof LivingEntity owner ? owner : null;
     }
 
     private static void dimensionalExplosion(ServerLevel serverWorld, boolean griefing, Entity one) {
@@ -700,7 +718,7 @@ public class JServerEvents {
     }
 
     public static EventResult beforeBlockSet(final @NonNull BlockPos blockPos, final @NonNull BlockState oldBlockState, final @NonNull BlockState newBlockState, final @NonNull Level level) {
-        if (oldBlockState.is(BlockTags.LEAVES) && newBlockState.is(BlockTags.LEAVES)) {
+        if (level.isClientSide() || oldBlockState.is(BlockTags.LEAVES) && newBlockState.is(BlockTags.LEAVES)) {
             return EventResult.pass();
         }
 

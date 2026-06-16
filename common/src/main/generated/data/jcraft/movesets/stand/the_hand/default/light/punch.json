@@ -1,0 +1,175 @@
+{
+  "anim_state": "LIGHT",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "crouching_variant": {
+    "anim_state": "CROUCHING_LIGHT",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "followup": {
+      "anim_state": "CROUCHING_LIGHT_FOLLOWUP",
+      "class": "LIGHT",
+      "cooldown_type": "STAND_LIGHT",
+      "move": {
+        "type": "jcraft:thehand_stomp2",
+        "attack_extras": {
+          "backstab": true,
+          "block_stun": 10,
+          "extra_hit_boxes": [
+            {
+              "size": 1.0
+            }
+          ],
+          "hit_animation": "CRUSH",
+          "hit_spark": "HIT_SPARK_2"
+        },
+        "cooldown": 0,
+        "damage": 6.0,
+        "duration": 20,
+        "extras": {
+          "actions": [
+            {
+              "type": "jcraft:play_sound",
+              "bind": false,
+              "run": "on_hit",
+              "sound": "jcraft:impact1"
+            },
+            {
+              "type": "jcraft:play_sound",
+              "bind": false,
+              "run": "on_hit",
+              "sound": "jcraft:impact2"
+            }
+          ],
+          "description": {
+            "translate": "move.jcraft.the_hand.default.stomp_second_hit.followup.description"
+          },
+          "name": {
+            "translate": "move.jcraft.the_hand.default.stomp_second_hit.followup.name"
+          }
+        },
+        "hitbox_size": 1.75,
+        "knockback": 0.3,
+        "move_distance": 0.6,
+        "offset": 0.4,
+        "strength": -0.3,
+        "stun": 15,
+        "windup": 13
+      }
+    },
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 12,
+        "hit_animation": "LOW",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 20,
+      "damage": 5.0,
+      "duration": 14,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_hand.default.stomp.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_hand.default.stomp.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.25,
+      "move_distance": 0.5,
+      "offset": 0.4,
+      "stun": 15,
+      "windup": 9
+    }
+  },
+  "followup": {
+    "anim_state": "LIGHT_FOLLOWUP",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_simple_uppercut_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 4,
+        "extra_hit_boxes": [
+          {
+            "size": 1.0
+          }
+        ],
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_2"
+      },
+      "cooldown": 0,
+      "damage": 6.0,
+      "duration": 14,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_hand.default.gut_punch.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_hand.default.gut_punch.followup.name"
+        }
+      },
+      "hitbox_size": 1.6,
+      "knockback": 0.3,
+      "move_distance": 0.75,
+      "offset": -0.1,
+      "strength": 0.3,
+      "stun": 8,
+      "windup": 9
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "HIGH",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 20,
+    "damage": 4.0,
+    "duration": 10,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact6"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_hand.default.punch.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.the_hand.default.punch.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.25,
+    "move_distance": 0.75,
+    "offset": -0.1,
+    "stun": 12,
+    "windup": 5
+  }
+}

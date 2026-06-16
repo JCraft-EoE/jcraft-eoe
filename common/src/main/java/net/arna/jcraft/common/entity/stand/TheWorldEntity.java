@@ -22,6 +22,7 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.actions.LungeAction;
+import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.FeignBarrageCounterAttack;
 import net.arna.jcraft.common.attack.moves.theworld.TWChargeAttack;
@@ -178,7 +179,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
                     Component.literal("Donut"),
                     Component.literal("slow, uninterruptible combo starter/extender, 1.5s stun on whiff")
             );
-    public static final TimeSkipMove<TheWorldEntity> TIME_SKIP = new TimeSkipMove<TheWorldEntity>(300, 14)
+    public static final TimeSkipMove<TheWorldEntity> TIME_SKIP = new TimeSkipMove<TheWorldEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.TIME_SKIP)
             .withInfo(
                     Component.literal("Timeskip"),
@@ -197,9 +198,9 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
                     Component.literal("user & stand charge forward, launches")
             );
     public static final TWChargeAttack CHARGE = new TWChargeAttack(100,
-            5, 19, 7.5f, 5f, 20, 1.5f, 0.25f, 0)
+            7, 19, 7.5f, 5f, 20, 1.5f, 0.25f, 0)
             .withCrouchingVariant(LUNGE)
-            .withSound(JSoundRegistry.TW_CHARGE)
+            .withInitAction(PlaySoundAction.playSound(JSoundRegistry.TW_CHARGE).linger())
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
@@ -244,7 +245,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
         moves.register(MoveClass.SPECIAL3, FEIGN_BARRAGE, State.BARRAGE);
         moves.register(MoveClass.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
-        moves.register(MoveClass.UTILITY, TIME_SKIP, State.IDLE);
+        moves.register(MoveClass.UTILITY, TIME_SKIP, State.TIMESKIP);
 
         moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
@@ -264,8 +265,8 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             return;
         }
 
-        playSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
-        playSound(JSoundRegistry.MUDA_DA.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.MUDA_DA.get(), 1f, 1f);
     }
 
     @Override

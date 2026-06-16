@@ -1,0 +1,144 @@
+{
+  "aerial_variant": {
+    "anim_state": "AIR_HEAVY",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:shared_simple_uppercut_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 12,
+        "extra_hit_boxes": [
+          {
+            "forward_offset": 1.0,
+            "size": 1.0,
+            "vertical_offset": -0.5
+          },
+          {
+            "forward_offset": 1.0,
+            "size": 1.0,
+            "vertical_offset": 0.75
+          }
+        ],
+        "hit_animation": "CRUSH",
+        "hit_spark": "HIT_SPARK_3"
+      },
+      "cooldown": 0,
+      "damage": 8.0,
+      "duration": 20,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_world_over_heaven.default.overhead_kick.air.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_world_over_heaven.default.overhead_kick.air.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.3,
+      "move_distance": 1.25,
+      "offset": 0.0,
+      "strength": -1.0,
+      "stun": 20,
+      "windup": 10
+    }
+  },
+  "anim_state": "HEAVY",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "crouching_variant": {
+    "anim_state": "SINGULARITY",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:theworld_overheaven_singularity_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 10,
+        "blockable_type": "NON_BLOCKABLE_EFFECTS_ONLY",
+        "hit_animation": "CRUSH",
+        "hit_spark": "HIT_SPARK_3"
+      },
+      "block_bypass": true,
+      "cooldown": 140,
+      "damage": 6.0,
+      "duration": 23,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:twohsingularity"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact12"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_world_over_heaven.default.singularity.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_world_over_heaven.default.singularity.cr.name"
+        }
+      },
+      "hitbox_size": 2.0,
+      "knockback": 0.4,
+      "move_distance": 1.0,
+      "offset": 0.2,
+      "stun": 25,
+      "windup": 11
+    }
+  },
+  "move": {
+    "type": "jcraft:theworld_overheaven_singularity_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 20,
+      "blockable_type": "NON_BLOCKABLE_EFFECTS_ONLY",
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "block_bypass": false,
+    "cooldown": 0,
+    "damage": 6.0,
+    "duration": 22,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:twohheavy"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact12"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_world_over_heaven.default.true_strike.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_world_over_heaven.default.true_strike.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 0.3,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 20,
+    "windup": 10
+  }
+}

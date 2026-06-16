@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:iron_bars"
+    },
+    "F": {
+      "item": "minecraft:blast_furnace"
+    },
+    "G": {
+      "item": "minecraft:grindstone"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "Q": {
+      "item": "jcraft:gas_can"
+    },
+    "Y": {
+      "item": "minecraft:yellow_dye"
+    }
+  },
+  "pattern": [
+    "BYY",
+    "IQI",
+    "GFG"
+  ],
+  "result": {
+    "item": "jcraft:road_roller"
+  },
+  "show_notification": true
+}

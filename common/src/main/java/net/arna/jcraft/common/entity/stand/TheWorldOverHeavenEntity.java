@@ -84,7 +84,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withLaunch()
             .withInfo(
                     Component.literal("Lunge"),
-                    Component.literal("medium speed launcher")
+                    Component.literal("Medium speed, high range launcher.")
             );
     public static final SimpleAttack<TheWorldOverHeavenEntity> LOW_KICK = SimpleAttack.<TheWorldOverHeavenEntity>lightAttack(
                     6, 12, 0.75f, 6f, 14, 0.25f, 0.25f)
@@ -94,7 +94,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withBlockStun(7)
             .withInfo(
                     Component.literal("Low Kick"),
-                    Component.literal("quick combo starter")
+                    Component.literal("Quick combo starter.")
             );
     public static final SimpleAttack<TheWorldOverHeavenEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheWorldOverHeavenEntity>(0,
             9, 13, 0.75f, 6f, 8, 1.75f, 1.25f, -0.1f)
@@ -106,7 +106,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(
                     Component.literal("Roundhouse"),
-                    Component.literal("quick combo finisher")
+                    Component.literal("Combo finisher.")
             );
     public static final SimpleAttack<TheWorldOverHeavenEntity> PUNCH = SimpleAttack.<TheWorldOverHeavenEntity>lightAttack(
                     4, 7, 0.75f, 5f, 11, 0.2f, -0.1f)
@@ -115,7 +115,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(
                     Component.literal("Punch"),
-                    Component.literal("quick combo starter")
+                    Component.literal("Extremely quick combo starter.")
             );
     public static final MainBarrageAttack<TheWorldOverHeavenEntity> BARRAGE = new MainBarrageAttack<TheWorldOverHeavenEntity>(280,
             0, 40, 0.75f, 1f, 30, 2f, 0.1f, 0f, 3, Blocks.OBSIDIAN.defaultDestroyTime())
@@ -123,10 +123,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(
                     Component.literal("Barrage"),
-                    Component.literal("fast reliable combo starter/extender, high stun")
+                    Component.literal("Fast reliable combo starter/extender, high stun.")
             );
     public static final SingularityAttack SINGULARITY = new SingularityAttack(140,
-            11, 23,1f, 0f, 25, 2f, 0.4f, 0.2f, true)
+            11, 23,1f, 6f, 25, 2f, 0.4f, 0.2f, true)
             .withSound(JSoundRegistry.TWOH_SINGULARITY)
             .withAnim(State.SINGULARITY)
             .withImpactSound(JSoundRegistry.IMPACT_12)
@@ -135,7 +135,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withInfo(
                     Component.literal("Singularity"),
-                    Component.literal("block bypass (stun will always hit, but the opponent can stay blocking)")
+                    Component.literal("Block bypass (stun will always hit, but the opponent can stay blocking)")
             );
     public static final SimpleUppercutAttack<TheWorldOverHeavenEntity> OVERHEAD_KICK = new SimpleUppercutAttack<TheWorldOverHeavenEntity>(0,
             10, 20, 1.25f, 8f, 20, 1.5f, 0.3f, 0f, -1)
@@ -148,10 +148,10 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withExtraHitBox(1, -0.5, 1)
             .withInfo(
                     Component.literal("Overhead Kick"),
-                    Component.literal("high damage, good reach, launches down")
+                    Component.literal("High damage, good reach, launches down.")
             );
     public static final SingularityAttack TRUE_STRIKE = new SingularityAttack(0,
-            10, 22,1f, 0f, 20, 2f, 0.3f, 0f, false)
+            10, 22,1f, 6f, 20, 2f, 0.3f, 0f, false)
             .withBlockStun(20)
             .withAerialVariant(OVERHEAD_KICK)
             .withCrouchingVariant(SINGULARITY)
@@ -162,7 +162,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(
                     Component.literal("True Strike"),
-                    Component.literal("damage ignores potions and enchantments, good stun, high blockstun, medium windup")
+                    Component.literal("Good stun, high blockstun, medium windup.")
             );
     public static final SmiteAttack AIR_SMITE = new SmiteAttack(200,
             10, 20, 1f,6f, 21, 3f, 0f, 0f, true, 7, 9)
@@ -171,7 +171,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withInfo(
                     Component.literal("You won't run away!"),
-                    Component.literal("summons a weaker lightning bolt at the aimed position")
+                    Component.literal("Summons a weaker lightning bolt at the aimed position.")
             );
     public static final SmiteAttack SMITE = new SmiteAttack(200,
             10, 20, 1f,8f, 21, 3f, 0f, 0f, false, 7, 9)
@@ -181,7 +181,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withInfo(
                     Component.literal("Evaporate"),
-                    Component.literal("summons a powerful lightning bolt that deals high damage and stun")
+                    Component.literal("Summons a powerful lightning bolt that deals high damage and stun, and lifts up on hit.")
             );
     public static final OverwriteAttack OVERWRITE = new OverwriteAttack(0, 7, 23, 1f,
             0f, 40, 2f, 1f, 0f)
@@ -200,8 +200,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withFollowup(OVERWRITE)
             .withSound(JSoundRegistry.TWOH_CHARGE_OVERWRITE)
             .withInfo(Component.literal("Reality Overwrite"), Component.literal("""
-                    charges (for a minimum of 1s) an unblockable punch that changes the reality of the hit victims
-                    While charging, (de)activate overwrite by pressing:
+                    Charges (for a minimum of 1s) an unblockable punch that changes the reality of the hit victims.
+                    While charging, finish overwrite by pressing:
                     SPECIAL 1 - makes victims unable to look at you (stops if TW:OH is desummoned)
                     SPECIAL 2 - applies every damage over time effect to victims
                     SPECIAL 3 - heals and enslaves mobs"""));
@@ -212,7 +212,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withBlockStun(6)
             .withInfo(
                     Component.literal("Aerial Divine Finisher"),
-                    Component.literal("briefly stalls mid-air")
+                    Component.literal("Briefly stalls mid-air. Knives explode on contact.")
             );
     public static final DivineFinisherAttack DIVINE_FINISHER = new DivineFinisherAttack(280,
             16, 22,0.75f, 0f, 20, 1.5f, 0f, 0f)
@@ -221,7 +221,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withBlockStun(6)
             .withInfo(
                     Component.literal("Divine Finisher"),
-                    Component.literal("fires 4 stunning knives that launch at a delay/in air summons and launches 8 knives")
+                    Component.literal("Fires 4 stunning knives that launch at a delay.")
             );
     public static final TimeStopMove<TheWorldOverHeavenEntity> TIME_STOP = new TimeStopMove<TheWorldOverHeavenEntity>(
             1400, 45, 50, Either.right(JServerConfig.TWOH_TIME_STOP_DURATION))
@@ -231,8 +231,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
                     Component.literal("5 seconds")
             );
 
-    public static final TimeSkipMove<TheWorldOverHeavenEntity> TIME_SKIP = new TimeSkipMove<TheWorldOverHeavenEntity>(
-            300, 14)
+    public static final TimeSkipMove<TheWorldOverHeavenEntity> TIME_SKIP = new TimeSkipMove<TheWorldOverHeavenEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.TWOH_TIMESKIP)
             .withInfo(
                     Component.literal("Timeskip"),
@@ -335,8 +334,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             return;
         }
 
-        playSound(JSoundRegistry.TWOH_SUMMON.get(), 1f, 1f);
-        playSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.TWOH_SUMMON.get(), 1f, 1f);
+        playBoundSound(JSoundRegistry.TW_SUMMON.get(), 1f, 1f);
     }
 
     @Override

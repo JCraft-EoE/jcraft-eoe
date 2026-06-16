@@ -1,0 +1,30 @@
+{
+  "anim_state": "BOMB_PLANT",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:killerqueen_bomb_plant_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "blockable_type": "NON_BLOCKABLE_EFFECTS_ONLY",
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 140,
+    "duration": 20,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.killer_queen.default.bomb_plant.description"
+      },
+      "name": {
+        "translate": "move.jcraft.killer_queen.default.bomb_plant.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 9,
+    "windup": 12
+  }
+}

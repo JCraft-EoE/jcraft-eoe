@@ -51,4 +51,8 @@ public class JDamageSources {
     public static @NonNull DamageSource phpoison(Level world) {
         return create(world, PHPOISON);
     }
+
+    public static @NonNull DamageSource phpoison(Level world, Entity attacker) {
+        return create(world, PHPOISON, attacker);
+    }
 }

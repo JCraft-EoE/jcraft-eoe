@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "H": {
+      "item": "minecraft:leather_helmet"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "R": {
+      "item": "minecraft:red_dye"
+    }
+  },
+  "pattern": [
+    " R ",
+    "LHL"
+  ],
+  "result": {
+    "item": "jcraft:red_hat"
+  },
+  "show_notification": true
+}

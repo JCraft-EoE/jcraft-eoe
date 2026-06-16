@@ -1,0 +1,41 @@
+{
+  "anim_state": "OVERCLOCK",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:goldexperience_overclock_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 13,
+      "blockable_type": "NON_BLOCKABLE",
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_3",
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 920,
+    "damage": 9.0,
+    "duration": 31,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact10"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.gold_experience.default.overclock.description"
+      },
+      "name": {
+        "translate": "move.jcraft.gold_experience.default.overclock.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 0.9,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 60,
+    "windup": 22
+  }
+}

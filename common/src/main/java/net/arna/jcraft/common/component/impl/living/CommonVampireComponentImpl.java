@@ -2,7 +2,9 @@ package net.arna.jcraft.common.component.impl.living;
 
 import lombok.Getter;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.common.effects.ExhaustionEffect;
 import net.arna.jcraft.common.food.IFoodData;
 import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.util.JUtils;
@@ -12,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -77,14 +80,17 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
                 starveTick = 80;
             } else {
                 // Regenerate
+                final MobEffectInstance exhaustion = entity.getEffect(JStatusRegistry.EXHAUSTION.get());
                 float health = entity.getHealth();
                 if (health < entity.getMaxHealth() && blood >= MIN_REGEN_BLOOD && --regenTick < 1) {
-                    entity.heal(1);
+                    if (exhaustion == null || healCount % ExhaustionEffect.MAX_LEVEL > exhaustion.getAmplifier()) {
+                        entity.heal(1f);
+                        healCount++;
 
-                    // Every third heal takes away a blood unit
-                    if (++healCount > 2) {
-                        blood--;
-                        healCount = 0;
+                        // Every third heal takes away a blood unit
+                        if (healCount % 3 == 0) {
+                            blood--;
+                        }
                     }
 
                     regenTick = 10;

@@ -2,118 +2,54 @@ package net.arna.jcraft.client.gui;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
-import me.shedaniel.clothconfig2.impl.builders.*;
-import net.arna.jcraft.common.config.*;
+import me.shedaniel.clothconfig2.impl.builders.AbstractFieldBuilder;
+import net.arna.jcraft.api.serverconfig.ConfigOption;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.network.c2s.ConfigUpdatePacket;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+
 import java.util.HashSet;
 import java.util.Set;
 
+@Environment(EnvType.CLIENT)
 public class ServerConfigUI {
+    private static final String OPTION_FORMAT = "%s.serverconfig.option.%s";
+    private static final String CATEGORY_FORMAT = "%s.serverconfig.category.%s";
+
     public static void show(final boolean editable) {
         final ConfigBuilder builder = ConfigBuilder.create();
         final Set<ConfigOption> changedOptions = new HashSet<>();
 
-        for (final ConfigOption option : ConfigOption.getImmutableOptions().values()) {
-            final ConfigCategory category = builder.getOrCreateCategory(Component.translatable("jcraft.serverconfig.category." + option.getCategory()));
-            final MutableComponent optionText = Component.translatable("jcraft.serverconfig.option." + option.getKey());
+        for (final ConfigOption option : ConfigOption.getOptions().values()) {
+            final ResourceLocation key = option.getKey();
+            final ResourceLocation categoryId = option.getCategory();
 
-            final AbstractConfigListEntry<?> entry = switch (option.getType()) {
-                case INTEGER -> {
-                    final IntOption intOption = (IntOption) option;
-                    if (intOption.getMin() != null && intOption.getMax() != null) {
-                        final IntSliderBuilder sliderBuilder = builder.entryBuilder().startIntSlider(optionText, intOption.getValue(),
-                                        intOption.getMin(), intOption.getMax())
-                                .setDefaultValue(intOption.getDefaultValue())
-                                .setSaveConsumer(value -> {
-                                    intOption.setValue(value);
-                                    changedOptions.add(intOption);
-                                });
+            final String categoryKey = String.format(CATEGORY_FORMAT, categoryId.getNamespace(), categoryId.getPath());
+            final String optionKey = String.format(OPTION_FORMAT, key.getNamespace(), key.getPath());
+            final String tooltipKey = optionKey + ".tooltip";
 
-                        yield sliderBuilder.build();
-                    } else {
-                        final IntFieldBuilder fieldBuilder = builder.entryBuilder().startIntField(optionText, intOption.getValue())
-                                .setDefaultValue(intOption.getDefaultValue())
-                                .setSaveConsumer(value -> {
-                                    intOption.setValue(value);
-                                    changedOptions.add(intOption);
-                                });
+            final ConfigCategory category = builder.getOrCreateCategory(Component.translatable(categoryKey));
+            final Component name = Component.translatable(optionKey);
 
-                        if (intOption.getMin() != null) {
-                            fieldBuilder.setMin(intOption.getMin());
-                        } else {
-                            fieldBuilder.removeMin();
-                        }
+            final AbstractFieldBuilder<?, ?, ?> entry = option.createField(builder, name, () -> changedOptions.add(option));
 
-                        if (intOption.getMax() != null) {
-                            fieldBuilder.setMax(intOption.getMax());
-                        } else {
-                            fieldBuilder.removeMax();
-                        }
+            if (I18n.exists(tooltipKey))
+                entry.setTooltip(Component.translatable(tooltipKey));
 
-                        yield fieldBuilder.build();
-                    }
-                }
-                case FLOAT -> {
-                    final FloatOption floatOption = (FloatOption) option;
-                    final FloatFieldBuilder fieldBuilder = builder.entryBuilder().startFloatField(optionText, floatOption.getValue())
-                            .setDefaultValue(floatOption.getDefaultValue())
-                            .setSaveConsumer(value -> {
-                                floatOption.setValue(value);
-                                changedOptions.add(floatOption);
-                            });
-
-                    if (floatOption.getMin() != null) {
-                        fieldBuilder.setMin(floatOption.getMin());
-                    } else {
-                        fieldBuilder.removeMin();
-                    }
-
-                    if (floatOption.getMax() != null) {
-                        fieldBuilder.setMax(floatOption.getMax());
-                    } else {
-                        fieldBuilder.removeMax();
-                    }
-
-                    yield fieldBuilder.build();
-                }
-                case BOOLEAN -> {
-                    final BooleanOption booleanOption = (BooleanOption) option;
-                    final BooleanToggleBuilder toggleBuilder = builder.entryBuilder().startBooleanToggle(optionText, booleanOption.getValue())
-                            .setDefaultValue(booleanOption.getDefaultValue())
-                            .setSaveConsumer(value -> {
-                                booleanOption.setValue(value);
-                                changedOptions.add(booleanOption);
-                            });
-                    yield toggleBuilder.build();
-                }
-                case ENUM -> {
-                    final EnumOption<?> enumOption = (EnumOption<?>) option;
-                    //noinspection unchecked // this is fine
-                    final EnumSelectorBuilder<Enum<?>> selectorBuilder = builder.entryBuilder().startEnumSelector(optionText,
-                                    (Class<Enum<?>>) enumOption.getClazz(), enumOption.getValue())
-                            .setDefaultValue(enumOption.getDefaultValue())
-                            .setSaveConsumer(e -> {
-                                enumOption.setValue(e.ordinal());
-                                changedOptions.add(enumOption);
-                            });
-
-                    yield selectorBuilder.build();
-                }
-            };
-
-            category.addEntry(entry);
+            category.addEntry(entry.build());
         }
 
         builder.setEditable(editable);
-        builder.setSavingRunnable(() -> NetworkManager.sendToServer(ConfigUpdatePacket.ID, ConfigOption.writeOptions(
-                new FriendlyByteBuf(Unpooled.buffer()), changedOptions)));
+        builder.setSavingRunnable(() -> NetworkManager.sendToServer(ConfigUpdatePacket.ID,
+                JServerConfig.writeOptions(new FriendlyByteBuf(Unpooled.buffer()), changedOptions)));
         Minecraft.getInstance().setScreen(builder.build());
     }
 }

@@ -43,12 +43,9 @@ public abstract class AbstractHoldableMove<T extends AbstractHoldableMove<T, A>,
     }
 
     /**
-     * Checks if the attacker is still using the given move, taking into account if the attacker is a stand in standby mode.
+     * Checks if the attacker is still using the given move.
      */
     private boolean sameMove(final A attacker, final MoveInputType type) {
-        if (attacker instanceof final StandEntity<?,?> stand) {
-            return type.getMoveClass(stand.isStandby()) == getMoveClass();
-        }
         return type.getMoveClass() == getMoveClass();
     }
 

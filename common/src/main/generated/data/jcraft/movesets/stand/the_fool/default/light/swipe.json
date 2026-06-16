@@ -1,0 +1,136 @@
+{
+  "anim_state": "SWIPE",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "crouching_variant": {
+    "anim_state": "DRILL",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_simple_multi_hit_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 4,
+        "extra_hit_boxes": [
+          {
+            "forward_offset": 1.75,
+            "size": 0.75,
+            "vertical_offset": -0.1
+          }
+        ],
+        "hit_animation": "LOW",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 0,
+      "damage": 2.5,
+      "duration": 14,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.the_fool.default.drill.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_fool.default.drill.cr.name"
+        }
+      },
+      "hit_moments": [
+        5,
+        8,
+        11
+      ],
+      "hitbox_size": 1.5,
+      "knockback": 0.2,
+      "move_distance": 1.5,
+      "offset": 0.25,
+      "stun": 7
+    }
+  },
+  "followup": {
+    "anim_state": "LIGHT_FOLLOWUP",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 4,
+        "extra_hit_boxes": [
+          {
+            "size": 1.0,
+            "vertical_offset": 0.25
+          }
+        ],
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_2",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 0,
+      "damage": 6.0,
+      "duration": 16,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact2"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_fool.default.swipe.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_fool.default.swipe.followup.name"
+        }
+      },
+      "hitbox_size": 2.0,
+      "knockback": 1.5,
+      "move_distance": 1.5,
+      "offset": 0.0,
+      "stun": 9,
+      "windup": 9
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 10,
+      "extra_hit_boxes": [
+        {
+          "size": 1.0,
+          "vertical_offset": 0.25
+        }
+      ],
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 30,
+    "damage": 6.0,
+    "duration": 14,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact2"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_fool.default.swipe.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.the_fool.default.swipe.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 0.5,
+    "move_distance": 1.5,
+    "offset": -0.1,
+    "stun": 15,
+    "windup": 7
+  }
+}

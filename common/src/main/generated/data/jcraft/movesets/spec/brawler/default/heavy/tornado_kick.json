@@ -1,0 +1,83 @@
+{
+  "anim_state": "TORNADO",
+  "class": "HEAVY",
+  "cooldown_type": "HEAVY",
+  "crouching_variant": {
+    "anim_state": "HEAVY",
+    "class": "HEAVY",
+    "cooldown_type": "HEAVY",
+    "move": {
+      "type": "jcraft:shared_simple_uppercut_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 10,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_2"
+      },
+      "cooldown": 0,
+      "damage": 6.0,
+      "duration": 21,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact3"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.brawler.default.uppercut.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.brawler.default.uppercut.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.3,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "strength": 0.3,
+      "stun": 15,
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 11,
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_2",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 200,
+    "damage": 7.0,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact3"
+        }
+      ],
+      "armor": 3,
+      "description": {
+        "translate": "move.jcraft.brawler.default.tornado_kick.description"
+      },
+      "name": {
+        "translate": "move.jcraft.brawler.default.tornado_kick.name"
+      }
+    },
+    "hitbox_size": 1.6,
+    "knockback": 0.85,
+    "move_distance": 1.0,
+    "offset": -0.1,
+    "stun": 20,
+    "windup": 12
+  }
+}

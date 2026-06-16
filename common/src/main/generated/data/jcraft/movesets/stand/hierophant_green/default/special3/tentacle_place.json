@@ -1,0 +1,27 @@
+{
+  "anim_state": "NET_SET",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:hierophantgreen_net_set_move",
+    "cooldown": 200,
+    "duration": 15,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:hgnetset"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.hierophant_green.default.tentacle_place.description"
+      },
+      "name": {
+        "translate": "move.jcraft.hierophant_green.default.tentacle_place.name"
+      }
+    },
+    "move_distance": 1.0,
+    "windup": 9
+  }
+}

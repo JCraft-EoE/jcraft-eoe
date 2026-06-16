@@ -1,0 +1,38 @@
+{
+  "anim_state": "ULTIMATE",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:horus_perfect_freeze_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 1000,
+    "damage": 4.0,
+    "duration": 30,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:horusplacecreepingice"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.horus.default.perfect_freeze.description"
+      },
+      "name": {
+        "translate": "move.jcraft.horus.default.perfect_freeze.name"
+      }
+    },
+    "hitbox_size": 2.5,
+    "knockback": 0.3,
+    "move_distance": 0.0,
+    "offset": 0.0,
+    "stun": 10,
+    "windup": 14
+  }
+}

@@ -156,22 +156,22 @@
 				{
 					"name": "eyes",
 					"parent": "head",
-					"pivot": [0, 27.6, -4.025]
+					"pivot": [0, 27.6, -4.1]
 				},
 				{
 					"name": "eyeRight",
 					"parent": "eyes",
-					"pivot": [-1.5, 27.6, -3.501],
+					"pivot": [-1.5, 27.6, -3.576],
 					"cubes": [
-						{"origin": [-2, 27.1, -4.001], "size": [1, 1, 1], "uv": [0, 0]}
+						{"origin": [-2, 27.1, -4.076], "size": [1, 1, 1], "uv": [0, 0]}
 					]
 				},
 				{
 					"name": "eyeLeft",
 					"parent": "eyes",
-					"pivot": [1.5, 27.6, -3.501],
+					"pivot": [1.5, 27.6, -3.576],
 					"cubes": [
-						{"origin": [1, 27.1, -4.001], "size": [1, 1, 1], "uv": [0, 0]}
+						{"origin": [1, 27.1, -4.076], "size": [1, 1, 1], "uv": [0, 0]}
 					]
 				},
 				{
@@ -297,6 +297,12 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "bipedHandRight",
+					"parent": "lower_armRight",
+					"pivot": [-4.8, 13.2, 0.2],
+					"rotation": [90, 0, -180]
 				},
 				{
 					"name": "shoulder_right",

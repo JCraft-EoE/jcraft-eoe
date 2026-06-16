@@ -1,0 +1,34 @@
+{
+  "carvers": {},
+  "downfall": 0.0,
+  "effects": {
+    "fog_color": 16314057,
+    "sky_color": 14987035,
+    "water_color": 10203353,
+    "water_fog_color": 6645121
+  },
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      "jcraft:sand_disk_pf"
+    ]
+  ],
+  "has_precipitation": false,
+  "spawn_costs": {},
+  "spawners": {
+    "ambient": [],
+    "axolotls": [],
+    "creature": [],
+    "misc": [],
+    "monster": [],
+    "underground_water_creature": [],
+    "water_ambient": [],
+    "water_creature": []
+  },
+  "temperature": 3.0
+}

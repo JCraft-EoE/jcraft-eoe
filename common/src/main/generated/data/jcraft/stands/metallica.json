@@ -1,0 +1,30 @@
+{
+  "idle_distance": 0.0,
+  "idle_rotation": -45.0,
+  "info": {
+    "con_count": 3,
+    "free_space": {
+      "translate": "entity.jcraft.metallica.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.metallica"
+    },
+    "pro_count": 3,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.metallica.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.metallica.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.metallica.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:msummon"
+    }
+  }
+}

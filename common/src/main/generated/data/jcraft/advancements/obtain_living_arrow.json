@@ -1,0 +1,38 @@
+{
+  "parent": "jcraft:obtain_stand",
+  "criteria": {
+    "has_arrow": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:living_arrow"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_living_arrow.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:living_arrow"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_living_arrow.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_arrow"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

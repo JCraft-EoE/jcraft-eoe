@@ -1,0 +1,8 @@
+{
+  "type": "jcraft:crazy_diamond",
+  "count": 1,
+  "ingredient": {
+    "item": "minecraft:stripped_mangrove_wood"
+  },
+  "result": "minecraft:mangrove_wood"
+}

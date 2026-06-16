@@ -1,0 +1,15 @@
+{
+  "idle_rotation": -45.0,
+  "info": {
+    "con_count": 0,
+    "free_space": {
+      "translate": "entity.jcraft.chariot_requiem.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.chariot_requiem"
+    },
+    "pro_count": 0,
+    "skin_names": []
+  },
+  "obtainable": false
+}

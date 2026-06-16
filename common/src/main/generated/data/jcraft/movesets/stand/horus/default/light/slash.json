@@ -1,0 +1,199 @@
+{
+  "aerial_variant": {
+    "anim_state": "LIGHT_AIR",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 11,
+      "damage": 5.0,
+      "duration": 11,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact9"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.horus.default.downward_claw.air.description"
+        },
+        "name": {
+          "translate": "move.jcraft.horus.default.downward_claw.air.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.25,
+      "move_distance": 0.75,
+      "offset": 0.5,
+      "stun": 12,
+      "windup": 6
+    }
+  },
+  "anim_state": "LIGHT",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "crouching_variant": {
+    "anim_state": "LIGHT_LOW",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 8,
+        "hit_animation": "LOW",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 9,
+      "damage": 4.0,
+      "duration": 9,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact9"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.horus.default.low_claw.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.horus.default.low_claw.cr.name"
+        }
+      },
+      "hitbox_size": 1.25,
+      "knockback": 0.25,
+      "move_distance": 0.95,
+      "offset": 0.5,
+      "stun": 8,
+      "windup": 5
+    }
+  },
+  "followup": {
+    "anim_state": "LIGHT_FOLLOWUP",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "crouching_variant": {
+      "anim_state": "IMPALE",
+      "class": "LIGHT",
+      "cooldown_type": "STAND_LIGHT",
+      "move": {
+        "type": "jcraft:shared_simple_attack",
+        "attack_extras": {
+          "backstab": true,
+          "block_stun": 25,
+          "hit_animation": "CRUSH",
+          "hit_spark": "HIT_SPARK_2"
+        },
+        "cooldown": 0,
+        "damage": 7.0,
+        "duration": 25,
+        "extras": {
+          "actions": [
+            {
+              "type": "jcraft:play_sound",
+              "bind": false,
+              "run": "on_hit",
+              "sound": "jcraft:impact9"
+            }
+          ],
+          "description": {
+            "translate": "move.jcraft.horus.default.impale.cr.description"
+          },
+          "name": {
+            "translate": "move.jcraft.horus.default.impale.cr.name"
+          }
+        },
+        "hitbox_size": 1.85,
+        "knockback": 1.5,
+        "move_distance": 0.75,
+        "offset": 0.2,
+        "stun": 25,
+        "windup": 15
+      }
+    },
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 4,
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_2",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 0,
+      "damage": 6.0,
+      "duration": 13,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact3"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.horus.default.finisher.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.horus.default.finisher.followup.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 1.0,
+      "move_distance": 0.75,
+      "offset": 0.2,
+      "stun": 10,
+      "windup": 9
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 23,
+    "damage": 5.0,
+    "duration": 11,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact3"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.horus.default.slash.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.horus.default.slash.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.2,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 12,
+    "windup": 6
+  }
+}

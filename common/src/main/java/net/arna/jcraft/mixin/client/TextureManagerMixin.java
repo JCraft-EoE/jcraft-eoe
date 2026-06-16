@@ -10,12 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TextureManager.class)
 public class TextureManagerMixin {
-    @Inject(
-            method = "tick",
-            at = @At("HEAD"),
-            cancellable = true
-    )
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void jcraft$tickAnimatedTextures(CallbackInfo ci) {
-        if (JClientUtils.isInTSRange(Minecraft.getInstance().player.position())) ci.cancel();
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && JClientUtils.isInTSRange(mc.player.position())) ci.cancel();
     }
 }

@@ -1,0 +1,89 @@
+{
+  "anim_state": "ROUNDHOUSE",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "crouching_variant": {
+    "anim_state": "SWEEP",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "LOW",
+        "hit_spark": "HIT_SPARK_2"
+      },
+      "cooldown": 16,
+      "damage": 5.0,
+      "duration": 16,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:twkick"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:twkickhit"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_world.default.sweep.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_world.default.sweep.cr.name"
+        }
+      },
+      "hitbox_size": 1.85,
+      "knockback": 0.5,
+      "move_distance": 0.75,
+      "offset": 0.4,
+      "stun": 16,
+      "windup": 6
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_uppercut_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "hit_animation": "HIGH",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 13,
+    "damage": 5.0,
+    "duration": 13,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:twkick"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:twkickhit"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_world.default.roundhouse.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_world.default.roundhouse.name"
+      }
+    },
+    "hitbox_size": 1.75,
+    "knockback": 0.5,
+    "move_distance": 0.75,
+    "offset": -0.2,
+    "strength": 0.4,
+    "stun": 10,
+    "windup": 7
+  }
+}

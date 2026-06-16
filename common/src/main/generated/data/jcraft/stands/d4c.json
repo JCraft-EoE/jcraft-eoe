@@ -1,0 +1,29 @@
+{
+  "idle_rotation": -45.0,
+  "info": {
+    "con_count": 2,
+    "free_space": {
+      "translate": "entity.jcraft.d4c.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.d4c"
+    },
+    "pro_count": 4,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.d4c.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.d4c.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.d4c.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:d4csummon"
+    }
+  }
+}

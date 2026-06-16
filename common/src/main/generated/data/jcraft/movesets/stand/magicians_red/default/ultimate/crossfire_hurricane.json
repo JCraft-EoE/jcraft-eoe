@@ -1,0 +1,27 @@
+{
+  "anim_state": "CROSSFIRE_HURRICANE",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:magiciansred_crossfire_hurricane_attack",
+    "cooldown": 800,
+    "duration": 22,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mrult"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.magicians_red.default.crossfire_hurricane.description"
+      },
+      "name": {
+        "translate": "move.jcraft.magicians_red.default.crossfire_hurricane.name"
+      }
+    },
+    "move_distance": 0.75,
+    "windup": 18
+  }
+}

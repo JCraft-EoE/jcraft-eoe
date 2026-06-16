@@ -1,0 +1,29 @@
+{
+  "idle_rotation": -30.0,
+  "info": {
+    "con_count": 3,
+    "free_space": {
+      "translate": "entity.jcraft.goldexperience.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.goldexperience"
+    },
+    "pro_count": 4,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.goldexperience.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.goldexperience.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.goldexperience.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:gesummon"
+    }
+  }
+}

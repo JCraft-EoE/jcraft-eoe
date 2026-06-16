@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#minecraft:buttons",
+      "required": false
+    },
+    "minecraft:bamboo",
+    "minecraft:totem_of_undying",
+    "minecraft:disc_fragment_5",
+    "jcraft:stand_arrowhead",
+    "jcraft:kq_coin",
+    "jcraft:requiem_arrow"
+  ]
+}

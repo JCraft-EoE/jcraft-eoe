@@ -1,0 +1,94 @@
+{
+  "type": "group",
+  "conditions": [
+    "USER_NOT_MOVING"
+  ],
+  "modifiers": [
+    {
+      "type": "custom",
+      "operation": "ADD",
+      "part": "body",
+      "property": "Y_ROT",
+      "value": 0.5235988
+    },
+    {
+      "type": "group",
+      "conditions": [
+        "LEFT_ARM_EMPTY"
+      ],
+      "modifiers": [
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "leftArm",
+          "property": "Y_ROT",
+          "value": 0.5235988
+        },
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "leftArm",
+          "property": "Z",
+          "value": -2.1
+        },
+        {
+          "type": "empty"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "conditions": [
+        "RIGHT_ARM_EMPTY_OR_ITEM"
+      ],
+      "modifiers": [
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "rightArm",
+          "property": "Y_ROT",
+          "value": 0.5235988
+        },
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "rightArm",
+          "property": "Z",
+          "value": 2.1
+        },
+        {
+          "type": "empty"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "modifiers": [
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "leftLeg",
+          "property": "Z",
+          "value": -1.0
+        },
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "rightLeg",
+          "property": "Z",
+          "value": 1.5
+        },
+        {
+          "type": "custom",
+          "operation": "ADD",
+          "part": "rightLeg",
+          "property": "Y_ROT",
+          "value": 0.7853982
+        },
+        {
+          "type": "empty"
+        }
+      ]
+    }
+  ]
+}

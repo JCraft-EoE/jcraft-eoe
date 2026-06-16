@@ -14,28 +14,29 @@ import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
 import mod.azure.azurelib.render.item.AzItemRendererRegistry;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.pose.PoseModifiers;
 import net.arna.jcraft.api.registry.JItemRegistry;
-import net.arna.jcraft.client.renderer.armor.ArmorRenderer;
-import net.arna.jcraft.client.renderer.item.GasCanItemRenderer;
-import net.arna.jcraft.client.rendering.DamageIndicatorManager;
-import net.arna.jcraft.client.particle.DamageNumberParticle;
-import net.arna.jcraft.client.rendering.StandUserPoseLoader;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
-import net.arna.jcraft.client.registry.*;
+import net.arna.jcraft.client.registry.JClientEventsRegistry;
+import net.arna.jcraft.client.registry.JRenderLayerRegistry;
+import net.arna.jcraft.client.renderer.armor.ArmorRenderer;
 import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
+import net.arna.jcraft.client.renderer.item.GasCanItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
+import net.arna.jcraft.client.rendering.StandUserPoseLoader;
+import net.arna.jcraft.client.sound.BoundSoundClient;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
-import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.MovementInputType;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.KeyMapping;
@@ -103,6 +104,9 @@ public class JCraftClient {
 
         GravityChannelClient.init();
 
+        BlockBreakerClient.init();
+        BoundSoundClient.init();
+
         // Rendering
         JRenderLayerRegistry.init();
         RenderHandler.init();
@@ -115,6 +119,12 @@ public class JCraftClient {
         AzArmorRendererRegistry.register(ArmorRenderer.simple("red_hat"), JItemRegistry.RED_HAT.get());
 
         AzItemRendererRegistry.register(JItemRegistry.GAS_CAN.get(), GasCanItemRenderer::new);
+
+        SpecialParticleShaderHandler.INSTANCE.init();
+        ZaWarudoShaderHandler.INSTANCE.init();
+        CrimsonShaderHandler.INSTANCE.init();
+        EpitaphVignetteShaderHandler.INSTANCE.init();
+        MandomRewindShaderHandler.INSTANCE.init();
 
         // Renderer registration
 

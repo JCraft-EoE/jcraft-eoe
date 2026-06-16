@@ -1,0 +1,48 @@
+{
+  "anim_state": "HEAVY",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "move": {
+    "type": "jcraft:shared_movement_slowing_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 13,
+      "extra_hit_boxes": [
+        {
+          "size": 1.25
+        }
+      ],
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_3",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 22,
+    "damage": 9.0,
+    "duration": 22,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact2"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.gold_experience.default.shoulder_smash.description"
+      },
+      "name": {
+        "translate": "move.jcraft.gold_experience.default.shoulder_smash.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 1.5,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 10,
+    "windup": 13
+  }
+}

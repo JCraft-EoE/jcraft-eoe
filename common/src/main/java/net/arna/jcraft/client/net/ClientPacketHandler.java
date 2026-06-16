@@ -25,8 +25,10 @@ import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.rendering.shader.TimeEraseShaderEffect;
+import net.arna.jcraft.client.sound.BoundSoundClient;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.common.config.ConfigOption;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
@@ -91,6 +93,16 @@ public class ClientPacketHandler {
         register(S2C_MANDOM_DATA, ClientPacketHandler::handleMandomData);
         register(S2C_IPS_TRIGGERED, ClientPacketHandler::handleIPSTriggered);
         register(S2C_DAMAGE_NUMBER, ClientPacketHandler::handleDamageNumber);
+        register(S2C_BLOCK_BREAKAGE, ClientPacketHandler::handleBlockBreakage);
+        register(S2C_BOUND_SOUND, ClientPacketHandler::handleBoundSound);
+    }
+
+    private static void handleBoundSound(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
+        BoundSoundClient.onBoundSoundPacket(client, buf);
+    }
+
+    private static void handleBlockBreakage(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
+        BlockBreakerClient.onBreakagePacket(buf);
     }
 
     private static void handleDamageNumber(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
@@ -128,9 +140,14 @@ public class ClientPacketHandler {
         );
 
         client.execute(() -> {
+            if (client.level == null) return;
+
             for (int i = 0; i < NUM_MAGNETIC_CIRCLES; i++) {
                 final double phi = i * Math.PI * 2 / NUM_MAGNETIC_CIRCLES;
-                final Vec3 direction = new Vec3(Math.cos(phi), 0, Math.sin(phi));
+                Vec3 direction = new Vec3(Math.cos(phi), 0, Math.sin(phi));
+
+                if (strength < 0) // exploding
+                    direction = direction.add(JUtils.randUnitVec(client.level.random));
 
                 final Vec3 basePos = pos.add(direction.scale(strength / 2.0));
 
@@ -530,10 +547,12 @@ public class ClientPacketHandler {
                 client.execute(() -> {
                     final Entity sourceShader = world.getEntity(id);
                     if (sourceShader instanceof final LivingEntity livingEntity) {
-                        if (JShaderRegistry.TIMESTOP_EFFECT != null)
-                        {
-                            JShaderRegistry.TIMESTOP_EFFECT.queueBubble(Optional.of(livingEntity).orElse(client.player), duration);
-                        }
+
+                        ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
+                        zaWarudoShaderHandler.shaderSourceEntity = Optional.of(livingEntity).orElse(client.player);
+                        zaWarudoShaderHandler.effectLength = duration;
+                        zaWarudoShaderHandler.shouldRender = true;
+
                     }
                 });
             }
@@ -542,19 +561,22 @@ public class ClientPacketHandler {
                     return;
                 }
 
-                TimeEraseShaderEffect effect = JShaderRegistry.TIME_ERASE;
-                if (effect != null) { effect.enabled = true; }
+                final CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
+                crimsonShaderHandler.effectLength = duration;
+                crimsonShaderHandler.shouldRender = true;
+
+
             });
             case MANDOM_REWIND -> {
-//                final float r = buf.readFloat();
-//                final float g = buf.readFloat();
-//                final float b = buf.readFloat();
-//                client.execute(() -> {
-//                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
-//                    mandomHandler.duration = duration;
-//                    mandomHandler.shaderColor = new Vector3f(r, g, b);
-//                    mandomHandler.shouldRender = true;
-//                });
+                final float r = buf.readFloat();
+                final float g = buf.readFloat();
+                final float b = buf.readFloat();
+                client.execute(() -> {
+                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
+                    mandomHandler.duration = duration;
+                    mandomHandler.shaderColor = new Vector3f(r, g, b);
+                    mandomHandler.shouldRender = true;
+                });
             }
         }
     }
@@ -568,10 +590,17 @@ public class ClientPacketHandler {
                 }
                 case ZA_WARUDO -> client.execute(() -> {
 
+                    ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
+                    zaWarudoShaderHandler.shouldRender = false;
+                    zaWarudoShaderHandler.renderingEffect = false;
+
                 });
                 case CRIMSON -> client.execute(() -> {
-                    TimeEraseShaderEffect effect = JShaderRegistry.TIME_ERASE;
-                    if (effect != null) { effect.enabled = false; }
+
+                    CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
+                    crimsonShaderHandler.shouldRender = false;
+                    crimsonShaderHandler.renderingEffect = false;
+
                 });
             }
         }

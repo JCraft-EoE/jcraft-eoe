@@ -1,7 +1,7 @@
 package net.arna.jcraft.api.registry;
 
 import dev.architectury.event.events.common.*;
-import net.arna.jcraft.common.config.ConfigOption;
+import net.arna.jcraft.api.serverconfig.ConfigOption;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.events.JBlockEvents;
 import net.arna.jcraft.common.events.JEntityEvents;
@@ -31,7 +31,7 @@ public interface JEventsRegistry {
 
         // Send initial values of server config options to the player.
         PlayerEvent.PLAYER_JOIN.register((player) -> {
-            ConfigUpdatePacket.sendOptionsToClient(player, ConfigOption.getImmutableOptions().values());
+            ConfigUpdatePacket.sendOptionsToClient(player, ConfigOption.getOptions().values());
             AttackerDataPacket.send(List.of(player));
         });
 

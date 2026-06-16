@@ -1,0 +1,64 @@
+{
+  "anim_state": "STOMP",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "followup": {
+    "anim_state": "DETONATE",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:horus_detonate_attack",
+      "cooldown": 0,
+      "duration": 12,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.horus.default.detonate.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.horus.default.detonate.followup.name"
+        }
+      },
+      "move_distance": 0.75,
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:horus_stomp_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 13,
+      "hit_animation": "LOW",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 22,
+    "damage": 9.0,
+    "duration": 22,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:horusstomp"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.horus.default.stomp.description"
+      },
+      "name": {
+        "translate": "move.jcraft.horus.default.stomp.name"
+      }
+    },
+    "hitbox_size": 1.3,
+    "knockback": 0.6,
+    "move_distance": 0.75,
+    "offset": 0.4,
+    "stun": 12,
+    "windup": 11
+  }
+}

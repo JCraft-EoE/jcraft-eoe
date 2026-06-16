@@ -1,0 +1,46 @@
+{
+  "anim_state": "ERASE_SPACE",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:thehand_erase_space_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "blockable_type": "NON_BLOCKABLE",
+      "hit_animation": "MID",
+      "hit_spark": "INVERTED_HIT_SPARK_3"
+    },
+    "cooldown": 300,
+    "damage": 4.0,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:thswipequick"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact12"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_hand.default.erase_space.description"
+      },
+      "mobility_type": "DASH",
+      "name": {
+        "translate": "move.jcraft.the_hand.default.erase_space.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": -0.5,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 6,
+    "windup": 12
+  }
+}

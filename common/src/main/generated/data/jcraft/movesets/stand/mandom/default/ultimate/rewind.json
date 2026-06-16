@@ -1,0 +1,28 @@
+{
+  "anim_state": "REWIND",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:mandom_rewind_move",
+    "cooldown": 6,
+    "duration": 10,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mandomrewind"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.mandom.default.rewind.description"
+      },
+      "name": {
+        "translate": "move.jcraft.mandom.default.rewind.name"
+      }
+    },
+    "move_distance": 0.0,
+    "reach": 200,
+    "windup": 5
+  }
+}

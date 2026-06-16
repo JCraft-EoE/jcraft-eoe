@@ -1,0 +1,36 @@
+{
+  "anim_state": "ACTIVE",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "crouching_variant": {
+    "anim_state": "ACTIVE",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:aerosmith_item_drop_attack",
+      "cooldown": 200,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.aerosmith.default.item_drop.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.aerosmith.default.item_drop.cr.name"
+        }
+      },
+      "range": 67.0
+    }
+  },
+  "move": {
+    "type": "jcraft:aerosmith_bomb_drop_attack",
+    "cooldown": 200,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.aerosmith.default.bomb_drop.description"
+      },
+      "name": {
+        "translate": "move.jcraft.aerosmith.default.bomb_drop.name"
+      }
+    },
+    "range": 67.0
+  }
+}

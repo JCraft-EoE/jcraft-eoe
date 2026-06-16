@@ -5,14 +5,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.stand.StandType;
-import net.arna.jcraft.common.advancements.Hamon1Trigger;
-import net.arna.jcraft.common.advancements.Hamon2Trigger;
-import net.arna.jcraft.common.advancements.Hamon3Trigger;
-import net.arna.jcraft.common.advancements.Hamon4Trigger;
-import net.arna.jcraft.common.advancements.Hamon5Trigger;
-import net.arna.jcraft.common.advancements.Hamon6Trigger;
-import net.arna.jcraft.common.advancements.ObtainedSpecTrigger;
-import net.arna.jcraft.common.advancements.ObtainedStandTrigger;
+import net.arna.jcraft.common.advancements.*;
 import net.arna.jcraft.common.item.SpecDiscItem;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
@@ -22,10 +15,14 @@ import net.minecraft.advancements.FrameType;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.KilledTrigger;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class JAdvancementProvider extends FabricAdvancementProvider {
@@ -182,7 +179,7 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
         consumer.accept(obtainSpecDisc);
         // find stone mask
         final Advancement findStoneMask = Advancement.Builder.advancement()
-                .display(JItemRegistry.STONE_MASK.get(),
+                .display(createStackWithAzId(JItemRegistry.STONE_MASK),
                         Component.translatable("advancements.jcraft.find_stone_mask.title"),
                         Component.translatable("advancements.jcraft.find_stone_mask.description"),
                         null,
@@ -224,7 +221,7 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
         consumer.accept(obtainBloodBottle);
         // find stone mask
         final Advancement obtainRedHat = Advancement.Builder.advancement()
-                .display(JItemRegistry.RED_HAT.get(),
+                .display(createStackWithAzId(JItemRegistry.RED_HAT),
                         Component.translatable("advancements.jcraft.obtain_red_hat.title"),
                         Component.translatable("advancements.jcraft.obtain_red_hat.description"),
                         null,
@@ -383,5 +380,13 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .addCriterion("waved", Hamon6Trigger.TriggerInstance.trigger())
                 .build(JCraft.id("hamon6"));
         consumer.accept(hamon6);
+    }
+
+    private static ItemStack createStackWithAzId(RegistrySupplier<? extends Item> item) {
+        ItemStack stack = new ItemStack(item.get());
+        CompoundTag tag = stack.getOrCreateTag();
+        UUID azId = UUID.nameUUIDFromBytes(item.getId().toString().getBytes(StandardCharsets.UTF_8));
+        tag.putUUID("az_id", azId);
+        return stack;
     }
 }

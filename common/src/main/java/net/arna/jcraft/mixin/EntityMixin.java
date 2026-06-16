@@ -5,11 +5,13 @@ import net.arna.jcraft.common.effects.FlammableEffect;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.events.EntityTickEvent;
+import net.arna.jcraft.common.events.JEntityEvents;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.mixin_logic.EntityAddon;
 import net.arna.jcraft.mixin_logic.EntityMixinLogic;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -58,21 +60,25 @@ public abstract class EntityMixin implements EntityAddon {
 
     @Inject(method = "isInvulnerable", at = @At("HEAD"), cancellable = true)
     private void invulnerableIfCreaming(CallbackInfoReturnable<Boolean> cir) {
-        if (jcraft$isCreaming())
+        if (CreamEntity.isCreaming((Entity) (Object) this))
             cir.setReturnValue(true);
     }
 
-    @ModifyExpressionValue(method = "isInvulnerableTo", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/Entity;invulnerable:Z"))
+    @SuppressWarnings("ConstantValue")
+    @ModifyExpressionValue(method = "isInvulnerableTo", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/Entity;invulnerable:Z", opcode = Opcodes.GETFIELD))
     private boolean invulnerableIfCreaming(boolean original) {
-        return original || jcraft$isCreaming();
+        return original || CreamEntity.isCreaming((Entity) (Object) this);
     }
 
-    private @Unique boolean jcraft$isCreaming() {
-        // Mark user invulnerable if they're using Cream and are voiding.
-        Entity thiz = (Entity) (Object) this;
-        return thiz instanceof LivingEntity le &&
-                JUtils.getStand(le) instanceof CreamEntity cream &&
-                cream.getVoidTime() > 0;
+    @Inject(method = "checkInsideBlocks", at = @At("HEAD"), cancellable = true)
+    private void jcraft$ignoreBlockPushingIfCreaming(CallbackInfo ci) {
+        if (CreamEntity.isCreaming((Entity) (Object) this))
+            ci.cancel();
+    }
+
+    @Inject(method = "setRemoved", at = @At("RETURN"))
+    private void jcraft$fireRemovedEvent(Entity.RemovalReason removalReason, CallbackInfo ci) {
+        JEntityEvents.REMOVE.invoker().remove((Entity) (Object) this, removalReason);
     }
 
     @Override

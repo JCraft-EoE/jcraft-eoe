@@ -1,0 +1,44 @@
+{
+  "anim_state": "RED_BIND",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:magiciansred_red_bind_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 7,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 100,
+    "damage": 3.0,
+    "duration": 22,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mrredbind"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact3"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.magicians_red.default.red_bind.description"
+      },
+      "name": {
+        "translate": "move.jcraft.magicians_red.default.red_bind.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.0,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 15,
+    "windup": 12
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "anim_state": "DONUT",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "move": {
+    "type": "jcraft:theworld_donut_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 13,
+      "extra_hit_boxes": [
+        {
+          "size": 1.5
+        }
+      ],
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_3",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 42,
+    "damage": 9.0,
+    "duration": 42,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:twdonut"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:twdonuthit"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.the_world.default.donut.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_world.default.donut.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 1.0,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 52,
+    "windup": 20
+  }
+}

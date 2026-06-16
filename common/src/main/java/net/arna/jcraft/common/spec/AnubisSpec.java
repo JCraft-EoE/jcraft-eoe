@@ -64,7 +64,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             26, 1f, 4f, 15, 1.75f, 0.2f, -0.1f, IntSet.of(8, 20), false)
             .withSound(JSoundRegistry.ANUBIS_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_9)
-            .withInfo(Component.literal("Cleaving Strikes (2 Hits)"), Component.empty());
+            .withInfo(Component.literal("Cleaving Strikes (2 Hits)"), Component.literal("Two-strike attack"));
     public static final KnockdownMultiHitAttack<AnubisSpec> REKKA_FINISHER = new KnockdownMultiHitAttack<AnubisSpec>(
             0, 40, 1f, 7f, 15, 2f, 0.9f, 0f,
             IntSet.of(32), 35)

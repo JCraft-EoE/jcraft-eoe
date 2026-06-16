@@ -82,7 +82,7 @@ public final class KQDetonateAttack extends AbstractMove<KQDetonateAttack, Abstr
         explode(stand, user, pos, 11.0f, 4.4);
     }
 
-    public static void explode(final AbstractKillerQueenEntity<?, ?> stand, final Entity user, final Vec3 pos, float damage, double hitboxSize) {
+    public static void explode(final StandEntity<?, ?> stand, final Entity user, final Vec3 pos, float damage, double hitboxSize) {
         final ServerLevel serverWorld = (ServerLevel) stand.level();
 
         JCraft.createParticle(serverWorld, pos.x, pos.y, pos.z, JParticleType.BOOM);

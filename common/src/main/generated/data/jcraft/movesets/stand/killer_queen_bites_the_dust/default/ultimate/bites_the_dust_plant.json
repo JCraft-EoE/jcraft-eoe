@@ -1,0 +1,39 @@
+{
+  "anim_state": "BTD_PLANT",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:killerqueen_bitesthedust_btd_plant_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "blockable_type": "NON_BLOCKABLE_EFFECTS_ONLY",
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 800,
+    "duration": 24,
+    "extractor": "jcraft:all",
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.bites_the_dust_plant.description"
+      },
+      "name": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.bites_the_dust_plant.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "injector": "jcraft:all",
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "rewindIds": [
+      "minecraft:vel",
+      "minecraft:pos",
+      "minecraft:yheadrot",
+      "minecraft:yrot",
+      "minecraft:xrot"
+    ],
+    "stun": 10,
+    "windup": 14
+  }
+}

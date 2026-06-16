@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "jcraft:brawler_spec_user",
+    "jcraft:hamon_spec_user",
+    "jcraft:tonpetty",
+    "jcraft:vampire_spec_user",
+    "jcraft:anubis_spec_user"
+  ]
+}

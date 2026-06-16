@@ -1,0 +1,94 @@
+{
+  "anim_state": "KICK",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "crouching_variant": {
+    "anim_state": "SWEEP",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:shared_knockdown_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 13,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_3"
+      },
+      "cooldown": 0,
+      "damage": 9.0,
+      "duration": 18,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:d4clight"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_hand.default.sweep.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_hand.default.sweep.cr.name"
+        }
+      },
+      "hitbox_size": 1.6,
+      "knockback": 0.4,
+      "knockdown_duration": 35,
+      "move_distance": 1.0,
+      "offset": 0.3,
+      "stun": 15,
+      "windup": 13
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_uppercut_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 13,
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_3",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 0,
+    "damage": 9.0,
+    "duration": 24,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:d4clight"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.the_hand.default.home_run.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_hand.default.home_run.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 1.1,
+    "move_distance": 0.75,
+    "offset": 0.1,
+    "strength": 0.3,
+    "stun": 12,
+    "windup": 13
+  }
+}

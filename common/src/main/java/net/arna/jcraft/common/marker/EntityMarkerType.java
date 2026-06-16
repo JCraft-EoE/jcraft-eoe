@@ -10,12 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class EntityMarkerType implements MarkerSavePredicate<UUID, Entity>, MarkerLoadPredicate<EntityMarker>, MarkerType<UUID, Entity, EntityMarker> {
@@ -57,6 +52,12 @@ public class EntityMarkerType implements MarkerSavePredicate<UUID, Entity>, Mark
 
     public Set<ResourceLocation> getIds() {
         return Collections.unmodifiableSet(ids);
+    }
+
+    public Set<ResourceLocation> getOrderedIds() {
+        List<ResourceLocation> orderedIds = new ArrayList<>(ids);
+        Collections.sort(orderedIds);
+        return new LinkedHashSet<>(orderedIds);
     }
 
     @Override

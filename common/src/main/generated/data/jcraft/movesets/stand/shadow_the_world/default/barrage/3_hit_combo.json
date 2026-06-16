@@ -1,0 +1,80 @@
+{
+  "anim_state": "THREE_HIT",
+  "class": "BARRAGE",
+  "cooldown_type": "STAND_BARRAGE",
+  "move": {
+    "type": "jcraft:shared_simple_multi_hit_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 0,
+    "damage": 4.0,
+    "duration": 24,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.shadow_the_world.default.3_hit_combo.description"
+      },
+      "finisher": {
+        "move": {
+          "type": "jcraft:shared_knockdown_attack",
+          "attack_extras": {
+            "backstab": true,
+            "block_stun": 9,
+            "hit_animation": "LAUNCH",
+            "hit_spark": "HIT_SPARK_2",
+            "override_stun": true,
+            "shockwaves": true,
+            "stun_type": "LAUNCH"
+          },
+          "cooldown": 0,
+          "damage": 5.0,
+          "duration": 4,
+          "extras": {
+            "actions": [
+              {
+                "type": "jcraft:play_sound",
+                "bind": false,
+                "run": "on_hit",
+                "sound": "jcraft:twkickhit"
+              }
+            ],
+            "name": {
+              "text": "3 Hit Combo (Finisher)"
+            }
+          },
+          "hitbox_size": 1.75,
+          "knockback": 2.0,
+          "knockdown_duration": 35,
+          "move_distance": 0.85,
+          "offset": 0.0,
+          "stun": 20,
+          "windup": 2
+        },
+        "tick": 20
+      },
+      "name": {
+        "translate": "move.jcraft.shadow_the_world.default.3_hit_combo.name"
+      }
+    },
+    "hit_moments": [
+      6,
+      14
+    ],
+    "hitbox_size": 1.5,
+    "knockback": 0.35,
+    "move_distance": 0.85,
+    "offset": 0.2,
+    "stun": 15
+  }
+}

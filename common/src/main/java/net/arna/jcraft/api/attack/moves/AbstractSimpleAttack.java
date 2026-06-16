@@ -5,6 +5,10 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.util.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.Pair;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectFloatPair;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
@@ -14,17 +18,21 @@ import net.arna.jcraft.api.attack.core.HitBoxData;
 import net.arna.jcraft.api.attack.enums.BlockableType;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.core.data.AttackMoveExtras;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.ExtraProducts;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -42,6 +50,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
@@ -506,6 +515,14 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     }
 
     /**
+     * Gets the multiplier that determines how much this move breaks blocks.
+     * @return how much this move breaks blocks.
+     */
+    protected float getBlockDestructionMultiplier(A attacker) {
+        return getDamage() / 2.5f;
+    }
+
+    /**
      * Spawns shockwaves for the given attacker and user.
      * Can be overridden to change shockwave behavior.
      * @param attacker The attacker
@@ -558,6 +575,9 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
 
         Set<LivingEntity> targets = findHits(attacker, boxes, damageSource, mayHitUser);
         if (targets.isEmpty()) {
+            // Break blocks
+            breakBlocks(attacker, boxes);
+
             return Set.of();
         }
 
@@ -592,6 +612,33 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         return targets;
     }
 
+    private void breakBlocks(final A attacker, final Set<AABB> boxes) {
+        Level level = attacker.getEntityWorld();
+
+        Object2FloatMap<BlockPos> breakages = boxes.stream()
+                .flatMap(box -> BlockPos.betweenClosedStream(box)
+                        .map(BlockPos::new) // make an immutable copy
+                        .filter(p -> mayBreak(attacker.getUser(), p)) // check if we can break this block
+                        // Map each block pos to a breakage
+                        .map(p -> ObjectFloatPair.of(new BlockPos(p), getBreakage(attacker, level, p, box)))
+                )
+                // Collect the block positions and their breakage into a map
+                .collect(Collectors.toMap(Pair::left, ObjectFloatPair::rightFloat,
+                        (f1, f2) -> f1, Object2FloatOpenHashMap::new));
+
+        // Send the breakages, treat block attack as coming from the user.
+        JBlockBreaker.setBreakState(level, attacker.getUser(), breakages, attacker.getUser().position());
+    }
+
+    protected float getBreakage(A attacker, Level level, BlockPos pos, AABB box) {
+        double distance = pos.getCenter().distanceTo(box.getCenter());
+        double mult = Mth.clamp(1.5 - distance, 0, 1);
+        mult *= mult;
+
+        float strength = getBlockDestructionMultiplier(attacker) * JServerConfig.BLOCK_BREAKAGE_MULTIPLIER.getValue();
+        return (float) (JBlockBreaker.calcBreakage(level, pos, strength) * mult);
+    }
+
     /**
      * Gets called for every target hit by {@link #attackBoxes(IAttacker, Set, DamageSource, Vec3)}.
      *
@@ -607,7 +654,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
                 new AttackData(
                     kbVec, stun, stunType.ordinal(), overrideStun,
                     damage, lift, getBlockStun(), damageSource, attacker.getUserOrThrow(),
-                    hitAnimation, attacker.getMoveUsage(), canBackstab, blockableType.isNonBlockable()
+                    hitAnimation, attacker.getMoveUsage(), canBackstab, blockableType.isNonBlockable(), true
                 )
         );
     }
