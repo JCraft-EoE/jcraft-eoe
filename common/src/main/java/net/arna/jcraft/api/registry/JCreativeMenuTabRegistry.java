@@ -20,7 +20,7 @@ import java.util.List;
 
 
 public interface JCreativeMenuTabRegistry {
-    @SuppressWarnings("UnstableApiUsage") // we do not care :)
+
     static void init() {
         JCraft.CREATIVE_TAB_REGISTRY.register("general", JCreativeMenuTabRegistry::createJcraftItemGroup);
         JCraft.CREATIVE_TAB_REGISTRY.register("stand_discs", JCreativeMenuTabRegistry::createStandDiscItemGroup);
@@ -285,6 +285,12 @@ public interface JCreativeMenuTabRegistry {
                 // order of the creative tab
                 .displayItems((displayContext, entries) -> {
                     entries.accept(JItemRegistry.DISC.get());
+                    entries.accept(JItemRegistry.DISC_CASE.get());
+                    entries.accept(JItemRegistry.DISC_CASE_COPPER.get());
+                    entries.accept(JItemRegistry.DISC_CASE_IRON.get());
+                    entries.accept(JItemRegistry.DISC_CASE_GOLD.get());
+                    entries.accept(JItemRegistry.DISC_CASE_EMERALD.get());
+                    entries.accept(JItemRegistry.DISC_CASE_DIAMOND.get());
 
                     entries.accept(JItemRegistry.SPEC_DISC.get());
                     final List<SpecType> specList = new ArrayList<>(SpecTypeUtil.streamAllRegular().toList());
