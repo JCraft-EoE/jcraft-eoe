@@ -4,7 +4,7 @@
   "cooldown_type": "STAND_ULTIMATE",
   "move": {
     "type": "jcraft:madeinheaven_time_acceleration_move",
-    "acceleration_duration": "mihTimeAccelerationDuration",
+    "acceleration_duration": "jcraft:mih_time_acceleration_duration",
     "cooldown": 1400,
     "duration": 40,
     "extras": {
