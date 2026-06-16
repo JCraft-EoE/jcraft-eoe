@@ -17,4 +17,9 @@ public class DiscCaseSlot extends Slot {
         return stack.is(JTagRegistry.DISCS);
     }
 
+    @Override
+    public int getMaxStackSize(final @NonNull ItemStack stack) {
+        return 1;
+    }
+
 }
