@@ -547,12 +547,10 @@ public class ClientPacketHandler {
                 client.execute(() -> {
                     final Entity sourceShader = world.getEntity(id);
                     if (sourceShader instanceof final LivingEntity livingEntity) {
-
-                        ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
-                        zaWarudoShaderHandler.shaderSourceEntity = Optional.of(livingEntity).orElse(client.player);
-                        zaWarudoShaderHandler.effectLength = duration;
-                        zaWarudoShaderHandler.shouldRender = true;
-
+                        if (JShaderRegistry.TIMESTOP_EFFECT != null)
+                        {
+                            JShaderRegistry.TIMESTOP_EFFECT.queueBubble(Optional.of(livingEntity).orElse(client.player), duration);
+                        }
                     }
                 });
             }
@@ -561,22 +559,19 @@ public class ClientPacketHandler {
                     return;
                 }
 
-                final CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
-                crimsonShaderHandler.effectLength = duration;
-                crimsonShaderHandler.shouldRender = true;
-
-
+                TimeEraseShaderEffect effect = JShaderRegistry.TIME_ERASE;
+                if (effect != null) { effect.enabled = true; }
             });
             case MANDOM_REWIND -> {
-                final float r = buf.readFloat();
-                final float g = buf.readFloat();
-                final float b = buf.readFloat();
-                client.execute(() -> {
-                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
-                    mandomHandler.duration = duration;
-                    mandomHandler.shaderColor = new Vector3f(r, g, b);
-                    mandomHandler.shouldRender = true;
-                });
+//                final float r = buf.readFloat();
+//                final float g = buf.readFloat();
+//                final float b = buf.readFloat();
+//                client.execute(() -> {
+//                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
+//                    mandomHandler.duration = duration;
+//                    mandomHandler.shaderColor = new Vector3f(r, g, b);
+//                    mandomHandler.shouldRender = true;
+//                });
             }
         }
     }
@@ -590,17 +585,10 @@ public class ClientPacketHandler {
                 }
                 case ZA_WARUDO -> client.execute(() -> {
 
-                    ZaWarudoShaderHandler zaWarudoShaderHandler = ZaWarudoShaderHandler.INSTANCE;
-                    zaWarudoShaderHandler.shouldRender = false;
-                    zaWarudoShaderHandler.renderingEffect = false;
-
                 });
                 case CRIMSON -> client.execute(() -> {
-
-                    CrimsonShaderHandler crimsonShaderHandler = CrimsonShaderHandler.INSTANCE;
-                    crimsonShaderHandler.shouldRender = false;
-                    crimsonShaderHandler.renderingEffect = false;
-
+                    TimeEraseShaderEffect effect = JShaderRegistry.TIME_ERASE;
+                    if (effect != null) { effect.enabled = false; }
                 });
             }
         }
@@ -652,7 +640,7 @@ public class ClientPacketHandler {
         final boolean editable = buf.readBoolean();
         final boolean show = buf.readBoolean();
 
-        ConfigOption.readOptions(buf);
+        JServerConfig.readOptions(buf);
 
         if (show) {
             client.execute(() -> ServerConfigUI.show(editable));

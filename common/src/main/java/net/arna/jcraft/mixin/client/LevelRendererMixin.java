@@ -2,14 +2,12 @@ package net.arna.jcraft.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.arna.jcraft.client.rendering.api.callbacks.PostWorldRenderCallback;
 import net.arna.jcraft.client.rendering.shader.JShaderRegistry;
 import net.arna.jcraft.client.rendering.shader.TimestopShaderEffect;
-import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
 import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.mixin_logic.StillDepthHolder;

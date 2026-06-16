@@ -97,6 +97,8 @@ public class JShaderRegistry {
 
             effect.link(SHADER_PROVIDER.compile(name, processed));
         }
+
+        JCraft.LOGGER.info("Compiled shaders");
     }
 
     private static void freezeRegistry()
