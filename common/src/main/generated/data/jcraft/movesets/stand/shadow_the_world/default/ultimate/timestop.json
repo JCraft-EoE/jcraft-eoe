@@ -23,7 +23,7 @@
         "translate": "move.jcraft.shadow_the_world.default.timestop.name"
       }
     },
-    "time_stop_duration": "stwTimeStopDuration",
+    "time_stop_duration": "jcraft:stw_time_stop_duration",
     "windup": 20
   }
 }

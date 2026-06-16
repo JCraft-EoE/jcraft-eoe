@@ -23,7 +23,7 @@
         "translate": "jcraft.generic.ts"
       }
     },
-    "time_stop_duration": "sptwTimeStopDuration",
+    "time_stop_duration": "jcraft:sptw_time_stop_duration",
     "windup": 5
   }
 }

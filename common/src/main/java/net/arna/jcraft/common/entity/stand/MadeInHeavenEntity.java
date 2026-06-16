@@ -439,9 +439,15 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
         if (user.isSprinting()) {
             user.setMaxUpStep(AUTOSTEP_HEIGHT);
+            setAfterimage(true);
+            user.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 2,10));
+            user.addEffect(new MobEffectInstance(JStatusRegistry.WATER_WALKING.get(), 2));
         }
         else {
             user.setMaxUpStep(DEFAULT_STEP_HEIGHT);
+            if (getState() != State.TIME_ACCELERATION) {
+                setAfterimage(false);
+            }
         }
 
         if (aTime > 0 && !user.hasEffect(JStatusRegistry.DAZED.get())) {
