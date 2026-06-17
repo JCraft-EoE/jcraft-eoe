@@ -31,9 +31,6 @@
     ],
     "modmenu": [
       "net.arna.jcraft.fabric.client.JModMenuIntegration"
-    ],
-    "fabric-datagen": [
-      "net.arna.jcraft.datagen.JDataGen"
     ]
   },
   "accessWidener": "jcraft.accesswidener",
