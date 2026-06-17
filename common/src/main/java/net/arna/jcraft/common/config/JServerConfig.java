@@ -113,6 +113,7 @@ public class JServerConfig {
     // public static final BooleanOption ENABLE_HITSTOP = new BooleanOption(JCraft.id("enable_hitstop"), GAMEPLAY, false);
     public static final BooleanOption EXCLUSIVE_STANDS = new BooleanOption(JCraft.id("exclusive_stands"), GAMEPLAY, false);
     public static final BooleanOption STAND_USER_SIGHT = new BooleanOption(JCraft.id("stand_user_sight"), GAMEPLAY, false);
+    public static final BooleanOption CREAM_VOID_VISIBLE = new BooleanOption(JCraft.id("cream_void_visible"), GAMEPLAY, false);
     public static final BooleanOption SPAWNER_STANDS = new BooleanOption(JCraft.id("spawner_stands"), GAMEPLAY, true);
 
     // TODO list options

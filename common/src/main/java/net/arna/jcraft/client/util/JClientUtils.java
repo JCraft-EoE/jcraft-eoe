@@ -4,6 +4,7 @@ import lombok.NonNull;
 import mod.azure.azurelib.animation.AzAnimationContext;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.D4CEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
@@ -146,7 +147,7 @@ public class JClientUtils {
         final Entity passenger = entity.getFirstPassenger();
         return passenger instanceof final KingCrimsonEntity kc && kc.getTETime() > 0 ||
                 passenger instanceof final D4CEntity d4c && d4c.getState() == D4CEntity.State.FLAG ||
-                passenger instanceof final CreamEntity cream && cream.isHalfBall() ||
+                passenger instanceof final CreamEntity cream && (cream.isHalfBall() || (cream.getVoidTime() > 0 && !JServerConfig.CREAM_VOID_VISIBLE.getValue())) ||
                 passenger instanceof final MetallicaEntity metallica && metallica.isInvisible();
     }
 

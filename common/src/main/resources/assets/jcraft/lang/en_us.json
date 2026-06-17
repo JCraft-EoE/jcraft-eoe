@@ -623,6 +623,8 @@
   "jcraft.serverconfig.option.cooldown_multiplier.tooltip": "Multiplies the length of all move cooldowns. Lower\nvalues shorten cooldowns, higher values lengthen\nthem.",
   "jcraft.serverconfig.option.cream_item_erase": "Cream Destroys Items",
   "jcraft.serverconfig.option.cream_item_erase.tooltip": "When enabled, items caught in Cream's void are\nerased instead of being dropped.",
+  "jcraft.serverconfig.option.cream_void_visible": "Cream Void Visible",
+  "jcraft.serverconfig.option.cream_void_visible.tooltip": "When disabled, Cream's Void is invisible.",
   "jcraft.serverconfig.option.damage_scaling_minimum": "Damage Scaling Minimum",
   "jcraft.serverconfig.option.damage_scaling_minimum.tooltip": "The lowest the combo damage multiplier can fall\nto. Each hit in a combo scales damage down toward\nthis floor.",
   "jcraft.serverconfig.option.def_spec": "Default Spec",
