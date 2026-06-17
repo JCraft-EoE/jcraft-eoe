@@ -1,5 +1,6 @@
 package net.arna.jcraft.datagen;
 
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.datagen.providers.data.*;
 import net.arna.jcraft.datagen.providers.assets.JLangProvider;
@@ -16,6 +17,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class JDataGen implements DataGeneratorEntrypoint {
+
+    // Mod id of the datagen mod is jcraft_datagen, but we generate data for jcraft.
+    @Override
+    public String getEffectiveModId() {
+        return JCraft.MOD_ID;
+    }
 
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
