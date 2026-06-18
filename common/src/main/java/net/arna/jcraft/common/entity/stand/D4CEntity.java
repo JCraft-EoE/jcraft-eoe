@@ -83,6 +83,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withBlockStun(4)
             .withExtraHitBox(0, 0, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Deadly Blow"),
                     Component.literal("combo finisher, more blockstun than other light followups"));
@@ -93,6 +94,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withCrouchingVariant(ITEM_PLACE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Chop"),
                     Component.literal("relatively quick combo starter"));

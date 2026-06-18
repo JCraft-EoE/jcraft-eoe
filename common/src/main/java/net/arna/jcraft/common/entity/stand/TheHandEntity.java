@@ -88,6 +88,7 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
             .withBlockStun(4)
             .withExtraHitBox(0, 0, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Gut Punch"),
                     Component.empty());
@@ -98,6 +99,7 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .noLoopPrevention()
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("Relatively quick combo starter."));

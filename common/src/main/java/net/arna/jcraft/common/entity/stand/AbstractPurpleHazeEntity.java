@@ -61,6 +61,8 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
+            .withLookTracking()
+            .withLookTracking()
             .withInfo(
                     Component.literal("Kick"),
                     Component.literal("fast combo finisher")
@@ -72,6 +74,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BACKHAND)
             .noLoopPrevention()
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("fast combo starter")
@@ -81,6 +84,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
             20, 10, 20, 0.75f, 7f, 14, 2.0f, 1.25f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withLaunch()
+            .withLookTracking()
             .withInfo(
                     Component.literal("Uppercut"),
                     Component.literal("launcher")

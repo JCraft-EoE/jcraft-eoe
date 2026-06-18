@@ -108,6 +108,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withLaunch()
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Slash"),
                     Component.literal("quick combo finisher")
@@ -117,6 +118,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LAST_SHOT)
             .withSound(JSoundRegistry.SC_POKE)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Stab"),
                     Component.literal("quick combo starter, links into Spinning Blade while armor is off")

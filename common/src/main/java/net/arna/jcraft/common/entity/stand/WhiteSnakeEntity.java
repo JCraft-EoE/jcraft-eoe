@@ -97,6 +97,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withLaunch()
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Finisher"),
                     Component.literal("quick combo finisher")
@@ -106,6 +107,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo starter")
@@ -116,6 +118,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Gut Punch"),
                     Component.literal("combo starter/extender")

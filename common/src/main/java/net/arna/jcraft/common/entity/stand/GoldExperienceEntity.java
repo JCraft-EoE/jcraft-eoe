@@ -84,6 +84,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo finisher")
@@ -94,6 +95,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(BERRY_BUSH)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo starter, low stun")

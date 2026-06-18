@@ -115,6 +115,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Kick"),
                     Component.literal("quick combo finisher")
@@ -125,6 +126,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(SPEED_CHOP)
             .withImpactSound(SoundEvents.TRIDENT_HIT)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Slice"),
                     Component.literal("quick combo starter")

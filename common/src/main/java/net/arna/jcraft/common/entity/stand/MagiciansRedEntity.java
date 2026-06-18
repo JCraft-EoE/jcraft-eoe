@@ -101,6 +101,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withLaunch()
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo finisher")
@@ -110,6 +111,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(REDIRECT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo starter")

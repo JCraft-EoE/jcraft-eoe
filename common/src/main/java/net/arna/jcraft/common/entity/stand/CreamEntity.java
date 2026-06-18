@@ -206,6 +206,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             14, 0.5f, 5f, 20, 2f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Swipe"),
                     Component.literal("quick air-to-ground poke"));

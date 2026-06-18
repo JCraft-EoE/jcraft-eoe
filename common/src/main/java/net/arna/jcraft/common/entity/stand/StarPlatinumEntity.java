@@ -103,6 +103,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withBlockStun(4)
             .withExtraHitBox(0, 0, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.translatable("jcraft.starplatinum.m1m1"),
                     Component.literal("Quick combo finisher.")
@@ -112,6 +113,7 @@ public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPla
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(UPPERCUT)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLookTracking()
             .withInfo(
                     Component.translatable("jcraft.starplatinum.m1"),
                     Component.literal("Quick combo starter.")

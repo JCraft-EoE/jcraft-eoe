@@ -104,6 +104,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Roundhouse"),
                     Component.literal("Combo finisher.")
@@ -113,6 +114,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LOW_KICK)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("Extremely quick combo starter.")

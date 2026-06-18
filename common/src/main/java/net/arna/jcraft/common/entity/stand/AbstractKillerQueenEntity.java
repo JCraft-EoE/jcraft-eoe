@@ -66,6 +66,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             // implemented in class: .withFollowup(LOW)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Second Punch"),
                     Component.literal("frametrap tool")
@@ -81,6 +82,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
             .withImpactSound(JSoundRegistry.IMPACT_6)
             .withCrouchingVariant(DETONATE)
             // implemented in class: .withFollowup(LIGHT_FOLLOWUP)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("combo starter, decent speed, has two followups")

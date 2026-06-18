@@ -71,6 +71,7 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(0, 0.35, 1.25)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Uppercut"),
                     Component.literal("slower combo starter, launches vertically")
@@ -80,6 +81,7 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
             .withImpactSound(JSoundRegistry.IMPACT_1)
             // .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(UPPERCUT)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo starter")
@@ -112,6 +114,7 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
+            .withLookTracking()
             .withInfo(
                     Component.literal("3 Hit Combo (Finisher)"),
                     Component.empty()
@@ -120,6 +123,7 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
             24, 0.85f, 4f, 15, 1.5f, 0.35f, 0.2f, IntSet.of(6, 14))
             .withFinisher(20, KNOCKDOWN)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLookTracking()
             .withInfo(
                     Component.literal("3 Hit Combo"),
                     Component.literal("knocks down")

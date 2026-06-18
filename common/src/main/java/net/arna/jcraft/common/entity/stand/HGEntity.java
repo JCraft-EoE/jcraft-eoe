@@ -99,6 +99,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Uppercut"),
                     Component.literal("reset tool, combos back into light")
@@ -109,6 +110,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withCrouchingVariant(CROUCHING_LIGHT)
             .withAerialVariant(AIR_LIGHT)
             .withImpactSound(JSoundRegistry.IMPACT_4)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo starter")

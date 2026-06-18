@@ -76,6 +76,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.translatable("jcraft.starplatinum.m1m1"),
                     Component.literal("quick combo finisher")
@@ -85,6 +86,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withLookTracking()
             .withInfo(
                     Component.translatable("jcraft.starplatinum.m1"),
                     Component.literal("quick combo starter, low knockback")

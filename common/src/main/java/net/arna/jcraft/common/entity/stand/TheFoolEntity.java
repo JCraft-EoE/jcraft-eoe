@@ -117,6 +117,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withBlockStun(4)
             .withExtraHitBox(0, 0.25, 1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Swipe"),
                     Component.literal("quick combo finisher")
@@ -128,6 +129,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withExtraHitBox(0, 0.25, 1)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(DRILL)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Swipe"),
                     Component.literal("slow, long-reaching poke")

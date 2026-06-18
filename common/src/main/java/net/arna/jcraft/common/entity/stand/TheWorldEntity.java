@@ -109,6 +109,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withLaunch()
             .withBlockStun(4)
             .withExtraHitBox(0, 0, 1)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo finisher")
@@ -118,6 +119,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withFollowup(LIGHT_FOLLOWUP)
             .withCrouchingVariant(LOW_KICK)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Punch"),
                     Component.literal("quick combo starter")

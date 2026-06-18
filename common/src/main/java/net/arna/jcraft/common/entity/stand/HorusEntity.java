@@ -85,6 +85,7 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
             .withLaunch()
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Finisher"),
                     Component.literal("quick combo finisher")
@@ -112,6 +113,7 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
             .withCrouchingVariant(LIGHT_LOW)
             .withAerialVariant(LIGHT_AIR)
             .withImpactSound(JSoundRegistry.IMPACT_3)
+            .withLookTracking()
             .withInfo(
                     Component.literal("Slash"),
                     Component.literal("quick combo starter, has a standing and crouching followup")
