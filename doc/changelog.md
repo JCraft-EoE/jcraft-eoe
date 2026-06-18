@@ -1,4 +1,5 @@
 # Changelog
+## General
 ### Stands & Specs
 * Disabled damage scaling for bosses and horses
 * Throwing now force-feeds potions
