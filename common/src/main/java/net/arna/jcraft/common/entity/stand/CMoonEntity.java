@@ -138,7 +138,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_5)
             .withAction(CMoonInversionAction.addInversion(40, 0.5f, false))
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.LOW)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Block Launch"),
                     Component.literal("lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks")
@@ -163,14 +162,12 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withStaticY()
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Ground Slam"),
                     Component.literal("launches downwards, combo starter/extender, knocks down if it hits while user is crouching")
             );
     public static final GravityShiftMove GRAV_SHIFT = new GravityShiftMove(1400, 20, 32, 1f)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Gravity Shift Radial"),
                     Component.literal("""
@@ -181,7 +178,6 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     public static final GravityShiftPulseMove GRAV_SHIFT_PULSE = new GravityShiftPulseMove(1400, 20, 32, 1f, 16)
             .withCrouchingVariant(GRAV_SHIFT)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT_DIRECTIONAL)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Gravity Shift Directional"),
                     Component.literal("""
@@ -200,10 +196,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
     // TODO add move info x2
     // TODO balance x2
     public static final CMoonTossMove TOSS = new CMoonTossMove(0, 1, 1, 0.75f)
-            .withoutLookTracking()
             .withAnim(CMoonEntity.State.ITEM_TOSS);
     public static final TossChargeMove<CMoonEntity> TOSS_CHARGE = new TossChargeMove<CMoonEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
-            .withoutLookTracking()
             .withFollowup(TOSS);
 
     private final List<Inversion> inversions = new ArrayList<>();

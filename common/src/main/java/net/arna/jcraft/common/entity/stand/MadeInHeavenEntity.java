@@ -149,7 +149,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final SpeedSliceAttack SPEED_SLICE = new SpeedSliceAttack(300, 10, 11,
             1.25f, 6f, 1.5f, 1f)
             .withSound(JSoundRegistry.MIH_SPEEDSLICE)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Speed Slice"),
                     Component.literal("short windup, harming teleport with hitstun and light knockback")
@@ -191,7 +190,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             26, 32, 0.75f, 8.5f, 40, 2f, -0.2f, 0.2f)
             .withSound(JSoundRegistry.STAND_DESUMMON)
             .withImpactSound(JSoundRegistry.IMPACT_7)
-            .withoutLookTracking()
             .withHyperArmor()
             .withBlockStun(4)
             .withHitSpark(JParticleType.HIT_SPARK_3)
@@ -203,7 +201,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final TimeAccelerationMove TIME_ACCELERATION = new TimeAccelerationMove(1400, 20,
             40, 1f, Either.right(JServerConfig.MIH_TIME_ACCELERATION_DURATION))
             .withSound(JSoundRegistry.MIH_TACCEL)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Time Acceleration"),
                     Component.literal("""
@@ -213,7 +210,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                             if the speedometer is full and the charging period finishes, enemies become standless for 15s"""));
     public static final CircleAttack CIRCLE = new CircleAttack(300, 13, 14, 1.25f)
             .withSound(JSoundRegistry.MIH_CIRCLE)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Heaven's Judgement"),
                     Component.literal("rapidly circles a looked-at target within 4m at a radius of 7m")
@@ -222,7 +218,6 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     public static final JudgementAttack JUDGEMENT = new JudgementAttack(300, 20, 60, 1.25f, 2)
             .withCrouchingVariant(CIRCLE)
             .withSound(JSoundRegistry.MIH_JUDGEMENT)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Divine Severance"),
                     Component.literal("Made in Heaven rapidly speed slices an area, then finishes with a large, launching slice")
@@ -230,10 +225,8 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<MadeInHeavenEntity> TOSS = new TossMove<MadeInHeavenEntity>(0, 1, 1, 0.75f,0.5f,2f)
-            .withoutLookTracking()
             .withAnim(MadeInHeavenEntity.State.ITEM_TOSS);
     public static final TossChargeMove<MadeInHeavenEntity> TOSS_CHARGE = new TossChargeMove<MadeInHeavenEntity>(30, 1 * 20 + 1, 1 * 20, 1.0f, 0)
-            .withoutLookTracking()
             .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Integer> ACCEL_TIME = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.INT);

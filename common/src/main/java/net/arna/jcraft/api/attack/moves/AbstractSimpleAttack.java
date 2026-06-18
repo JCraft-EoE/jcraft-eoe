@@ -482,18 +482,9 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         final Vec3 upVec = new Vec3(gravDir.step()).scale(-1.0);
 
         final Vec3 rotVec;
-        if (isLookTracking(attacker)) {
-            // Use the aim committed when the move started (matches the stand body), so the hitbox doesn't
-            // re-aim mid-move. Falls back to the live look for non-stand attackers.
-            if (attacker.getBaseEntity() instanceof final StandEntity<?, ?> stand) {
-                Vec3 lockedVec = Vec3.directionFromRotation(stand.getLockedAimPitch(), stand.getLockedAimYaw());
-                if (gravDir == Direction.UP) {
-                    lockedVec = new Vec3(lockedVec.x, -lockedVec.y, lockedVec.z);
-                }
-                rotVec = lockedVec;
-            } else {
-                rotVec = userRotVec;
-            }
+        if (isLookTracking()) {
+            // Follow the user's full 3D aim, matching the stand body.
+            rotVec = userRotVec;
         } else {
             // Classic behaviour: staticY moves flatten the hitbox onto the horizontal plane.
             Vec3 classicRotVec = (staticY || attacker.isRemote()) ? getRotVec(attacker) : userRotVec;

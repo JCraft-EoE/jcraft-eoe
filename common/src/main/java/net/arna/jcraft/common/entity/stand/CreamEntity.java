@@ -154,13 +154,11 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final GrabAttack<CreamEntity, State> GRAB = new GrabAttack<>(280,
             8, 20,1f, 3f, 30, 1.5f, 0f, 0f, GRAB_HIT, StateContainer.of(State.GRAB_HIT))
             .withSound(JSoundRegistry.CREAM_GRAB)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab"),
                     Component.literal("unblockable, knocks back"));
     public static final SurpriseMove SURPRISE = new SurpriseMove(100, 14, 24, 1f)
             .withSound(JSoundRegistry.CREAM_SUMMON)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Surprise"),
                     Component.literal("""
@@ -172,7 +170,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withAction(EffectAction.inflict(JStatusRegistry.KNOCKDOWN, 25, 0, true, false))
             .withLaunchNoShockwave()
             .withImpactSound(JSoundRegistry.IMPACT_5)
-            .withoutLookTracking()
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withInfo(
                     Component.literal("Charge"),
@@ -182,7 +179,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             8f, 5, 2f, 1.25f, 0f, 35)
             .withCrouchingVariant(CHARGE)
             .withSound(JSoundRegistry.CREAM_OVERHEAD)
-            .withoutLookTracking()
             .withImpactSound(JSoundRegistry.IMPACT_5)
             .withLaunch()
             .withHyperArmor()
@@ -193,19 +189,16 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final ConsumeAttack CONSUME = new ConsumeAttack(640, 35, 40, 1f,
             2f, 0, 2f, 0f, 0f)
             .withSound(JSoundRegistry.CREAM_CONSUME)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Void"),
                     Component.literal("high windup, 6 seconds"));
     public static final BallModeEnterMove ENTER = new BallModeEnterMove(40, 10, 15, 0f)
             .withSound(JSoundRegistry.CREAM_ENTER)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Enter Cream"),
                     Component.literal("Cream consumes itself and the user halfway, increasing mobility and decreasing defense"));
     public static final BallModeExitMove EXIT = new BallModeExitMove(40, 5, 15, 0f)
             .withSound(JSoundRegistry.CREAM_EXIT)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Exit Cream"),
                     Component.literal("Cream and its user return from the void"));
@@ -213,7 +206,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             14, 0.5f, 5f, 20, 2f, 0.75f, 0.2f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Swipe"),
                     Component.literal("quick air-to-ground poke"));
@@ -224,7 +216,6 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Overhead Smash"),
                     Component.literal("slow, uninterruptible launcher"));
@@ -233,19 +224,16 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withSound(JSoundRegistry.CREAM_COMBO)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Aerial Assault"),
                     Component.literal("less stun than grounded version"));
     public static final BallChargeAttack BALL_CHARGE = new BallChargeAttack(200, 13, 28, 1f, false)
             .withSound(JSoundRegistry.CREAM_BALLDASH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Void Charge"),
                     Component.literal("Cream quickly transforms into a black hole and charges in the pointed direction"));
     public static final DetachChargeMove DETACH_CHARGE = new DetachChargeMove(200, 13, 28, 1f)
             .withSound(JSoundRegistry.CREAM_BALLDASH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Detaching Void Charge"),
                     Component.literal("""
@@ -254,17 +242,14 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             );
     public static final BallChargeAttack BALL_DESTROY = new BallChargeAttack(200, 13, 28, 1f, true)
             .withSound(JSoundRegistry.CREAM_BALLDASH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Destroy"),
                     Component.literal("Cream quickly transforms into a black hole and charges in a downward curve"));
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<CreamEntity> TOSS = new TossMove<CreamEntity>(0, 1, 1, 0.75f)
-            .withoutLookTracking()
             .withAnim(CreamEntity.State.ITEM_TOSS);
     public static final TossChargeMove<CreamEntity> TOSS_CHARGE = new TossChargeMove<CreamEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
-            .withoutLookTracking()
             .withFollowup(TOSS);
 
     public static final float VOIDING_FLIGHT_SPEED = 0.05f;

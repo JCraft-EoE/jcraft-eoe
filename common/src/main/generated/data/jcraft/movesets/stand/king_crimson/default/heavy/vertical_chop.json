@@ -32,7 +32,7 @@
         "description": {
           "translate": "move.jcraft.king_crimson.default.overhead_hook.followup.description"
         },
-        "look_tracking_reach": 3.5,
+        "look_tracking": true,
         "name": {
           "translate": "move.jcraft.king_crimson.default.overhead_hook.followup.name"
         }
@@ -81,7 +81,7 @@
         "translate": "move.jcraft.king_crimson.default.vertical_chop.description"
       },
       "followup_frame": 7,
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "name": {
         "translate": "move.jcraft.king_crimson.default.vertical_chop.name"
       }

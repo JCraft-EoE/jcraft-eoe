@@ -118,7 +118,6 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
             );
     public static final HorusBarrageAttack BARRAGE = new HorusBarrageAttack(240,
             5, 80,0.75f, 0, 0, 0, 0, 0, 5)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Barrage"),
                     Component.literal("4s max duration, can be held")
@@ -126,7 +125,6 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
             .withAction(PlaySoundAction.playSound(JSoundRegistry.HORUS_BARRAGE_FIRE));
     public static final HorusDetonateAttack DETONATE = new HorusDetonateAttack(0, 10, 12, 0.75f)
             .withAnim(State.DETONATE)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Detonate"),
                     Component.empty()
@@ -138,7 +136,6 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.LOW)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Stomp"),
                     Component.literal("summons a large icicle, press Heavy again to detonate it")
@@ -149,7 +146,6 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Beak Dive"),
                     Component.literal("""
@@ -160,7 +156,6 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
     // Special 1
     public static final IceLanceAttack LANCE = new IceLanceAttack(80, 18, 24, 0.75f)
             .withAnim(State.LANCE)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Ice Lance"),
                     Component.literal("""
@@ -170,7 +165,6 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
             .withSound(JSoundRegistry.HORUS_LANCE_CHARGE);
     public static final ScatterAttack SCATTER = new ScatterAttack(60, 16, 20, 0.75f)
             .withCrouchingVariant(LANCE)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Scatter"),
                     Component.literal("""
@@ -197,7 +191,6 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
                     ));
     // Special 3
     public static final ChasingFreezeAttack PLACE = new ChasingFreezeAttack(200, 8, 14, 0.75f)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Chasing Freeze"),
                     Component.empty()

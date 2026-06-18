@@ -108,7 +108,6 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .allowHitUser()
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab (Final Hit)"),
                     Component.empty()
@@ -119,7 +118,6 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             .withStunType(StunType.UNBURSTABLE)
             .withFinisher(19, GRAB_HIT_FINAL)
             .allowHitUser()
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab (Final Hit)"),
                     Component.empty()
@@ -131,7 +129,6 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             .withSound(JSoundRegistry.D4C_THROW)
             .withImpactSound(JSoundRegistry.PH_GRAB_HIT)
             .allowHitUser()
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab"),
                     Component.literal("unblockable, combo finisher")

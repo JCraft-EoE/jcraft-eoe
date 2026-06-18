@@ -324,68 +324,28 @@ public final class JUtils {
         return bHit;
     }
 
-    /**
-     * How far short of a hit a look-tracked stand stops, in blocks, so its body sits in front of the target
-     * rather than inside it. Entities use a smaller margin than blocks.
-     */
+    // How far short of a block/entity hit a stand stops, so its body sits in front rather than inside it.
     public static final double LOOK_TRACK_ENTITY_MARGIN = 0.75;
     public static final double LOOK_TRACK_BLOCK_MARGIN = 1.0;
 
-    /**
-     * Clamps a desired stand reach so it stops along the aim direction instead of clipping through the world:
-     * <ul>
-     *     <li>extends to {@code maxReach} when nothing is in the way,</li>
-     *     <li>stops {@link #LOOK_TRACK_ENTITY_MARGIN}/{@link #LOOK_TRACK_BLOCK_MARGIN} blocks short of the
-     *     first entity/block hit, and</li>
-     *     <li>never collapses below {@code minReach}, so the stand always detaches (and clips a little into
-     *     anything closer than that) rather than snapping back into the user.</li>
-     * </ul>
-     * <p>
-     * This is a <b>volumetric</b> cast: rather than a single centre line, it fires a bundle of parallel rays
-     * offset to the corners of the stand's cross-section (perpendicular to {@code lookDir}) and takes the
-     * nearest hit, so the reach accounts for the stand's actual width/height instead of threading the needle
-     * past obstacles just off the crosshair.
-     *
-     * @param user     the stand's user, providing the level and self-ignore for the raycast
-     * @param origin   the ray origin (typically the user's eye position)
-     * @param lookDir  the (normalized) aim direction to cast along
-     * @param ignore   the stand entity; rays pass through it and its bounding box sizes the bundle. May be
-     *                 {@code null}, in which case a single thin ray is used.
-     * @param minReach the minimum reach distance in blocks (the stand never gets closer than this)
-     * @param maxReach the maximum reach distance in blocks
-     * @return the clamped reach distance in blocks, within {@code [minReach, maxReach]}
-     */
+    // Clamps a stand's reach so it stops short of the first hit along the aim instead of clipping through it,
+    // never below minReach. Fires the centre ray plus one to each side, offset by the stand's half-width, so its
+    // width is accounted for; the spread is horizontal only so it doesn't catch the ground when aiming level.
     public static double clampReachToLook(final LivingEntity user, final Vec3 origin, final Vec3 lookDir,
                                           final @Nullable Entity ignore, final double minReach, final double maxReach) {
         double reach = singleReach(user, origin, lookDir, ignore, maxReach);
 
         if (ignore != null) {
+            final Vec3 right = lookDir.cross(new Vec3(0.0, 1.0, 0.0)).normalize();
             final double halfWidth = ignore.getBbWidth() * 0.5;
-            final double halfHeight = ignore.getBbHeight() * 0.5;
-
-            // Two axes perpendicular to the aim, forming the plane of the stand's cross-section.
-            final Vec3 reference = Math.abs(lookDir.y) > 0.999 ? new Vec3(1.0, 0.0, 0.0) : new Vec3(0.0, 1.0, 0.0);
-            final Vec3 right = lookDir.cross(reference).normalize();
-            final Vec3 up = right.cross(lookDir).normalize();
-
-            // Sample the four corners of that cross-section; the nearest of all rays is where the stand's body
-            // (not just its centre line) first makes contact. Stop early once we've already hit the minimum.
-            for (int sx = -1; sx <= 1 && reach > minReach; sx += 2) {
-                for (int sy = -1; sy <= 1 && reach > minReach; sy += 2) {
-                    final Vec3 offsetOrigin = origin.add(right.scale(sx * halfWidth)).add(up.scale(sy * halfHeight));
-                    reach = Math.min(reach, singleReach(user, offsetOrigin, lookDir, ignore, maxReach));
-                }
+            for (int s = -1; s <= 1 && reach > minReach; s += 2) {
+                reach = Math.min(reach, singleReach(user, origin.add(right.scale(s * halfWidth)), lookDir, ignore, maxReach));
             }
         }
 
         return Mth.clamp(reach, minReach, maxReach);
     }
 
-    /**
-     * Casts a single thin ray for {@link #clampReachToLook} and returns the distance to the first block/entity
-     * hit (less the relevant margin), or {@code maxReach} when nothing is in the way. Not yet clamped to a
-     * minimum.
-     */
     private static double singleReach(final LivingEntity user, final Vec3 origin, final Vec3 lookDir,
                                       final @Nullable Entity ignore, final double maxReach) {
         final Vec3 end = origin.add(lookDir.scale(maxReach));

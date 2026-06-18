@@ -58,9 +58,9 @@ public class BaseMoveExtras {
 
             Codec.BOOL.optionalFieldOf("lingering_sounds", false).forGetter(BaseMoveExtras::isLingeringSounds),
 
-            Codec.BOOL.optionalFieldOf("look_tracking", true).forGetter(BaseMoveExtras::isLookTracking),
+            Codec.BOOL.optionalFieldOf("look_tracking", false).forGetter(BaseMoveExtras::isLookTracking),
 
-            Codec.FLOAT.optionalFieldOf("look_tracking_reach", 5f).forGetter(BaseMoveExtras::getLookTrackingReach)
+            Codec.FLOAT.optionalFieldOf("look_tracking_reach", 3.5f).forGetter(BaseMoveExtras::getLookTrackingReach)
     ).apply(instance, BaseMoveExtras::new));
     private Component name = Component.empty();
     private Component description = Component.empty();
@@ -75,8 +75,8 @@ public class BaseMoveExtras {
     private OptionalInt followupFrame = OptionalInt.empty();
     private boolean loopPrevention = true;
     private boolean lingeringSounds = false;
-    private boolean lookTracking = true;
-    private float lookTrackingReach = 5f;
+    private boolean lookTracking = false;
+    private float lookTrackingReach = 3.5f;
 
     private BaseMoveExtras(final Component name, final Component description, final List<MoveCondition<?, ?>> conditions,
                            final List<MoveAction<?, ?>> actions,
@@ -122,11 +122,11 @@ public class BaseMoveExtras {
                 .withActionsRaw(actions)
                 .withInitActionsRaw(initActions)
                 .withFollowupFrame(followupFrame)
-                .withLookTracking(lookTracking)
                 .withLookTrackingReach(lookTrackingReach);
         if (ranged) move.markRanged();
         if (mayHitUser) move.allowHitUser();
         if (!loopPrevention) move.noLoopPrevention();
+        if (lookTracking) move.withLookTracking();
         finisher.ifPresent(f -> ((AbstractMove) move).withFinisher(f.leftInt(), f.right()));
 
         return move;

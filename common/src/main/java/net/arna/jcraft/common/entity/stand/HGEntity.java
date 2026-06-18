@@ -180,7 +180,6 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     public static final EmeraldSplashAttack EMERALD_SPLASH = new EmeraldSplashAttack(0, 12,
             1, 0, 0, 0, 0, IntSet.of(1, 3, 5), 1.5f, false)
             .withSound(JSoundRegistry.HG_SPLASH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Emerald Splash (Fire)"),
                     Component.empty()
@@ -188,7 +187,6 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     public static final SimpleHoldableMove<HGEntity> EMERALD_CHARGE = new SimpleHoldableMove<HGEntity>(100,
             0, 40, 1, 7)
             .withFollowup(EMERALD_SPLASH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Emerald Splash"),
                     Component.literal("""
@@ -197,7 +195,6 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
 
     public static final NetSetMove NET_SET = new NetSetMove(200, 9, 15, 1f)
             .withSound(JSoundRegistry.HG_NET_SET)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Tentacle Place"),
                     Component.literal("""
@@ -216,7 +213,6 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             1, 0, 0, 0, 0, IntSet.of(12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32), 2f, true)
             .withReflect()
             .withSound(JSoundRegistry.HG_SPLASH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("All-Consuming Emerald Splash"),
                     Component.literal("""
@@ -227,10 +223,8 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<HGEntity> TOSS = new TossMove<HGEntity>(0, 1, 1, 0.75f)
-            .withoutLookTracking()
             .withAnim(HGEntity.State.ITEM_TOSS);
     public static final TossChargeMove<HGEntity> TOSS_CHARGE = new TossChargeMove<HGEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
-            .withoutLookTracking()
             .withFollowup(TOSS);
 
     public HGEntity(Level worldIn) {

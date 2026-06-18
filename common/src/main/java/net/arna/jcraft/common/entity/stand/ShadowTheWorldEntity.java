@@ -112,7 +112,6 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("3 Hit Combo (Finisher)"),
                     Component.empty()
@@ -121,7 +120,6 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
             24, 0.85f, 4f, 15, 1.5f, 0.35f, 0.2f, IntSet.of(6, 14))
             .withFinisher(20, KNOCKDOWN)
             .withImpactSound(JSoundRegistry.IMPACT_1)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("3 Hit Combo"),
                     Component.literal("knocks down")
@@ -130,7 +128,6 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
     public static final SimpleHoldableMove<ShadowTheWorldEntity> IMPALING_THRUST = new SimpleHoldableMove<ShadowTheWorldEntity>(200,
             61, 60, 0.75f, 10)
             .withFollowup(IMPALING_THRUST_HIT)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Impaling Thrust"),
                     Component.literal("chargeable attack, Shadow The World prepares an attack, then stops time and hits everything between the start and end")
@@ -150,7 +147,6 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
                     Component.literal("The World detaches from the user and lunges forward, combo starter")
             );
     public static final TimeSkipMove<ShadowTheWorldEntity> TIME_SKIP = new TimeSkipMove<ShadowTheWorldEntity>(200, 7)
-            .withoutLookTracking()
             .withSound(JSoundRegistry.TIME_SKIP)
             .withSound(JSoundRegistry.STW_ZAP)
             .withInfo(
@@ -160,13 +156,11 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
     public static final TimeStopMove<ShadowTheWorldEntity> TIME_STOP = new TimeStopMove<ShadowTheWorldEntity>(1400,
             20, 30, Either.right(JServerConfig.STW_TIME_STOP_DURATION))
             .withSound(JSoundRegistry.STW_TS)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Timestop"),
                     Component.literal("2.5 seconds")
             );
     public static final STWCounterAttack COUNTER = new STWCounterAttack(400, 5, 20, 0.75f)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Counter"),
                     Component.literal("""
@@ -177,10 +171,8 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<ShadowTheWorldEntity> TOSS = new TossMove<ShadowTheWorldEntity>(0, 1, 1, 0.75f)
-            .withoutLookTracking()
             .withAnim(ShadowTheWorldEntity.State.ITEM_TOSS);
     public static final TossChargeMove<ShadowTheWorldEntity> TOSS_CHARGE = new TossChargeMove<ShadowTheWorldEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
-            .withoutLookTracking()
             .withFollowup(TOSS);
 
     private int desummonTime = 6;

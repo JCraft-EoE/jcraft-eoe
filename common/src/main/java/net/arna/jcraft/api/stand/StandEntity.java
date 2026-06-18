@@ -106,18 +106,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     private static final EntityDataAccessor<Boolean> FREE;
     private static final EntityDataAccessor<Boolean> REMOTE;
-    // Whether the current move follows the user's aim in 3D. Synced so the client-side stand positioning
-    // (see EntityMixinLogic) and rendering can react to per-move opt-outs (e.g. Metallica).
+    // Whether the current move follows the user's aim in 3D; the client derives the position from it locally.
     private static final EntityDataAccessor<Boolean> LOOK_TRACKING;
-    // The user's yaw/pitch captured when the current look-tracked move started. Used (server-side) to aim the
-    // hitbox at the committed direction instead of the live look while the move is out.
-    private static final EntityDataAccessor<Float> LOCKED_AIM_YAW;
-    private static final EntityDataAccessor<Float> LOCKED_AIM_PITCH;
-    // The world position the stand commits to when a look-tracked move starts. Synced so the client plants the
-    // stand here (see EntityMixinLogic) instead of following the user while the move is out.
-    private static final EntityDataAccessor<Float> LOCKED_POS_X;
-    private static final EntityDataAccessor<Float> LOCKED_POS_Y;
-    private static final EntityDataAccessor<Float> LOCKED_POS_Z;
+    // Reach of the current look-tracked move; the only position value networked (see EntityMixinLogic).
     private static final EntityDataAccessor<Float> LOCKED_DISTANCE;
 
     private static final EntityDataAccessor<String> USER_POSE;
@@ -210,11 +201,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         FREE = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.BOOLEAN);
         REMOTE = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.BOOLEAN);
         LOOK_TRACKING = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.BOOLEAN);
-        LOCKED_AIM_YAW = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
-        LOCKED_AIM_PITCH = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
-        LOCKED_POS_X = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
-        LOCKED_POS_Y = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
-        LOCKED_POS_Z = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
         LOCKED_DISTANCE = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
 
         FREEX = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
@@ -362,9 +348,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     /**
-     * @return whether the stand's current move follows the user's aim in 3D. Synced from the server based on
-     * {@link AbstractMove#isLookTracking(net.arna.jcraft.api.attack.IAttacker)} of the
-     * {@link #getCurrentMove() current move}.
+     * @return whether the stand's current move follows the user's aim in 3D. Synced so the client can derive
+     * the stand's position locally (see EntityMixinLogic) from the user's live look and {@link #getLockedDistance()}.
      */
     public boolean isLookTracking() {
         return this.entityData.get(LOOK_TRACKING);
@@ -375,54 +360,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     /**
-     * @return the user's yaw captured when the current look-tracked move started. Used to position the stand
-     * at the committed aim for the move's duration instead of following the live look.
+     * @return the look-tracking reach for the current move: how far the stand sits from the user along their aim.
      */
-    public float getLockedAimYaw() {
-        return this.entityData.get(LOCKED_AIM_YAW);
-    }
-
-    /**
-     * @return the user's pitch captured when the current look-tracked move started.
-     */
-    public float getLockedAimPitch() {
-        return this.entityData.get(LOCKED_AIM_PITCH);
-    }
-
-    public void setLockedAim(final float yaw, final float pitch) {
-        this.entityData.set(LOCKED_AIM_YAW, yaw);
-        this.entityData.set(LOCKED_AIM_PITCH, pitch);
-    }
-
-    /**
-     * @return the world position the stand is committed to for the current look-tracked move. The stand is
-     * planted here (see EntityMixinLogic) so it stays put instead of following the user while the move is out.
-     */
-    public Vec3 getLockedPos() {
-        return new Vec3(this.entityData.get(LOCKED_POS_X), this.entityData.get(LOCKED_POS_Y), this.entityData.get(LOCKED_POS_Z));
-    }
-
-    public void setLockedPos(final Vec3 pos) {
-        this.entityData.set(LOCKED_POS_X, (float) pos.x);
-        this.entityData.set(LOCKED_POS_Y, (float) pos.y);
-        this.entityData.set(LOCKED_POS_Z, (float) pos.z);
-    }
-
     public float getLockedDistance() {
         return this.entityData.get(LOCKED_DISTANCE);
     }
 
     public void setLockedDistance(final float distance) {
         this.entityData.set(LOCKED_DISTANCE, distance);
-    }
-
-    /**
-     * Whether this stand permits 3D look-tracking on its moves at all. Override and return {@code false} to
-     * disable it for an entire stand (e.g. Metallica), without tagging each move individually.
-     * @return whether look-tracking is allowed for this stand
-     */
-    public boolean allowsLookTracking() {
-        return true;
     }
 
     public float getDistanceOffset() {
@@ -689,7 +634,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         if (prevMove != null) prevMove.onDeactivate(getThis());
         if (curMove != null) {
             moveUsage = new MoveUsage(tickCount, curMove);
-            setLockedDistance(-1f);
+            setLockedDistance(-1f); // unlocked; re-clamped on the move's first look-tracked tick
         }
     }
 
@@ -754,11 +699,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         entityData.define(FREE, false);
         entityData.define(REMOTE, false);
         entityData.define(LOOK_TRACKING, false);
-        entityData.define(LOCKED_AIM_YAW, 0f);
-        entityData.define(LOCKED_AIM_PITCH, 0f);
-        entityData.define(LOCKED_POS_X, 0f);
-        entityData.define(LOCKED_POS_Y, 0f);
-        entityData.define(LOCKED_POS_Z, 0f);
         entityData.define(LOCKED_DISTANCE, 1f);
 
         entityData.define(FREEX, 0f);
@@ -1125,8 +1065,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         AbstractMove<?, ? super E> move = this.getCurrentMove();
-        // Cleared each tick; set true only once the stand has actually been planted at a committed world point
-        // below (so the client never tries to render it at an unset LOCKED_POS).
+        // Cleared each tick; set true below only while a look-tracked move is active.
         setLookTracking(false);
         if (defaultToNear() && moveStun <= 0) {
             if (move == null) {
@@ -1170,33 +1109,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                         user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 4, true, false));
                     }*/
 
-                    // Look-tracked moves extend the whole stand toward the user's aim (up to the move's
-                    // look-tracking reach), clamped by blocks and entities in the way. The hitbox rides along
-                    // since it is offset from the stand's body. Other moves keep the classic fixed pivot.
-                    float attackDist = move.getMoveDistance();
-                    if (move.isLookTracking(getThis())) {
-                        // While the move is active, position the whole stand at where the user is currently
-                        // aiming, so it follows the crosshair instead of committing to the start aim.
-                        setLockedAim(user.getYRot(), user.getXRot());
-                        // Cast from the eye so a slight downward look doesn't instantly hit the floor at the
-                        // user's feet. The minimum reach (the move's normal distance) keeps the stand from ever
-                        // collapsing back into the user; it clips a little into anything closer.
-                        final Vec3 eye = user.getEyePosition();
-                        final Vec3 aim = user.getLookAngle();
-                        // With distance adjustment on, the reach is clamped to blocks/entities each tick. With it
-                        // off, the stand stays at a constant distance (the move's full reach) while the move is out.
-                        final double reach = JServerConfig.STAND_DISTANCE_ADJUSTMENT.getValue()
-                                ? JUtils.clampReachToLook(user, eye, aim, this, move.getMoveDistance(), move.getLookTrackingReach())
-                                : move.getLookTrackingReach();
-                        // Centre the stand on the aim point (subtract half its height so it isn't planted by its
-                        // feet, which would float it a body-height too high / sink it into the ground).
-                        final Vec3 aimPoint = eye.add(aim.scale(reach)).subtract(0, getBbHeight() * 0.5, 0);
-                        setLockedPos(aimPoint);
-                        attackDist = (float) reach;
+                    final float attackDist = move.getMoveDistance();
+                    if (move.isLookTracking()) {
+                        // Lock the reach once at move start (LOCKED_DISTANCE is reset to -1 in setCurrentMove);
+                        // it's the only value networked, the position is derived from it in EntityMixinLogic.
                         if (getLockedDistance() < 0f) {
-                            setLockedDistance(attackDist);
+                            final double reach = JServerConfig.STAND_DISTANCE_ADJUSTMENT.getValue()
+                                    ? JUtils.clampReachToLook(user, user.getEyePosition(), user.getLookAngle(), this,
+                                            move.getMoveDistance(), move.getLookTrackingReach())
+                                    : move.getLookTrackingReach();
+                            setLockedDistance((float) reach);
                         }
-                        // LOCKED_POS is valid now: tell the client to plant the stand there.
                         setLookTracking(true);
                     }
 

@@ -76,7 +76,6 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
             );
     public static final SheerHeartAttackAttack SHEER_HEART_ATTACK = new SheerHeartAttackAttack(1000, 16, 20, 1f)
 //            .withSound(JSoundRegistry.KQ_SHA)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Sheer Heart Attack"),
                     Component.literal("creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner")
@@ -100,10 +99,8 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     // TODO add move info x2
     // TODO balance x2
     public static final KQTossMove TOSS = new KQTossMove(0, 1, 1, 0.75f)
-            .withoutLookTracking()
             .withAnim(KillerQueenEntity.State.ITEM_TOSS);
     public static final TossChargeMove<KillerQueenEntity> TOSS_CHARGE = new TossChargeMove<KillerQueenEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
-            .withoutLookTracking()
             .withFollowup(TOSS);
 
     // Light chain implementation

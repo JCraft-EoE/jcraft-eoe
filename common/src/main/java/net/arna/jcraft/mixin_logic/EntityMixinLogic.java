@@ -2,7 +2,6 @@ package net.arna.jcraft.mixin_logic;
 
 import com.google.common.collect.ImmutableList;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JUtils;
@@ -41,21 +40,25 @@ public class EntityMixinLogic {
                 return;
             }
 
-            // During a look-tracked move, plant the stand at the world point it committed to when the move
-            // started (see StandEntity tick), so it stays put instead of following the user or sinking into the
-            // ground. Other states (and moves that opt out, see AbstractMove#isLookTracking) keep the classic
-            // relative pivot below.
+            // Look-tracked moves sit out from the user's eyes along their live aim, so the stand follows where
+            // they look in 3D. Derived locally from the look and the only networked value, the reach.
             if (stand.isLookTracking()) {
-                final Vec3 locked = stand.getLockedPos();
-                if (JServerConfig.STAND_DISTANCE_ADJUSTMENT.getValue()) {
-                    positionUpdater.accept(passenger, locked.x, locked.y, locked.z);
-                } else {
-                    final Vec3 offset = locked.subtract(thisEntity.position());
-                    final Vec3 adjusted = offset.lengthSqr() < 1.0E-7
-                            ? locked
-                            : thisEntity.position().add(offset.normalize().scale(stand.getLockedDistance()));
-                    positionUpdater.accept(passenger, adjusted.x, adjusted.y, adjusted.z);
+                final Vec3 eye = thisEntity.getEyePosition();
+                final Vec3 look = thisEntity.getLookAngle();
+
+                double reach = stand.getLockedDistance();
+                // Clamp the reach against the live look so the stand stops short of blocks rather than clipping
+                // through them (e.g. aiming down mid-attack). Cast from the eye so a slight downward look has
+                // headroom before the ray reaches the floor, instead of snapping the stand back to the user.
+                if (thisEntity instanceof final LivingEntity user) {
+                    reach = JUtils.clampReachToLook(user, eye, look, stand, 0.5, reach);
                 }
+
+                // Centre the stand's body on the aim point (drop it half its height along gravity so it isn't
+                // planted by its feet).
+                final Vec3 down = Vec3.atLowerCornerOf(GravityChangerAPI.getGravityDirection(thisEntity).getNormal());
+                final Vec3 pos = eye.add(look.scale(reach)).add(down.scale(passenger.getBbHeight() * 0.5));
+                positionUpdater.accept(passenger, pos.x, pos.y, pos.z);
                 info.cancel();
                 return;
             }

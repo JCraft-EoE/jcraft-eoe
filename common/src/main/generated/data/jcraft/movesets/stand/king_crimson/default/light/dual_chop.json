@@ -34,7 +34,7 @@
         "description": {
           "translate": "move.jcraft.king_crimson.default.sweep.cr.description"
         },
-        "look_tracking_reach": 3.5,
+        "look_tracking": true,
         "name": {
           "translate": "move.jcraft.king_crimson.default.sweep.cr.name"
         }
@@ -76,7 +76,7 @@
       "description": {
         "translate": "move.jcraft.king_crimson.default.dual_chop.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.king_crimson.default.dual_chop.name"

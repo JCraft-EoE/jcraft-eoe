@@ -146,7 +146,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withExtraHitBox(1, 0.75, 1)
             .withExtraHitBox(1, -0.5, 1)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Overhead Kick"),
                     Component.literal("High damage, good reach, launches down.")
@@ -161,7 +160,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("True Strike"),
                     Component.literal("Good stun, high blockstun, medium windup.")
@@ -171,7 +169,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withSound(JSoundRegistry.TWOH_SMITE)
             .withBlockStun(13)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("You won't run away!"),
                     Component.literal("Summons a weaker lightning bolt at the aimed position.")
@@ -182,7 +179,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withSound(JSoundRegistry.TWOH_SMITE)
             .withBlockStun(13)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Evaporate"),
                     Component.literal("Summons a powerful lightning bolt that deals high damage and stun, and lifts up on hit.")
@@ -195,7 +191,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             .withHyperArmor()
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withHitSpark(JParticleType.HIT_SPARK_3)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Overwrite (Hit)"),
                     Component.empty()
@@ -204,7 +199,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             360, 71, 70, 1f, 20)
             .withFollowup(OVERWRITE)
             .withSound(JSoundRegistry.TWOH_CHARGE_OVERWRITE)
-            .withoutLookTracking()
             .withInfo(Component.literal("Reality Overwrite"), Component.literal("""
                     Charges (for a minimum of 1s) an unblockable punch that changes the reality of the hit victims.
                     While charging, finish overwrite by pressing:
@@ -216,8 +210,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             16, 22, 0.75f, 0f, 20, 1.5f, 0f, 0f)
             .withSound(JSoundRegistry.TWOH_KNIFETHROW)
             .withBlockStun(6)
-            .withoutLookTracking()
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Aerial Divine Finisher"),
                     Component.literal("Briefly stalls mid-air. Knives explode on contact.")
@@ -226,9 +218,7 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
             16, 22,0.75f, 0f, 20, 1.5f, 0f, 0f)
             .withAerialVariant(AERIAL_DIVINE_FINISHER)
             .withSound(JSoundRegistry.TWOH_KNIFESUMMON)
-            .withoutLookTracking()
             .withBlockStun(6)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Divine Finisher"),
                     Component.literal("Fires 4 stunning knives that launch at a delay.")
@@ -236,7 +226,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     public static final TimeStopMove<TheWorldOverHeavenEntity> TIME_STOP = new TimeStopMove<TheWorldOverHeavenEntity>(
             1400, 45, 50, Either.right(JServerConfig.TWOH_TIME_STOP_DURATION))
             .withSound(JSoundRegistry.TWOH_TS)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Timestop"),
                     Component.literal("5 seconds")
@@ -244,7 +233,6 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
 
     public static final TimeSkipMove<TheWorldOverHeavenEntity> TIME_SKIP = new TimeSkipMove<TheWorldOverHeavenEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.TWOH_TIMESKIP)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Timeskip"),
                     Component.literal("14m range")
@@ -252,10 +240,8 @@ public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEnti
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<TheWorldOverHeavenEntity> TOSS = new TossMove<TheWorldOverHeavenEntity>(0, 1, 1, 0.75f)
-            .withoutLookTracking()
             .withAnim(TheWorldOverHeavenEntity.State.ITEM_TOSS);
     public static final TossChargeMove<TheWorldOverHeavenEntity> TOSS_CHARGE = new TossChargeMove<TheWorldOverHeavenEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
-            .withoutLookTracking()
             .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Integer> OVERWRITE_TYPE = SynchedEntityData.defineId(TheWorldOverHeavenEntity.class, EntityDataSerializers.INT);

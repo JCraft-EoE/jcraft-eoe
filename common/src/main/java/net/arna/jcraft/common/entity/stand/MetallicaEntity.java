@@ -94,7 +94,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
     public static final float IRON_MAX = 80.0f;
 
     public static final GiveScalpelMove GIVE_SCALPEL = new GiveScalpelMove(0, 8, 9, 0)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Give Scalpel"),
                     Component.empty()
@@ -153,7 +152,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withInitAction(UserAnimationAction.play("mtl.brg"));
     public static final KnockdownAttack<MetallicaEntity> SWEEP = new KnockdownAttack<MetallicaEntity>(0,
             7, 14, 0.75f, 5f, 8, 1.5f, 0.3f, 0.4f, 35)
-            .withoutLookTracking()
             .withSound(JSoundRegistry.METALLICA_BLADE_SWIPE)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
             .withHitSpark(JParticleType.SWEEP_ATTACK)
@@ -205,7 +203,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withInitAction(UserAnimationAction.play("mtl.sms"))
             .withCondition(MetallicaIronCondition.atLeast(IRON_MAX / 2.0f));
     public static final RemoteScalpelMove REMOTE_SCALPEL_MOVE = new RemoteScalpelMove(0, 7, 12, 0)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Scalpel Toss (Remote)"),
                     Component.literal("""
@@ -216,9 +213,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withInitAction(UserAnimationAction.play("mtl.rs"))
             .withCondition(MetallicaIronCondition.atLeast(ScalpelProjectile.IRON_COST));
     public static final FanTossAttack FAN_TOSS = new FanTossAttack(0, 7, 12, 0.75f)
-            .withoutLookTracking()
             .withSound(JSoundRegistry.METALLICA_SCALPEL_SUMMON)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Scalpel Toss (Wide)"),
                     Component.literal("""
@@ -231,7 +226,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withSound(JSoundRegistry.METALLICA_SCALPEL_SUMMON)
             .withCrouchingVariant(REMOTE_SCALPEL_MOVE)
             .withAerialVariant(FAN_TOSS)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Scalpel Toss (Precise)"),
                     Component.literal("""
@@ -243,7 +237,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withCondition(MetallicaIronCondition.atLeast(ScalpelProjectile.IRON_COST));
 
     public static final RazorCoughAttack RAZOR_COUGH_ATTACK = new RazorCoughAttack(140, 10, 20)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Internal Attack"),
                     Component.literal("""
@@ -255,7 +248,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
     public static final CreateMagneticFieldMove CREATE_MAGNETIC_FIELD = new CreateMagneticFieldMove(200, 5, 15)
             .withCrouchingVariant(RAZOR_COUGH_ATTACK)
             // .withAerialVariant(EXPLODE_MAGNETIC_FIELD)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Place Magnetic Field"),
                     Component.literal("""
@@ -280,7 +272,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withInitAction(UserAnimationAction.play("mtl.ita")); */
 
     public static final ExplodeMagneticFieldMove EXPLODE_MAGNETIC_FIELD = new ExplodeMagneticFieldMove(0, 10, 20)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Explode Magnetic Field"),
                     Component.literal("""
@@ -294,7 +285,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withAction(EffectAction.inflict(JStatusRegistry.HYPOXIA, 200, 0, false, true))
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab (Final Hit)"),
                     Component.empty()
@@ -303,7 +293,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
     public static final SimpleAttack<MetallicaEntity> GRAB_HIT = new SimpleAttack<MetallicaEntity>(0,
             13, 24, 0.5f, 4f, 10, 2f, 0f, 0f)
             .withStunType(StunType.UNBURSTABLE)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab (Second Hit)"),
                     Component.empty())
@@ -313,7 +302,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
     public static final GrabAttack<MetallicaEntity, State> GRAB = new GrabAttack<>(280,
             9, 20, 0.5f, 0, 15, 1.5f, 0, 0, GRAB_HIT,
             StateContainer.of(State.GRAB_HIT), 17, 0.4)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Grab"),
                     Component.literal("""
@@ -327,7 +315,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withInitAction(UserAnimationAction.play("mtl.grab"));
     public static final InvisibilityMove GO_INVISIBLE = new InvisibilityMove(20, 10, 15)
             .withSound(JSoundRegistry.METALLICA_INVISIBILITY)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Invisibility"),
                     Component.literal("""
@@ -339,7 +326,6 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withCondition(MetallicaIronCondition.atLeast(5.0f));
     public static final HarvestMove HARVEST = new HarvestMove(60 * 20, 0.75f, 3)
             .withCrouchingVariant(GO_INVISIBLE)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Harvest Iron"),
                     Component.literal("""
@@ -350,10 +336,8 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             );
     public static final BisectAttack BISECT = new BisectAttack(0, 1, 11, 0.75f)
             .withSound(JSoundRegistry.METALLICA_CRY)
-            .withoutLookTracking()
             .withInitAction(UserAnimationAction.play("mtl.bsc_fire"));
     public static final BisectChargeMove BISECT_CHARGE = new BisectChargeMove(30 * 20, 81, 80, 0.75f, 12)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Bisect"),
                     Component.literal("""

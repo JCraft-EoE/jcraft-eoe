@@ -170,14 +170,12 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             1f, 0f, 0f, 4f, HealMove.HealTarget.USER, false)
             .withCrouchingVariant(HEAL)
             .withSound(JSoundRegistry.GE_HEAL)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Healing Hand"),
                     Component.literal("standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs")
             );
     public static final LifeBeamAttack LIFE_BEAM = new LifeBeamAttack(0, 1, 10, 1.1f)
             .withSound(JSoundRegistry.GER_LASER_FIRE)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Life Beam"),
                     Component.literal("")
@@ -186,7 +184,6 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             0, 40, 1.1f, 9)
             .withFollowup(LIFE_BEAM)
             .withSound(JSoundRegistry.GER_LASER)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Life Beam"),
                     Component.literal("""
@@ -195,14 +192,12 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             );
     public static final NullificationAttack NULLIFICATION = new NullificationAttack(480, 5, 35, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Nullification"),
                     Component.literal("0.25s windup, 1.5s counter, stuns on hit")
             );
     public static final ReturnToZeroMove RETURN_TO_ZERO = new ReturnToZeroMove(1200, 30, 32, 1f, 64, 200, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
             .withSound(JSoundRegistry.GER_SETUP)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Return to Zero"),
                     Component.literal("initial press: saves the state of " +
@@ -210,7 +205,6 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             );
     public static final FlightMove FLIGHT = new FlightMove(320, 1, 0, 0f, 20)
             .withSound(JSoundRegistry.GER_FLY)
-            .withoutLookTracking()
             .withInfo(
                     Component.literal("Flight"),
                     Component.literal("1 second of flight")
@@ -218,10 +212,8 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     // TODO add move info x2
     // TODO balance x2
     public static final TossMove<GEREntity> TOSS = new TossMove<GEREntity>(0, 1, 1, 0.75f,0.13f)
-            .withoutLookTracking()
             .withAnim(GEREntity.State.ITEM_TOSS);
     public static final TossChargeMove<GEREntity> TOSS_CHARGE = new TossChargeMove<GEREntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
-            .withoutLookTracking()
             .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Integer> FLIGHT_TIME = SynchedEntityData.defineId(GEREntity.class, EntityDataSerializers.INT);
