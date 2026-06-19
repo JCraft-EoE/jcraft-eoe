@@ -30,7 +30,6 @@
         "description": {
           "translate": "move.jcraft.brawler.default.sweep.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.brawler.default.sweep.cr.name"
         }
@@ -74,7 +73,6 @@
       "description": {
         "translate": "move.jcraft.brawler.default.right_low_kick.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.brawler.default.right_low_kick.name"
       }

@@ -23,7 +23,6 @@
       "description": {
         "translate": "move.jcraft.aerosmith.default.loft_bombing.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.aerosmith.default.loft_bombing.name"
       }

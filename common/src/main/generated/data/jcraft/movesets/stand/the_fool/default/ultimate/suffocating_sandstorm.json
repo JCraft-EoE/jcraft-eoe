@@ -37,7 +37,6 @@
       "description": {
         "translate": "move.jcraft.the_fool.default.suffocating_sandstorm.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_fool.default.suffocating_sandstorm.name"
       }

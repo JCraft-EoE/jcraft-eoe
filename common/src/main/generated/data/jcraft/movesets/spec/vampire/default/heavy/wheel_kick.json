@@ -27,7 +27,6 @@
         "description": {
           "translate": "move.jcraft.vampire.default.axe_kick.air.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.vampire.default.axe_kick.air.name"
         }
@@ -72,7 +71,6 @@
         "description": {
           "translate": "move.jcraft.vampire.default.sweep_kick.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.vampire.default.sweep_kick.cr.name"
         }
@@ -112,7 +110,6 @@
       "description": {
         "translate": "move.jcraft.vampire.default.wheel_kick.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.vampire.default.wheel_kick.name"
       }

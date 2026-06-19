@@ -36,8 +36,6 @@
         "description": {
           "translate": "move.jcraft.star_platinum_the_world.default.what_an_ugly_watch.cr.description"
         },
-        "look_tracking": false,
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "jcraft.sptw.sp3"
         }
@@ -69,7 +67,6 @@
             }
           ],
           "armor": 2147483647,
-          "look_tracking_reach": 3.5,
           "name": {
             "translate": "jcraft.sptw.crsp3hit"
           }
@@ -121,8 +118,6 @@
       "description": {
         "translate": "move.jcraft.star_platinum_the_world.default.what_an_ugly_watch.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "jcraft.sptw.sp3"
       }
@@ -171,8 +166,6 @@
           }
         ],
         "armor": 2147483647,
-        "look_tracking": false,
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "jcraft.sptw.sp3hit"
         }

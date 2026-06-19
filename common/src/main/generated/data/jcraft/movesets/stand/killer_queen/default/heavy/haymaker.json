@@ -39,7 +39,6 @@
       "description": {
         "translate": "move.jcraft.killer_queen.default.haymaker.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.killer_queen.default.haymaker.name"
       }

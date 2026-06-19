@@ -30,7 +30,6 @@
       "description": {
         "translate": "move.jcraft.magicians_red.default.red_bind.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.magicians_red.default.red_bind.name"
       }

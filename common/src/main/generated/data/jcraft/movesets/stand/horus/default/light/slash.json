@@ -26,7 +26,6 @@
         "description": {
           "translate": "move.jcraft.horus.default.downward_claw.air.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.horus.default.downward_claw.air.name"
         }
@@ -69,7 +68,6 @@
         "description": {
           "translate": "move.jcraft.horus.default.low_claw.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.horus.default.low_claw.cr.name"
         }
@@ -113,7 +111,6 @@
           "description": {
             "translate": "move.jcraft.horus.default.impale.cr.description"
           },
-          "look_tracking_reach": 3.5,
           "name": {
             "translate": "move.jcraft.horus.default.impale.cr.name"
           }
@@ -152,7 +149,7 @@
         "description": {
           "translate": "move.jcraft.horus.default.finisher.followup.description"
         },
-        "look_tracking_reach": 3.5,
+        "look_tracking": true,
         "name": {
           "translate": "move.jcraft.horus.default.finisher.followup.name"
         }
@@ -188,7 +185,7 @@
       "description": {
         "translate": "move.jcraft.horus.default.slash.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.horus.default.slash.name"

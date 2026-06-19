@@ -14,7 +14,6 @@
         "description": {
           "translate": "move.jcraft.horus.default.icicle_fire.followup.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.horus.default.icicle_fire.followup.name"
         }
@@ -33,7 +32,6 @@
         "translate": "move.jcraft.horus.default.icicle_charge.description"
       },
       "is_holdable": true,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.horus.default.icicle_charge.name"
       }

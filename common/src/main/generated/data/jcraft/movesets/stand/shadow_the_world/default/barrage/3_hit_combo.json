@@ -49,8 +49,7 @@
                 "sound": "jcraft:twkickhit"
               }
             ],
-            "look_tracking": false,
-            "look_tracking_reach": 3.5,
+            "look_tracking": true,
             "name": {
               "text": "3 Hit Combo (Finisher)"
             }
@@ -65,8 +64,7 @@
         },
         "tick": 20
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "name": {
         "translate": "move.jcraft.shadow_the_world.default.3_hit_combo.name"
       }

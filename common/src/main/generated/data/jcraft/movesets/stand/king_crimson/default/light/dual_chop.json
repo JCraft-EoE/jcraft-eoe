@@ -34,7 +34,6 @@
         "description": {
           "translate": "move.jcraft.king_crimson.default.sweep.cr.description"
         },
-        "look_tracking": true,
         "name": {
           "translate": "move.jcraft.king_crimson.default.sweep.cr.name"
         }

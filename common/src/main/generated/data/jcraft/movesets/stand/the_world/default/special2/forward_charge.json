@@ -49,7 +49,6 @@
         "description": {
           "translate": "move.jcraft.the_world.default.lunge.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_world.default.lunge.cr.name"
         }
@@ -90,7 +89,6 @@
       "description": {
         "translate": "move.jcraft.the_world.default.forward_charge.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_world.default.forward_charge.name"
       },

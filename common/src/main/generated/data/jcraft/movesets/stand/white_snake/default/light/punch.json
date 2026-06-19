@@ -34,7 +34,6 @@
         "description": {
           "translate": "move.jcraft.white_snake.default.uppercut.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.white_snake.default.uppercut.cr.name"
         }
@@ -78,7 +77,7 @@
         "description": {
           "translate": "move.jcraft.white_snake.default.finisher.followup.description"
         },
-        "look_tracking_reach": 3.5,
+        "look_tracking": true,
         "name": {
           "translate": "move.jcraft.white_snake.default.finisher.followup.name"
         }
@@ -114,7 +113,7 @@
       "description": {
         "translate": "move.jcraft.white_snake.default.punch.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.white_snake.default.punch.name"

@@ -26,7 +26,6 @@
         "translate": "move.jcraft.purple_haze_distortion.default.barrage.description"
       },
       "is_holdable": true,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.purple_haze_distortion.default.barrage.name"
       }

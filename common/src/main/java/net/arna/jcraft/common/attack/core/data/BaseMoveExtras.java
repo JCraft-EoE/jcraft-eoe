@@ -60,7 +60,7 @@ public class BaseMoveExtras {
 
             Codec.BOOL.optionalFieldOf("look_tracking", false).forGetter(BaseMoveExtras::isLookTracking),
 
-            Codec.FLOAT.optionalFieldOf("look_tracking_reach", 3.5f).forGetter(BaseMoveExtras::getLookTrackingReach)
+            Codec.FLOAT.optionalFieldOf("look_tracking_reach", AbstractMove.DEFAULT_LOOK_TRACKING_REACH).forGetter(BaseMoveExtras::getLookTrackingReach)
     ).apply(instance, BaseMoveExtras::new));
     private Component name = Component.empty();
     private Component description = Component.empty();
@@ -76,7 +76,7 @@ public class BaseMoveExtras {
     private boolean loopPrevention = true;
     private boolean lingeringSounds = false;
     private boolean lookTracking = false;
-    private float lookTrackingReach = 3.5f;
+    private float lookTrackingReach = AbstractMove.DEFAULT_LOOK_TRACKING_REACH;
 
     private BaseMoveExtras(final Component name, final Component description, final List<MoveCondition<?, ?>> conditions,
                            final List<MoveAction<?, ?>> actions,

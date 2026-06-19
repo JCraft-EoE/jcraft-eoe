@@ -14,7 +14,6 @@
         "description": {
           "translate": "move.jcraft.vampire.default.space_ripper_stingy_eyes_fire.followup.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.vampire.default.space_ripper_stingy_eyes_fire.followup.name"
         },
@@ -40,7 +39,6 @@
         "translate": "move.jcraft.vampire.default.space_ripper_stingy_eyes.description"
       },
       "is_holdable": true,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.vampire.default.space_ripper_stingy_eyes.name"
       }

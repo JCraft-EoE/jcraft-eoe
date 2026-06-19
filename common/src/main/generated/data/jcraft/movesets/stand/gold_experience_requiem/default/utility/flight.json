@@ -16,8 +16,6 @@
       "description": {
         "translate": "move.jcraft.gold_experience_requiem.default.flight.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "mobility_type": "FLIGHT",
       "name": {
         "translate": "move.jcraft.gold_experience_requiem.default.flight.name"

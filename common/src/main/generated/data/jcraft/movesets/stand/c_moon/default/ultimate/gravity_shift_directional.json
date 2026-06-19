@@ -21,8 +21,6 @@
         "description": {
           "translate": "move.jcraft.c_moon.default.gravity_shift_radial.cr.description"
         },
-        "look_tracking": false,
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.c_moon.default.gravity_shift_radial.cr.name"
         }
@@ -46,8 +44,6 @@
       "description": {
         "translate": "move.jcraft.c_moon.default.gravity_shift_directional.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.c_moon.default.gravity_shift_directional.name"
       }

@@ -47,7 +47,6 @@
           "damage": 1.0,
           "duration": 9,
           "extras": {
-            "look_tracking_reach": 3.5,
             "name": {
               "text": "Barrage (Final Hit)"
             }
@@ -62,7 +61,6 @@
         "tick": 23
       },
       "is_holdable": true,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.made_in_heaven.default.barrage.name"
       }

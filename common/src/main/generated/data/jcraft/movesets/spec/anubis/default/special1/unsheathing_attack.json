@@ -30,7 +30,6 @@
         "description": {
           "translate": "move.jcraft.anubis.default.unsheating_sweep.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.anubis.default.unsheating_sweep.cr.name"
         }
@@ -71,7 +70,6 @@
       "description": {
         "translate": "move.jcraft.anubis.default.unsheathing_attack.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.anubis.default.unsheathing_attack.name"
       }

@@ -17,7 +17,6 @@
       "description": {
         "translate": "move.jcraft.crazy_diamond.default.null.description"
       },
-      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.crazy_diamond.default.null.name"

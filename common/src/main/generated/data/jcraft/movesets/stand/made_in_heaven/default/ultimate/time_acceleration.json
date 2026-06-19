@@ -18,8 +18,6 @@
       "description": {
         "translate": "move.jcraft.made_in_heaven.default.time_acceleration.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.made_in_heaven.default.time_acceleration.name"
       }

@@ -35,7 +35,6 @@
         "description": {
           "translate": "move.jcraft.star_platinum.default.takedown.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "jcraft.starplatinum.crsp1"
         }
@@ -68,7 +67,6 @@
             }
           ],
           "armor": 2147483647,
-          "look_tracking_reach": 3.5,
           "name": {
             "translate": "jcraft.starplatinum.crsp1hit"
           }
@@ -119,7 +117,6 @@
       "description": {
         "translate": "move.jcraft.star_platinum.default.star_finger.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "jcraft.starplatinum.sp1"
       }

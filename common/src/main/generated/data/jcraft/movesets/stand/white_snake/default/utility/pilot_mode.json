@@ -8,7 +8,6 @@
       "description": {
         "translate": "move.jcraft.white_snake.default.pilot_mode.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.white_snake.default.pilot_mode.name"
       }

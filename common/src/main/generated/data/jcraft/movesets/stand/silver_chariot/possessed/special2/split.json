@@ -33,7 +33,6 @@
         "description": {
           "translate": "move.jcraft.silver_chariot.possessed.lacerate.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "mobility_type": "DASH",
         "name": {
           "translate": "move.jcraft.silver_chariot.possessed.lacerate.cr.name"
@@ -83,8 +82,6 @@
       "description": {
         "translate": "move.jcraft.silver_chariot.possessed.split.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "mobility_type": "DASH",
       "name": {
         "translate": "move.jcraft.silver_chariot.possessed.split.name"

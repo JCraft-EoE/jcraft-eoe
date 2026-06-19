@@ -39,7 +39,6 @@
       "description": {
         "translate": "move.jcraft.the_world.default.donut.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_world.default.donut.name"
       }

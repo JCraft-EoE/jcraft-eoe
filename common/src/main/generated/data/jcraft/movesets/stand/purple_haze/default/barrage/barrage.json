@@ -26,7 +26,6 @@
         "translate": "move.jcraft.purple_haze.default.barrage.description"
       },
       "is_holdable": true,
-      "look_tracking_reach": 3.5,
       "may_hit_user": true,
       "name": {
         "translate": "move.jcraft.purple_haze.default.barrage.name"

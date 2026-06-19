@@ -34,7 +34,6 @@
         "description": {
           "translate": "move.jcraft.purple_haze_distortion.default.ground_slam.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.purple_haze_distortion.default.ground_slam.cr.name"
         }
@@ -77,7 +76,6 @@
       "description": {
         "translate": "move.jcraft.purple_haze_distortion.default.grab.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.purple_haze_distortion.default.grab.name"
       }
@@ -128,8 +126,6 @@
                   "sound": "jcraft:impact1"
                 }
               ],
-              "look_tracking": false,
-              "look_tracking_reach": 3.5,
               "name": {
                 "text": "Grab (Final Hit)"
               }
@@ -143,8 +139,6 @@
           },
           "tick": 19
         },
-        "look_tracking": false,
-        "look_tracking_reach": 3.5,
         "name": {
           "text": "Grab (Final Hit)"
         }

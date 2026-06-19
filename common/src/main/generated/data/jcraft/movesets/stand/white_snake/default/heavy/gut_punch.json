@@ -30,7 +30,7 @@
       "description": {
         "translate": "move.jcraft.white_snake.default.gut_punch.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "name": {
         "translate": "move.jcraft.white_snake.default.gut_punch.name"
       }

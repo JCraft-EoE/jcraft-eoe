@@ -30,7 +30,6 @@
       "description": {
         "translate": "move.jcraft.hamon.default.focus_strike.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.hamon.default.focus_strike.name"
       }

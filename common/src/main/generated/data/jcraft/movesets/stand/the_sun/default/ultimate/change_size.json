@@ -9,7 +9,6 @@
       "description": {
         "translate": "move.jcraft.the_sun.default.change_size.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_sun.default.change_size.name"
       }

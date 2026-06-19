@@ -17,8 +17,6 @@
       "description": {
         "translate": "move.jcraft.mandom.default.rewind.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.mandom.default.rewind.name"
       }

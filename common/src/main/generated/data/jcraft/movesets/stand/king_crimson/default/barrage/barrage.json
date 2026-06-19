@@ -49,7 +49,6 @@
                 "sound": "jcraft:impact6"
               }
             ],
-            "look_tracking": true,
             "name": {
               "text": "Barrage (Final Hit)"
             }
@@ -65,7 +64,6 @@
         "tick": 36
       },
       "is_holdable": true,
-      "look_tracking": true,
       "name": {
         "translate": "move.jcraft.king_crimson.default.barrage.name"
       }

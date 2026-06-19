@@ -24,8 +24,6 @@
       "description": {
         "translate": "move.jcraft.horus.default.beak_dive.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "mobility_type": "FLIGHT",
       "name": {
         "translate": "move.jcraft.horus.default.beak_dive.name"

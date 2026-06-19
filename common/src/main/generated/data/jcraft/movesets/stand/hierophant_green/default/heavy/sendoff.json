@@ -34,7 +34,6 @@
       "description": {
         "translate": "move.jcraft.hierophant_green.default.sendoff.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.hierophant_green.default.sendoff.name"
       }

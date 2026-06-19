@@ -28,8 +28,6 @@
         "description": {
           "translate": "move.jcraft.hierophant_green.default.emerald_splash_fire.followup.description"
         },
-        "look_tracking": false,
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.hierophant_green.default.emerald_splash_fire.followup.name"
         },
@@ -57,8 +55,6 @@
         "translate": "move.jcraft.hierophant_green.default.emerald_splash.description"
       },
       "is_holdable": true,
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.hierophant_green.default.emerald_splash.name"
       }

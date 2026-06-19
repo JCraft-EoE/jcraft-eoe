@@ -31,7 +31,6 @@
       "description": {
         "translate": "move.jcraft.silver_chariot.default.cleave.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.silver_chariot.default.cleave.name"
       }

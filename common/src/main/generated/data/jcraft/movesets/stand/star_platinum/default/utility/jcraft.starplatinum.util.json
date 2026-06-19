@@ -10,8 +10,6 @@
       "description": {
         "translate": "move.jcraft.star_platinum.default.stand_jump.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "mobility_type": "DASH",
       "name": {
         "translate": "jcraft.starplatinum.util"

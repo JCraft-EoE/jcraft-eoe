@@ -19,7 +19,6 @@
       "description": {
         "translate": "move.jcraft.killer_queen.default.grab.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.killer_queen.default.grab.name"
       }
@@ -29,7 +28,6 @@
       "cooldown": 0,
       "duration": 20,
       "extras": {
-        "look_tracking_reach": 3.5,
         "name": {
           "text": "Grab (hit)"
         }

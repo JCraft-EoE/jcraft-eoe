@@ -39,7 +39,6 @@
           "description": {
             "translate": "move.jcraft.gold_experience_requiem.default.punch.followup.description"
           },
-          "look_tracking_reach": 3.5,
           "name": {
             "translate": "move.jcraft.gold_experience_requiem.default.punch.followup.name"
           }
@@ -81,7 +80,6 @@
         "description": {
           "translate": "move.jcraft.gold_experience_requiem.default.downward_kick.air.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.gold_experience_requiem.default.downward_kick.air.name"
         }
@@ -120,7 +118,7 @@
       "description": {
         "translate": "move.jcraft.gold_experience_requiem.default.punch.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.gold_experience_requiem.default.punch.name"

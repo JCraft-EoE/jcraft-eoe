@@ -35,7 +35,6 @@
         "description": {
           "translate": "move.jcraft.star_platinum.default.uppercut.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "jcraft.starplatinum.crm1"
         }
@@ -84,7 +83,7 @@
         "description": {
           "translate": "move.jcraft.star_platinum.default.punch.followup.description"
         },
-        "look_tracking_reach": 3.5,
+        "look_tracking": true,
         "name": {
           "translate": "jcraft.starplatinum.m1m1"
         }
@@ -120,7 +119,7 @@
       "description": {
         "translate": "move.jcraft.star_platinum.default.punch.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "loop_prevention": false,
       "name": {
         "translate": "jcraft.starplatinum.m1"

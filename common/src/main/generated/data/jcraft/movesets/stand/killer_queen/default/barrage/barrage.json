@@ -32,7 +32,6 @@
         "translate": "move.jcraft.killer_queen.default.barrage.description"
       },
       "is_holdable": true,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.killer_queen.default.barrage.name"
       }

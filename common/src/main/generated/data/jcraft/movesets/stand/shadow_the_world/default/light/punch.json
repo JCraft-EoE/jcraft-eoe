@@ -35,7 +35,7 @@
         "description": {
           "translate": "move.jcraft.shadow_the_world.default.uppercut.cr.description"
         },
-        "look_tracking_reach": 3.5,
+        "look_tracking": true,
         "name": {
           "translate": "move.jcraft.shadow_the_world.default.uppercut.cr.name"
         }
@@ -72,7 +72,7 @@
       "description": {
         "translate": "move.jcraft.shadow_the_world.default.punch.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.shadow_the_world.default.punch.name"

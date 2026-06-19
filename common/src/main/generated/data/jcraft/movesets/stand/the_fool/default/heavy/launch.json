@@ -44,8 +44,6 @@
       "description": {
         "translate": "move.jcraft.the_fool.default.launch.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_fool.default.launch.name"
       }

@@ -25,7 +25,6 @@
       "description": {
         "translate": "move.jcraft.vampire.default.beatdown.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.vampire.default.beatdown.name"
       }

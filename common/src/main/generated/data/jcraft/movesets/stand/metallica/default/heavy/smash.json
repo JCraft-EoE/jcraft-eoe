@@ -53,8 +53,6 @@
         "description": {
           "translate": "move.jcraft.metallica.default.sweep.cr.description"
         },
-        "look_tracking": false,
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.metallica.default.sweep.cr.name"
         }
@@ -121,7 +119,6 @@
         "description": {
           "translate": "move.jcraft.metallica.default.cleave.followup.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.metallica.default.cleave.followup.name"
         }
@@ -181,7 +178,6 @@
       "description": {
         "translate": "move.jcraft.metallica.default.smash.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.metallica.default.smash.name"
       },

@@ -31,7 +31,6 @@
       "description": {
         "translate": "move.jcraft.anubis.default.pommel_strike.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.anubis.default.pommel_strike.name"
       }

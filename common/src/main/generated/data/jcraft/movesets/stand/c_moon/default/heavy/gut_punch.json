@@ -47,7 +47,6 @@
       "description": {
         "translate": "move.jcraft.c_moon.default.gut_punch.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.c_moon.default.gut_punch.name"
       }

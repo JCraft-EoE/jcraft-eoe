@@ -38,8 +38,6 @@
         "description": {
           "translate": "move.jcraft.the_world_over_heaven.default.overhead_kick.air.description"
         },
-        "look_tracking": false,
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_world_over_heaven.default.overhead_kick.air.name"
         }
@@ -90,7 +88,6 @@
         "description": {
           "translate": "move.jcraft.the_world_over_heaven.default.singularity.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_world_over_heaven.default.singularity.cr.name"
         }
@@ -133,8 +130,6 @@
       "description": {
         "translate": "move.jcraft.the_world_over_heaven.default.true_strike.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_world_over_heaven.default.true_strike.name"
       }

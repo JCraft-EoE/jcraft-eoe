@@ -48,7 +48,6 @@
                   "sound": "jcraft:twkickhit"
                 }
               ],
-              "look_tracking_reach": 3.5,
               "name": {
                 "text": "Kick Barrage (Final Hit)"
               }
@@ -62,7 +61,6 @@
           },
           "tick": 37
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.gold_experience_requiem.default.kick_barrage.air.name"
         }
@@ -103,7 +101,6 @@
         "translate": "move.jcraft.gold_experience_requiem.default.barrage.description"
       },
       "is_holdable": true,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.gold_experience_requiem.default.barrage.name"
       }

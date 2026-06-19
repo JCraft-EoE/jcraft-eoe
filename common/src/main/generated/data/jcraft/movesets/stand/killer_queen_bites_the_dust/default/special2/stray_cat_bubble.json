@@ -14,8 +14,6 @@
         "description": {
           "translate": "move.jcraft.killer_queen_bites_the_dust.default.stray_cat_counter.cr.description"
         },
-        "look_tracking": false,
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.killer_queen_bites_the_dust.default.stray_cat_counter.cr.name"
         }
@@ -39,8 +37,6 @@
       "description": {
         "translate": "move.jcraft.killer_queen_bites_the_dust.default.stray_cat_bubble.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.killer_queen_bites_the_dust.default.stray_cat_bubble.name"
       },

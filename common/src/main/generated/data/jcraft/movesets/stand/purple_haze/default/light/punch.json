@@ -33,7 +33,6 @@
           "description": {
             "translate": "move.jcraft.purple_haze.default.hammerfist.followup.description"
           },
-          "look_tracking_reach": 3.5,
           "may_hit_user": true,
           "name": {
             "translate": "move.jcraft.purple_haze.default.hammerfist.followup.name"
@@ -77,7 +76,6 @@
         "description": {
           "translate": "move.jcraft.purple_haze.default.backhand.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "may_hit_user": true,
         "name": {
           "translate": "move.jcraft.purple_haze.default.backhand.cr.name"
@@ -122,7 +120,7 @@
         "description": {
           "translate": "move.jcraft.purple_haze.default.kick.followup.description"
         },
-        "look_tracking_reach": 3.5,
+        "look_tracking": true,
         "may_hit_user": true,
         "name": {
           "translate": "move.jcraft.purple_haze.default.kick.followup.name"
@@ -159,7 +157,7 @@
       "description": {
         "translate": "move.jcraft.purple_haze.default.punch.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "loop_prevention": false,
       "may_hit_user": true,
       "name": {

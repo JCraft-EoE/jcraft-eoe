@@ -17,7 +17,6 @@
       "description": {
         "translate": "move.jcraft.the_world.default.feign_barrage.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_world.default.feign_barrage.name"
       }
@@ -59,7 +58,6 @@
         "description": {
           "text": "quick, armored knockdown"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "text": "Counter (Hit)"
         }

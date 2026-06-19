@@ -73,8 +73,10 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private float moveDistance;
     /** Whether the stand extends toward the user's 3D aim instead of pivoting at a fixed distance. Off by default; enable with {@link #withLookTracking()}. */
     private boolean lookTracking = false;
+    /** Default {@link #lookTrackingReach}, in blocks. Single source of truth so the move default and the codec default can't drift. */
+    public static final float DEFAULT_LOOK_TRACKING_REACH = 3.5f;
     /** Max distance the stand extends toward the aim when {@link #lookTracking} is on, before clamping to blocks/entities. */
-    private float lookTrackingReach = 2f;
+    private float lookTrackingReach = DEFAULT_LOOK_TRACKING_REACH;
     /**
      * This move's assigned animation
      */

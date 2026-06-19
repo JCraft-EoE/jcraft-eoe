@@ -9,7 +9,6 @@
       "description": {
         "translate": "move.jcraft.hamon.default.empower_move.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.hamon.default.empower_move.name"
       }

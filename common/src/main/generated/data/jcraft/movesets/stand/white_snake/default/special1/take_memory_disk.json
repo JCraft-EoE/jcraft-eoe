@@ -48,7 +48,6 @@
       "description": {
         "translate": "move.jcraft.white_snake.default.take_memory_disk.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.white_snake.default.take_memory_disk.name"
       }

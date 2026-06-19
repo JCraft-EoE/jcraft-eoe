@@ -25,8 +25,7 @@
       "description": {
         "translate": "move.jcraft.cream.half_ball.swipe.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "name": {
         "translate": "move.jcraft.cream.half_ball.swipe.name"
       }

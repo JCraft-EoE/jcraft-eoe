@@ -34,7 +34,6 @@
         "description": {
           "translate": "move.jcraft.magicians_red.default.low_kick.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.magicians_red.default.low_kick.cr.name"
         }
@@ -102,7 +101,6 @@
             "description": {
               "text": "launcher"
             },
-            "look_tracking_reach": 3.5,
             "name": {
               "text": "Hammerfist Flare"
             }
@@ -116,7 +114,6 @@
         },
         "tick": 15
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.magicians_red.default.hammerfist.name"
       }

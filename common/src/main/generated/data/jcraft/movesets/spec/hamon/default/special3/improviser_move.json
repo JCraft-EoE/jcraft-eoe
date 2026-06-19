@@ -29,7 +29,6 @@
         "translate": "move.jcraft.hamon.default.improviser_move.description"
       },
       "is_holdable": true,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.hamon.default.improviser_move.name"
       }

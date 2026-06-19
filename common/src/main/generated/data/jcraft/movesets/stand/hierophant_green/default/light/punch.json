@@ -26,7 +26,6 @@
         "description": {
           "translate": "move.jcraft.hierophant_green.default.backward_flip_kick.air.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.hierophant_green.default.backward_flip_kick.air.name"
         }
@@ -79,7 +78,6 @@
           "description": {
             "translate": "move.jcraft.hierophant_green.default.sweep.followup.description"
           },
-          "look_tracking_reach": 3.5,
           "name": {
             "translate": "move.jcraft.hierophant_green.default.sweep.followup.name"
           }
@@ -116,7 +114,6 @@
         "description": {
           "translate": "move.jcraft.hierophant_green.default.low_punch.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "loop_prevention": false,
         "name": {
           "translate": "move.jcraft.hierophant_green.default.low_punch.cr.name"
@@ -162,7 +159,7 @@
         "description": {
           "translate": "move.jcraft.hierophant_green.default.uppercut.followup.description"
         },
-        "look_tracking_reach": 3.5,
+        "look_tracking": true,
         "name": {
           "translate": "move.jcraft.hierophant_green.default.uppercut.followup.name"
         }
@@ -199,7 +196,7 @@
       "description": {
         "translate": "move.jcraft.hierophant_green.default.punch.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.hierophant_green.default.punch.name"

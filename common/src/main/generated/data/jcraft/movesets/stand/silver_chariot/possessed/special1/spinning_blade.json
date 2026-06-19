@@ -33,7 +33,6 @@
         "description": {
           "translate": "move.jcraft.silver_chariot.possessed.divine_blade.followup.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.silver_chariot.possessed.divine_blade.followup.name"
         }
@@ -70,7 +69,6 @@
         "translate": "move.jcraft.silver_chariot.possessed.spinning_blade.description"
       },
       "followup_frame": 6,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.silver_chariot.possessed.spinning_blade.name"
       }

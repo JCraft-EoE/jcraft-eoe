@@ -8,7 +8,6 @@
       "description": {
         "translate": "move.jcraft.killer_queen.default.coin_toss.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.killer_queen.default.coin_toss.name"
       },

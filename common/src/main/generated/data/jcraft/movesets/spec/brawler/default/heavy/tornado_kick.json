@@ -29,7 +29,6 @@
         "description": {
           "translate": "move.jcraft.brawler.default.uppercut.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.brawler.default.uppercut.cr.name"
         }
@@ -70,7 +69,6 @@
       "description": {
         "translate": "move.jcraft.brawler.default.tornado_kick.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.brawler.default.tornado_kick.name"
       }

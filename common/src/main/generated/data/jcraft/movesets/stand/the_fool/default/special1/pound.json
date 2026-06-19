@@ -34,7 +34,6 @@
         "description": {
           "translate": "move.jcraft.the_fool.default.slam.followup.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.the_fool.default.slam.followup.name"
         }
@@ -76,7 +75,6 @@
       "description": {
         "translate": "move.jcraft.the_fool.default.pound.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.the_fool.default.pound.name"
       }

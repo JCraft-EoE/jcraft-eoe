@@ -27,8 +27,6 @@
         "description": {
           "translate": "move.jcraft.metallica.default.give_scalpel.cr.description"
         },
-        "look_tracking": false,
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.metallica.default.give_scalpel.cr.name"
         }
@@ -97,7 +95,6 @@
                     "sound": "jcraft:impact9"
                   }
                 ],
-                "look_tracking_reach": 3.5,
                 "name": {
                   "text": "Launch"
                 }
@@ -111,7 +108,6 @@
             },
             "tick": 16
           },
-          "look_tracking_reach": 3.5,
           "name": {
             "translate": "move.jcraft.metallica.default.impale.followup.name"
           }
@@ -152,7 +148,6 @@
         "description": {
           "translate": "move.jcraft.metallica.default.slice_2nd_hit.followup.description"
         },
-        "look_tracking_reach": 3.5,
         "loop_prevention": false,
         "name": {
           "translate": "move.jcraft.metallica.default.slice_2nd_hit.followup.name"
@@ -194,7 +189,6 @@
       "description": {
         "translate": "move.jcraft.metallica.default.slice.description"
       },
-      "look_tracking_reach": 3.5,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.metallica.default.slice.name"

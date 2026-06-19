@@ -14,7 +14,6 @@
         "description": {
           "translate": "move.jcraft.d4c.default.item_place.cr.description"
         },
-        "look_tracking_reach": 3.5,
         "name": {
           "translate": "move.jcraft.d4c.default.item_place.cr.name"
         }
@@ -63,7 +62,7 @@
         "description": {
           "translate": "move.jcraft.d4c.default.deadly_blow.followup.description"
         },
-        "look_tracking_reach": 3.5,
+        "look_tracking": true,
         "name": {
           "translate": "move.jcraft.d4c.default.deadly_blow.followup.name"
         }
@@ -99,7 +98,7 @@
       "description": {
         "translate": "move.jcraft.d4c.default.chop.description"
       },
-      "look_tracking_reach": 3.5,
+      "look_tracking": true,
       "loop_prevention": false,
       "name": {
         "translate": "move.jcraft.d4c.default.chop.name"

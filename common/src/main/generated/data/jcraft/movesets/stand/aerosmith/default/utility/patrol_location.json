@@ -9,7 +9,6 @@
       "description": {
         "translate": "move.jcraft.aerosmith.default.patrol_location.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.aerosmith.default.patrol_location.name"
       }

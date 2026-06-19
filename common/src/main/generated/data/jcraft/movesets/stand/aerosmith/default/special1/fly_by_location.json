@@ -8,7 +8,6 @@
       "description": {
         "translate": "move.jcraft.aerosmith.default.fly_by_location.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.aerosmith.default.fly_by_location.name"
       }

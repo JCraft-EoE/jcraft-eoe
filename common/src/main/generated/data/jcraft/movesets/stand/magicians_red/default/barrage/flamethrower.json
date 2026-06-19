@@ -25,7 +25,6 @@
       "description": {
         "translate": "move.jcraft.magicians_red.default.flamethrower.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.magicians_red.default.flamethrower.name"
       }

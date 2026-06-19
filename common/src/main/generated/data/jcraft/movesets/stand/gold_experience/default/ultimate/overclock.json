@@ -27,7 +27,6 @@
       "description": {
         "translate": "move.jcraft.gold_experience.default.overclock.description"
       },
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.gold_experience.default.overclock.name"
       }

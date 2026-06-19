@@ -10,8 +10,6 @@
       "description": {
         "translate": "move.jcraft.silver_chariot.possessed.counter.description"
       },
-      "look_tracking": false,
-      "look_tracking_reach": 3.5,
       "name": {
         "translate": "move.jcraft.silver_chariot.possessed.counter.name"
       }
