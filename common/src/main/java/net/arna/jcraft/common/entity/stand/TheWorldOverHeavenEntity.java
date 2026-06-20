@@ -49,7 +49,7 @@ import java.util.function.Supplier;
  */
 public class TheWorldOverHeavenEntity extends StandEntity<TheWorldOverHeavenEntity, TheWorldOverHeavenEntity.State> {
     public static final MoveSet<TheWorldOverHeavenEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_WORLD_OVER_HEAVEN,
-            TheWorldOverHeavenEntity::registerMoves, State.class);
+            TheWorldOverHeavenEntity::registerMoves, TheWorldOverHeavenEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-45f)
             .evolution(true)

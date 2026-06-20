@@ -50,7 +50,7 @@ import java.util.function.Supplier;
  */
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
     public static final MoveSet<KQBTDEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.KILLER_QUEEN_BITES_THE_DUST,
-            KQBTDEntity::registerMoves, State.class);
+            KQBTDEntity::registerMoves, KQBTDEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-30f)
             .evolution(true)

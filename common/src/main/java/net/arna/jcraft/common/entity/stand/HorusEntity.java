@@ -47,7 +47,7 @@ import java.util.Objects;
  */
 public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
     public static final MoveSet<HorusEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.HORUS,
-            HorusEntity::registerMoves, State.class);
+            HorusEntity::registerMoves, HorusEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.horus"))

@@ -21,7 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 
 public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
-    public static final MoveSet<BrawlerSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.BRAWLER, BrawlerSpec::registerMoves, State.class);
+    public static final MoveSet<BrawlerSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.BRAWLER, BrawlerSpec::registerMoves, BrawlerSpec.class, State.class);
     public static final SpecData DATA = SpecData.builder()
             .name(Component.translatable("spec.jcraft.brawler"))
             .description(Component.literal("Close-range pressure and combo extension tool"))

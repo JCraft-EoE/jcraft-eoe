@@ -6,11 +6,13 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.JSpecHolder;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -31,7 +33,6 @@ import net.arna.jcraft.common.item.ScalpelItem;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.Advancement;
@@ -78,6 +79,9 @@ import net.minecraft.world.phys.*;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -1085,5 +1089,95 @@ public final class JUtils {
             return false;
         }
         return kc.getTETime() > 0;
+    }
+
+    /**
+     * Resolves the concrete class bound to {@link AbstractMove}'s second type parameter ({@code A})
+     * for the given move instance.
+     * <p>
+     * Walks the class hierarchy from the move's concrete class up to {@link AbstractMove}, collecting
+     * each {@code extends} clause. Resolution then flows <b>bottom-up</b>: the concrete subclass supplies
+     * the actual types that resolve its superclass's type variables, and each step rebinds the next
+     * superclass's type parameters in terms of those. This correctly handles intermediate classes that
+     * add, remove, or reorder type parameters, and {@code A} being introduced at any level. If {@code A}
+     * cannot be resolved to a concrete type (e.g. the move's class is itself still generic), the type
+     * variable's upper bound is returned instead (usually StandEntity, JSpec or IAttacker).
+     * <p>
+     * In all cases where the implementation hierarchy is correct, this method should return a non-null value.
+     * A null value may be returned if any class in the hierarchy extends an unparameterized version of
+     * an otherwise generic class.
+     *
+     * @param move The move whose attacker class should be resolved.
+     * @return The class of the {@code A} type argument (or its upper bound), or {@code null} if it can't be determined.
+     */
+    public static Class<?> resolveAttackerClass(AbstractMove<?, ?> move) {
+        // Collect each generic superclass edge from the concrete class up to (and including) AbstractMove,
+        // in bottom-up order. Each entry's type arguments are expressed in terms of the class below it.
+        List<ParameterizedType> chain = new ArrayList<>();
+        Class<?> klass = move.getClass();
+
+        while (klass != null && klass != AbstractMove.class) {
+            Type genericSuper = klass.getGenericSuperclass();
+            if (genericSuper instanceof ParameterizedType pt) {
+                chain.add(pt);
+                if (pt.getRawType() == AbstractMove.class) {
+                    break;
+                }
+            }
+            klass = klass.getSuperclass();
+        }
+
+        if (chain.isEmpty()) return null;
+
+        // Walk the edges bottom-up. After each edge, `substitutions` maps the (super)class's own type
+        // variables to their resolved types. The next edge's arguments reference those variables, so we
+        // can rebind them as we climb. Type variables (not positions) are used as keys, so intermediate
+        // classes shifting the position of A are handled transparently.
+        Map<TypeVariable<?>, Type> substitutions = new HashMap<>();
+        Type attackerType = null;
+
+        for (ParameterizedType pt : chain) {
+            Class<?> rawClass = (Class<?>) pt.getRawType();
+            TypeVariable<?>[] params = rawClass.getTypeParameters();
+            Type[] args = pt.getActualTypeArguments();
+
+            Map<TypeVariable<?>, Type> next = new HashMap<>();
+            for (int i = 0; i < params.length; i++) {
+                Type arg = args[i];
+                if (arg instanceof TypeVariable<?> tv) {
+                    // Argument is a type variable of the class below, resolve it through what we know so far.
+                    next.put(params[i], substitutions.getOrDefault(tv, tv));
+                } else {
+                    // Concrete type (Class or ParameterizedType), store directly.
+                    next.put(params[i], arg);
+                }
+            }
+            substitutions = next;
+
+            if (rawClass == AbstractMove.class) {
+                // A is AbstractMove's second type parameter.
+                attackerType = substitutions.get(params[1]);
+                break;
+            }
+        }
+
+        return toClass(attackerType);
+    }
+
+    /**
+     * Reduces a resolved {@link Type} to a concrete {@link Class}.
+     * Parameterized types yield their raw class, and unresolved type variables fall back to their
+     * (recursively reduced) first upper bound.
+     */
+    private static Class<?> toClass(@Nullable Type type) {
+        if (type instanceof Class<?> klass) {
+            return klass;
+        } else if (type instanceof ParameterizedType pt) {
+            return toClass(pt.getRawType());
+        } else if (type instanceof TypeVariable<?> tv) {
+            Type[] bounds = tv.getBounds();
+            return bounds.length > 0 ? toClass(bounds[0]) : null;
+        }
+        return null;
     }
 }

@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
  * @see net.arna.jcraft.common.entity.npc.DarbyYoungerEntity DarbyYoungerEntity
  */
 public class AtumEntity extends StandEntity<AtumEntity, AtumEntity.State> {
-    public static final MoveSet<AtumEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.ATUM, AtumEntity::registerMoves, State.class);
+    public static final MoveSet<AtumEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.ATUM, AtumEntity::registerMoves, AtumEntity.class, State.class);
     public static final StandData DATA = StandData.of(StandInfo.of(Component.translatable("entity.jcraft.atum")))
             .withObtainable(false);
 

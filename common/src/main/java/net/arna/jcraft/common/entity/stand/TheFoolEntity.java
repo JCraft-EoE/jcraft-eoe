@@ -67,7 +67,7 @@ import java.util.List;
  */
 public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.State> {
     public static final MoveSet<TheFoolEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_FOOL,
-            TheFoolEntity::registerMoves, State.class);
+            TheFoolEntity::registerMoves, TheFoolEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .idleDistance(2f)

@@ -34,7 +34,7 @@ import static net.arna.jcraft.JCraft.SPEC_QUEUE_MOVESTUN_LIMIT;
 
 public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> {
     public static final MoveSet<MandomEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.MANDOM,
-            MandomEntity::registerMoves, State.class);
+            MandomEntity::registerMoves, MandomEntity.class, State.class);
 
     public static final StandData DATA = StandData.builder()
             .idleDistance(0f)

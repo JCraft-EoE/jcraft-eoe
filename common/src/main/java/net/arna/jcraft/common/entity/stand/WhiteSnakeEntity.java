@@ -52,9 +52,9 @@ import org.joml.Vector3f;
  */
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
     public static final MoveSet<WhiteSnakeEntity, State> DEFAULT_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.WHITE_SNAKE,
-            WhiteSnakeEntity::registerDefaultMoves, State.class);
+            WhiteSnakeEntity::registerDefaultMoves, WhiteSnakeEntity.class, State.class);
     public static final MoveSet<WhiteSnakeEntity, State> REMOTE_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.WHITE_SNAKE,
-            "remote", WhiteSnakeEntity::registerRemoteMoves, State.class);
+            "remote", WhiteSnakeEntity::registerRemoteMoves, WhiteSnakeEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .info(StandInfo.builder()

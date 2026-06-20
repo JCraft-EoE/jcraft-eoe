@@ -37,7 +37,7 @@ import org.joml.Vector3f;
  */
 public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<PurpleHazeDistortionEntity, PurpleHazeDistortionEntity.State> {
     public static final MoveSet<PurpleHazeDistortionEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.PURPLE_HAZE_DISTORTION,
-            PurpleHazeDistortionEntity::registerMoves, State.class);
+            PurpleHazeDistortionEntity::registerMoves, PurpleHazeDistortionEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .evolution(true)

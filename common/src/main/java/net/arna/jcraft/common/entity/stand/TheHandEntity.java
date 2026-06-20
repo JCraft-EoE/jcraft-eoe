@@ -36,7 +36,7 @@ import org.joml.Vector3f;
  */
 public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.State> {
     public static final MoveSet<TheHandEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_HAND,
-            TheHandEntity::registerMoves, State.class);
+            TheHandEntity::registerMoves, TheHandEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.the_hand"))

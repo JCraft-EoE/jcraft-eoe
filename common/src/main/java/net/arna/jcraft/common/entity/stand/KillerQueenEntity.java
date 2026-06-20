@@ -40,7 +40,7 @@ import java.util.function.Supplier;
  */
 public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQueenEntity, KillerQueenEntity.State> {
     public static final MoveSet<KillerQueenEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.KILLER_QUEEN,
-            KillerQueenEntity::registerMoves, State.class);
+            KillerQueenEntity::registerMoves, KillerQueenEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-30f)
             .info(StandInfo.builder()

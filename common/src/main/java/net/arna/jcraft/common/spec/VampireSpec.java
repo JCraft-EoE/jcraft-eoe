@@ -24,7 +24,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 @Getter
 public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
-    public static final MoveSet<VampireSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.VAMPIRE, VampireSpec::registerMoves, State.class);
+    public static final MoveSet<VampireSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.VAMPIRE, VampireSpec::registerMoves, VampireSpec.class, State.class);
     public static final SpecData DATA = SpecData.builder()
             .name(Component.translatable("spec.jcraft.vampire"))
             .description(Component.literal("Supernatural all-ranger"))

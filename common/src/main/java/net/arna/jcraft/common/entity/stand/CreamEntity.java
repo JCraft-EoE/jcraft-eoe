@@ -74,9 +74,9 @@ import java.util.List;
 @Getter
 public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final MoveSet<CreamEntity, CreamEntity.State> DEFAULT_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CREAM,
-            CreamEntity::registerDefaultMoves, State.class);
+            CreamEntity::registerDefaultMoves, CreamEntity.class, State.class);
     public static final MoveSet<CreamEntity, CreamEntity.State> HALF_BALL_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CREAM,
-            "half_ball", CreamEntity::registerHalfBallMoves, State.class);
+            "half_ball", CreamEntity::registerHalfBallMoves, CreamEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .info(StandInfo.builder()

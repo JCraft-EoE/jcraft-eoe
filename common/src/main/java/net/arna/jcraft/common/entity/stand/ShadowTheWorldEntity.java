@@ -47,7 +47,7 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
     public static final String DESUMMON_CONTROLLER = "desummon";
 
     public static final MoveSet<ShadowTheWorldEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.SHADOW_THE_WORLD,
-            ShadowTheWorldEntity::registerMoves, State.class);
+            ShadowTheWorldEntity::registerMoves, ShadowTheWorldEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-45f)
             .info(StandInfo.builder()

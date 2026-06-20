@@ -60,7 +60,7 @@ import org.joml.Vector3f;
 
 public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntity.State> {
     public static final MoveSet<AerosmithEntity, AerosmithEntity.State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.AEROSMITH,
-            AerosmithEntity::registerDefaultMoves, AerosmithEntity.State.class);
+            AerosmithEntity::registerDefaultMoves, AerosmithEntity.class, AerosmithEntity.State.class);
 
     public static final EntityDataAccessor<Float> OVERHEAT = SynchedEntityData.defineId(AerosmithEntity.class, EntityDataSerializers.FLOAT);
     public static final float OVERHEAT_MAX = 15f;

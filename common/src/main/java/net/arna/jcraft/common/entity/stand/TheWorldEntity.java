@@ -45,7 +45,7 @@ import java.util.function.Supplier;
  */
 public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity, TheWorldEntity.State> {
     public static final MoveSet<TheWorldEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_WORLD,
-            TheWorldEntity::registerMoves, State.class);
+            TheWorldEntity::registerMoves, TheWorldEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .evolution(true)
             .info(StandInfo.builder()

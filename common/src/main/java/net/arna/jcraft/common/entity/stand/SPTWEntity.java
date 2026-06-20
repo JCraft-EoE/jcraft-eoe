@@ -39,7 +39,7 @@ import org.joml.Vector3f;
  */
 public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPTWEntity.State> {
     public static final MoveSet<SPTWEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.STAR_PLATINUM_THE_WORLD,
-            SPTWEntity::registerMoves, State.class);
+            SPTWEntity::registerMoves, SPTWEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(315f)
             .evolution(true)

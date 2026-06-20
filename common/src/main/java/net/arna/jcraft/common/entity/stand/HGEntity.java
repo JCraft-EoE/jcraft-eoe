@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     public static final MoveSet<HGEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.HIEROPHANT_GREEN,
-            HGEntity::registerMoves, State.class);
+            HGEntity::registerMoves, HGEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .info(StandInfo.builder()

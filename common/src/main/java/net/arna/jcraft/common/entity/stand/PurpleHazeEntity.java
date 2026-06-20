@@ -66,7 +66,7 @@ import java.util.Objects;
  */
 public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeEntity, PurpleHazeEntity.State> {
     public static final MoveSet<PurpleHazeEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.PURPLE_HAZE,
-            PurpleHazeEntity::registerMoves, State.class);
+            PurpleHazeEntity::registerMoves, PurpleHazeEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .info(StandInfo.builder()

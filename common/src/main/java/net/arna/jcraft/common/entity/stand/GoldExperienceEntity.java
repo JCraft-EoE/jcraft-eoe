@@ -46,7 +46,7 @@ import org.joml.Vector3f;
  */
 public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, GoldExperienceEntity.State> {
     public static final MoveSet<GoldExperienceEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.GOLD_EXPERIENCE,
-            GoldExperienceEntity::registerMoves, State.class);
+            GoldExperienceEntity::registerMoves, GoldExperienceEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-30f)
             .info(StandInfo.builder()

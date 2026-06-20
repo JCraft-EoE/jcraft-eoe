@@ -1,5 +1,6 @@
 package net.arna.jcraft.api.attack.moves;
 
+import com.google.common.base.MoreObjects;
 import com.mojang.datafixers.Products;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.util.*;
@@ -22,10 +23,10 @@ import net.arna.jcraft.api.attack.core.RunMoment;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.registry.JEntityTypeRegistry;
-import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
+import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
@@ -67,6 +68,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * This is for internal use only.
      */
     private T originalMove = getThis();
+    private Class<? extends A> attackerClass;
     private MoveClass moveClass;
     private int cooldown;
     private int windup, duration;
@@ -563,6 +565,22 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     }
 
     /**
+     * Returns the class of the {@link A} type arg or the upper bound if not specified.
+     * Used to check whether the moves added by data files are compatible with the attacker.
+     * @return The class of the {@link A} type arg.
+     */
+    @SuppressWarnings("unchecked")
+    public Class<? extends A> getAttackerClass() {
+        if (attackerClass == null) {
+            // Default to IAttacker if somehow this is null.
+            attackerClass = (Class<? extends A>) MoreObjects.firstNonNull(JUtils.resolveAttackerClass(this),
+                    IAttacker.class);
+        }
+
+        return attackerClass;
+    }
+
+    /**
      * Called when this move is registered to a {@link MoveMap MoveMap}.
      * Not supposed to be called anywhere else.
      *
@@ -1018,6 +1036,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     protected @NonNull T copyExtras(final @NonNull T base) {
         AbstractMove<T, A> cast = base; // Required to access private fields
         cast.originalMove = originalMove;
+        cast.attackerClass = attackerClass;
         cast.moveClass = moveClass;
         cast.name = name;
         cast.description = description;

@@ -63,9 +63,9 @@ import java.util.List;
  */
 public class SilverChariotEntity extends StandEntity<SilverChariotEntity, SilverChariotEntity.State> {
     public static final MoveSet<SilverChariotEntity, State> DEFAULT_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.SILVER_CHARIOT,
-            SilverChariotEntity::registerDefaultMoves, State.class);
+            SilverChariotEntity::registerDefaultMoves, SilverChariotEntity.class, State.class);
     public static final MoveSet<SilverChariotEntity, State> POSSESSED_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.SILVER_CHARIOT,
-            "possessed", SilverChariotEntity::registerPossessedMoves, State.class);
+            "possessed", SilverChariotEntity::registerPossessedMoves, SilverChariotEntity.class, State.class);
 
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)

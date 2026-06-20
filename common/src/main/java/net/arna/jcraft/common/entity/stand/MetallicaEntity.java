@@ -71,7 +71,7 @@ import java.util.*;
  */
 public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntity.State> {
     public static final MoveSet<MetallicaEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.METALLICA,
-            MetallicaEntity::registerMoves, State.class);
+            MetallicaEntity::registerMoves, MetallicaEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleDistance(0f)
             .info(StandInfo.builder()

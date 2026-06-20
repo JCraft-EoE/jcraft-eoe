@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 
 public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
-    public static final MoveSet<AnubisSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.ANUBIS, AnubisSpec::registerMoves, State.class);
+    public static final MoveSet<AnubisSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.ANUBIS, AnubisSpec::registerMoves, AnubisSpec.class, State.class);
     public static final SpecData DATA = SpecData.builder()
             .name(Component.translatable("spec.jcraft.anubis"))
             .description(Component.literal("Accelerating offense"))

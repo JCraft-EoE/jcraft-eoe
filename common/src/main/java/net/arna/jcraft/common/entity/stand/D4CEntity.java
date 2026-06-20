@@ -48,7 +48,7 @@ import org.joml.Vector3f;
  * @see ItemPlaceMove
  */
 public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
-    public static final MoveSet<D4CEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.D4C, D4CEntity::registerMoves, State.class);
+    public static final MoveSet<D4CEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.D4C, D4CEntity::registerMoves, D4CEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-45f)
             .info(StandInfo.builder()

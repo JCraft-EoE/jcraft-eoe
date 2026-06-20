@@ -10,9 +10,9 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.IAttackerType;
 import net.arna.jcraft.api.attack.IAttacker;
+import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.StateContainerHolder;
-import net.arna.jcraft.api.attack.MoveMap;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +26,8 @@ public class MoveSetImpl<A extends IAttacker<? extends A, S>, S extends Enum<S>>
     private final String name;
     private final Consumer<MoveMap<A, S>> register;
     @Getter
+    private final Class<A> attackerClass;
+    @Getter
     private final Class<S> stateClass;
     @Getter
     private final Codec<MoveMap<A, S>> codec;
@@ -37,13 +39,19 @@ public class MoveSetImpl<A extends IAttacker<? extends A, S>, S extends Enum<S>>
     private boolean initialized = false;
 
     public MoveSetImpl(@NonNull final RegistrySupplier<? extends IAttackerType> type, @NonNull final String name,
-                       @NonNull final Consumer<MoveMap<A, S>> register, @NonNull final Class<S> stateClass) {
+                       @NonNull final Consumer<MoveMap<A, S>> register, final Class<A> attackerClass,
+                       @NonNull final Class<S> stateClass) {
         this.type = type;
         this.name = name;
         this.register = register;
+        this.attackerClass = attackerClass;
         this.stateClass = stateClass;
         codec = MoveMap.codecFor(stateClass);
         entryCodec = MoveMap.Entry.codecFor(stateClass);
+
+        if (attackerClass == null)
+            JCraft.LOGGER.warn("Move set '{}' for attacker {} did not specify an attacker class. " +
+                            "This is deprecated behaviour.", name, type.getId());
     }
 
     @Override
@@ -75,6 +83,8 @@ public class MoveSetImpl<A extends IAttacker<? extends A, S>, S extends Enum<S>>
                                 p.getSecond().error().map(DataResult.PartialResult::message).orElse("Unknown error"));
                         return null;
                     }
+
+                    verifyCompatibility(p.getFirst(), result.get());
                     return result.get();
                 })
                 // Filter out nulls (failed decodes)
@@ -123,6 +133,16 @@ public class MoveSetImpl<A extends IAttacker<? extends A, S>, S extends Enum<S>>
 
         if (initialized) {
             listener.onMoveSetReload(this);
+        }
+    }
+
+    private void verifyCompatibility(final @NonNull ResourceLocation moveId, final MoveMap.Entry<A, S> entry) {
+        Class<?> moveAttackerClass = entry.getMove().getAttackerClass();
+        if (moveAttackerClass == null) return; // Unknown, assume it supports all attackers.
+
+        boolean compatible = moveAttackerClass.isAssignableFrom(attackerClass);
+        if (!compatible) {
+            throw new IllegalStateException("Move " + moveId + " is incompatible with attacker " + type.getId() + ".");
         }
     }
 }

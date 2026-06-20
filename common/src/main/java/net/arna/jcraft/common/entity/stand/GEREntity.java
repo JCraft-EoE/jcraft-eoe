@@ -54,7 +54,7 @@ import static net.arna.jcraft.api.component.living.CommonHitPropertyComponent.Hi
  */
 public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public static final MoveSet<GEREntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.GOLD_EXPERIENCE_REQUIEM,
-            GEREntity::registerMoves, State.class);
+            GEREntity::registerMoves, GEREntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-30f)
             .evolution(true)

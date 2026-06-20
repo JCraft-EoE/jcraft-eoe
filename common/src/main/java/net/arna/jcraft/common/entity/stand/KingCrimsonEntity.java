@@ -65,7 +65,7 @@ import java.util.function.Supplier;
  */
 public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimsonEntity.State> {
     public static final MoveSet<KingCrimsonEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.KING_CRIMSON,
-            KingCrimsonEntity::registerMoves, State.class);
+            KingCrimsonEntity::registerMoves, KingCrimsonEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleDistance(1f)
             .idleRotation(-65f)
