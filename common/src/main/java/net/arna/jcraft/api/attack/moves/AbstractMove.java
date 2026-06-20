@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.MoveSelectionResult;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveMap;
@@ -37,6 +38,7 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -573,8 +575,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     public Class<? extends A> getAttackerClass() {
         if (attackerClass == null) {
             // Default to IAttacker if somehow this is null.
-            attackerClass = (Class<? extends A>) MoreObjects.firstNonNull(JUtils.resolveAttackerClass(this),
-                    IAttacker.class);
+            Class<?> resolvedClass = JUtils.resolveAttackerClass(AbstractMove.class, this);
+            attackerClass = (Class<? extends A>) MoreObjects.firstNonNull(resolvedClass, IAttacker.class);
         }
 
         return attackerClass;
@@ -701,6 +703,78 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         if (sounds != null && !sounds.isEmpty() && shouldCancelSounds(attacker)) {
             BoundSoundPlayer.stopAll(sounds);
         }
+    }
+
+    /**
+     * Verifies whether the provided attacker is compatible with this move.
+     * <p>
+     * Being compatible in this case means all the following:
+     * <ul>
+     *     <li>It's a subclass of {@link A}</li>
+     *     <li>The attacker type of each action is a superclass of the attacker</li>
+     *     <li>The attacker type of each condition is a superclass of the attacker</li>
+     *     <li>It's compatible with the followup (if applicable)</li>
+     *     <li>It's compatible with the aerial variant (if applicable)</li>
+     *     <li>It's compatible with the crouching variant (if applicable)</li>
+     *     <li>It's compatible with the finisher (if applicable)</li>
+     * </ul>
+     *
+     * If the first condition is met, the remaining ones are too, assuming no generic type constraints were violated.
+     * However, data driven moves allow the user to violate these constraints easily, hence we check them anyway.
+     * @param moveId The id of this move, used in errors.
+     * @param attackerId The id of the attacker, used in errors.
+     * @param attackerClass The class of the attacker. Used to check compatibility.
+     */
+    public final void verifyCompatibility(final @NonNull ResourceLocation moveId, final ResourceLocation attackerId,
+                                    final Class<? extends A> attackerClass) {
+        verifyCompatibility(moveId, attackerId, attackerClass, null);
+    }
+
+    protected void verifyCompatibility(final @NonNull ResourceLocation moveId, final ResourceLocation attackerId,
+                                    final Class<? extends A> attackerClass, final String variant) {
+        String variantText = variant == null ? "" : " + " + variant;
+        String moveText = moveId + variantText;
+
+        if (getAttackerClass() != null && !getAttackerClass().isAssignableFrom(attackerClass)) {
+            throw new IllegalStateException("Move " + moveText + " is incompatible with attacker " + attackerId + ".");
+        }
+
+        for (MoveAction<?, ? super A> action : getActions()) {
+            if (action.getAttackerClass() == null) continue;
+
+            if (!action.getAttackerClass().isAssignableFrom(attackerClass)) {
+                ResourceLocation actionTypeId = JRegistries.MOVE_ACTION_TYPE_REGISTRY.getId(action.getType());
+                throw new IllegalStateException("Move " + moveText + " has an action that's incompatible with attacker " +
+                        attackerId + ": " + actionTypeId + ".");
+            }
+        }
+
+        for (MoveCondition<?, ? super A> condition : getConditions()) {
+            if (condition.getAttackerClass() == null) continue;
+
+            if (!condition.getAttackerClass().isAssignableFrom(attackerClass)) {
+                ResourceLocation conditionTypeId = JRegistries.MOVE_CONDITION_TYPE_REGISTRY.getId(condition.getType());
+                throw new IllegalStateException("Move " + moveText + " has a condition that's incompatible with attacker " +
+                        attackerId + ": " + conditionTypeId + ".");
+            }
+        }
+
+        String variantPrefix = variant == null ? "" : variant + " + ";
+        AbstractMove<?, ? super A> followup = getFollowup();
+        if (followup != null)
+            followup.verifyCompatibility(moveId, attackerId, attackerClass, variantPrefix + "followup");
+
+        AbstractMove<?, ? super A> aerial = getAerialVariant();
+        if (aerial != null)
+            aerial.verifyCompatibility(moveId, attackerId, attackerClass, variantPrefix + "aerial");
+
+        AbstractMove<?, ? super A> crouching = getCrouchingVariant();
+        if (crouching != null)
+            crouching.verifyCompatibility(moveId, attackerId, attackerClass, variantPrefix + "crouching");
+
+        AbstractMove<?, ? super A> finisher = getFinisher() == null ? null : getFinisher().right();
+        if (finisher != null)
+            finisher.verifyCompatibility(moveId, attackerId, attackerClass, variantPrefix + "finisher");
     }
 
     /**

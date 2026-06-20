@@ -84,8 +84,10 @@ public class MoveSetImpl<A extends IAttacker<? extends A, S>, S extends Enum<S>>
                         return null;
                     }
 
-                    verifyCompatibility(p.getFirst(), result.get());
-                    return result.get();
+                    MoveMap.Entry<A, S> entry = result.get();
+                    if (attackerClass != null)
+                        entry.getMove().verifyCompatibility(p.getFirst(), type.getId(), attackerClass);
+                    return entry;
                 })
                 // Filter out nulls (failed decodes)
                 .filter(Objects::nonNull)
@@ -133,16 +135,6 @@ public class MoveSetImpl<A extends IAttacker<? extends A, S>, S extends Enum<S>>
 
         if (initialized) {
             listener.onMoveSetReload(this);
-        }
-    }
-
-    private void verifyCompatibility(final @NonNull ResourceLocation moveId, final MoveMap.Entry<A, S> entry) {
-        Class<?> moveAttackerClass = entry.getMove().getAttackerClass();
-        if (moveAttackerClass == null) return; // Unknown, assume it supports all attackers.
-
-        boolean compatible = moveAttackerClass.isAssignableFrom(attackerClass);
-        if (!compatible) {
-            throw new IllegalStateException("Move " + moveId + " is incompatible with attacker " + type.getId() + ".");
         }
     }
 }

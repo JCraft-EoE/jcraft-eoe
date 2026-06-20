@@ -6,7 +6,6 @@ import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
@@ -1092,35 +1091,36 @@ public final class JUtils {
     }
 
     /**
-     * Resolves the concrete class bound to {@link AbstractMove}'s second type parameter ({@code A})
-     * for the given move instance.
+     * Resolves the concrete class bound to the base class's second type parameter ({@code A})
+     * for the given object instance.
      * <p>
-     * Walks the class hierarchy from the move's concrete class up to {@link AbstractMove}, collecting
+     * Walks the class hierarchy from the object's concrete class up to the base class, collecting
      * each {@code extends} clause. Resolution then flows <b>bottom-up</b>: the concrete subclass supplies
      * the actual types that resolve its superclass's type variables, and each step rebinds the next
      * superclass's type parameters in terms of those. This correctly handles intermediate classes that
      * add, remove, or reorder type parameters, and {@code A} being introduced at any level. If {@code A}
-     * cannot be resolved to a concrete type (e.g. the move's class is itself still generic), the type
+     * cannot be resolved to a concrete type (e.g. the object's class is itself still generic), the type
      * variable's upper bound is returned instead (usually StandEntity, JSpec or IAttacker).
      * <p>
      * In all cases where the implementation hierarchy is correct, this method should return a non-null value.
      * A null value may be returned if any class in the hierarchy extends an unparameterized version of
      * an otherwise generic class.
      *
-     * @param move The move whose attacker class should be resolved.
+     * @param baseClass The base class to walk up to. Should have two generic type parameters where the second one is the attacker.
+     * @param object The object whose attacker class should be resolved.
      * @return The class of the {@code A} type argument (or its upper bound), or {@code null} if it can't be determined.
      */
-    public static Class<?> resolveAttackerClass(AbstractMove<?, ?> move) {
-        // Collect each generic superclass edge from the concrete class up to (and including) AbstractMove,
+    public static Class<?> resolveAttackerClass(Class<?> baseClass, Object object) {
+        // Collect each generic superclass edge from the concrete class up to (and including) the base class,
         // in bottom-up order. Each entry's type arguments are expressed in terms of the class below it.
         List<ParameterizedType> chain = new ArrayList<>();
-        Class<?> klass = move.getClass();
+        Class<?> klass = object.getClass();
 
-        while (klass != null && klass != AbstractMove.class) {
+        while (klass != null && klass != baseClass) {
             Type genericSuper = klass.getGenericSuperclass();
             if (genericSuper instanceof ParameterizedType pt) {
                 chain.add(pt);
-                if (pt.getRawType() == AbstractMove.class) {
+                if (pt.getRawType() == baseClass) {
                     break;
                 }
             }
@@ -1154,8 +1154,8 @@ public final class JUtils {
             }
             substitutions = next;
 
-            if (rawClass == AbstractMove.class) {
-                // A is AbstractMove's second type parameter.
+            if (rawClass == baseClass) {
+                // A is always the second type parameter.
                 attackerType = substitutions.get(params[1]);
                 break;
             }
