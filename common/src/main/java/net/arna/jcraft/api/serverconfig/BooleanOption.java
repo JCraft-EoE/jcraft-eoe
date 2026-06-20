@@ -17,7 +17,12 @@ public class BooleanOption extends ConfigOption {
     private final boolean defaultValue;
 
     public BooleanOption(final ResourceLocation key, final ResourceLocation category, final boolean value) {
-        super(key, category);
+        this(key, category, null, value);
+    }
+
+    public BooleanOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory,
+                         final boolean value) {
+        super(key, category, subcategory);
         this.value = this.defaultValue = value;
     }
 

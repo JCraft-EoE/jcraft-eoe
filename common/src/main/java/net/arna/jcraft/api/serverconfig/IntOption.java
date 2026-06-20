@@ -20,18 +20,33 @@ public class IntOption extends ConfigOption {
     private Integer min, max;
 
     public IntOption(final ResourceLocation key, final ResourceLocation category, final int value) {
-        super(key, category);
+        this(key, category, null, value);
+    }
+
+    public IntOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory, final int value) {
+        super(key, category, null);
         this.value = this.defaultValue = value;
     }
 
     public IntOption(final ResourceLocation key, final ResourceLocation category, final int value, final int min) {
-        super(key, category);
+        this(key, category, null, value, min);
+    }
+
+    public IntOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory,
+                       final int value, final int min) {
+        super(key, category, subcategory);
         this.value = this.defaultValue = value;
         this.min = min;
     }
 
-    public IntOption(final ResourceLocation key, final ResourceLocation category, final int value, final int min, final int max) {
-        super(key, category);
+    public IntOption(final ResourceLocation key, final ResourceLocation category, final int value, final int min,
+                       final int max) {
+        this(key, category, null, value, min, max);
+    }
+
+    public IntOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory,
+                       final int value, final int min, final int max) {
+        super(key, category, subcategory);
         this.value = this.defaultValue = value;
         this.min = min;
         this.max = max;

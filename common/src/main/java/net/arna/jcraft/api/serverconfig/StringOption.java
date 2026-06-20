@@ -19,8 +19,13 @@ public class StringOption extends ConfigOption {
     @Getter
     private final String defaultValue;
 
-    public StringOption(ResourceLocation key, ResourceLocation category, String defaultValue) {
-        super(key, category);
+    public StringOption(final ResourceLocation key, final ResourceLocation category, final String defaultValue) {
+        this(key, category, null, defaultValue);
+    }
+
+    public StringOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory,
+                        final String defaultValue) {
+        super(key, category, subcategory);
         this.value = this.defaultValue = defaultValue;
     }
 
