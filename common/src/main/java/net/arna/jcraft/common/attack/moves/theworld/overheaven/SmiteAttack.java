@@ -5,9 +5,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
-import net.arna.jcraft.common.entity.stand.TheWorldOverHeavenEntity;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Getter
-public final class SmiteAttack extends AbstractSimpleAttack<SmiteAttack, TheWorldOverHeavenEntity> {
+public final class SmiteAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<SmiteAttack<A>, A> {
     private final boolean aerial;
     private final int levitationDuration, levitationAmplifier;
 
@@ -46,14 +46,15 @@ public final class SmiteAttack extends AbstractSimpleAttack<SmiteAttack, TheWorl
     }
 
     @Override
-    public @NonNull MoveType<SmiteAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<SmiteAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void onInitiate(final TheWorldOverHeavenEntity attacker) {
+    public void onInitiate(final A attacker) {
         super.onInitiate(attacker);
 
+        final LivingEntity baseEntity = attacker.getBaseEntity();
         LivingEntity user = attacker.getUserOrThrow();
         if (!aerial) {
             lightningPos = user.position();
@@ -66,69 +67,70 @@ public final class SmiteAttack extends AbstractSimpleAttack<SmiteAttack, TheWorl
                     576 // Squared
             );
 
-            lightningPos = Objects.requireNonNullElseGet(eHit, () -> attacker.level().clip(new ClipContext(eP, eP.add(rangeMod),
+            lightningPos = Objects.requireNonNullElseGet(eHit, () -> baseEntity.level().clip(new ClipContext(eP, eP.add(rangeMod),
                     ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, user))).getLocation();
         }
 
-        AreaEffectCloud effectCloud = new AreaEffectCloud(attacker.level(),
+        AreaEffectCloud effectCloud = new AreaEffectCloud(baseEntity.level(),
                 lightningPos.x, lightningPos.y, lightningPos.z);
         effectCloud.setOwner(user);
         effectCloud.setRadius(getDamage() / 2f);
         effectCloud.setWaitTime(10);
         effectCloud.setRadiusPerTick(-0.5f);
 
-        attacker.level().addFreshEntity(effectCloud);
+        baseEntity.level().addFreshEntity(effectCloud);
 
-        attacker.level().playSound(null, lightningPos.x, lightningPos.y, lightningPos.z,
+        baseEntity.level().playSound(null, lightningPos.x, lightningPos.y, lightningPos.z,
                 JSoundRegistry.TWOH_CHARGE.get(), SoundSource.PLAYERS, 1, 1);
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final TheWorldOverHeavenEntity attacker, final LivingEntity user) {
-        LightningBolt bolt = new LightningBolt(EntityType.LIGHTNING_BOLT, attacker.level());
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
+        final LivingEntity baseEntity = attacker.getBaseEntity();
+        LightningBolt bolt = new LightningBolt(EntityType.LIGHTNING_BOLT, baseEntity.level());
         bolt.setVisualOnly(true);
         bolt.setPos(lightningPos);
         this.bolt = new WeakReference<>(bolt);
 
         Set<LivingEntity> targets = super.perform(attacker, user);
 
-        attacker.level().addFreshEntity(bolt);
+        baseEntity.level().addFreshEntity(bolt);
         return targets;
     }
 
     @Override
-    protected Set<AABB> calculateBoxes(final TheWorldOverHeavenEntity attacker, final LivingEntity user, final Vec3 rotVec, final Vec3 upVec, final Vec3 hPos, final Vec3 fPos) {
+    protected Set<AABB> calculateBoxes(final A attacker, final LivingEntity user, final Vec3 rotVec, final Vec3 upVec, final Vec3 hPos, final Vec3 fPos) {
         return Set.of(createBox(lightningPos, getHitboxSize()));
     }
 
     @Override
-    protected void processTarget(final TheWorldOverHeavenEntity attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
+    protected void processTarget(final A attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
         super.processTarget(attacker, target, kbVec, damageSource);
 
         LightningBolt bolt = this.bolt.get();
 
         if (bolt != null) {
-            target.thunderHit((ServerLevel) attacker.level(), bolt);
+            target.thunderHit((ServerLevel) attacker.getEntityWorld(), bolt);
             target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, levitationDuration, levitationAmplifier, true, false));
         }
     }
 
     @Override
-    protected @NonNull SmiteAttack getThis() {
+    protected @NonNull SmiteAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull SmiteAttack copy() {
-        return copyExtras(new SmiteAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull SmiteAttack<A> copy() {
+        return copyExtras(new SmiteAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset(), isAerial(), levitationDuration, levitationAmplifier));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<SmiteAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<SmiteAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<SmiteAttack>, SmiteAttack> buildCodec(RecordCodecBuilder.Instance<SmiteAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<SmiteAttack<?>>, SmiteAttack<?>> buildCodec(RecordCodecBuilder.Instance<SmiteAttack<?>> instance) {
             return instance.group(extras(), attackExtras(), cooldown(), windup(), duration(), moveDistance(), damage(),
                     stun(), hitboxSize(), knockback(), offset(), Codec.BOOL.fieldOf("aerial").forGetter(SmiteAttack::isAerial),
                             ExtraCodecs.NON_NEGATIVE_INT.fieldOf("levitation_duration").forGetter(SmiteAttack::getLevitationDuration),

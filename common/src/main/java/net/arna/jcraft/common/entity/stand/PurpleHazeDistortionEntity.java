@@ -74,7 +74,7 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
                     Component.literal("5m range")
             );
 
-    public static final DistortionMove DISTORTION = new DistortionMove(20)
+    public static final DistortionMove<PurpleHazeDistortionEntity> DISTORTION = new DistortionMove<PurpleHazeDistortionEntity>(20)
             .withCrouchingVariant(PILOT_MODE)
             .withInfo(
                     Component.literal("Distortion"),

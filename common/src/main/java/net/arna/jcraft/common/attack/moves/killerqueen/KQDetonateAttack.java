@@ -13,7 +13,6 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
-import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -29,18 +28,18 @@ import java.util.Set;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public final class KQDetonateAttack extends AbstractMove<KQDetonateAttack, AbstractKillerQueenEntity<?, ?>> {
+public final class KQDetonateAttack<A extends StandEntity<? extends A, ?>> extends AbstractMove<KQDetonateAttack<A>, A> {
     public KQDetonateAttack(final int cooldown, final int windup, final int duration, final float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
     }
 
     @Override
-    public @NotNull MoveType<KQDetonateAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<KQDetonateAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final AbstractKillerQueenEntity<?, ?> attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final CommonBombTrackerComponent.BombData bombData = JComponentPlatformUtils.getBombTracker(user).getMainBomb();
 
         final Entity bombEntity = bombData.bombEntity;
@@ -59,26 +58,26 @@ public final class KQDetonateAttack extends AbstractMove<KQDetonateAttack, Abstr
     }
 
     @Override
-    public MoveSelectionResult specificMoveSelectionCriterion(AbstractKillerQueenEntity<?, ?> attacker,
-                                                                                  LivingEntity mob, LivingEntity target, int stunTicks,
-                                                                                  int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand,
-                                                                                  AbstractMove<?, ?> enemyAttack) {
+    public MoveSelectionResult specificMoveSelectionCriterion(A attacker,
+                                                              LivingEntity mob, LivingEntity target, int stunTicks,
+                                                              int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand,
+                                                              AbstractMove<?, ?> enemyAttack) {
         final Vec3 bombPos = JComponentPlatformUtils.getBombTracker(mob).getMainBomb().getBombPos();
         return bombPos != null && target.distanceToSqr(bombPos) < 9.0D ?
                 MoveSelectionResult.USE : MoveSelectionResult.STOP;
     }
 
     @Override
-    protected @NonNull KQDetonateAttack getThis() {
+    protected @NonNull KQDetonateAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull KQDetonateAttack copy() {
-        return copyExtras(new KQDetonateAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+    public @NonNull KQDetonateAttack<A> copy() {
+        return copyExtras(new KQDetonateAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
-    public static void explode(final AbstractKillerQueenEntity<?, ?> stand, final Entity user, final Vec3 pos) {
+    public static void explode(final StandEntity<?, ?> stand, final Entity user, final Vec3 pos) {
         explode(stand, user, pos, 11.0f, 4.4);
     }
 
@@ -98,11 +97,11 @@ public final class KQDetonateAttack extends AbstractMove<KQDetonateAttack, Abstr
         }
     }
 
-    public static class Type extends AbstractMove.Type<KQDetonateAttack> {
+    public static class Type extends AbstractMove.Type<KQDetonateAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<KQDetonateAttack>, KQDetonateAttack> buildCodec(RecordCodecBuilder.Instance<KQDetonateAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<KQDetonateAttack<?>>, KQDetonateAttack<?>> buildCodec(RecordCodecBuilder.Instance<KQDetonateAttack<?>> instance) {
             return baseDefault(instance, KQDetonateAttack::new);
         }
     }

@@ -4,11 +4,11 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.PlayerCloneEntity;
-import net.arna.jcraft.common.entity.stand.D4CEntity;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public final class CloneSpawnMove extends AbstractMove<CloneSpawnMove, D4CEntity> {
+public final class CloneSpawnMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<CloneSpawnMove<A>, A> {
     private CloneType cloneType = CloneType.SWORD;
 
     public CloneSpawnMove(final int cooldown, final int windup, final int duration, final float moveDistance) {
@@ -32,39 +32,40 @@ public final class CloneSpawnMove extends AbstractMove<CloneSpawnMove, D4CEntity
     }
 
     @Override
-    public @NotNull MoveType<CloneSpawnMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<CloneSpawnMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void onInitiate(D4CEntity attacker) {
+    public void onInitiate(A attacker) {
         super.onInitiate(attacker);
         cloneType = CloneType.SWORD;
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final D4CEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
+        final LivingEntity baseEntity = attacker.getBaseEntity();
         final ItemStack weapon = cloneType.weapon.getDefaultInstance();
         if (weapon.isDamageableItem()) {
             weapon.setDamageValue(weapon.getMaxDamage());
         }
 
         if (user instanceof final ServerPlayer playerEntity) {
-            final PlayerCloneEntity clone = new PlayerCloneEntity(attacker.level());
+            final PlayerCloneEntity clone = new PlayerCloneEntity(baseEntity.level());
             clone.copyPosition(playerEntity);
             clone.setMaster(playerEntity);
             clone.disableDrops();
             clone.disableExperience();
 
-            attacker.level().addFreshEntity(clone);
+            baseEntity.level().addFreshEntity(clone);
             clone.setItemSlot(EquipmentSlot.MAINHAND, weapon);
             JComponentPlatformUtils.getStandComponent(clone).setType(JStandTypeRegistry.NONE.get());
         } else if (user instanceof final Mob mob) { //Code sourced from MobEntity.class convertTo()
             final EntityType<?> entityType = mob.getType();
-            final Mob newMob = (Mob) entityType.create(attacker.level());
+            final Mob newMob = (Mob) entityType.create(baseEntity.level());
 
             if (newMob == null) {
-                JCraft.LOGGER.error("Failed to create D4C clone mob of type {} in world {}", entityType, attacker.level());
+                JCraft.LOGGER.error("Failed to create D4C clone mob of type {} in world {}", entityType, baseEntity.level());
                 return Set.of();
             }
 
@@ -78,7 +79,7 @@ public final class CloneSpawnMove extends AbstractMove<CloneSpawnMove, D4CEntity
 
             newMob.tickCount = mob.tickCount;
 
-            attacker.level().addFreshEntity(newMob);
+            baseEntity.level().addFreshEntity(newMob);
             newMob.setItemSlot(EquipmentSlot.MAINHAND, weapon);
             JComponentPlatformUtils.getStandComponent(newMob).setType(JStandTypeRegistry.NONE.get());
         }
@@ -87,7 +88,7 @@ public final class CloneSpawnMove extends AbstractMove<CloneSpawnMove, D4CEntity
     }
 
     @Override
-    public boolean onInitMove(D4CEntity attacker, MoveClass moveClass) {
+    public boolean onInitMove(A attacker, MoveClass moveClass) {
         switch (moveClass) {
             case SPECIAL1 -> cloneType = CloneType.AXE;
             case SPECIAL2 -> cloneType = CloneType.BOW;
@@ -101,20 +102,20 @@ public final class CloneSpawnMove extends AbstractMove<CloneSpawnMove, D4CEntity
     }
 
     @Override
-    protected @NonNull CloneSpawnMove getThis() {
+    protected @NonNull CloneSpawnMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull CloneSpawnMove copy() {
-        return copyExtras(new CloneSpawnMove(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+    public @NonNull CloneSpawnMove<A> copy() {
+        return copyExtras(new CloneSpawnMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
-    public static class Type extends AbstractMove.Type<CloneSpawnMove> {
+    public static class Type extends AbstractMove.Type<CloneSpawnMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<CloneSpawnMove>, CloneSpawnMove> buildCodec(RecordCodecBuilder.Instance<CloneSpawnMove> instance) {
+        protected @NotNull App<RecordCodecBuilder.Mu<CloneSpawnMove<?>>, CloneSpawnMove<?>> buildCodec(RecordCodecBuilder.Instance<CloneSpawnMove<?>> instance) {
             return baseDefault(instance, CloneSpawnMove::new);
         }
     }

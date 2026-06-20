@@ -36,9 +36,9 @@ import java.util.Set;
 public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<BreathXrayMove<A>, A> {
     @Getter
     private final Object2IntMap<LivingEntity> detected = new Object2IntOpenHashMap<>(32);
+    @Getter
     private boolean active = true;
 
-    public boolean isActive() { return active; }
     @Getter
     private float range;
     private float scanAngle = 0.0f;
@@ -51,12 +51,12 @@ public class BreathXrayMove<A extends IAttacker<? extends A, ?>> extends Abstrac
         this.requireRemote = requireRemote;
     }
 
-    public BreathXrayMove<?> withRange(float range) {
+    public BreathXrayMove<A> withRange(float range) {
         this.range = range;
         return getThis();
     }
 
-    public BreathXrayMove<?> withRequireRemote(boolean require) {
+    public BreathXrayMove<A> withRequireRemote(boolean require) {
         this.requireRemote = require;
         return getThis();
     }

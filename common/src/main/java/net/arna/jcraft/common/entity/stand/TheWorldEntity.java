@@ -168,7 +168,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
                     Component.literal("Feign Barrage"),
                     Component.literal("counter, 0.25s windup, 2.25s duration, teleports and knocks down on hit")
             );
-    public static final TWDonutAttack DONUT = new TWDonutAttack(42,
+    public static final TWDonutAttack<TheWorldEntity> DONUT = new TWDonutAttack<TheWorldEntity>(42,
             20, 42, 1f,9f, 52, 2f, 1f, 0f)
             .withSound(JSoundRegistry.TW_DONUT)
             .withImpactSound(JSoundRegistry.TW_DONUT_HIT)

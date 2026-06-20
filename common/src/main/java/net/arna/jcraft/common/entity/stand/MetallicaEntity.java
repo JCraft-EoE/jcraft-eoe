@@ -236,7 +236,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withInitAction(UserAnimationAction.play("mtl.pt"))
             .withCondition(MetallicaIronCondition.atLeast(ScalpelProjectile.IRON_COST));
 
-    public static final RazorCoughAttack RAZOR_COUGH_ATTACK = new RazorCoughAttack(140, 10, 20)
+    public static final RazorCoughAttack<MetallicaEntity> RAZOR_COUGH_ATTACK = new RazorCoughAttack<MetallicaEntity>(140, 10, 20)
             .withInfo(
                     Component.literal("Internal Attack"),
                     Component.literal("""
@@ -257,7 +257,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             )
             .withInitAction(UserAnimationAction.play("mtl.sfk"))
             .withCondition(MetallicaIronCondition.atLeast(CreateMagneticFieldMove.IRON_COST));
-    /* public static final InternalAttack INTERNAL_ATTACK = new InternalAttack(200, 10, 15)
+    /* public static final InternalAttack<MetallicaEntity> INTERNAL_ATTACK = new InternalAttack<MetallicaEntity>(200, 10, 15)
             .withCrouchingVariant(CREATE_MAGNETIC_FIELD)
             .withInfo(
                     Component.literal("Internal Attack"),
@@ -271,7 +271,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             )
             .withInitAction(UserAnimationAction.play("mtl.ita")); */
 
-    public static final ExplodeMagneticFieldMove EXPLODE_MAGNETIC_FIELD = new ExplodeMagneticFieldMove(0, 10, 20)
+    public static final ExplodeMagneticFieldMove<MetallicaEntity> EXPLODE_MAGNETIC_FIELD = new ExplodeMagneticFieldMove<MetallicaEntity>(0, 10, 20)
             .withInfo(
                     Component.literal("Explode Magnetic Field"),
                     Component.literal("""

@@ -5,12 +5,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.GEButterflyEntity;
 import net.arna.jcraft.common.entity.GEFrogEntity;
 import net.arna.jcraft.common.entity.GESnakeEntity;
-import net.arna.jcraft.common.entity.stand.GoldExperienceEntity;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public final class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExperienceEntity> {
+public final class LifeGiverAttack<A extends IAttacker<? extends A, ?>> extends AbstractMove<LifeGiverAttack<A>, A> {
     @Setter
     private LifeGiverType typeToSummon;
 
@@ -30,12 +30,13 @@ public final class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExp
     }
 
     @Override
-    public @NotNull MoveType<LifeGiverAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<LifeGiverAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final GoldExperienceEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
+        final LivingEntity baseEntity = attacker.getBaseEntity();
         ItemStack item = user.getOffhandItem(); // Get offhand, or if unavailable main hand stack
         if (item.isEmpty()) {
             item = user.getMainHandItem();
@@ -53,7 +54,7 @@ public final class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExp
                     return Set.of();
                 }
 
-                final GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegistry.GE_SNAKE.get(), attacker.level());
+                final GESnakeEntity snake = new GESnakeEntity(JEntityTypeRegistry.GE_SNAKE.get(), baseEntity.level());
                 if (user instanceof Player playerEntity) {
                     snake.tame(playerEntity);
                 } else {
@@ -67,12 +68,12 @@ public final class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExp
                     return Set.of();
                 }
 
-                final GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegistry.GE_FROG.get(), attacker.level());
+                final GEFrogEntity frog = new GEFrogEntity(JEntityTypeRegistry.GE_FROG.get(), baseEntity.level());
                 frog.setMaster(user);
                 animal = frog;
             }
             case BUTTERFLY -> {
-                final GEButterflyEntity butterfly = new GEButterflyEntity(JEntityTypeRegistry.GE_BUTTERFLY.get(), attacker.level());
+                final GEButterflyEntity butterfly = new GEButterflyEntity(JEntityTypeRegistry.GE_BUTTERFLY.get(), baseEntity.level());
                 butterfly.setMaster(user);
                 animal = butterfly;
             }
@@ -86,21 +87,21 @@ public final class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExp
         if (!(user instanceof Player player && player.getAbilities().instabuild)) {
             item.shrink(1);
         }
-        animal.moveTo(attacker.getX(), attacker.getY() + 0.5f, attacker.getZ(), attacker.getYRot(), attacker.getXRot());
+        animal.moveTo(baseEntity.getX(), baseEntity.getY() + 0.5f, baseEntity.getZ(), baseEntity.getYRot(), baseEntity.getXRot());
         animal.setItemInHand(InteractionHand.MAIN_HAND, animalItem);
-        attacker.level().addFreshEntity(animal);
+        baseEntity.level().addFreshEntity(animal);
 
         return Set.of();
     }
 
     @Override
-    protected @NonNull LifeGiverAttack getThis() {
+    protected @NonNull LifeGiverAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull LifeGiverAttack copy() {
-        return copyExtras(new LifeGiverAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+    public @NonNull LifeGiverAttack<A> copy() {
+        return copyExtras(new LifeGiverAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
     public enum LifeGiverType {
@@ -109,11 +110,11 @@ public final class LifeGiverAttack extends AbstractMove<LifeGiverAttack, GoldExp
         BUTTERFLY
     }
 
-    public static class Type extends AbstractMove.Type<LifeGiverAttack> {
+    public static class Type extends AbstractMove.Type<LifeGiverAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<LifeGiverAttack>, LifeGiverAttack> buildCodec(RecordCodecBuilder.Instance<LifeGiverAttack> instance) {
+        protected @NotNull App<RecordCodecBuilder.Mu<LifeGiverAttack<?>>, LifeGiverAttack<?>> buildCodec(RecordCodecBuilder.Instance<LifeGiverAttack<?>> instance) {
             return baseDefault(instance, LifeGiverAttack::new);
         }
     }

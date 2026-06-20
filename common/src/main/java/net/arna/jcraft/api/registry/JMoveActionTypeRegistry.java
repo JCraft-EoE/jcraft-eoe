@@ -22,6 +22,7 @@ public interface JMoveActionTypeRegistry {
     RegistrySupplier<LightOnFireAction.Type> LIGHT_ON_FIRE = register("light_on_fire", LightOnFireAction.Type.INSTANCE);
     RegistrySupplier<LaunchUpAction.Type> LAUNCH_UP = register("launch_up", LaunchUpAction.Type.INSTANCE);
     RegistrySupplier<NotifyHamonStompAction.Type> NOTIFY_HAMON_STOMP_ACTION = register("notify_hamon_stomp_action", NotifyHamonStompAction.Type.INSTANCE);
+    RegistrySupplier<AnubisBloodLustMoveAction.Type> ANUBIS_BLOOD_LUST = register("anubis_blood_lust", AnubisBloodLustMoveAction.Type.INSTANCE);
 
     private static <T extends MoveActionType<?>> RegistrySupplier<T> register(String name, T type) {
         return MOVE_ACTION_TYPE_REGISTRY.register(name, () -> type);

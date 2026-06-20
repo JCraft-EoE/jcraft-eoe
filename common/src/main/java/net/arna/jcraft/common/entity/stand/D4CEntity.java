@@ -69,7 +69,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .summonData(SummonData.of(JSoundRegistry.D4C_SUMMON))
             .build();
 
-    public static final ItemPlaceMove ITEM_PLACE = new ItemPlaceMove(JCraft.LIGHT_COOLDOWN, 8, 12, 0.75f)
+    public static final ItemPlaceMove<D4CEntity> ITEM_PLACE = new ItemPlaceMove<D4CEntity>(JCraft.LIGHT_COOLDOWN, 8, 12, 0.75f)
             .withAnim(State.ITEM_PLACE)
             .withInfo(
                     Component.literal("Item Place"),
@@ -114,7 +114,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withInfo(
                     Component.literal("Charge"),
                     Component.literal("user & stand charge forward, uninterruptible launcher"));
-    public static final DimensionalHopMove DIM_HOP = new DimensionalHopMove(1200, 40, 60,
+    public static final DimensionalHopMove<D4CEntity> DIM_HOP = new DimensionalHopMove<D4CEntity>(1200, 40, 60,
             1f, 0f, 0, 1.75f, 0f, 0f, 300)
             .withSound(JSoundRegistry.D4C_DIMHOP)
             .withInfo(
@@ -155,7 +155,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
             .withInfo(
                     Component.literal("Counter"),
                     Component.literal("0.25s startup, 1.5s duration, high damage, knocks back when hit"));
-    public static final CloneSpawnMove CLONE_SPAWN = new CloneSpawnMove(300, 40, 50, 1f)
+    public static final CloneSpawnMove<D4CEntity> CLONE_SPAWN = new CloneSpawnMove<D4CEntity>(300, 40, 50, 1f)
             .withSound(JSoundRegistry.D4C_DIMHOP)
             .withInfo(
                     Component.literal("Dimensional Clone"),
@@ -166,7 +166,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                             SPECIAL 1 - Wooden Axe
                             SPECIAL 2 - Bow
                             SPECIAL 3 - None"""));
-    public static final FlagMove FLAG = new FlagMove(200, 10, 60, 0f)
+    public static final FlagMove<D4CEntity> FLAG = new FlagMove<D4CEntity>(200, 10, 60, 0f)
             .withSound(JSoundRegistry.D4C_UTILITY)
             .withInfo(
                     Component.literal("Dimensional Phase"),

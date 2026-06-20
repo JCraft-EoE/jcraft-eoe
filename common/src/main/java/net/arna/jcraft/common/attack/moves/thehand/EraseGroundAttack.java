@@ -4,7 +4,7 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
-import net.arna.jcraft.common.entity.stand.TheHandEntity;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -16,19 +16,19 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
-public class EraseGroundAttack extends AbstractEraseAttack<EraseGroundAttack> {
+public class EraseGroundAttack<A extends StandEntity<? extends A, ?>> extends AbstractEraseAttack<EraseGroundAttack<A>, A> {
     public EraseGroundAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                              float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
     }
 
     @Override
-    public @NonNull MoveType<EraseGroundAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<EraseGroundAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(TheHandEntity attacker, LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user) {
         Set<LivingEntity> targets = super.perform(attacker, user);
 
         final Level level = user.level();
@@ -66,20 +66,20 @@ public class EraseGroundAttack extends AbstractEraseAttack<EraseGroundAttack> {
     }
 
     @Override
-    protected @NonNull EraseGroundAttack getThis() {
+    protected @NonNull EraseGroundAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull EraseGroundAttack copy() {
-        return copyExtras(new EraseGroundAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitboxSize(), getKnockback(), getOffset()));
+    public @NonNull EraseGroundAttack<A> copy() {
+        return copyExtras(new EraseGroundAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 
-    public static class Type extends AbstractEraseAttack.Type<EraseGroundAttack> {
+    public static class Type extends AbstractEraseAttack.Type<EraseGroundAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<EraseGroundAttack>, EraseGroundAttack> buildCodec(RecordCodecBuilder.Instance<EraseGroundAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<EraseGroundAttack<?>>, EraseGroundAttack<?>> buildCodec(RecordCodecBuilder.Instance<EraseGroundAttack<?>> instance) {
             return attackDefault(instance, EraseGroundAttack::new);
         }
     }

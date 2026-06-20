@@ -44,7 +44,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
                     Component.literal("Hammerfist"),
                     Component.literal("1s knockdown")
             );
-    public static final BackhandAttack BACKHAND = new BackhandAttack(14, 6, 14, 0.75f,
+    public static final BackhandAttack<AbstractPurpleHazeEntity<?, ?>> BACKHAND = new BackhandAttack<AbstractPurpleHazeEntity<?, ?>>(14, 6, 14, 0.75f,
             6f, 20, 1.5f, 0.25f, -0.6f, 0.5f)
             .withFollowup(BACKHAND_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_4)
@@ -94,14 +94,14 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
                     Component.literal("fast reliable combo starter/extender, high stun")
             );
 
-    public static final LaunchCapsulesAttack LAUNCH_CAPSULES = new LaunchCapsulesAttack(6 * 20, 9, 18, 0.75f)
+    public static final LaunchCapsulesAttack<AbstractPurpleHazeEntity<?, ?>> LAUNCH_CAPSULES = new LaunchCapsulesAttack<AbstractPurpleHazeEntity<?, ?>>(6 * 20, 9, 18, 0.75f)
             .withSound(JSoundRegistry.PH_CAPSULE2)
             .withInfo(
                     Component.literal("Triple Capsule Launch"),
                     Component.literal("launches 3 capsules close by")
             );
 
-    public static final LaunchCapsuleAttack LAUNCH_CAPSULE = new LaunchCapsuleAttack(6 * 20, 7, 14, 0.75f)
+    public static final LaunchCapsuleAttack<AbstractPurpleHazeEntity<?, ?>> LAUNCH_CAPSULE = new LaunchCapsuleAttack<AbstractPurpleHazeEntity<?, ?>>(6 * 20, 7, 14, 0.75f)
             .withSound(JSoundRegistry.PH_CAPSULE1)
             .withCrouchingVariant(LAUNCH_CAPSULES)
             .withInfo(
@@ -109,7 +109,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
                     Component.literal("launches a single, fast capsule at the aimed location")
             );
 
-    public static final FullReleaseAttack FULL_RELEASE = new FullReleaseAttack(30 * 20, 30, 0.75f,
+    public static final FullReleaseAttack<AbstractPurpleHazeEntity<?, ?>> FULL_RELEASE = new FullReleaseAttack<AbstractPurpleHazeEntity<?, ?>>(30 * 20, 30, 0.75f,
             3f, 11, 1.75f, 0.45f, 0.2f, IntSet.of(14, 24))
             .withSound(JSoundRegistry.PH_ULTIMATE)
             .withHitSpark(JParticleType.HIT_SPARK_1)
@@ -142,7 +142,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
                     Component.literal("Rekka (2nd Hit)"),
                     Component.literal("links into Light")
             );
-    public static final PHRekkaAttack REKKA1 = new PHRekkaAttack(100, 7, 14, 1f,
+    public static final PHRekkaAttack<AbstractPurpleHazeEntity<?, ?>> REKKA1 = new PHRekkaAttack<AbstractPurpleHazeEntity<?, ?>>(100, 7, 14, 1f,
             4f, 15, 1.5f, 0.5f, 0f)
             .withSound(JSoundRegistry.PH_REKKA1)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -156,7 +156,7 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
                             A set of three attacks, which cancel into each other during recovery.
                             Last hit knocks down for 2.5s""")
             );
-    public static final PHGroundSlamAttack GROUND_SLAM = new PHGroundSlamAttack(6 * 20, 10, 18, 0.75f,
+    public static final PHGroundSlamAttack<AbstractPurpleHazeEntity<?, ?>> GROUND_SLAM = new PHGroundSlamAttack<AbstractPurpleHazeEntity<?, ?>>(6 * 20, 10, 18, 0.75f,
             6f, 10, 1.75f, 0.3f, 0.3f)
             .withSound(JSoundRegistry.PH_GROUNDSLAM)
             .withImpactSound(JSoundRegistry.IMPACT_1)

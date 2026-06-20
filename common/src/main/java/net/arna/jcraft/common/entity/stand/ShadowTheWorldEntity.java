@@ -96,7 +96,7 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
                     Component.literal("Shoulder Bash"),
                     Component.literal("uninterruptible get-off-me tool, brief knockdown")
             );
-    public static final LungeAttack LUNGE = new LungeAttack(0,
+    public static final LungeAttack<ShadowTheWorldEntity> LUNGE = new LungeAttack<ShadowTheWorldEntity>(0,
             14, 20, 0.75f,8f, 19, 1.6f, 2f, 0f, 10, 6)
             .withCrouchingVariant(GUARD_CANCEL)
             .withSound(JSoundRegistry.STW_WARBLE)
@@ -160,7 +160,7 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
                     Component.literal("Timestop"),
                     Component.literal("2.5 seconds")
             );
-    public static final STWCounterAttack COUNTER = new STWCounterAttack(400, 5, 20, 0.75f)
+    public static final STWCounterAttack<ShadowTheWorldEntity> COUNTER = new STWCounterAttack<ShadowTheWorldEntity>(400, 5, 20, 0.75f)
             .withInfo(
                     Component.literal("Counter"),
                     Component.literal("""

@@ -166,7 +166,7 @@ public final class TimeSkipMove<A extends IAttacker<? extends A, ?>> extends Abs
 
     @Override
     public @NonNull TimeSkipMove<A> copy() {
-        return copyExtras(new TimeSkipMove<A>(getCooldown(), range, getWindup(), getDuration(), getMoveDistance())
+        return copyExtras(new TimeSkipMove<>(getCooldown(), range, getWindup(), getDuration(), getMoveDistance())
                 .withParticles(particles)
                 .withSounds(sounds));
     }

@@ -128,7 +128,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                     Component.literal("Barrage"),
                     Component.literal("fast reliable combo starter/extender, medium stun")
             );
-    public static final GiveStandAttack GIVE_STAND = new GiveStandAttack(400,
+    public static final GiveStandAttack<WhiteSnakeEntity> GIVE_STAND = new GiveStandAttack<WhiteSnakeEntity>(400,
             22, 34, 1, 1, 2, 0, 0)
             .withSound(JSoundRegistry.WS_STAND_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -139,7 +139,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                     Component.literal("Give Stand Disk"),
                     Component.literal("gives a single hit target a stand, provided they do not have one already, from a disk in the user's off hand")
             );
-    public static final StealStandAttack STAND_DISC = new StealStandAttack(480,
+    public static final StealStandAttack<WhiteSnakeEntity> STAND_DISC = new StealStandAttack<WhiteSnakeEntity>(480,
             22, 34, 1, 8f, 20, 2, 0.5f, 0)
             .withSound(JSoundRegistry.WS_STAND_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -179,14 +179,14 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                     Component.literal("Take Memory Disk"),
                     Component.literal("uninterruptible& unblockable, gives mining fatigue & weakness for 30s")
             );
-    public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(160,
+    public static final ChargedSpewAttack<WhiteSnakeEntity> CHARGED_SPEW = new ChargedSpewAttack<WhiteSnakeEntity>(160,
             20, 26, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withInfo(
                     Component.literal("Poison Spew"),
                     Component.literal("fires a spread of 5 acid projectiles that slow enemies and persist on the surface they hits for 5s")
             );
-    public static final PoisonSpewAttack POISON_SPEW = new PoisonSpewAttack(100,
+    public static final PoisonSpewAttack<WhiteSnakeEntity> POISON_SPEW = new PoisonSpewAttack<WhiteSnakeEntity>(100,
             10, 14, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withCrouchingVariant(CHARGED_SPEW)
@@ -194,7 +194,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                     Component.literal("Poison Spew"),
                     Component.literal("fires an acid projectile that slows enemies and persists on the surface it hits for 5s")
             );
-    public static final MeltYourHeartAttack MELT_YOUR_HEART = new MeltYourHeartAttack(800,
+    public static final MeltYourHeartAttack<WhiteSnakeEntity> MELT_YOUR_HEART = new MeltYourHeartAttack<WhiteSnakeEntity>(800,
             40, 50, 1f, 3f, 20, 2f, 1f, 0f)
             .withSound(JSoundRegistry.WS_MYH)
             .withImpactSound(JSoundRegistry.IMPACT_2)

@@ -73,7 +73,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             .build();
     public static final Supplier<IPoseModifier> POSE = AbstractKillerQueenEntity.POSE;
 
-    public static final ElbowAttack ELBOW = new ElbowAttack(0, 5, 9, 0.75f,
+    public static final ElbowAttack<KQBTDEntity> ELBOW = new ElbowAttack<KQBTDEntity>(0, 5, 9, 0.75f,
             7.5f, 10, 1f, 1.1f, 0f)
             .withSound(JSoundRegistry.KQBTD_ELBOW)
             .withImpactSound(JSoundRegistry.IMPACT_4)
@@ -88,20 +88,20 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("Stray Cat Counter"),
                     Component.literal("0.25s windup counter, turns opponent into your primary bomb")
             );
-    public static final BubbleAttack BUBBLE = new BubbleAttack(120, 15, 18, 0.75f)
+    public static final BubbleAttack<KQBTDEntity> BUBBLE = new BubbleAttack<KQBTDEntity>(120, 15, 18, 0.75f)
             .withCrouchingVariant(BUBBLE_COUNTER)
             .withSound(JSoundRegistry.KQBTD_BUBBLE)
             .withInfo(
                     Component.literal("Stray Cat Bubble"),
                     Component.literal("launches an explosive bubble guided by your view rotation")
             );
-    public static final BTDDetonateAttack BTD_DETONATE = new BTDDetonateAttack(20, 5, 6, 0.75f, 200)
+    public static final BTDDetonateAttack<KQBTDEntity> BTD_DETONATE = new BTDDetonateAttack<KQBTDEntity>(20, 5, 6, 0.75f, 200)
             .withSound(JSoundRegistry.KQ_DETONATE)
             .withInfo(
                     Component.literal("Detonate"),
                     Component.empty()
             );
-    public static final BTDPlantAttack BTD_PLANT = new BTDPlantAttack(800,
+    public static final BTDPlantAttack<KQBTDEntity> BTD_PLANT = new BTDPlantAttack<KQBTDEntity>(800,
             14, 24, 1f, 10, 1.5f, 0f, BTDPlantAttack.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withBlockStun(8)
@@ -109,7 +109,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("Bites the Dust Plant"),
                     Component.literal("press the same button to detonate, sending the affected enemy back to their previous location")
             );
-    public static final BTDGrabHitAttack GRAB_HIT = new BTDGrabHitAttack(0, 42, 0.75f,
+    public static final BTDGrabHitAttack<KQBTDEntity> GRAB_HIT = new BTDGrabHitAttack<KQBTDEntity>(0, 42, 0.75f,
             3f, 15, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
@@ -126,7 +126,7 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final KQTossMove TOSS = new KQTossMove(0, 1, 1, 0.75f)
+    public static final KQTossMove<KQBTDEntity> TOSS = new KQTossMove<KQBTDEntity>(0, 1, 1, 0.75f)
             .withAnim(KQBTDEntity.State.ITEM_TOSS);
     public static final TossChargeMove<KQBTDEntity> TOSS_CHARGE = new TossChargeMove<KQBTDEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);

@@ -170,7 +170,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Vertical Chop"),
                     Component.literal("medium windup combo starter, has a true followup in the form of a slow, armored knockdown")
             );
-    public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(200, 10, 15, 1f)
+    public static final BloodThrowAttack<KingCrimsonEntity> BLOOD_THROW = new BloodThrowAttack<KingCrimsonEntity>(200, 10, 15, 1f)
             .withInfo(
                     Component.literal("Blood Throw"),
                     Component.literal("throws a stunning, blinding blood projectile, crouch while it comes out for higher speed")
@@ -189,7 +189,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Eye Chop"),
                     Component.literal("blindness on hit, combo starter, low blockstun")
             );
-    public static final KCDonutAttack DONUT = new KCDonutAttack(48, 30, 48, 1f,
+    public static final KCDonutAttack<KingCrimsonEntity> DONUT = new KCDonutAttack<KingCrimsonEntity>(48, 30, 48, 1f,
             14f, 10, 1.75f, 1.5f, 0.1f)
             .withSound(JSoundRegistry.KC_DONUT)
             .withImpactSound(JSoundRegistry.IMPACT_7)
@@ -205,7 +205,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Epitaph"),
                     Component.literal("0.2s windup, 1.5s counter, combo starter. Cannot be buffered.")
             );
-    public static final PredictionMove PREDICTION = new PredictionMove(160, 4, 104, -1f)
+    public static final PredictionMove<KingCrimsonEntity> PREDICTION = new PredictionMove<KingCrimsonEntity>(160, 4, 104, -1f)
             .withCrouchingVariant(EPITAPH)
             .withSound(JSoundRegistry.KC_EPITAPH)
             .withInfo(
