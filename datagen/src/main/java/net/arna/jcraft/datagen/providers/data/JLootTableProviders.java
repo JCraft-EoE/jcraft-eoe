@@ -39,18 +39,18 @@ public class JLootTableProviders {
 
         @Override
         public void generate() {
-            addMeteoriteHammerDrop(JBlockRegistry.METEORITE_BLOCK.get());
+            addMeteoriteHammerDrop(JBlockRegistry.METEORITE_BLOCK.get(), 0.25f);
             dropSelf(JBlockRegistry.POLISHED_METEORITE_BLOCK.get());
-            addMeteoriteHammerDrop(JBlockRegistry.METEORITE_IRON_ORE_BLOCK.get());
+            addMeteoriteHammerDrop(JBlockRegistry.METEORITE_IRON_ORE_BLOCK.get(), 1f);
             dropSelf(JBlockRegistry.SOUL_BLOCK.get());
             dropSelf(JBlockRegistry.HOT_SAND_BLOCK.get());
             dropSelf(JBlockRegistry.STELLAR_IRON_BLOCK.get());
             dropSelf(JBlockRegistry.CINDERELLA_GREEN_BLOCK.get());
         }
 
-        private void addMeteoriteHammerDrop(Block block) {
+        private void addMeteoriteHammerDrop(Block block, float chance) {
             add(block, LootTable.lootTable()
-                    .withPool(constantPool(1f)
+                    .withPool(constantPool(chance)
                             .when(ExplosionCondition.survivesExplosion())
                             .when(speedwagonsHammerCondition())
                             .add(LootItem.lootTableItem(JItemRegistry.STELLAR_IRON_DUST.get())))
