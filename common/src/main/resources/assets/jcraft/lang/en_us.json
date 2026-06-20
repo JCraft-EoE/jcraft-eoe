@@ -584,6 +584,7 @@
   "jcraft.diosdiary.desc": "§9Contains the musings of a long dead man.",
   "jcraft.diosdiary.evodesc": "§9(§eC-Moon & The World §9evolution item)",
   "jcraft.disc.combat": "Cannot use disc while in combat!",
+  "jcraft.disc.fragile_has_stand": "Cannot use a fragile disc with a stand!",
   "jcraft.disc.same_spec": "You already have this spec!",
   "jcraft.disc.same_stand": "You already have this stand!",
   "jcraft.disc.stand_in_use": "Another player is already using this stand!",

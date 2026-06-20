@@ -61,6 +61,7 @@ public class StandDiscItem extends Item {
         int itemSkin = 0;
 
         final CompoundTag data = itemStack.getOrCreateTag();
+        final boolean oneUse = data.getByte("OneUse") != 0;
         itemStand = StandTypeUtil.readFromNBT(data, "StandID");
         if (data.contains("Skin", Tag.TAG_INT)) {
             itemSkin = data.getInt("Skin");
@@ -74,6 +75,11 @@ public class StandDiscItem extends Item {
         final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(user);
         final StandType userStand = standData.getType();
         final int userSkin = standData.getSkin();
+
+        if (oneUse && !StandTypeUtil.isNone(userStand)) {
+            user.displayClientMessage(Component.translatable("jcraft.disc.fragile_has_stand").withStyle(ChatFormatting.RED), true);
+            return InteractionResultHolder.fail(itemStack);
+        }
 
         if (itemStand == userStand && (itemStand == null || itemSkin == userSkin)) {
             if (itemStand != null) {
@@ -107,6 +113,10 @@ public class StandDiscItem extends Item {
 
         // 1s usage cooldown to prevent overuse
         user.getCooldowns().addCooldown(this, 20);
+
+        if (oneUse) {
+            itemStack.shrink(1);
+        }
 
         return InteractionResultHolder.success(itemStack);
     }

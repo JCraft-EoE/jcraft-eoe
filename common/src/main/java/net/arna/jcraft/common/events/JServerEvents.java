@@ -553,6 +553,7 @@ public class JServerEvents {
                     if (standType != null && standType != JStandTypeRegistry.NONE.get()) {
                         final int skin = Math.max(0, Math.min(standData.getSkin(), standType.getData().getInfo().getSkinCount() - 1));
                         final ItemStack disc = StandDiscItem.createDiscStack(standType, skin);
+                        disc.getOrCreateTag().putByte("OneUse", (byte) 1);
                         Containers.dropItemStack(serverWorld, living.getX(), living.getY(), living.getZ(), disc);
                     }
                     standData.setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0, false);
