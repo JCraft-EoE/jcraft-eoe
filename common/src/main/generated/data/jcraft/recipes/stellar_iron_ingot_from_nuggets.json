@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "jcraft:stellar_iron_nugget"
+    },
+    {
+      "item": "jcraft:stellar_iron_nugget"
+    },
+    {
+      "item": "jcraft:stellar_iron_nugget"
+    },
+    {
+      "item": "jcraft:stellar_iron_nugget"
+    },
+    {
+      "item": "jcraft:stellar_iron_nugget"
+    },
+    {
+      "item": "jcraft:stellar_iron_nugget"
+    },
+    {
+      "item": "jcraft:stellar_iron_nugget"
+    },
+    {
+      "item": "jcraft:stellar_iron_nugget"
+    },
+    {
+      "item": "jcraft:stellar_iron_nugget"
+    }
+  ],
+  "result": {
+    "item": "jcraft:stellar_iron_ingot"
+  }
+}

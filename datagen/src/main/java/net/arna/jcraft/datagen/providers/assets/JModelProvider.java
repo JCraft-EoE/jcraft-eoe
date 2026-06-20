@@ -62,6 +62,10 @@ public class JModelProvider extends FabricModelProvider {
         generateStandDiscModels(generator);
 
         generator.generateFlatItem(JItemRegistry.STELLAR_IRON_INGOT.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.STELLAR_IRON_NUGGET.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.STELLAR_IRON_DUST.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.STELLAR_IRON_SMALL_DUST.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.SPEEDWAGONS_HAMMER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         generator.generateFlatItem(JItemRegistry.STONE_MASK.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.RED_HAT.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.PLANKTON_VIAL.get(), ModelTemplates.FLAT_ITEM);

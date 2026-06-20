@@ -55,6 +55,62 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .requires(JBlockRegistry.STELLAR_IRON_BLOCK.get())
                 .unlockedBy("has_block", InventoryChangeTrigger.TriggerInstance.hasItems(JBlockRegistry.STELLAR_IRON_BLOCK.get()))
                 .save(exporter, JCraft.id("stellar_iron_ingot_from_block"));
+        // stellar iron ingot from nuggets
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, JItemRegistry.STELLAR_IRON_INGOT.get())
+                .requires(JItemRegistry.STELLAR_IRON_NUGGET.get(), 9)
+                .unlockedBy("has_nugget", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.STELLAR_IRON_NUGGET.get()))
+                .save(exporter, JCraft.id("stellar_iron_ingot_from_nuggets"));
+        // stellar iron nuggets from ingot
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, JItemRegistry.STELLAR_IRON_NUGGET.get(), 9)
+                .requires(JItemRegistry.STELLAR_IRON_INGOT.get())
+                .unlockedBy("has_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.STELLAR_IRON_INGOT.get()))
+                .save(exporter, JCraft.id("stellar_iron_nugget_from_ingot"));
+        // stellar iron dust from small dusts
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, JItemRegistry.STELLAR_IRON_DUST.get())
+                .requires(JItemRegistry.STELLAR_IRON_SMALL_DUST.get(), 9)
+                .unlockedBy("has_small_dust", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.STELLAR_IRON_SMALL_DUST.get()))
+                .save(exporter, JCraft.id("stellar_iron_dust_from_small_dusts"));
+        // stellar iron small dusts from dust
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, JItemRegistry.STELLAR_IRON_SMALL_DUST.get(), 9)
+                .requires(JItemRegistry.STELLAR_IRON_DUST.get())
+                .unlockedBy("has_dust", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.STELLAR_IRON_DUST.get()))
+                .save(exporter, JCraft.id("stellar_iron_small_dust_from_dust"));
+        // stellar iron nugget from small dust smelting
+        SimpleCookingRecipeBuilder.smelting(
+                        Ingredient.of(JItemRegistry.STELLAR_IRON_SMALL_DUST.get()),
+                        RecipeCategory.MISC,
+                        JItemRegistry.STELLAR_IRON_NUGGET.get(),
+                        0.1f,
+                        200)
+                .unlockedBy("has_small_dust", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.STELLAR_IRON_SMALL_DUST.get()))
+                .save(exporter, JCraft.id("stellar_iron_nugget_from_small_dust_smelting"));
+        // stellar iron nugget from small dust blasting
+        SimpleCookingRecipeBuilder.blasting(
+                        Ingredient.of(JItemRegistry.STELLAR_IRON_SMALL_DUST.get()),
+                        RecipeCategory.MISC,
+                        JItemRegistry.STELLAR_IRON_NUGGET.get(),
+                        0.1f,
+                        100)
+                .unlockedBy("has_small_dust", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.STELLAR_IRON_SMALL_DUST.get()))
+                .save(exporter, JCraft.id("stellar_iron_nugget_from_small_dust_blasting"));
+        // stellar iron ingot from dust smelting
+        SimpleCookingRecipeBuilder.smelting(
+                        Ingredient.of(JItemRegistry.STELLAR_IRON_DUST.get()),
+                        RecipeCategory.MISC,
+                        JItemRegistry.STELLAR_IRON_INGOT.get(),
+                        0.7f,
+                        200)
+                .unlockedBy("has_dust", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.STELLAR_IRON_DUST.get()))
+                .save(exporter, JCraft.id("stellar_iron_ingot_from_dust_smelting"));
+        // stellar iron ingot from dust blasting
+        SimpleCookingRecipeBuilder.blasting(
+                        Ingredient.of(JItemRegistry.STELLAR_IRON_DUST.get()),
+                        RecipeCategory.MISC,
+                        JItemRegistry.STELLAR_IRON_INGOT.get(),
+                        0.7f,
+                        100)
+                .unlockedBy("has_dust", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.STELLAR_IRON_DUST.get()))
+                .save(exporter, JCraft.id("stellar_iron_ingot_from_dust_blasting"));
         // disc from smelting
         SimpleCookingRecipeBuilder.smelting(
                         Ingredient.of(Items.LIGHT_BLUE_STAINED_GLASS_PANE),
@@ -336,6 +392,16 @@ public class JRecipeProvider extends FabricRecipeProvider {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, JItemRegistry.KNIFEBUNDLE.get())
                 .requires(JItemRegistry.KNIFE.get(), 9)
                 .unlockedBy("has_knife", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.KNIFE.get()))
+                .save(exporter);
+        // Speedwagon's Hammer
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, JItemRegistry.SPEEDWAGONS_HAMMER.get())
+                .pattern(" BD")
+                .pattern(" SB")
+                .pattern("S  ")
+                .define('B', Items.IRON_BLOCK)
+                .define('D', Items.DIAMOND)
+                .define('S', Items.STICK)
+                .unlockedBy("has_iron_block", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_BLOCK))
                 .save(exporter);
         // road roller
         ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, JItemRegistry.ROAD_ROLLER.get())

@@ -85,10 +85,14 @@ public interface JItemRegistry {
     RegistrySupplier<Item> BLOOD_BOTTLE = register("blood_bottle", () -> new BloodBottleItem(settings().stacksTo(1)));
 
     RegistrySupplier<Item> STELLAR_IRON_INGOT = register("stellar_iron_ingot", () -> new Item(settings()));
+    RegistrySupplier<Item> STELLAR_IRON_NUGGET = register("stellar_iron_nugget", () -> new Item(settings()));
+    RegistrySupplier<Item> STELLAR_IRON_DUST = register("stellar_iron_dust", () -> new Item(settings()));
+    RegistrySupplier<Item> STELLAR_IRON_SMALL_DUST = register("stellar_iron_small_dust", () -> new Item(settings()));
     RegistrySupplier<Item> STAND_ARROWHEAD = register("stand_arrowhead", () -> new Item(settings()));
     RegistrySupplier<Item> PRISON_KEY = register("prison_key", () -> new Item(settings()));
     RegistrySupplier<Item> PLANKTON_VIAL = register("plankton_vial", () -> new Item(settings()));
     RegistrySupplier<Item> STEEL_BALL = register("steel_ball", () -> new Item(settings()));
+    RegistrySupplier<Item> SPEEDWAGONS_HAMMER = register("speedwagons_hammer", () -> new SpeedwagonHammerItem(Tiers.DIAMOND, 10f, -3.2f, settings()));
     RegistrySupplier<Item> GAS_CAN = register("gas_can", () -> new GasCanItem(settings().stacksTo(1)));
     RegistrySupplier<Item> MATCHBOX = register("matchbox", () -> new MatchboxItem(settings().stacksTo(1)));
 

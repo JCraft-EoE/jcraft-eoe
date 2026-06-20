@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.7,
+  "ingredient": {
+    "item": "jcraft:stellar_iron_dust"
+  },
+  "result": "jcraft:stellar_iron_ingot"
+}

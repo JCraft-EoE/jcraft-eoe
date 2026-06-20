@@ -190,6 +190,9 @@ public interface JCreativeMenuTabRegistry {
                     entries.accept(JItemRegistry.POLISHED_METEORITE_BLOCK.get());
                     entries.accept(JItemRegistry.METEORITE_IRON_ORE_BLOCK.get());
                     entries.accept(JItemRegistry.STELLAR_IRON_INGOT.get());
+                    entries.accept(JItemRegistry.STELLAR_IRON_NUGGET.get());
+                    entries.accept(JItemRegistry.STELLAR_IRON_DUST.get());
+                    entries.accept(JItemRegistry.STELLAR_IRON_SMALL_DUST.get());
                     entries.accept(JItemRegistry.STELLAR_IRON_BLOCK.get());
                     entries.accept(JItemRegistry.STAND_ARROWHEAD.get());
                     entries.accept(JItemRegistry.STAND_ARROW.get());
@@ -215,6 +218,7 @@ public interface JCreativeMenuTabRegistry {
                     // entries.accept(JItemRegistry.SOUL_WOOD_BLOCK.get());
                     entries.accept(JItemRegistry.KNIFE.get());
                     entries.accept(JItemRegistry.KNIFEBUNDLE.get());
+                    entries.accept(JItemRegistry.SPEEDWAGONS_HAMMER.get());
                     // entries.accept(JItemRegistry.PRISON_KEY.get());
                     // entries.accept(JItemRegistry.PLANKTON_VIAL.get());
                     // entries.accept(JItemRegistry.SHIV.get());

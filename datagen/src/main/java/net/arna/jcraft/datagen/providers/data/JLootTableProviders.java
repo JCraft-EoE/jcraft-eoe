@@ -8,15 +8,21 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
+import net.minecraft.world.level.storage.loot.predicates.InvertedLootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import java.util.Map;
@@ -33,13 +39,29 @@ public class JLootTableProviders {
 
         @Override
         public void generate() {
-            dropSelf(JBlockRegistry.METEORITE_BLOCK.get());
+            addMeteoriteHammerDrop(JBlockRegistry.METEORITE_BLOCK.get());
             dropSelf(JBlockRegistry.POLISHED_METEORITE_BLOCK.get());
-            dropSelf(JBlockRegistry.METEORITE_IRON_ORE_BLOCK.get());
+            addMeteoriteHammerDrop(JBlockRegistry.METEORITE_IRON_ORE_BLOCK.get());
             dropSelf(JBlockRegistry.SOUL_BLOCK.get());
             dropSelf(JBlockRegistry.HOT_SAND_BLOCK.get());
             dropSelf(JBlockRegistry.STELLAR_IRON_BLOCK.get());
             dropSelf(JBlockRegistry.CINDERELLA_GREEN_BLOCK.get());
+        }
+
+        private void addMeteoriteHammerDrop(Block block) {
+            add(block, LootTable.lootTable()
+                    .withPool(constantPool(1f)
+                            .when(ExplosionCondition.survivesExplosion())
+                            .when(speedwagonsHammerCondition())
+                            .add(LootItem.lootTableItem(JItemRegistry.STELLAR_IRON_DUST.get())))
+                    .withPool(constantPool(1f)
+                            .when(ExplosionCondition.survivesExplosion())
+                            .when(InvertedLootItemCondition.invert(speedwagonsHammerCondition()))
+                            .add(LootItem.lootTableItem(block))));
+        }
+
+        private LootItemCondition.Builder speedwagonsHammerCondition() {
+            return MatchTool.toolMatches(ItemPredicate.Builder.item().of(JItemRegistry.SPEEDWAGONS_HAMMER.get()));
         }
     }
 

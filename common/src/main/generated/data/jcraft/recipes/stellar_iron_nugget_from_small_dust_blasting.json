@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.1,
+  "ingredient": {
+    "item": "jcraft:stellar_iron_small_dust"
+  },
+  "result": "jcraft:stellar_iron_nugget"
+}

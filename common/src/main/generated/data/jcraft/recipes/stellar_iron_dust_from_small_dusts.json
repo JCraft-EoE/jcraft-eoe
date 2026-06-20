@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "jcraft:stellar_iron_small_dust"
+    },
+    {
+      "item": "jcraft:stellar_iron_small_dust"
+    },
+    {
+      "item": "jcraft:stellar_iron_small_dust"
+    },
+    {
+      "item": "jcraft:stellar_iron_small_dust"
+    },
+    {
+      "item": "jcraft:stellar_iron_small_dust"
+    },
+    {
+      "item": "jcraft:stellar_iron_small_dust"
+    },
+    {
+      "item": "jcraft:stellar_iron_small_dust"
+    },
+    {
+      "item": "jcraft:stellar_iron_small_dust"
+    },
+    {
+      "item": "jcraft:stellar_iron_small_dust"
+    }
+  ],
+  "result": {
+    "item": "jcraft:stellar_iron_dust"
+  }
+}

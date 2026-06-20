@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_small_dust": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:stellar_iron_small_dust"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "jcraft:stellar_iron_nugget_from_small_dust_blasting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_small_dust",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "jcraft:stellar_iron_nugget_from_small_dust_blasting"
+    ]
+  },
+  "sends_telemetry_event": false
+}

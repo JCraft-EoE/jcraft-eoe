@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "minecraft:iron_block"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    " BD",
+    " SB",
+    "S  "
+  ],
+  "result": {
+    "item": "jcraft:speedwagons_hammer"
+  },
+  "show_notification": true
+}
