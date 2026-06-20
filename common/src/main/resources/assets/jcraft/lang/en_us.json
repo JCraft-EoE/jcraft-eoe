@@ -608,6 +608,7 @@
   "jcraft.movetype.utility": "Utility",
   "jcraft.requiemarrow.desc": "§eAble to grant immense power to those worthy.",
   "jcraft.revolver.shots": "§9Shots:",
+  "jcraft.serverconfig.category.addons": "Addons",
   "jcraft.serverconfig.category.balance": "Balance",
   "jcraft.serverconfig.category.gameplay": "Gameplay",
   "jcraft.serverconfig.category.interaction": "Interaction",
