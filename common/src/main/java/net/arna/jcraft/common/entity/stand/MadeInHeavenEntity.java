@@ -98,12 +98,13 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .summonData(SummonData.of(JSoundRegistry.MIH_SUMMON))
             .build();
 
-    public static final SimpleAttack<MadeInHeavenEntity> SPEED_CHOP = new SimpleAttack<MadeInHeavenEntity>(0,
+    public static final SimpleAttack<MadeInHeavenEntity> SPEED_CHOP = new SimpleAttack<MadeInHeavenEntity>(15,
             6, 11, 0.75f, 3f, 8, 1.5f, 0.5f, -0.1f)
             .withAnim(State.SPEED_CHOP)
             .withAction(EffectAction.inflict(JStatusRegistry.BLEEDING, 80, 1, true, false, true))
             .withImpactSound(SoundEvents.TRIDENT_HIT)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
+            .withBlockStun(3)
             .withInfo(
                     Component.literal("Speed Chop"),
                     Component.literal("tiny stun, procs bleed")

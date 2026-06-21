@@ -204,7 +204,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
-            .withBlockStun(11)
+            .withBlockStun(8)
             .withInfo(
                     Component.literal("Forward Charge"),
                     Component.literal("The World detaches from the user and lunges forward, combo starter")
