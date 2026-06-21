@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.projectile;
 
 import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -180,7 +181,10 @@ public class ItemTossProjectile extends AbstractArrow {
     }
 
     @Override
-    protected void onHitEntity(final EntityHitResult result) {
+    protected void onHitEntity(final @NonNull EntityHitResult result) {
+        if (level().isClientSide()) {
+            return;
+        }
         // this part has been heavily inspired by AbstractArrow
         Entity entity = result.getEntity();
         Entity entity2 = JUtils.getUserIfStand(this.getOwner());
