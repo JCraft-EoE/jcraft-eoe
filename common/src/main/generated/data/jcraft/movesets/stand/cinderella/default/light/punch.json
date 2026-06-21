@@ -1,0 +1,40 @@
+{
+  "anim_state": "LIGHT",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 22,
+    "damage": 4.0,
+    "duration": 11,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact2"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.cinderella.default.punch.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.cinderella.default.punch.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.15,
+    "move_distance": 0.75,
+    "offset": 0.2,
+    "stun": 11,
+    "windup": 7
+  }
+}

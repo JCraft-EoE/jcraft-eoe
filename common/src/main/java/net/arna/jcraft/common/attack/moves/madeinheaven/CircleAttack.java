@@ -6,15 +6,17 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.lang.ref.WeakReference;
@@ -41,11 +43,23 @@ public final class CircleAttack extends AbstractMove<CircleAttack, MadeInHeavenE
         super.onInitiate(attacker);
 
         LivingEntity user = attacker.getUserOrThrow();
-        LivingEntity target = AbstractSimpleAttack.findHits(attacker, user.getEyePosition().add(attacker.getLookAngle()), 2d, null)
-                .stream()
-                .map(JUtils::getUserIfStand)
-                .findFirst()
-                .orElse(null);
+
+        // Pick the entity the user is actually looking at within range, instead of an arbitrary one in a box.
+        final double range = 6d;
+        final Vec3 eye = user.getEyePosition();
+        final Vec3 end = eye.add(user.getLookAngle().scale(range));
+        final EntityHitResult hit = ProjectileUtil.getEntityHitResult(user, eye, end,
+                user.getBoundingBox().inflate(range),
+                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> e != user && e != attacker && e instanceof LivingEntity),
+                range * range);
+
+        LivingEntity target = null;
+        if (hit != null && hit.getEntity() instanceof LivingEntity living) {
+            final LivingEntity mapped = JUtils.getUserIfStand(living); // circle the stand's user, not the stand
+            if (mapped != user) {
+                target = mapped;
+            }
+        }
 
         attacker.setCirclingTarget(target);
         this.target = new WeakReference<>(target);

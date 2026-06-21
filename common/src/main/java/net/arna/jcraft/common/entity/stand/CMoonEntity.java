@@ -195,7 +195,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<CMoonEntity> TOSS = new TossMove<CMoonEntity>(0, 1, 1, 0.75f)
+    public static final CMoonTossMove TOSS = new CMoonTossMove(0, 1, 1, 0.75f)
             .withAnim(CMoonEntity.State.ITEM_TOSS);
     public static final TossChargeMove<CMoonEntity> TOSS_CHARGE = new TossChargeMove<CMoonEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);

@@ -1,0 +1,18 @@
+{
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:shared_no_op_move",
+    "cooldown": 0,
+    "duration": 0,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.the_sun.default.change_size.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_sun.default.change_size.name"
+      }
+    },
+    "move_distance": 0.0
+  }
+}

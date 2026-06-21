@@ -17,6 +17,7 @@ public enum CooldownType {
     STAND_TOSS,
 
     // Spec Cooldowns
+    LIGHT(Category.SPEC),
     HEAVY(Category.SPEC),
     BARRAGE(Category.SPEC, true),
     SPECIAL1(Category.SPEC),

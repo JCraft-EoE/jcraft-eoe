@@ -10,7 +10,10 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
  */
 public class MagiciansRedRenderer extends StandEntityRenderer<MagiciansRedEntity> {
     public MagiciansRedRenderer(final EntityRendererProvider.Context context) {
-        super(context, b -> b.addRenderLayer(new MRGlowLayer()), JStandTypeRegistry.MAGICIANS_RED.get(), -0.10f, -0.05f);
+        super(context, b -> b
+                .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
+                .addRenderLayer(new MRGlowLayer()),
+                JStandTypeRegistry.MAGICIANS_RED.get(), -0.10f, -0.05f);
     }
 
     /*@Override

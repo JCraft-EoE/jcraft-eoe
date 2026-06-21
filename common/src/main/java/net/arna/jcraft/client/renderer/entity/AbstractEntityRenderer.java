@@ -13,8 +13,11 @@ import mod.azure.azurelib.render.entity.AzEntityRenderer;
 import mod.azure.azurelib.render.entity.AzEntityRendererConfig;
 import mod.azure.azurelib.render.layer.AzBlockAndItemLayer;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.util.AlphaMultiBufferSource;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -37,34 +40,10 @@ public abstract class AbstractEntityRenderer<T extends Entity> extends AzEntityR
     public static final String ANIMATION_STR_TEMPLATE = "animations/%s.animation.json";
 
     /**
-     * Path to the model to be used for this entity.
-     */
-    protected final @NonNull ResourceLocation model;
-    /**
-     * Path to the texture to be used for this entity.
-     */
-    protected final @NonNull ResourceLocation texture;
-
-    /**
      * Constructs a renderer with a fully customizable config and the given model/texture paths.
      */
-    protected AbstractEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context,
-                                     final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
+    protected AbstractEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context) {
         super(config, context);
-        this.model = model;
-        this.texture = texture;
-    }
-
-    /**
-     * Constructs a renderer with a fully customizable config and model/texture paths based on the specified ID.
-     *
-     * <ul>
-     * <li>Resulting model path will be equivalent to <code>JCraft.id("geo/" + id + ".geo.json")</code></li>
-     * <li>Resulting texture path will be equivalent to <code>JCraft.id("textures/entity/" + id + ".png")</code></li>
-     * </ul>
-     */
-    protected AbstractEntityRenderer(final @NonNull AzEntityRendererConfig<T> config, final @NonNull EntityRendererProvider.Context context, final @NonNull String id) {
-        this(config, context, JCraft.id(MODEL_STR_TEMPLATE.formatted(id)), JCraft.id(TEXTURE_STR_TEMPLATE.formatted(id)));
     }
 
     /**
@@ -72,7 +51,7 @@ public abstract class AbstractEntityRenderer<T extends Entity> extends AzEntityR
      */
     protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier,
                                      final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
-        this(AzEntityRendererConfig.<T>builder(model, texture).setAnimatorProvider(animatorSupplier).build(), context, model, texture);
+        this(AzEntityRendererConfig.<T>builder(model, texture).setAnimatorProvider(animatorSupplier).build(), context);
     }
 
     /**
@@ -90,27 +69,29 @@ public abstract class AbstractEntityRenderer<T extends Entity> extends AzEntityR
     /**
      * Constructs a renderer with a config based on the {@link AzAnimator} {@link Supplier} and the {@link mod.azure.azurelib.render.entity.AzEntityRendererConfig.Builder} {@link Function}, and the given model/texture paths.
      */
-    protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs,
+    protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context,
+                                     final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier,
+                                     final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs,
                                      final @NonNull ResourceLocation model, final @NonNull ResourceLocation texture) {
-        this(additionalConfigs.apply(AzEntityRendererConfig.<T>builder(model, texture).setAnimatorProvider(animatorSupplier)).build(), context, model, texture);
+        this(additionalConfigs.apply(AzEntityRendererConfig.<T>builder(model, texture).setAnimatorProvider(animatorSupplier)).build(), context);
     }
 
     /**
-     * Constructs a renderer with a config based on the {@link AzAnimator} {@link Supplier} and the {@link mod.azure.azurelib.render.entity.AzEntityRendererConfig.Builder} {@link Function}, and model/texture paths based on the specified ID.
+     * Constructs a renderer with a config based on the {@link AzAnimator} {@link Supplier} and the
+     * {@link mod.azure.azurelib.render.entity.AzEntityRendererConfig.Builder} {@link Function}, and model/texture paths based on the specified ID.
      *
      * <ul>
      * <li>Resulting model path will be equivalent to <code>JCraft.id("geo/" + id + ".geo.json")</code></li>
      * <li>Resulting texture path will be equivalent to <code>JCraft.id("textures/entity/" + id + ".png")</code></li>
      * </ul>
      */
-    protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context, final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier, final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs, final @NonNull String id) {
-        this(additionalConfigs.apply(AzEntityRendererConfig.<T>builder(JCraft.id(MODEL_STR_TEMPLATE.formatted(id)), JCraft.id(TEXTURE_STR_TEMPLATE.formatted(id))).setAnimatorProvider(animatorSupplier)).build(),
-                context, JCraft.id(MODEL_STR_TEMPLATE.formatted(id)), JCraft.id(TEXTURE_STR_TEMPLATE.formatted(id)));
-    }
-
-    @Override
-    public @NonNull ResourceLocation getTextureLocation(final @NonNull T entity) {
-        return texture;
+    protected AbstractEntityRenderer(final @NonNull EntityRendererProvider.Context context,
+                                     final @NonNull Supplier<AzAnimator<UUID, T>> animatorSupplier,
+                                     final @NonNull Function<AzEntityRendererConfig.Builder<T>, AzEntityRendererConfig.Builder<T>> additionalConfigs,
+                                     final @NonNull String id) {
+        this(additionalConfigs.apply(AzEntityRendererConfig.<T>builder(JCraft.id(MODEL_STR_TEMPLATE.formatted(id)),
+                        JCraft.id(TEXTURE_STR_TEMPLATE.formatted(id))).setAnimatorProvider(animatorSupplier)).build(),
+                context);
     }
 
     /**
@@ -200,11 +181,52 @@ public abstract class AbstractEntityRenderer<T extends Entity> extends AzEntityR
                 }
             }
 
-            super.renderItemForBone(context, bone, itemStack, animatable);
+            renderItemStack(context, bone, itemStack, animatable);
         }
 
         protected void superRenderItemForBone(final AzRendererPipelineContext<UUID, T> context, final AzBone bone, final ItemStack itemStack, final T animatable) {
-            super.renderItemForBone(context, bone, itemStack, animatable);
+            renderItemStack(context, bone, itemStack, animatable);
+        }
+
+        /**
+         * Renders the held item through the vanilla {@link net.minecraft.client.renderer.entity.ItemRenderer},
+         * fading it by {@link #getItemAlpha} so it matches a translucent (e.g. first-person) stand. The alpha is
+         * baked into the item's vertex colours via {@link AlphaMultiBufferSource}; see
+         * {@link net.arna.jcraft.client.util.AlphaVertexConsumer} for why a shader colour set here would not survive
+         * the buffer being flushed later.
+         * <p>
+         * This mirrors the {@link AzBlockAndItemLayer#renderItemForBone} living-entity branch ({@code T extends Mob}
+         * is always a {@link net.minecraft.world.entity.LivingEntity}).
+         */
+        private void renderItemStack(final AzRendererPipelineContext<UUID, T> context, final AzBone bone, final ItemStack itemStack, final T animatable) {
+            final float alpha = getItemAlpha(context, animatable);
+            MultiBufferSource bufferSource = context.multiBufferSource();
+            if (alpha < 1f) {
+                bufferSource = new AlphaMultiBufferSource(bufferSource, alpha);
+            }
+
+            Minecraft.getInstance()
+                    .getItemRenderer()
+                    .renderStatic(
+                            animatable,
+                            itemStack,
+                            getTransformTypeForStack(bone, itemStack, animatable),
+                            false,
+                            context.poseStack(),
+                            bufferSource,
+                            animatable.level(),
+                            context.packedLight(),
+                            context.packedOverlay(),
+                            animatable.getId()
+                    );
+        }
+
+        /**
+         * The opacity to render held items with. Defaults to fully opaque; overridden (e.g. for stands) so the
+         * item fades together with a transparent owner.
+         */
+        protected float getItemAlpha(final AzRendererPipelineContext<UUID, T> context, final T animatable) {
+            return 1f;
         }
     }
 }

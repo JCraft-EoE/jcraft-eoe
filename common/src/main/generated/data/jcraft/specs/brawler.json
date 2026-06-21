@@ -1,0 +1,11 @@
+{
+  "description": {
+    "translate": "spec.jcraft.brawler.info.desc"
+  },
+  "free_space": {
+    "translate": "spec.jcraft.brawler.info.details"
+  },
+  "name": {
+    "translate": "spec.jcraft.brawler"
+  }
+}

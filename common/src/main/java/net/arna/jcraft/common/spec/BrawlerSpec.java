@@ -33,31 +33,37 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
             21, 1f, 6f, 15, 1.5f, 0.3f, 0f, 0.3f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
-            .withInfo(Component.literal("Uppercut"), Component.literal("medium speed"));
+            .withInfo(Component.literal("Uppercut"), Component.literal("Medium speed, good stun, launches up on hit."));
+
     public static final SimpleAttack<BrawlerSpec> TORNADO = new SimpleAttack<BrawlerSpec>(200, 12,
-            20, 1f, 7f, 20, 1.6f, 0.4f, -0.1f)
+            20, 1f, 7f, 20, 1.6f, 0.85f, -0.1f)
             .withCrouchingVariant(HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withArmor(3)
-            .withInfo(Component.literal("Tornado Kick"), Component.literal("3 points of armor, high stun"));
+            .withLaunch()
+            .withInfo(Component.literal("Tornado Kick"), Component.literal("3 points of armor, high stun, launches away on hit."));
+
     public static final SimpleMultiHitAttack<BrawlerSpec> COMBO = new SimpleMultiHitAttack<BrawlerSpec>(360,
-            26, 1f, 4, 15, 1.5f, 0.2f, -0.1f, IntSet.of(5, 10, 19))
+            26, 1f, 4f, 15, 1.5f, 0.2f, -0.1f, IntSet.of(5, 10, 19))
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withBlockStun(5)
-            .withInfo(Component.literal("Combo"), Component.literal("hits 3 times, combo starter/extender"));
+            .withInfo(Component.literal("Combo"), Component.literal("Hits 3 times, vital combo starter/extender."));
+
     public static final SimpleAttack<BrawlerSpec> GUT = new SimpleAttack<BrawlerSpec>(0, 11, 18,
-            1f, 6f, 16, 1.5f, 0.4f, 0f)
+            1f, 6f, 13, 1.5f, 0.9f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
-            .withInfo(Component.literal("Gut Punch"), Component.literal("good stun"));
-    public static final KnockdownAttack<BrawlerSpec> SWEEP = new KnockdownAttack<BrawlerSpec>(0, 11, 18,
-            1f, 5f, 16, 1.5f, 0.6f, 0.85f, 25)
-            .withImpactSound(JSoundRegistry.IMPACT_2)
-            .withStaticY()
-            .withInfo(Component.literal("SWEEP"), Component.literal("knocks down"));
+            .withInfo(Component.literal("Gut Punch"), Component.literal("Good stun, slow startup."));
+
+    public static final KnockdownAttack<BrawlerSpec> SWEEP = new KnockdownAttack<BrawlerSpec>(0, 9, 16,
+        1f, 5f, 16, 1.5f, 0.6f, 0.85f, 25)
+        .withImpactSound(JSoundRegistry.IMPACT_2)
+        .withStaticY()
+        .withInfo(Component.literal("Sweep"), Component.literal("Knocks down."));
+
     public static final SimpleAttack<BrawlerSpec> LOW_KICK = new SimpleAttack<BrawlerSpec>(0, 6, 11,
             1f, 4f, 10, 1.25f, 0.15f, 0.35f)
             .withCrouchingVariant(SWEEP)
@@ -65,7 +71,7 @@ public class BrawlerSpec extends JSpec<BrawlerSpec, BrawlerSpec.State> {
             .withExtraHitBox(0.25, 0, 1)
             .withStaticY()
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.LOW)
-            .withInfo(Component.literal("Right Low Kick"), Component.literal("fast jab"));
+            .withInfo(Component.literal("Right Low Kick"), Component.literal("Fast, short-ranged jab."));
 
     public BrawlerSpec(LivingEntity livingEntity) {
         super(JSpecTypeRegistry.BRAWLER.get(), livingEntity);

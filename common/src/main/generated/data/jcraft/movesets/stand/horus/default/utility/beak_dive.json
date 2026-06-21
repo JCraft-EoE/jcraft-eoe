@@ -1,0 +1,40 @@
+{
+  "anim_state": "DIVEKICK",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:horus_horus_divekick_attack",
+    "attack_extras": {
+      "block_stun": 10,
+      "hit_animation": "HIGH",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 240,
+    "damage": 6.0,
+    "duration": 25,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.horus.default.beak_dive.description"
+      },
+      "mobility_type": "FLIGHT",
+      "name": {
+        "translate": "move.jcraft.horus.default.beak_dive.name"
+      },
+      "ranged": true
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.23,
+    "move_distance": 8.0,
+    "offset": 0.3,
+    "stun": 19,
+    "windup": 8
+  }
+}

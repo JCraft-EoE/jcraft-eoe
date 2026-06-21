@@ -499,6 +499,37 @@ public class JTagProviders {
             discs.add(JItemRegistry.DISC.get());
             discs.add(JItemRegistry.STAND_DISC.get());
             discs.add(JItemRegistry.SPEC_DISC.get());
+            
+            final var ferrous = getOrCreateTagBuilder(JTagRegistry.FERROUS_ITEMS);
+            ferrous.addOptionalTag(ItemTags.IRON_ORES);
+            ferrous.add(Items.RAW_IRON);
+            ferrous.add(Items.RAW_IRON_BLOCK);
+            ferrous.add(Items.IRON_NUGGET);
+            ferrous.add(Items.IRON_INGOT);
+            ferrous.add(Items.IRON_BLOCK);
+            ferrous.add(Items.IRON_BARS);
+            ferrous.add(Items.IRON_DOOR);
+            ferrous.add(Items.IRON_TRAPDOOR);
+            ferrous.add(Items.CHAIN);
+            ferrous.add(Items.IRON_HELMET);
+            ferrous.add(Items.IRON_CHESTPLATE);
+            ferrous.add(Items.IRON_LEGGINGS);
+            ferrous.add(Items.IRON_BOOTS);
+            ferrous.add(Items.CHAINMAIL_HELMET);
+            ferrous.add(Items.CHAINMAIL_CHESTPLATE);
+            ferrous.add(Items.CHAINMAIL_LEGGINGS);
+            ferrous.add(Items.CHAINMAIL_BOOTS);
+            ferrous.add(Items.IRON_HORSE_ARMOR);
+            ferrous.add(Items.IRON_AXE);
+            ferrous.add(Items.IRON_PICKAXE);
+            ferrous.add(Items.IRON_SHOVEL);
+            ferrous.add(Items.IRON_HOE);
+            ferrous.add(Items.IRON_SWORD);
+            ferrous.add(Items.ANVIL);
+            ferrous.add(JItemRegistry.SCALPEL.getId());
+            ferrous.add(JItemRegistry.KNIFE.getId());
+            ferrous.add(JItemRegistry.KNIFEBUNDLE.getId());
+            ferrous.add(JItemRegistry.ROAD_ROLLER.getId());
         }
     }
 
@@ -527,15 +558,19 @@ public class JTagProviders {
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.ZOMBIE));
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.ZOMBIE_VILLAGER));
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.HUSK));
+            canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.DROWNED));
 
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.SKELETON));
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.WITHER_SKELETON));
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.STRAY));
+            //canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.BOGGED));
 
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.VINDICATOR));
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.EVOKER));
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.PILLAGER));
             canHaveStandBuilder.addElement(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.WITCH));
+
+            canHaveStandBuilder.addTag(JTagRegistry.SPEC_USER.location());
 
             // ferromagnetic entities
             TagBuilder ferrousEntitiesBuilder = getOrCreateRawBuilder(JTagRegistry.FERROUS_ENTITIES);
@@ -649,6 +684,33 @@ public class JTagProviders {
             unaffectedByEpitaph.add(EntityType.PAINTING);
             unaffectedByEpitaph.add(EntityType.ARMOR_STAND);
 
+            final var prefersGoldDrip = getOrCreateTagBuilder(JTagRegistry.PREFERS_GOLD_DRIP);
+            prefersGoldDrip.add(EntityType.PIGLIN);
+            prefersGoldDrip.add(EntityType.PIGLIN_BRUTE);
+            prefersGoldDrip.add(EntityType.ZOMBIFIED_PIGLIN);
+
+            final var doesntBreathe = getOrCreateTagBuilder(JTagRegistry.DOESNT_BREATHE);
+            doesntBreathe.add(EntityType.ARMOR_STAND);
+            doesntBreathe.add(JEntityTypeRegistry.ROAD_ROLLER.getId());
+            doesntBreathe.addTag(JTagRegistry.STANDS);
+
+            final var cantBreakBlocks = getOrCreateTagBuilder(JTagRegistry.CANT_BREAK_BLOCKS);
+            // empty
+
+            final var cantHear = getOrCreateTagBuilder(JTagRegistry.CANT_HEAR);
+            cantHear.add(JEntityTypeRegistry.AEROSMITH.get());
+
+            final var bosses = getOrCreateTagBuilder(JTagRegistry.BOSSES);
+            bosses.add(EntityType.ENDER_DRAGON);
+            bosses.add(EntityType.WITHER);
+            bosses.add(EntityType.WARDEN);
+            bosses.add(EntityType.ELDER_GUARDIAN);
+            bosses.add(JEntityTypeRegistry.TONPETTY.getId());
+
+            final var ignoresDamageScaling = getOrCreateTagBuilder(JTagRegistry.IGNORES_DAMAGE_SCALING);
+            ignoresDamageScaling.addTag(JTagRegistry.BOSSES);
+            ignoresDamageScaling.add(EntityType.HORSE);
+
             addTagsForCompatibilities(arg);
         }
 
@@ -673,7 +735,8 @@ public class JTagProviders {
                     .addTag(JTagRegistry.STANDS);
             getOrCreateTagBuilder(TagKey.create(Registries.ENTITY_TYPE,
                     new ResourceLocation("carryon", "entity_blacklist")))
-                    .addTag(JTagRegistry.STANDS);
+                    .addTag(JTagRegistry.STANDS)
+                    .add(JEntityTypeRegistry.PLAYER_CLONE.get());
             getOrCreateTagBuilder(TagKey.create(Registries.ENTITY_TYPE,
                     new ResourceLocation("irons_spellbooks", "cant_root")))
                     .addTag(JTagRegistry.STANDS);
@@ -704,7 +767,8 @@ public class JTagProviders {
                     .add(DamageTypes.IN_FIRE)
                     .add(DamageTypes.LAVA)
                     .add(DamageTypes.FALLING_BLOCK)
-                    .add(DamageTypes.DROWN);
+                    .add(DamageTypes.DROWN)
+                    .add(DamageTypes.IN_WALL);
         }
     }
 }

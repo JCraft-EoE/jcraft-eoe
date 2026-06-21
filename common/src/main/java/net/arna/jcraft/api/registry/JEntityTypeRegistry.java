@@ -281,7 +281,7 @@ public interface JEntityTypeRegistry {
             ).sized(
                     1.2f,
                     0.9f
-            ).build("aerosmith"));
+            ).clientTrackingRange(12).build("aerosmith"));
 
     RegistrySupplier<EntityType<GEREntity>> GER = ENTITY_TYPE_REGISTRY.register(JCraft.id("ger"),
             () -> EntityType.Builder.of(
@@ -710,6 +710,13 @@ public interface JEntityTypeRegistry {
                     MobCategory.CREATURE
             ).sized(0.3f, 0.9f).build("mandom")
     );
+    RegistrySupplier<EntityType<CarbonDioxideRadarEntity>> CO2_RADAR = ENTITY_TYPE_REGISTRY.register(JCraft.id("co2_radar"),
+            () -> EntityType.Builder.of(
+                    WorldOnlyEntityFactory.from(CarbonDioxideRadarEntity::new),
+                    MobCategory.MISC
+            ).sized(0.0f, 0.0f).noSummon().build("co2_radar")
+    );
+
     RegistrySupplier<EntityType<TCBEntity>> TCB = ENTITY_TYPE_REGISTRY.register(JCraft.id("tcb"),
             () -> EntityType.Builder.of(
                     WorldOnlyEntityFactory.from(TCBEntity::new),
@@ -848,7 +855,7 @@ public interface JEntityTypeRegistry {
         EntityAttributeRegistry.register(AYA_TSUJI, AyaTsujiEntity::createAyaTsujiAttributes);
         EntityAttributeRegistry.register(DARBY_OLDER, DarbyOlderEntity::createDarbyOlderAttributes);
         EntityAttributeRegistry.register(DARBY_YOUNGER, DarbyYoungerEntity::createDarbyYoungerAttributes);
-        EntityAttributeRegistry.register(TONPETTY, TonpettyEntity::createTonpettiAttributes);
+        EntityAttributeRegistry.register(TONPETTY, TonpettyEntity::createTonpettyAttributes);
 
         EntityAttributeRegistry.register(METALLICA, MetallicaEntity::createMobAttributes);
         EntityAttributeRegistry.register(THE_HAND, TheHandEntity::createMobAttributes);

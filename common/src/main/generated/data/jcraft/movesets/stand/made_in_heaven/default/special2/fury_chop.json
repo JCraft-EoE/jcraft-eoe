@@ -1,0 +1,44 @@
+{
+  "anim_state": "FURY_CHOP",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "move": {
+    "type": "jcraft:madeinheaven_fury_chop_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 11,
+      "hit_animation": "HIGH",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 24,
+    "damage": 7.0,
+    "duration": 24,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mihfurychop"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact2"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.made_in_heaven.default.fury_chop.description"
+      },
+      "name": {
+        "translate": "move.jcraft.made_in_heaven.default.fury_chop.name"
+      }
+    },
+    "hitbox_size": 1.6,
+    "knockback": 0.25,
+    "move_distance": 0.85,
+    "offset": 0.2,
+    "stun": 20,
+    "windup": 15
+  }
+}

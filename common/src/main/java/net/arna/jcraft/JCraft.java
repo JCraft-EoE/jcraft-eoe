@@ -16,6 +16,8 @@ import mod.azure.azurelib.animation.cache.AzIdentityRegistry;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.misc.ConditionalFlightHandler;
+import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
@@ -38,6 +40,7 @@ import net.arna.jcraft.common.tickable.MoveTickQueue;
 import net.arna.jcraft.common.tickable.PastDimensions;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.villagertrades.VillagerTradesModifier;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
@@ -128,6 +131,7 @@ public final class JCraft {
     public static final GameRules.Key<BooleanValue> ALLOW_MOB_EVOLVED_STANDS = register("allowMobEvolvedStands", Category.MOBS, BooleanValue.create(false));
     public static final GameRules.Key<BooleanValue> STAND_GRIEFING = register("standGriefing", Category.MISC, BooleanValue.create(true));
     public static final GameRules.Key<BooleanValue> KEEP_STAND = register("keepStand", Category.MISC, BooleanValue.create(true));
+    public static final GameRules.Key<BooleanValue> DROP_STAND_AS_DISC = register("dropStandAsDisc", Category.MISC, BooleanValue.create(false));
     public static final GameRules.Key<BooleanValue> KEEP_SPEC = register("keepSpec", Category.MISC, BooleanValue.create(true));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
     public static final GameRules.Key<IntegerValue> STAND_ARROW_BASE_DAMAGE = register("standArrowBaseDamage", Category.MISC, IntegerValue.create(2));
@@ -238,8 +242,10 @@ public final class JCraft {
         STATS.register();
 
         MoveTickQueue.registerMoveTickQueue();
-
         GravityChannel.registerReceivers();
+        JBlockBreaker.init();
+        VillagerTradesModifier.init();
+        ConditionalFlightHandler.init();
 
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);

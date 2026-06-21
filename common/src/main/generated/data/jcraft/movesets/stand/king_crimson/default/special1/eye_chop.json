@@ -1,0 +1,82 @@
+{
+  "anim_state": "EYE_CHOP",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "crouching_variant": {
+    "anim_state": "BLOOD_THROW",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:kingcrimson_blood_throw_attack",
+      "cooldown": 200,
+      "duration": 15,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.king_crimson.default.blood_throw.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.king_crimson.default.blood_throw.cr.name"
+        },
+        "ranged": true
+      },
+      "move_distance": 1.0,
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 4,
+      "extra_hit_boxes": [
+        {
+          "size": 1.0,
+          "vertical_offset": 0.5
+        }
+      ],
+      "hit_animation": "HIGH",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 0,
+    "damage": 9.0,
+    "duration": 29,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:kceyechop"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact9"
+        },
+        {
+          "type": "jcraft:effect",
+          "effects": [
+            {
+              "amplifier": 0,
+              "duration": 200,
+              "effect": "minecraft:blindness"
+            }
+          ],
+          "run": "on_strike"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.king_crimson.default.eye_chop.description"
+      },
+      "name": {
+        "translate": "move.jcraft.king_crimson.default.eye_chop.name"
+      }
+    },
+    "hitbox_size": 1.75,
+    "knockback": 0.7,
+    "move_distance": 1.0,
+    "offset": -0.3,
+    "stun": 27,
+    "windup": 20
+  }
+}

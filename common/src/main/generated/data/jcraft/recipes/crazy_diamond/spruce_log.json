@@ -1,0 +1,8 @@
+{
+  "type": "jcraft:crazy_diamond",
+  "count": 1,
+  "ingredient": {
+    "item": "minecraft:stripped_spruce_log"
+  },
+  "result": "minecraft:spruce_log"
+}

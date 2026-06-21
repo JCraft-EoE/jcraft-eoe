@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:swords",
+    "#minecraft:shovels",
+    "#minecraft:pickaxes",
+    "#minecraft:axes",
+    "#minecraft:hoes",
+    "minecraft:trident",
+    "minecraft:cobblestone",
+    "minecraft:cobbled_deepslate",
+    "minecraft:bone",
+    "minecraft:goat_horn",
+    "jcraft:knife",
+    "jcraft:shiv",
+    "jcraft:scalpel",
+    "jcraft:prison_key"
+  ]
+}

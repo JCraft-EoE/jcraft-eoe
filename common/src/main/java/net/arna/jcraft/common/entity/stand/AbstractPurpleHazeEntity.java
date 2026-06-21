@@ -26,6 +26,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
+import net.arna.jcraft.common.effects.PurpleInfectionEffect;
+import org.jetbrains.annotations.Nullable;
+
 import static net.arna.jcraft.api.registry.JStatusRegistry.PHPOISON;
 
 @Getter
@@ -279,7 +282,8 @@ public abstract sealed class AbstractPurpleHazeEntity<E extends AbstractPurpleHa
         hurtMarked = true;
     }
 
-    public static void infect(LivingEntity target, int ticks) {
+    public static void infect(LivingEntity target, int ticks, @Nullable LivingEntity user) {
+        PurpleInfectionEffect.trackInfector(target, user);
         infect(target, ticks, PHPOISON.get());
     }
 

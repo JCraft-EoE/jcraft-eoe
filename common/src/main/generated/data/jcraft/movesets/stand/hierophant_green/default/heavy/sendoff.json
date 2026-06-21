@@ -1,0 +1,48 @@
+{
+  "anim_state": "SENDOFF",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 12,
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_3",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 0,
+    "damage": 8.0,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:wsdonut"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.hierophant_green.default.sendoff.description"
+      },
+      "name": {
+        "translate": "move.jcraft.hierophant_green.default.sendoff.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 1.5,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 16,
+    "windup": 11
+  }
+}

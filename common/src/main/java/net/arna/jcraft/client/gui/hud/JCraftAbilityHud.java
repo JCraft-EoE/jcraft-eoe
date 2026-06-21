@@ -6,10 +6,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.client.JClientConfig;
+import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.util.ColorUtils;
 import net.arna.jcraft.common.util.CooldownType;
@@ -147,7 +148,8 @@ public class JCraftAbilityHud {
             int selectedY = isMid ? iconSpacing * 11 : 0;
 
             final JSpec<?, ?> spec = JUtils.getSpec(player);
-            if (stand == null) {
+            if (stand == null || (stand instanceof AerosmithEntity as && !as.isAllowingMoveHandling())
+            ) {
                 // Render cooldown HUD for specs
                 if (spec != null) {
                     renderIcons(ctx, SPEC_ICONS, selectedX, selectedY, cooldown -> spec.getType().getId());
@@ -169,7 +171,7 @@ public class JCraftAbilityHud {
 
     public static String cooldownTypeToKeybind(CooldownType type, boolean makeShort) {
         return switch (type) {
-            case STAND_LIGHT ->                 "M1";
+            case LIGHT, STAND_LIGHT ->          "M1";
             case HEAVY, STAND_HEAVY ->          generateName(heavyKey.getParent(), makeShort);
             case BARRAGE, STAND_BARRAGE ->      generateName(barrageKey.getParent(), makeShort);
             case ULTIMATE, STAND_ULTIMATE ->    generateName(ultKey.getParent(), makeShort);

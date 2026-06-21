@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "jcraft:stand_arrowhead"
+    },
+    "B": {
+      "item": "jcraft:polished_meteorite_block"
+    },
+    "D": {
+      "item": "jcraft:disc"
+    }
+  },
+  "pattern": [
+    "BBB",
+    "BAB",
+    "BDB"
+  ],
+  "result": {
+    "item": "jcraft:stand_disc"
+  },
+  "show_notification": true
+}

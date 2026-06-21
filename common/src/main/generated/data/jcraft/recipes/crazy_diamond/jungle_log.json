@@ -1,0 +1,8 @@
+{
+  "type": "jcraft:crazy_diamond",
+  "count": 1,
+  "ingredient": {
+    "item": "minecraft:stripped_jungle_log"
+  },
+  "result": "minecraft:jungle_log"
+}

@@ -1,0 +1,55 @@
+{
+  "anim_state": "DIRECTIONAL_SHIFT",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "crouching_variant": {
+    "anim_state": "GRAV_SHIFT",
+    "class": "ULTIMATE",
+    "cooldown_type": "STAND_ULTIMATE",
+    "move": {
+      "type": "jcraft:cmoon_gravity_shift_move",
+      "cooldown": 1400,
+      "duration": 32,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:cmoongravshift"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.c_moon.default.gravity_shift_radial.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.c_moon.default.gravity_shift_radial.cr.name"
+        }
+      },
+      "move_distance": 1.0,
+      "windup": 20
+    }
+  },
+  "move": {
+    "type": "jcraft:cmoon_gravity_shift_pulse_move",
+    "cooldown": 1400,
+    "duration": 32,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:cmoondirectionalshift"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.c_moon.default.gravity_shift_directional.description"
+      },
+      "name": {
+        "translate": "move.jcraft.c_moon.default.gravity_shift_directional.name"
+      }
+    },
+    "move_distance": 1.0,
+    "radius": 16,
+    "windup": 20
+  }
+}

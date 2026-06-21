@@ -253,6 +253,30 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .unlockedBy("has_sand", InventoryChangeTrigger.TriggerInstance.hasItems(Items.SAND))
                 .unlockedBy("has_magma_block", InventoryChangeTrigger.TriggerInstance.hasItems(Items.MAGMA_BLOCK))
                 .save(exporter);
+        // Bullet
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.BULLET.get(), 8)
+                .pattern(" D ")
+                .pattern("ACA")
+                .pattern("ABA")
+                .define('A', Items.GOLD_NUGGET)
+                .define('B', Items.POLISHED_BLACKSTONE_BUTTON)
+                .define('C', Items.GUNPOWDER)
+                .define('D', Items.COPPER_INGOT)
+                .unlockedBy("has_copper", InventoryChangeTrigger.TriggerInstance.hasItems(Items.COPPER_INGOT))
+                .save(exporter);
+        // Peacemaker
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.PEACEMAKER.get())
+                .pattern(" AB")
+                .pattern("CDC")
+                .pattern(" EF")
+                .define('A', Items.HEAVY_WEIGHTED_PRESSURE_PLATE)
+                .define('B', Items.IRON_INGOT)
+                .define('C', Items.IRON_INGOT)
+                .define('D', Items.IRON_BLOCK)
+                .define('E', Items.IRON_BARS)
+                .define('F', Items.STRIPPED_OAK_WOOD)
+                .unlockedBy("has_iron", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_INGOT))
+                .save(exporter);
         // Anubis sheathed
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.ANUBIS_SHEATHED.get())
                 .pattern("LSI")
@@ -316,13 +340,14 @@ public class JRecipeProvider extends FabricRecipeProvider {
         // road roller
         ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, JItemRegistry.ROAD_ROLLER.get())
                 .pattern("BYY")
-                .pattern("III")
+                .pattern("IQI")
                 .pattern("GFG")
                 .define('B', Items.IRON_BARS)
                 .define('I', Items.IRON_BLOCK)
                 .define('Y', Items.YELLOW_DYE)
                 .define('F', Items.BLAST_FURNACE)
                 .define('G', Items.GRINDSTONE)
+                .define('Q', JItemRegistry.GAS_CAN.get())
                 .unlockedBy("has_iron_block", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_BLOCK))
                 .save(exporter);
 

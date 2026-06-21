@@ -1,0 +1,38 @@
+{
+  "criteria": {
+    "has_ore": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:meteorite_iron_ore_block"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "jcraft:textures/block/foolish_sand_block.png",
+    "description": {
+      "translate": "advancements.jcraft.obtain_meteorite_iron_ore.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:meteorite_iron_ore_block"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_meteorite_iron_ore.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_ore"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

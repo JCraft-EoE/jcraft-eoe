@@ -26,8 +26,10 @@ import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
 import net.arna.jcraft.client.rendering.handler.MandomRewindShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.sound.BoundSoundClient;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.common.config.ConfigOption;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
@@ -92,6 +94,16 @@ public class ClientPacketHandler {
         register(S2C_MANDOM_DATA, ClientPacketHandler::handleMandomData);
         register(S2C_IPS_TRIGGERED, ClientPacketHandler::handleIPSTriggered);
         register(S2C_DAMAGE_NUMBER, ClientPacketHandler::handleDamageNumber);
+        register(S2C_BLOCK_BREAKAGE, ClientPacketHandler::handleBlockBreakage);
+        register(S2C_BOUND_SOUND, ClientPacketHandler::handleBoundSound);
+    }
+
+    private static void handleBoundSound(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
+        BoundSoundClient.onBoundSoundPacket(client, buf);
+    }
+
+    private static void handleBlockBreakage(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
+        BlockBreakerClient.onBreakagePacket(buf);
     }
 
     private static void handleDamageNumber(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
@@ -129,9 +141,14 @@ public class ClientPacketHandler {
         );
 
         client.execute(() -> {
+            if (client.level == null) return;
+
             for (int i = 0; i < NUM_MAGNETIC_CIRCLES; i++) {
                 final double phi = i * Math.PI * 2 / NUM_MAGNETIC_CIRCLES;
-                final Vec3 direction = new Vec3(Math.cos(phi), 0, Math.sin(phi));
+                Vec3 direction = new Vec3(Math.cos(phi), 0, Math.sin(phi));
+
+                if (strength < 0) // exploding
+                    direction = direction.add(JUtils.randUnitVec(client.level.random));
 
                 final Vec3 basePos = pos.add(direction.scale(strength / 2.0));
 
@@ -636,7 +653,7 @@ public class ClientPacketHandler {
         final boolean editable = buf.readBoolean();
         final boolean show = buf.readBoolean();
 
-        ConfigOption.readOptions(buf);
+        JServerConfig.readOptions(buf);
 
         if (show) {
             client.execute(() -> ServerConfigUI.show(editable));

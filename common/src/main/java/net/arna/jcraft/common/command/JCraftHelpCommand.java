@@ -38,14 +38,22 @@ public class JCraftHelpCommand {
                         Makes the target block or unblock with their stand
                         §c/spec about§r
                         Displays all relevant Spec information
+                        §c/spec clear§r
+                        Clears your current spec
+                        §c/spec reset§r
+                        Resets spec data
                         §c/spec set§r
                         Sets your spec
+                        §c/spec unlock§r
+                        Fully progresses your current spec (only if it has a progression system)
                         §c/attack§r
                         Causes targets to start a spec/stand attack, which IGNORES COOLDOWNS
                         §c/framedata§r
                         Displays information about moves your stand or spec did after starting the command
                         §c/jgravity§r
                         Sets your gravity direction
+                        §c/jwiki§r
+                        Sends a link to the OFFICIAL Jcraft:EoE Wiki
                         """), false
         );
         // https://trello.com/b/B5Q7ZthB/jcraft-eyes-of-ender-community-trello

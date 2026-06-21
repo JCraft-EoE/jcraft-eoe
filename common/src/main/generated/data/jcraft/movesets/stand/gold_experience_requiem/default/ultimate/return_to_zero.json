@@ -1,0 +1,46 @@
+{
+  "anim_state": "SETUP",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:goldexperience_requiem_return_to_zero_move",
+    "cooldown": 1200,
+    "duration": 32,
+    "extractor": "jcraft:all",
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:gersetup"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.gold_experience_requiem.default.return_to_zero.description"
+      },
+      "name": {
+        "translate": "move.jcraft.gold_experience_requiem.default.return_to_zero.name"
+      }
+    },
+    "injector": "jcraft:all",
+    "move_distance": 1.0,
+    "radius": 64,
+    "reach": 200,
+    "rewindIds": [
+      "minecraft:active_effects",
+      "minecraft:air",
+      "jcraft:blood_gauge",
+      "minecraft:fall_distance",
+      "minecraft:food_data",
+      "jcraft:hamon_charge",
+      "minecraft:health",
+      "minecraft:pos",
+      "minecraft:vehicle",
+      "minecraft:vel",
+      "minecraft:xrot",
+      "minecraft:yheadrot",
+      "minecraft:yrot"
+    ],
+    "windup": 30
+  }
+}

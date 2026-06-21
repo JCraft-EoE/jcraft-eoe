@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#minecraft:skeletons",
+      "required": false
+    },
+    "#jcraft:stands",
+    "minecraft:iron_golem",
+    "minecraft:snow_golem",
+    "jcraft:training_dummy",
+    "jcraft:roadroller",
+    "jcraft:blockprojectile",
+    "jcraft:hg_net",
+    "jcraft:hamon_wave",
+    "jcraft:lifedetector",
+    "jcraft:redbind",
+    "jcraft:sandtornado",
+    "jcraft:sha"
+  ]
+}

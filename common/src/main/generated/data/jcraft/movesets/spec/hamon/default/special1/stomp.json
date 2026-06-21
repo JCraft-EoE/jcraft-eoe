@@ -1,0 +1,44 @@
+{
+  "anim_state": "STOMP",
+  "class": "SPECIAL1",
+  "cooldown_type": "SPECIAL1",
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 7,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1",
+      "static_height": true
+    },
+    "cooldown": 0,
+    "damage": 3.0,
+    "duration": 13,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact4"
+        },
+        {
+          "type": "jcraft:notify_hamon_stomp_action",
+          "run": "on_strike"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.hamon.default.stomp.description"
+      },
+      "name": {
+        "translate": "move.jcraft.hamon.default.stomp.name"
+      }
+    },
+    "hitbox_size": 1.25,
+    "knockback": 0.5,
+    "move_distance": 1.0,
+    "offset": 0.4,
+    "stun": 9,
+    "windup": 7
+  }
+}

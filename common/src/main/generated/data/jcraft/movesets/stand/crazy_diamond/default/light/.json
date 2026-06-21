@@ -1,0 +1,32 @@
+{
+  "anim_state": "LIGHT",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "move": {
+    "type": "jcraft:shared_restoration_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 34,
+    "damage": 5.0,
+    "duration": 14,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.crazy_diamond.default.null.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.crazy_diamond.default.null.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.3,
+    "move_distance": 0.75,
+    "offset": -0.1,
+    "stun": 20,
+    "windup": 6
+  }
+}

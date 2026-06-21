@@ -1,0 +1,8 @@
+{
+  "type": "jcraft:crazy_diamond",
+  "count": 1,
+  "ingredient": {
+    "item": "minecraft:stripped_mangrove_log"
+  },
+  "result": "minecraft:mangrove_log"
+}

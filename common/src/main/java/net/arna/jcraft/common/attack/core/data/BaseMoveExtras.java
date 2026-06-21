@@ -54,7 +54,9 @@ public class BaseMoveExtras {
                             i -> i.isEmpty() ? Optional.empty() : Optional.of(i.getAsInt()))
                     .forGetter(BaseMoveExtras::getFollowupFrame),
 
-            Codec.BOOL.optionalFieldOf("loop_prevention", true).forGetter(BaseMoveExtras::isLoopPrevention)
+            Codec.BOOL.optionalFieldOf("loop_prevention", true).forGetter(BaseMoveExtras::isLoopPrevention),
+
+            Codec.BOOL.optionalFieldOf("lingering_sounds", false).forGetter(BaseMoveExtras::isLingeringSounds)
     ).apply(instance, BaseMoveExtras::new));
     private Component name = Component.empty();
     private Component description = Component.empty();
@@ -68,12 +70,13 @@ public class BaseMoveExtras {
     private Optional<IntObjectPair<AbstractMove<?, ?>>> finisher = Optional.empty();
     private OptionalInt followupFrame = OptionalInt.empty();
     private boolean loopPrevention = true;
+    private boolean lingeringSounds = false;
 
     private BaseMoveExtras(final Component name, final Component description, final List<MoveCondition<?, ?>> conditions,
                            final List<MoveAction<?, ?>> actions,
                            final int armor, Optional<MobilityType> mobilityType, final Optional<Boolean> isHoldable, final boolean ranged,
                            final boolean mayHitUser, final Optional<IntObjectPair<AbstractMove<?, ?>>> finisher,
-                           final OptionalInt followupFrame, final boolean loopPrevention) {
+                           final OptionalInt followupFrame, final boolean loopPrevention, final boolean lingeringSounds) {
         this.name = name;
         this.description = description;
         this.conditions.addAll(conditions);
@@ -86,6 +89,7 @@ public class BaseMoveExtras {
         this.finisher = finisher;
         this.followupFrame = followupFrame;
         this.loopPrevention = loopPrevention;
+        this.lingeringSounds = lingeringSounds;
     }
 
     @SuppressWarnings({"unchecked", "RedundantCast", "rawtypes"})
@@ -94,7 +98,7 @@ public class BaseMoveExtras {
                 (List<MoveAction<?, ?>>) (List) move.getActions(),
                 move.getArmor(), Optional.ofNullable(move.getMobilityType()), Optional.ofNullable(move.getIsHoldable()),
                 move.isRanged(), move.isMayHitUser(), Optional.ofNullable((IntObjectPair<AbstractMove<?, ?>>) (IntObjectPair) move.getFinisher()),
-                move.getFollowupFrame(), move.isLoopPrevention());
+                move.getFollowupFrame(), move.isLoopPrevention(), move.isLingeringSounds());
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"}) // generic types and (de)serialization don't mix well

@@ -261,7 +261,7 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
             return;
         }
         if (tsTime < 1) {
-            if ( (getCurrentMove() != null || getState() == State.CHARGE_HIT) && getMoveStun() == 1 && getState() != State.COUNTER) {
+            if ( (getCurrentMove() != null || getState() == State.CHARGE_HIT) && getMoveStun() == 1 && getState() != State.COUNTER && getState() != State.ITEM_TOSS_CHARGE) {
                 // Stay in final attack pose
                 setCurrentMove(null);
                 setMoveStun(desummonTime);

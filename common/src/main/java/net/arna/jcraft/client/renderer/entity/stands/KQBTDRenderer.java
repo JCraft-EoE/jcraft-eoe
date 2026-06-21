@@ -11,7 +11,10 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 public class KQBTDRenderer extends StandEntityRenderer<KQBTDEntity> {
 
     public KQBTDRenderer(final EntityRendererProvider.Context context) {
-        super(context, b -> b.addRenderLayer(new KQBTDEyesLayer()), JStandTypeRegistry.KILLER_QUEEN_BITES_THE_DUST.get(), 0f, -0.2f);
+        super(context, b -> b
+                .addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>())
+                .addRenderLayer(new KQBTDEyesLayer()),
+                JStandTypeRegistry.KILLER_QUEEN_BITES_THE_DUST.get(), 0f, -0.2f);
     }
 
 }

@@ -1,0 +1,25 @@
+{
+  "anim_state": "TIME_SKIP",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:shared_time_skip_move",
+    "cooldown": 300,
+    "duration": 2,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.the_world_over_heaven.default.timeskip.description"
+      },
+      "mobility_type": "TELEPORT",
+      "name": {
+        "translate": "move.jcraft.the_world_over_heaven.default.timeskip.name"
+      }
+    },
+    "move_distance": 1.0,
+    "range": 14.0,
+    "sounds": [
+      "jcraft:twohtimeskip"
+    ],
+    "windup": 2
+  }
+}

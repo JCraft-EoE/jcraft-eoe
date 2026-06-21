@@ -30,9 +30,9 @@ public class CrazyDiamondEntity extends StandEntity<CrazyDiamondEntity, CrazyDia
 
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<CrazyDiamondEntity> TOSS = new TossMove<CrazyDiamondEntity>(0, 1, 1, 0.75f)
+    public static final TossMove<CrazyDiamondEntity> TOSS = new TossMove<CrazyDiamondEntity>(0, 1, 1, 0.75f,0.13f)
             .withAnim(CrazyDiamondEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<CrazyDiamondEntity> TOSS_CHARGE = new TossChargeMove<CrazyDiamondEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<CrazyDiamondEntity> TOSS_CHARGE = new TossChargeMove<CrazyDiamondEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
     public static final StandData DATA = StandData.builder()

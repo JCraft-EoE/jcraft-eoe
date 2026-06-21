@@ -1,0 +1,31 @@
+{
+  "parent": "jcraft:obtain_any_spec",
+  "criteria": {
+    "breathed": {
+      "conditions": {},
+      "trigger": "jcraft:hamon1"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.jcraft.hamon1.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:spec_disc",
+      "nbt": "{SpecID:\"jcraft:hamon\"}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.hamon1.title"
+    }
+  },
+  "requirements": [
+    [
+      "breathed"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

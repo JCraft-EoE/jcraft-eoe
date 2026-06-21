@@ -1,0 +1,28 @@
+{
+  "anim_state": "DIM_HOP",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:dirtydeedsdonedirtcheap_clone_spawn_move",
+    "cooldown": 300,
+    "duration": 50,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:d4cdimhop"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.d4c.default.dimensional_clone.description"
+      },
+      "name": {
+        "translate": "move.jcraft.d4c.default.dimensional_clone.name"
+      },
+      "ranged": true
+    },
+    "move_distance": 1.0,
+    "windup": 40
+  }
+}

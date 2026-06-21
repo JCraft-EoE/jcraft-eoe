@@ -1,0 +1,77 @@
+{
+  "anim_state": "BARRAGE",
+  "class": "BARRAGE",
+  "cooldown_type": "STAND_BARRAGE",
+  "move": {
+    "type": "jcraft:shared_main_barrage_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 3,
+      "hit_animation": "MID",
+      "shockwaves": true,
+      "stun_type": "WINDED"
+    },
+    "cooldown": 200,
+    "damage": 1.0,
+    "duration": 32,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mihbarrage"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.made_in_heaven.default.barrage.description"
+      },
+      "finisher": {
+        "move": {
+          "type": "jcraft:shared_simple_attack",
+          "attack_extras": {
+            "backstab": true,
+            "block_stun": 5,
+            "hit_animation": "LAUNCH",
+            "hit_spark": "HIT_SPARK_2",
+            "override_stun": true,
+            "shockwaves": true,
+            "stun_type": "LAUNCH"
+          },
+          "cooldown": 0,
+          "damage": 1.0,
+          "duration": 9,
+          "extras": {
+            "name": {
+              "text": "Barrage (Final Hit)"
+            }
+          },
+          "hitbox_size": 1.5,
+          "knockback": 1.1,
+          "move_distance": 0.85,
+          "offset": 0.0,
+          "stun": 10,
+          "windup": 6
+        },
+        "tick": 23
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.made_in_heaven.default.barrage.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "interval": 2,
+    "knockback": 0.1,
+    "mineable_hardness": 2.0,
+    "move_distance": 0.85,
+    "offset": 0.0,
+    "stun": 10,
+    "windup": 0
+  }
+}

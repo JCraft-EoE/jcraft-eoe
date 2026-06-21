@@ -1,0 +1,29 @@
+{
+  "idle_rotation": 220.0,
+  "info": {
+    "con_count": 3,
+    "free_space": {
+      "translate": "entity.jcraft.cream.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.cream"
+    },
+    "pro_count": 4,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.cream.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.cream.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.cream.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:creamsummon"
+    }
+  }
+}

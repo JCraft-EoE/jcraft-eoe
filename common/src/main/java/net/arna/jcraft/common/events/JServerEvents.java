@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
@@ -22,6 +23,7 @@ import net.arna.jcraft.common.entity.StandMeteorEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.item.AuMockItem;
 import net.arna.jcraft.common.item.RewindMockItem;
+import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
@@ -43,6 +45,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -239,9 +242,10 @@ public class JServerEvents {
                 case BLOCK_ATTRACTION -> {
                     BlockPos attractionBlockPos = interest.getAttractionBlockPos();
                     if (entity.distanceToSqr(attractionBlockPos.getX(), attractionBlockPos.getY(), attractionBlockPos.getZ()) < 4) {
-                        boolean griefing = serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING);
-                        dimensionalExplosion(serverWorld, griefing, entity);
-                        if (griefing) {
+                        // Only grief (and remove the attracted block) where the responsible entity is allowed to.
+                        boolean mayBreak = AbstractMove.mayBreak(serverWorld, attractionUser(entity), attractionBlockPos, null);
+                        dimensionalExplosion(serverWorld, mayBreak, entity);
+                        if (mayBreak) {
                             serverWorld.setBlockAndUpdate(attractionBlockPos, Blocks.AIR.defaultBlockState());
                         }
                     } else {
@@ -271,7 +275,12 @@ public class JServerEvents {
                                 entity.hurtMarked = true;
 
                                 if (item2.distanceTo(entity) <= 1.0) {
-                                    dimensionalExplosion(serverWorld, serverWorld.getGameRules().getBoolean(JCraft.STAND_GRIEFING), entity, item2);
+                                    // The annihilation happens at the midpoint between the two items; only grief there if allowed.
+                                    Vec3 midPos = item.position().add(item2.position()).scale(0.5);
+                                    LivingEntity user = attractionUser(item);
+                                    if (user == null) user = attractionUser(item2);
+                                    boolean mayBreak = AbstractMove.mayBreak(serverWorld, user, BlockPos.containing(midPos), null);
+                                    dimensionalExplosion(serverWorld, mayBreak, entity, item2);
                                     saveForNextIteration = false;
                                 }
                             }
@@ -292,6 +301,17 @@ public class JServerEvents {
             AttackerDataPacket.send(server.getPlayerList().getPlayers());
             AttackerDataLoader.setDirty(false);
         }
+    }
+
+    /**
+     * Resolves the {@link LivingEntity} responsible for an attracted entity (the thrower of the item),
+     * used as the claim/protection subject when deciding whether the annihilation may break blocks.
+     * Returns {@code null} when no living owner is known, in which case only the mob-griefing/spawn-protection
+     * rules apply.
+     */
+    @Nullable
+    private static LivingEntity attractionUser(Entity entity) {
+        return entity instanceof ItemEntity item && item.getOwner() instanceof LivingEntity owner ? owner : null;
     }
 
     private static void dimensionalExplosion(ServerLevel serverWorld, boolean griefing, Entity one) {
@@ -457,9 +477,11 @@ public class JServerEvents {
             if (Platform.isModLoaded("jjbacosplay")) {
                 List<CosplayItem<?>> slottedCosplay = COSPLAY.get(slot);
                 if (!slottedCosplay.isEmpty()) {
-                    ArmorItem selected = JUtils.chooseRandom(random,
-                            slottedCosplay.get(random.nextInt(slottedCosplay.size())).getAll()
-                    ).get();
+                    final boolean goldPreferred = mob.getType().is(JTagRegistry.PREFERS_GOLD_DRIP);
+                    final CosplayItem<?> randomCosplay = slottedCosplay.get(random.nextInt(slottedCosplay.size()));
+                    ArmorItem selected = goldPreferred && randomCosplay.get(ArmorMaterials.GOLD) != null
+                        ? randomCosplay.get(ArmorMaterials.GOLD).get()
+                        : JUtils.chooseRandom(random, randomCosplay.getAll()).get();
                     itemStack = new ItemStack(selected);
                     if (VANILLA_MATERIAL.contains(selected.getMaterial())) {
                         armorLevel = ((ArmorMaterials) selected.getMaterial()).ordinal();
@@ -525,7 +547,16 @@ public class JServerEvents {
             if (living instanceof final ServerPlayer serverPlayer) {
                 final GameRules gameRules = serverWorld.getGameRules();
 
-                if (!gameRules.getBoolean(JCraft.KEEP_STAND)) {
+                if (gameRules.getBoolean(JCraft.DROP_STAND_AS_DISC)) {
+                    final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(living);
+                    final StandType standType = standData.getType();
+                    if (standType != null && standType != JStandTypeRegistry.NONE.get()) {
+                        final int skin = Math.max(0, Math.min(standData.getSkin(), standType.getData().getInfo().getSkinCount() - 1));
+                        final ItemStack disc = StandDiscItem.createDiscStack(standType, skin);
+                        Containers.dropItemStack(serverWorld, living.getX(), living.getY(), living.getZ(), disc);
+                    }
+                    standData.setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0, false);
+                } else if (!gameRules.getBoolean(JCraft.KEEP_STAND)) {
                     JComponentPlatformUtils.getStandComponent(living).setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0, false);
                 }
 
@@ -687,7 +718,7 @@ public class JServerEvents {
     }
 
     public static EventResult beforeBlockSet(final @NonNull BlockPos blockPos, final @NonNull BlockState oldBlockState, final @NonNull BlockState newBlockState, final @NonNull Level level) {
-        if (oldBlockState.is(BlockTags.LEAVES) && newBlockState.is(BlockTags.LEAVES)) {
+        if (level.isClientSide() || oldBlockState.is(BlockTags.LEAVES) && newBlockState.is(BlockTags.LEAVES)) {
             return EventResult.pass();
         }
 

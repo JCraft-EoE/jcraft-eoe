@@ -7,10 +7,9 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMultiHitAttack;
-import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -41,12 +40,6 @@ public class BloodSuckHitsAttack extends AbstractMultiHitAttack<BloodSuckHitsAtt
         user.heal(1);
         attacker.getVampireComponent().setBlood(attacker.getVampireComponent().getBlood() + 2 * bloodMult);
         JUtils.serverPlaySound(JSoundRegistry.VAMPIRE_SUCK.get(), (ServerLevel) user.level(), user.position(), 32);
-        return targets;
-    }
-
-    @Override
-    protected Set<LivingEntity> validateTargets(VampireSpec attacker, Set<LivingEntity> targets) {
-        targets.removeIf(t -> t.getType().is(JTagRegistry.BLOODLESS_ENTITIES));
         return targets;
     }
 

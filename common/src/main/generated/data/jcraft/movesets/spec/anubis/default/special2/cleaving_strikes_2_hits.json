@@ -1,0 +1,48 @@
+{
+  "anim_state": "REKKA2",
+  "class": "SPECIAL2",
+  "cooldown_type": "SPECIAL2",
+  "move": {
+    "type": "jcraft:anubis_simple_anubis_multi_hit_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 30,
+    "damage": 4.0,
+    "duration": 26,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:anubisrekka2"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact9"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.anubis.default.cleaving_strikes_2_hits.description"
+      },
+      "name": {
+        "translate": "move.jcraft.anubis.default.cleaving_strikes_2_hits.name"
+      }
+    },
+    "hit_moments": [
+      8,
+      20
+    ],
+    "hitbox_size": 1.75,
+    "knockback": 0.2,
+    "move_distance": 1.0,
+    "offset": -0.1,
+    "stun": 15,
+    "unsheathe_sweep": false
+  }
+}

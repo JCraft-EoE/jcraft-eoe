@@ -1,0 +1,93 @@
+{
+  "anim_state": "DUAL_CHOP",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "crouching_variant": {
+    "anim_state": "SWEEP",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_knockdown_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 6,
+        "extra_hit_boxes": [
+          {
+            "size": 1.0
+          }
+        ],
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 0,
+      "damage": 5.0,
+      "duration": 20,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact4"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.king_crimson.default.sweep.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.king_crimson.default.sweep.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.4,
+      "knockdown_duration": 35,
+      "move_distance": 0.85,
+      "offset": 0.3,
+      "stun": 20,
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_multi_hit_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 40,
+    "damage": 4.0,
+    "duration": 23,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:kcdualchop"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact4"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.king_crimson.default.dual_chop.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.king_crimson.default.dual_chop.name"
+      }
+    },
+    "hit_moments": [
+      10,
+      16
+    ],
+    "hitbox_size": 1.5,
+    "knockback": 0.2,
+    "move_distance": 0.85,
+    "offset": -0.1,
+    "stun": 21
+  }
+}

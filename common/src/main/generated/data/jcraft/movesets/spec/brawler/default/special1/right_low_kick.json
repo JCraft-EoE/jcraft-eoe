@@ -1,0 +1,87 @@
+{
+  "anim_state": "LOW_KICK",
+  "class": "SPECIAL1",
+  "cooldown_type": "SPECIAL1",
+  "crouching_variant": {
+    "anim_state": "SWEEP",
+    "class": "SPECIAL1",
+    "cooldown_type": "SPECIAL1",
+    "move": {
+      "type": "jcraft:shared_knockdown_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1",
+        "static_height": true
+      },
+      "cooldown": 0,
+      "damage": 5.0,
+      "duration": 16,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact2"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.brawler.default.sweep.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.brawler.default.sweep.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.6,
+      "knockdown_duration": 25,
+      "move_distance": 1.0,
+      "offset": 0.85,
+      "stun": 16,
+      "windup": 9
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "extra_hit_boxes": [
+        {
+          "forward_offset": 0.25,
+          "size": 1.0
+        }
+      ],
+      "hit_animation": "LOW",
+      "hit_spark": "HIT_SPARK_1",
+      "static_height": true
+    },
+    "cooldown": 0,
+    "damage": 4.0,
+    "duration": 11,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact6"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.brawler.default.right_low_kick.description"
+      },
+      "name": {
+        "translate": "move.jcraft.brawler.default.right_low_kick.name"
+      }
+    },
+    "hitbox_size": 1.25,
+    "knockback": 0.15,
+    "move_distance": 1.0,
+    "offset": 0.35,
+    "stun": 10,
+    "windup": 6
+  }
+}

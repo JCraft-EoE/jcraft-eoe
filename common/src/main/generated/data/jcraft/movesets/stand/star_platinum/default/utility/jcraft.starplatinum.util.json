@@ -1,0 +1,22 @@
+{
+  "anim_state": "JUMP",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:shared_jump_move",
+    "cooldown": 300,
+    "duration": 14,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.star_platinum.default.stand_jump.description"
+      },
+      "mobility_type": "DASH",
+      "name": {
+        "translate": "jcraft.starplatinum.util"
+      }
+    },
+    "move_distance": 1.0,
+    "strength": 1.5,
+    "windup": 5
+  }
+}

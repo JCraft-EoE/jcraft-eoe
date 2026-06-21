@@ -27,6 +27,6 @@ public class GERScorpionRenderer extends AbstractEntityRenderer<GERScorpionEntit
                 )
                 .setAnimatorProvider(() -> new EntityAnimator<>(ID))
                 .build(),
-                context, ID);
+                context);
     }
 }

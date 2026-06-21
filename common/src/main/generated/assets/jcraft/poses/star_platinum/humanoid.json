@@ -1,0 +1,62 @@
+{
+  "type": "group",
+  "modifiers": [
+    {
+      "type": "group",
+      "conditions": [
+        "LEFT_ARM_EMPTY"
+      ],
+      "modifiers": [
+        {
+          "type": "custom",
+          "operation": "SET",
+          "part": "leftArm",
+          "property": "X_ROT",
+          "value": 0.0
+        },
+        {
+          "type": "custom",
+          "operation": "SET",
+          "part": "leftArm",
+          "property": "Y_ROT",
+          "value": -0.2617994
+        },
+        {
+          "type": "custom",
+          "operation": "SET",
+          "part": "leftArm",
+          "property": "Z_ROT",
+          "value": 0.08726646
+        },
+        {
+          "type": "empty"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "conditions": [
+        "RIGHT_ARM_EMPTY"
+      ],
+      "modifiers": [
+        {
+          "type": "custom",
+          "operation": "SET",
+          "part": "rightArm",
+          "property": "Z_ROT",
+          "value": 0.2617994
+        },
+        {
+          "type": "custom",
+          "operation": "MULTIPLY",
+          "part": "rightArm",
+          "property": "X_ROT",
+          "value": 0.5
+        },
+        {
+          "type": "empty"
+        }
+      ]
+    }
+  ]
+}

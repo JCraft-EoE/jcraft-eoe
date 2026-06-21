@@ -1,0 +1,32 @@
+{
+  "anim_state": "SPEED_SLICE",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:madeinheaven_speed_slice_attack",
+    "cooldown": 300,
+    "damage": 6.0,
+    "duration": 11,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mihspeedslice"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.made_in_heaven.default.speed_slice.description"
+      },
+      "mobility_type": "TELEPORT",
+      "name": {
+        "translate": "move.jcraft.made_in_heaven.default.speed_slice.name"
+      },
+      "ranged": true
+    },
+    "hitbox_size": 1.5,
+    "knockback": 1.0,
+    "move_distance": 1.25,
+    "windup": 10
+  }
+}

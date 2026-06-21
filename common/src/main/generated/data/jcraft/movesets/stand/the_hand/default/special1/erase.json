@@ -1,0 +1,93 @@
+{
+  "anim_state": "ERASE",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "crouching_variant": {
+    "anim_state": "ERASE_GROUND",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:thehand_erase_ground_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 12,
+        "blockable_type": "NON_BLOCKABLE",
+        "hit_animation": "MID",
+        "hit_spark": "INVERTED_HIT_SPARK_3",
+        "static_height": true
+      },
+      "cooldown": 120,
+      "damage": 8.0,
+      "duration": 29,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:thswipe"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact12"
+          }
+        ],
+        "armor": 2,
+        "description": {
+          "translate": "move.jcraft.the_hand.default.erase.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_hand.default.erase.cr.name"
+        }
+      },
+      "hitbox_size": 2.0,
+      "knockback": 0.0,
+      "move_distance": 0.75,
+      "offset": 0.35,
+      "stun": 14,
+      "windup": 18
+    }
+  },
+  "move": {
+    "type": "jcraft:thehand_erase_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 12,
+      "blockable_type": "NON_BLOCKABLE",
+      "hit_animation": "MID",
+      "hit_spark": "INVERTED_HIT_SPARK_3"
+    },
+    "cooldown": 120,
+    "damage": 8.0,
+    "duration": 29,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:thswipe"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact12"
+        }
+      ],
+      "armor": 2,
+      "description": {
+        "translate": "move.jcraft.the_hand.default.erase.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_hand.default.erase.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 0.0,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 14,
+    "windup": 18
+  }
+}

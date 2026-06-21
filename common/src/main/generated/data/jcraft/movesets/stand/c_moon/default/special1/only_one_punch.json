@@ -1,0 +1,58 @@
+{
+  "anim_state": "GRAV_PUNCH",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:cmoon_grav_punch_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 12,
+      "blockable_type": "NON_BLOCKABLE_EFFECTS_ONLY",
+      "extra_hit_boxes": [
+        {
+          "size": 1.0
+        }
+      ],
+      "hit_animation": "MID",
+      "hit_spark": "INVERTED_HIT_SPARK_3"
+    },
+    "cooldown": 300,
+    "damage": 8.0,
+    "duration": 32,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:cmoongravpunch"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:cmoongravpunchhit"
+        },
+        {
+          "type": "jcraft:cmoon_inversion",
+          "damage": 0.5,
+          "run": "on_strike",
+          "slow": false,
+          "time": 40
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.c_moon.default.only_one_punch.description"
+      },
+      "name": {
+        "translate": "move.jcraft.c_moon.default.only_one_punch.name"
+      }
+    },
+    "hitbox_size": 1.75,
+    "knockback": 0.35,
+    "move_distance": 1.0,
+    "offset": -0.3,
+    "stun": 45,
+    "windup": 20
+  }
+}

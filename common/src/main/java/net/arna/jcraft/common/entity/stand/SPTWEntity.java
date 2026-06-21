@@ -167,7 +167,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                     Component.translatable("jcraft.generic.ts"),
                     Component.literal("1.75 seconds, extremely low windup")
             );
-    public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(300, 14)
+    public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.STAR_PLATINUM_TIMESKIP)
             .withInfo(
                     Component.translatable("jcraft.generic.tp"),
@@ -175,9 +175,9 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<SPTWEntity> TOSS = new TossMove<SPTWEntity>(0, 1, 1, 0.75f)
+    public static final TossMove<SPTWEntity> TOSS = new TossMove<SPTWEntity>(0, 1, 1, 0.75f, 0.15f)
             .withAnim(SPTWEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<SPTWEntity> TOSS_CHARGE = new TossChargeMove<SPTWEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<SPTWEntity> TOSS_CHARGE = new TossChargeMove<SPTWEntity>(70, 1 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
     public SPTWEntity(Level worldIn) {

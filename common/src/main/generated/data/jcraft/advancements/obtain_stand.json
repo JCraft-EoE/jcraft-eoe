@@ -1,0 +1,35 @@
+{
+  "parent": "jcraft:obtain_meteorite_iron_ore",
+  "criteria": {
+    "has_stand": {
+      "conditions": {},
+      "trigger": "jcraft:obtained_stand"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_stand.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:stand_arrow"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_stand.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_stand"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "jcraft:disc"
+    ]
+  },
+  "sends_telemetry_event": true
+}

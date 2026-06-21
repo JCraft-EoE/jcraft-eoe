@@ -1,0 +1,58 @@
+{
+  "anim_state": "NONE",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "crouching_variant": {
+    "anim_state": "NONE",
+    "class": "SPECIAL2",
+    "cooldown_type": "STAND_SP2",
+    "move": {
+      "type": "jcraft:metallica_razor_cough_attack",
+      "cooldown": 140,
+      "duration": 20,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:user_animation",
+            "animation": "mtl.rca",
+            "run": "at_init"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.metallica.default.internal_attack.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.metallica.default.internal_attack.cr.name"
+        }
+      },
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:metallica_create_magnetic_field_move",
+    "cooldown": 200,
+    "duration": 15,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:user_animation",
+          "animation": "mtl.sfk",
+          "run": "at_init"
+        }
+      ],
+      "conditions": [
+        {
+          "type": "jcraft:metallica_iron",
+          "min_iron": 10.0
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.metallica.default.place_magnetic_field.description"
+      },
+      "name": {
+        "translate": "move.jcraft.metallica.default.place_magnetic_field.name"
+      }
+    },
+    "windup": 5
+  }
+}

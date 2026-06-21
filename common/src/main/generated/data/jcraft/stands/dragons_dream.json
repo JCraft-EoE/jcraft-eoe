@@ -1,0 +1,15 @@
+{
+  "idle_rotation": -45.0,
+  "info": {
+    "con_count": 0,
+    "free_space": {
+      "translate": "entity.jcraft.dragons_dream.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.dragons_dream"
+    },
+    "pro_count": 0,
+    "skin_names": []
+  },
+  "obtainable": false
+}

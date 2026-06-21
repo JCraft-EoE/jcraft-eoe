@@ -1,0 +1,30 @@
+{
+  "idle_distance": 2.0,
+  "idle_rotation": 225.0,
+  "info": {
+    "con_count": 3,
+    "free_space": {
+      "translate": "entity.jcraft.thefool.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.thefool"
+    },
+    "pro_count": 5,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.thefool.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.thefool.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.thefool.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:foolsummon"
+    }
+  }
+}

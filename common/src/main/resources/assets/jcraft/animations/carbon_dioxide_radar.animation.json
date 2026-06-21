@@ -1,0 +1,125 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"animation_length": 2.0128,
+			"bones": {
+				"body": {
+					"rotation": {
+						"0.0": {
+							"vector": [-5, 0, 3]
+						},
+						"0.9959": {
+							"vector": [4, 0, -3],
+							"easing": "easeInOutSine"
+						},
+						"2.0128": {
+							"vector": [-5, 0, 3],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"propeller": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"arm": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.9959": {
+							"vector": [0, -5, 0],
+							"easing": "easeInOutSine"
+						},
+						"2.0128": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"hinge": {
+					"rotation": {
+						"0.0": {
+							"vector": [5, 0, 0]
+						},
+						"0.9959": {
+							"vector": [-4, 0, 3],
+							"easing": "easeInOutSine"
+						},
+						"2.0128": {
+							"vector": [5, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				},
+				"forearm": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.9959": {
+							"vector": [0, 7.5, 0],
+							"easing": "easeInOutSine"
+						},
+						"2.0128": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				}
+			}
+		},
+		"summon": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.2516,
+			"bones": {
+				"body": {
+					"rotation": {
+						"vector": [-5, 0, 3]
+					},
+					"scale": {
+						"0.0": {
+							"vector": [0, 1, 0]
+						},
+						"0.2516": {
+							"vector": [1, 1, 1],
+							"easing": "easeInElastic"
+						}
+					}
+				},
+				"propeller": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.2516": {
+							"vector": [0, -360, 0]
+						}
+					}
+				},
+				"arm": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"blur": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"hinge": {
+					"rotation": {
+						"vector": [5, 0, 0]
+					}
+				},
+				"forearm": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		}
+	}
+}

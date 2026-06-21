@@ -5,10 +5,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.api.MoveSelectionResult;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.moves.AbstractBarrageAttack;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.spec.HamonSpec;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -18,6 +21,8 @@ import net.minecraft.world.entity.LivingEntity;
 import java.util.Set;
 
 public class ImproviserMove extends AbstractBarrageAttack<ImproviserMove, HamonSpec> {
+
+    public static final float PROJECTILE_IMPROVISER_CHARGE = HamonSpec.MAX_CHARGE / 2;
 
     @Getter
     private final float chargePerTick;
@@ -50,6 +55,13 @@ public class ImproviserMove extends AbstractBarrageAttack<ImproviserMove, HamonS
             living.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 1, 0, false, false, true));
         }
         return Set.of();
+    }
+
+    @Override
+    public MoveSelectionResult specificMoveSelectionCriterion(final HamonSpec attacker, final LivingEntity mob, final LivingEntity target,
+                                                              final int stunTicks, final int enemyMoveStun, final double distance,
+                                                              final StandEntity<?, ?> enemyStand, final AbstractMove<?, ?> enemyAttack) {
+        return MoveSelectionResult.STOP;
     }
 
     @Override

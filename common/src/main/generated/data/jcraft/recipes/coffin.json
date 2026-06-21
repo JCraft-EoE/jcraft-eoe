@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "tag": "minecraft:beds"
+    },
+    "S": {
+      "tag": "minecraft:wooden_slabs"
+    }
+  },
+  "pattern": [
+    "SSS",
+    "SBS"
+  ],
+  "result": {
+    "item": "jcraft:coffin"
+  },
+  "show_notification": true
+}

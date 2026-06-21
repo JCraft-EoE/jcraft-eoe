@@ -1,0 +1,51 @@
+{
+  "anim_state": "SANDSTORM",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:thefool_sandstorm_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 11,
+      "blockable_type": "NON_BLOCKABLE_EFFECTS_ONLY",
+      "extra_hit_boxes": [
+        {
+          "size": 1.5
+        }
+      ],
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_3"
+    },
+    "cooldown": 800,
+    "damage": 7.0,
+    "duration": 41,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:foolultimate"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:twkickhit"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.the_fool.default.suffocating_sandstorm.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_fool.default.suffocating_sandstorm.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 0.1,
+    "move_distance": 1.5,
+    "offset": 0.0,
+    "stun": 20,
+    "windup": 28
+  }
+}

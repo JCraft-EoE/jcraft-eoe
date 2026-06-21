@@ -22,6 +22,10 @@ import net.arna.jcraft.api.attack.core.RunMoment;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
@@ -33,7 +37,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -79,6 +85,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private Boolean isHoldable;
     private boolean loopPrevention = true;
     private OptionalInt followupFrame = OptionalInt.empty();
+    private boolean lingeringSounds;
 
     // Properties that are NOT serialized (usually set in constructor)
     // Used to help AI know how and when to use this attack.
@@ -96,6 +103,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     // How long this move was charged for, if any.
     @Getter @Setter
     private int chargeTime = 0;
+    private final Map<A, List<BoundSoundPlayer.SoundHandle>> activeSounds = new WeakHashMap<>();
 
     protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
         this.cooldown = cooldown;
@@ -500,6 +508,26 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    /**
+     * Makes sounds played by this move linger.
+     * I.e., they aren't stopped when the move is cancelled.
+     * @return This move
+     */
+    public T withLingeringSounds() {
+        return withLingeringSounds(true);
+    }
+
+    /**
+     * Makes sounds played by this move linger.
+     * I.e., they aren't stopped when the move is cancelled.
+     * @param lingeringSounds Whether sounds on this move should linger
+     * @return This move
+     */
+    public T withLingeringSounds(final boolean lingeringSounds) {
+        this.lingeringSounds = lingeringSounds;
+        return getThis();
+    }
+
     // Lombok does not understand these variable names already start with 'is',
     // even though IntelliJ thinks it does.
     // Also, for some reason, suppressing the warning gives a warning about the suppression being redundant,
@@ -533,7 +561,6 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         isFollowup = true;
         return getThis();
     }
-
 
     /**
      * Called when this move is registered to a {@link MoveMap MoveMap}.
@@ -615,6 +642,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * By default, only plays the sound(s) and invokes the init actions, if any.
      */
     public void onInitiate(final A attacker) {
+        activeSounds.remove(attacker);
+
         LivingEntity user = attacker.getUser();
         Set<LivingEntity> targets = Set.of(); // Obviously none yet
         for (final MoveAction<?, ? super A> action : actions) {
@@ -628,6 +657,45 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * Called when this move is canceled. Does nothing by default.
      */
     public void onCancel(final A attacker) {}
+
+    /**
+     * Adds a sound handle to the list of active sounds for the given attacker.
+     * These sounds will be cancelled if the move is cancelled.
+     * @param attacker The attacker the sound is playing for
+     * @param handle The sound handle
+     */
+    public void submitBoundSound(final A attacker, final BoundSoundPlayer.SoundHandle handle) {
+        activeSounds.computeIfAbsent(attacker, a -> new ArrayList<>()).add(handle);
+    }
+
+    /**
+     * Called when the move is deactivated. I.e., when the current move of the attacker changes
+     * from this move to something else.
+     * <p>
+     * Stops ongoing sounds by default unless the move ended naturally (move stun = 0)
+     * @param attacker The attacker that deactivated this move.
+     */
+    public void onDeactivate(final A attacker) {
+        List<BoundSoundPlayer.SoundHandle> sounds = activeSounds.remove(attacker);
+
+        // Stop sounds if there are any, unless this move ended naturally (move sound 0),
+        // this move has lingering sounds, or we switched to this move's finisher or followup.
+        if (sounds != null && !sounds.isEmpty() && shouldCancelSounds(attacker)) {
+            BoundSoundPlayer.stopAll(sounds);
+        }
+    }
+
+    /**
+     * Determines whether the sounds from this move should be cancelled when the move is deactivated.
+     * Should be overridden by moves that want sounds to linger under certain conditions.
+     * @param attacker The attacker to check for
+     * @return Whether sounds should be cancelled.
+     */
+    protected boolean shouldCancelSounds(final A attacker) {
+        return attacker.getMoveStun() != 0 && !isLingeringSounds() &&
+                (finisher == null || attacker.getCurrentMove() != finisher.right()) &&
+                (followup == null || attacker.getCurrentMove() != followup);
+    }
 
     /**
      * Whether this attack should be allowed to move onto its finisher.
@@ -705,6 +773,9 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
         Set<LivingEntity> targets = perform(attacker, user);
         boolean hit = !targets.isEmpty();
+        if (!hit) {
+            playWhiffSound(attacker);
+        }
 
         for (final MoveAction<?, ? super A> action : actions) {
             if (action.getRunMoment() == RunMoment.ON_STRIKE || hit && action.getRunMoment() == RunMoment.ON_HIT) {
@@ -712,6 +783,21 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
             }
         }
         attacker.onPerform(this, targets);
+    }
+
+    protected boolean shouldPlayWhiffSound(final A attacker) {
+        return false;
+    }
+
+    private void playWhiffSound(final A attacker) {
+        if (!shouldPlayWhiffSound(attacker) || attacker.getEntityWorld().isClientSide || attacker.getCurrentMove() != this) {
+            return;
+        }
+
+        final RandomSource random = attacker.getBaseEntity().getRandom();
+        final float volume = 0.6f + random.nextFloat() * 0.35f;
+        final float pitch = 0.85f + random.nextFloat() * 0.3f;
+        attacker.playAttackerSound(JSoundRegistry.WHIFF.get(), volume, pitch, false, true);
     }
 
     /**
@@ -831,8 +917,20 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     public static boolean mayBreak(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
                                    @Nullable Predicate<BlockState> pred) {
+        if (user != null) {
+            if (user.getType().is(JTagRegistry.CANT_BREAK_BLOCKS)) {
+                return false;
+            }
+            // special case for brawler attacking training dummy
+            if (user.getType() == JEntityTypeRegistry.BRAWLER_SPEC_USER.get() && user instanceof Mob brawler &&
+                    brawler.getTarget() != null && brawler.getTarget().getType() == JEntityTypeRegistry.TRAINING_DUMMY.get()) {
+                return false;
+            }
+        }
         Predicate<BlockState> isDestructable = state -> {
-            if (state.isAir()) return true;
+            if (state.isAir()) {
+                return true;
+            }
             else {
                 Block block = state.getBlock();
                 float destroyTime = block.defaultDestroyTime();

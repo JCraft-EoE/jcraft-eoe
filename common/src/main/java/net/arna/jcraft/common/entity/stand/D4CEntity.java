@@ -39,7 +39,6 @@ import org.joml.Vector3f;
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Dirty_Deeds_Done_Dirt_Cheap">Dirty Deeds Done Dirt Cheap</a>.
  * @see JStandTypeRegistry#D4C
- * @see net.arna.jcraft.client.renderer.entity.stands.D4CRenderer D4CRenderer
  * @see CloneSpawnMove
  * @see D4CCounterAttack
  * @see D4CGrabAttack
@@ -67,10 +66,7 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                     .skinName(Component.literal("Teaser"))
                     .skinName(Component.literal("Spangled"))
                     .build())
-            .summonData(SummonData.builder()
-                    .sound(JSoundRegistry.D4C_SUMMON)
-                    .playGenericSound(true)
-                    .build())
+            .summonData(SummonData.of(JSoundRegistry.D4C_SUMMON))
             .build();
 
     public static final ItemPlaceMove ITEM_PLACE = new ItemPlaceMove(JCraft.LIGHT_COOLDOWN, 8, 12, 0.75f)
@@ -177,9 +173,9 @@ public class D4CEntity extends StandEntity<D4CEntity, D4CEntity.State> {
                     Component.literal("hides in a flag in an un-stunnable, floating state"));
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<D4CEntity> TOSS = new TossMove<D4CEntity>(0, 1, 1, 0.75f)
+    public static final TossMove<D4CEntity> TOSS = new TossMove<D4CEntity>(0, 1, 1, 0.75f,0.13f)
             .withAnim(D4CEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<D4CEntity> TOSS_CHARGE = new TossChargeMove<D4CEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<D4CEntity> TOSS_CHARGE = new TossChargeMove<D4CEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
     public D4CEntity(Level worldIn) {

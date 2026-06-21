@@ -1,6 +1,8 @@
 package net.arna.jcraft.common.entity;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import net.arna.jcraft.common.entity.stand.AbstractPurpleHazeEntity;
 import net.arna.jcraft.common.entity.stand.AbstractPurpleHazeEntity.PoisonType;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
@@ -19,12 +21,17 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Stack;
 
 public class PurpleHazeCloudEntity extends Entity {
     public static int MAX_AGE = 100;
     private static final EntityDataAccessor<Float> RADIUS;
     private static final EntityDataAccessor<Integer> POISON_TYPE;
+
+    @Getter @Setter
+    @Nullable private LivingEntity owner;
 
     static {
         RADIUS = SynchedEntityData.defineId(PurpleHazeCloudEntity.class, EntityDataSerializers.FLOAT);
@@ -120,7 +127,7 @@ public class PurpleHazeCloudEntity extends Entity {
                     entity -> {
                         if (entity instanceof LivingEntity living) {
                             switch (poisonType) {
-                                case HARMING -> AbstractPurpleHazeEntity.infect(living, 4);
+                                case HARMING -> AbstractPurpleHazeEntity.infect(living, 4, owner);
                                 case DEBILITATING -> {
                                     AbstractPurpleHazeEntity.infect(living, 3, MobEffects.BLINDNESS);
                                     AbstractPurpleHazeEntity.infect(living, 3, MobEffects.MOVEMENT_SLOWDOWN);

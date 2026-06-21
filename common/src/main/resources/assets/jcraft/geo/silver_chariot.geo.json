@@ -156,22 +156,22 @@
 				{
 					"name": "eyes",
 					"parent": "head",
-					"pivot": [0, 27.6, -4.025]
+					"pivot": [0, 27.6, -4.1]
 				},
 				{
 					"name": "eyeRight",
 					"parent": "eyes",
-					"pivot": [-1.5, 27.6, -3.501],
+					"pivot": [-1.5, 27.6, -3.576],
 					"cubes": [
-						{"origin": [-2, 27.1, -4.001], "size": [1, 1, 1], "uv": [0, 0]}
+						{"origin": [-2, 27.1, -4.076], "size": [1, 1, 1], "uv": [0, 0]}
 					]
 				},
 				{
 					"name": "eyeLeft",
 					"parent": "eyes",
-					"pivot": [1.5, 27.6, -3.501],
+					"pivot": [1.5, 27.6, -3.576],
 					"cubes": [
-						{"origin": [1, 27.1, -4.001], "size": [1, 1, 1], "uv": [0, 0]}
+						{"origin": [1, 27.1, -4.076], "size": [1, 1, 1], "uv": [0, 0]}
 					]
 				},
 				{
@@ -196,7 +196,7 @@
 					]
 				},
 				{
-					"name": "katana",
+					"name": "prop5",
 					"parent": "lower_armRight",
 					"pivot": [-6, 13, 0],
 					"cubes": [
@@ -297,6 +297,12 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "bipedHandRight",
+					"parent": "lower_armRight",
+					"pivot": [-4.8, 13.2, 0.2],
+					"rotation": [90, 0, -180]
 				},
 				{
 					"name": "shoulder_right",
@@ -536,7 +542,7 @@
 					]
 				},
 				{
-					"name": "blur",
+					"name": "prop4",
 					"parent": "Stand",
 					"pivot": [0, 18, 0],
 					"cubes": [
@@ -555,13 +561,13 @@
 					]
 				},
 				{
-					"name": "exploding_armor",
+					"name": "prop3",
 					"parent": "Stand",
 					"pivot": [13, 28, -1]
 				},
 				{
 					"name": "armor1",
-					"parent": "exploding_armor",
+					"parent": "prop3",
 					"pivot": [11.375, 29.375, 0.125],
 					"cubes": [
 						{
@@ -620,7 +626,7 @@
 				},
 				{
 					"name": "armor2",
-					"parent": "exploding_armor",
+					"parent": "prop3",
 					"pivot": [14.625, 29.375, 0.125],
 					"cubes": [
 						{
@@ -679,7 +685,7 @@
 				},
 				{
 					"name": "armor3",
-					"parent": "exploding_armor",
+					"parent": "prop3",
 					"pivot": [11.375, 29.375, -2.125],
 					"cubes": [
 						{
@@ -738,7 +744,7 @@
 				},
 				{
 					"name": "armor4",
-					"parent": "exploding_armor",
+					"parent": "prop3",
 					"pivot": [14.625, 29.375, -2.125],
 					"cubes": [
 						{

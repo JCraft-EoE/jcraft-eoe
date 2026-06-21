@@ -299,7 +299,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -614,7 +614,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -913,7 +913,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1168,7 +1168,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1495,7 +1495,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1648,7 +1648,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2718,7 +2718,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -3912,7 +3912,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4126,7 +4126,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4419,7 +4419,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4708,7 +4708,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"rotation": {
 						"vector": [0, 0, 45],
 						"easing": "linear"
@@ -5064,7 +5064,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"rotation": {
 						"vector": [0, 0, 45],
 						"easing": "linear"
@@ -5409,7 +5409,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"rotation": {
 						"vector": [0, 0, 45],
 						"easing": "linear"
@@ -5726,7 +5726,7 @@
 						"easing": "linear"
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -5978,7 +5978,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -6457,7 +6457,7 @@
 						}
 					}
 				},
-				"bubble": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"

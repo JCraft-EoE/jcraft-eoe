@@ -1,0 +1,38 @@
+{
+  "parent": "jcraft:obtain_any_spec",
+  "criteria": {
+    "has_disc": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:spec_disc"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_spec_disc.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:spec_disc"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_spec_disc.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_disc"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

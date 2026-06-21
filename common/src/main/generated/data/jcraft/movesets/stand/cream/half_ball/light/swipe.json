@@ -1,0 +1,39 @@
+{
+  "anim_state": "BALL_LIGHT",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "hit_animation": "HIGH",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 0,
+    "damage": 5.0,
+    "duration": 14,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact3"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.cream.half_ball.swipe.description"
+      },
+      "name": {
+        "translate": "move.jcraft.cream.half_ball.swipe.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 0.75,
+    "move_distance": 0.5,
+    "offset": 0.2,
+    "stun": 20,
+    "windup": 7
+  }
+}

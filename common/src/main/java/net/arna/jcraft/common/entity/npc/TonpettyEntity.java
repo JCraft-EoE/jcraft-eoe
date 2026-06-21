@@ -16,31 +16,48 @@ import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.spec.HamonSpecUser;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 import java.util.WeakHashMap;
 
-public class TonpettyEntity extends HamonSpecUser {
-
+public class TonpettyEntity extends HamonSpecUser implements NeutralMob {
     public static final ResourceKey<DamageType> HAMON_INITIATION = JDamageSources.createDamageType("hamoninit");
+    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
+    private final ServerBossEvent bossEvent = new ServerBossEvent(getDisplayName(), BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.PROGRESS);
 
     protected Set<Player> greeted = Collections.newSetFromMap(new WeakHashMap<>());
     protected Set<Player> warned = Collections.newSetFromMap(new WeakHashMap<>());
+    private int remainingPersistentAngerTime;
+    @Nullable
+    private UUID persistentAngerTarget;
 
     public TonpettyEntity(final Level level) {
         super(JEntityTypeRegistry.TONPETTY.get(), level);
+        // Only make visible when Tonpetty is aggravated.
+        bossEvent.setVisible(false);
     }
 
     @Override
@@ -118,8 +135,88 @@ public class TonpettyEntity extends HamonSpecUser {
         return InteractionResult.SUCCESS;
     }
 
-    public static AttributeSupplier.Builder createTonpettiAttributes() {
+    public static AttributeSupplier.Builder createTonpettyAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 20.0).add(Attributes.MOVEMENT_SPEED, 0.25);
     }
 
+    @Override
+    protected void registerGoals() {
+        super.registerGoals();
+        targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (level().isClientSide()) return;
+
+        // Toggle boss bar based on whether we're angry.
+        if (isAngry() != bossEvent.isVisible())
+            bossEvent.setVisible(isAngry());
+    }
+
+    @Override
+    public void customServerAiStep() {
+        bossEvent.setProgress(getHealth() / getMaxHealth());
+        updatePersistentAnger((ServerLevel)level(), true);
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        addPersistentAngerSaveData(compound);
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        readPersistentAngerSaveData(level(), compound);
+
+        if (hasCustomName()) {
+            bossEvent.setName(getDisplayName());
+        }
+    }
+
+    @Override
+    public void setCustomName(@Nullable Component name) {
+        super.setCustomName(name);
+        bossEvent.setName(getDisplayName());
+    }
+
+    @Override
+    public void startPersistentAngerTimer() {
+        setRemainingPersistentAngerTime(PERSISTENT_ANGER_TIME.sample(random));
+    }
+
+    @Override
+    public void setRemainingPersistentAngerTime(int remainingPersistentAngerTime) {
+        this.remainingPersistentAngerTime = remainingPersistentAngerTime;
+    }
+
+    @Override
+    public int getRemainingPersistentAngerTime() {
+        return remainingPersistentAngerTime;
+    }
+
+    @Override
+    public void setPersistentAngerTarget(@Nullable UUID persistentAngerTarget) {
+        this.persistentAngerTarget = persistentAngerTarget;
+    }
+
+    @Nullable
+    @Override
+    public UUID getPersistentAngerTarget() {
+        return persistentAngerTarget;
+    }
+
+    @Override
+    public void startSeenByPlayer(@NotNull ServerPlayer player) {
+        bossEvent.addPlayer(player);
+    }
+
+    @Override
+    public void stopSeenByPlayer(@NotNull ServerPlayer player) {
+        bossEvent.removePlayer(player);
+    }
 }

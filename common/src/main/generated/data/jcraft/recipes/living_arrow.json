@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "jcraft:stand_arrow"
+    },
+    {
+      "item": "jcraft:sinners_soul"
+    }
+  ],
+  "result": {
+    "item": "jcraft:living_arrow"
+  }
+}

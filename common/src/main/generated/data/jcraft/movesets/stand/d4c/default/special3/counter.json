@@ -1,0 +1,20 @@
+{
+  "anim_state": "COUNTER",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:dirtydeedsdonedirtcheap_d_4c_counter_attack",
+    "cooldown": 300,
+    "duration": 35,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.d4c.default.counter.description"
+      },
+      "name": {
+        "translate": "move.jcraft.d4c.default.counter.name"
+      }
+    },
+    "move_distance": 0.75,
+    "windup": 5
+  }
+}

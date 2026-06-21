@@ -1,7 +1,7 @@
 # JCraft: Eyes of Ender
 JCraft: Eyes of Ender is a sophisticated Minecraft mod for Minecraft 1.20.1 that adds over 25 stands from the JoJo universe, each with their own unique moveset that was meticulously balanced by our talented team. 
-While the mod has a heavy focus on PvP, many stands also add survival features such as barrage mining and they're also great for PvE.
-On top of that, it also adds several structures, specs (like brawler and vampirism) and much more.
+While the mod has a heavy focus on PvP, many stands also add survival features such as throwing as well as block breaking, and they're also great for PvE.
+On top of that, it also adds several structures like the vampire lair or the hamon temple, specs (like brawler and vampirism) and much more.
 
 You can download the mod on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/jcraft-eyes-of-ender) or [Modrinth](https://modrinth.com/mod/jojo-eyes-of-ender).
 

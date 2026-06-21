@@ -1,0 +1,43 @@
+{
+  "anim_state": "COMBO",
+  "class": "BARRAGE",
+  "cooldown_type": "BARRAGE",
+  "move": {
+    "type": "jcraft:shared_simple_multi_hit_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 5,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 360,
+    "damage": 4.0,
+    "duration": 26,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact2"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.brawler.default.combo.description"
+      },
+      "name": {
+        "translate": "move.jcraft.brawler.default.combo.name"
+      }
+    },
+    "hit_moments": [
+      5,
+      10,
+      19
+    ],
+    "hitbox_size": 1.5,
+    "knockback": 0.2,
+    "move_distance": 1.0,
+    "offset": -0.1,
+    "stun": 15
+  }
+}

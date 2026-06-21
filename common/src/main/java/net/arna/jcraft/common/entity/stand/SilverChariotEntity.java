@@ -258,14 +258,15 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     ));
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<SilverChariotEntity> TOSS = new TossMove<SilverChariotEntity>(0, 1, 1, 0.75f)
+    public static final SilverChariotTossMove TOSS = new SilverChariotTossMove(0, 1, 1, 0.75f,0.08f)
             .withAnim(SilverChariotEntity.State.ITEM_TOSS);
-    public static final TossChargeMove<SilverChariotEntity> TOSS_CHARGE = new TossChargeMove<SilverChariotEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<SilverChariotEntity> TOSS_CHARGE = new TossChargeMove<SilverChariotEntity>(40, 1 * 20 + 1, 1 * 20, 1.0f, 5)
             .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Boolean> HAS_RAPIER;
     private static final EntityDataAccessor<Integer> MODE;
     private static final EntityDataAccessor<Integer> ARMOR_TIME;
+    public static final double ARMORLESS_WINDUP_FACTOR = 0.67;
 
     static {
         HAS_RAPIER = SynchedEntityData.defineId(SilverChariotEntity.class, EntityDataSerializers.BOOLEAN);
@@ -419,8 +420,8 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
 
         final AbstractMove<?, ? super SilverChariotEntity> attackRef = move.copy();
         if (getMode() == Mode.ARMORLESS) {
-            attackRef.withWindup((int) (attackRef.getWindup() * 0.67));
-            attackRef.withDuration((int) (attackRef.getDuration() * 0.67));
+            attackRef.withWindup((int) (attackRef.getWindup() * ARMORLESS_WINDUP_FACTOR));
+            attackRef.withDuration((int) (attackRef.getDuration() * ARMORLESS_WINDUP_FACTOR));
         }
         if (!hasRapier() && attackRef instanceof AbstractSimpleAttack<?, ?> simpleAttackRef) {
             simpleAttackRef.withHitboxSize(simpleAttackRef.getHitboxSize() * 0.75f);

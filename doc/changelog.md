@@ -1,85 +1,63 @@
 # Changelog
 ## General
-* **Added Hamon**
-* **Cosplay has been moved to its own mod**
-* "Kill Vampirism" has been renamed to "Heal On Kill" to reduce the confusion
-* updated Azurelib version to latest
-### Blocks & Items
-* removed JCraft items being added to vanilla creative tabs because that lead to a doubling in the search
-* removed items without any use from the creative tabs; they are still accessible via `/give`
-* removed Steel Ball recipe
-* added Rewind Mock Item
-  * once a Mandom Rewind is over, can be used to be resolved
-  * gets resolved to either air or its original form, depending if the block it spawned from was reset or not
-* get GO or DO particles depending if stand user players or stand user mobs are nearby
-### NPCs & Stands
-* improved combat AI
-* Whitesnake
-  * Poison Spew cooldowns increased by 4s
-  * Poison Spew Projectile no longer interrupts moves
-  * can now steal stands for real
-* Mandom
-  * now also resets the air (bubbles) of entities
-  * now also rewinds blocks (no dupes totally sure yes yes)
-  * particle color changed according to skin and shader added
-* added Monks (`hamon_spec_user`) and Tonpetty (see Hamon section)
-* D4C clones don't drop XP anymore if summoned by players
-* entities resurrected by Vampirism don't drop XP or loot anymore
-* Metallica now has some sweet mosh particles
-* slight changes to Horus' hitbox
-* Brawler
-  * will fight Training Dummies on sight
-  * taking away his dummy will aggro him
-* Anubis Spec User now drops Anubis on death
+### Stands & Specs
+* Disabled damage scaling for bosses and horses
+* Throwing now force-feeds potions
+* Throwing items are now transparent while being hold by Stand
+* Breaking Blocks now only triggers when nothing else was hit
+* Aerosmith
+  * now heats up blocks, i.e. makes them work temporarily like Magma Blocks
+  * BreathXRay now respects Hypoxia levels
+  * only displays landing gear when starting/landing
+  * improved the Ult mechanics
+  * added glowing to AS when it is out of sight for the user
+  * getting stunned while AS is on Autopilot influences AS now
+  * added particles to show which entity is targeted by AS
+* Made In Heaven
+  * Sprinting while Stand is out
+    * gives Speed 70
+    * creates Hunger (configurable)
+    * gives Water Walking and Dolphin's Grace
+    * gives Exhaustion
+  * improved Hit Detection for MIH Cr Sp 3
+* Added description for Hamon Charge in `/spec about`
+* Missing with Stands/Specs now makes miss sounds (whiff)
+### Effects
+* Exhaustion I to IV, works against regeneration from 25% to 100%
 ### Structures
-* added the monastery
-* added Anubis temple
-* added proper placement tags for all JCraft structures, i.e. you can now choose their biomes via datapacks
+* made Vampire Lairs rarer
 ### Configs
-* added different ways how long the Move UI should be displayed, including Always and Never (default as it was, client side)
-* Mandom can affect blocks or not (default it does, server config)
-* Whitesnake can steal stands from players or not (default it doesn't, server config)
-### Compatibility
-* made the mod compatible with FTB Chunks
-### Commands
-* `/spec reset @s` resets your spec as if you just first obtained it
-* `/stand about` now isn't global anymore when you have no stand summoned
-* added a notification to actually use `/stand about` when first stand is summoned
+* `mih_sprint_hunger_multiplier` how much Hunger is created by MIH sprinting
+* Vampires taking extra damage by Hamon Users is now on by default
+* `show_all_cosplay` has been removed, as it doesn't serve any purpose anymore
+* Added tooltips to all server config options
+* `block_breakage_multiplier` to scale the effectiveness of Block Breaking
+* Server config is now part of the API (for add-ons)
 ### Tags
-* new tag `jcraft:bloodless_entities` for entities that cannot be bloodsucked by Vampires
-* new tag `jcraft:ironless_entities` for entities that cannot be ironsucked by Metallica
+* `jcraft:bosses` describes what constitutes bosses for JCraft purposes (for now Ender Dragon, Wither, Warden, Elder Guardian and Tonpetty) 
+* `jcraft:ignores_damage_scaling` describes which entities ignore Stand/Spec damage scaling (for now bosses and horses)
 ### Bug Fixes
-* Anvil cannot consume multiple Cinderella masks at once anymore
-* Cinderella Enchantments are no longer additive but behave like other enchantments now
-* fixed STW's desummon animation
-* fixed idle and blocking animations not playing sometimes
-* fixed Gold Experience's Snake not animating movement
-* Brawler spec user no longer attacks villagers
-* fixed Stone Mask not spawning in Vampire Lairs
-* Training Dummy can no longer be abused by Vampires and Metallica users
-* Leash of Training Dummy now drops if it is picked up
-* fixed rare crash with inhale attack
-* Road Roller can no longer get stands
-* added names to Brawler and Anubis Spec User
-* Horus Frostwalker now respects Stand Griefing rule
-* GE Berry Bush attack now respects Stand Griefing rule
-## Hamon
-* first spec to have progression (see Commands section to skip those)
-* [insert information about the moves]
-## Cosplay
-* everything except red hat has been moved to its own mod, JJBA Cosplay
-* your cosplay shouldn't get lost **IF** you install the other mod together with 0.18.0
-* IF the cosplay mod is installed, Stand user mobs will spawn with cosplay on
-* for more news on cosplay see changelog of JJBA Cosplay
+* Fixed missing translation for Anubis Special 2 and Hamon Charge
+* Fixed AS bomb double damage
+* Fixed AS detecting and following Spectators
+* Fixed AS getting stuck shooting on Multiplayer
+* Fixed PH Poison damage attribution
+* Fixed bound sounds lingering when spamming
+* Fixed Spec moves holding when Stand is out
+* Fixed Stand throwing into claims
+* Fixed D4C explosions not respecting claims
+* Fixed an absurd jump boost by using The Fool with Elytra
+* Disabled Pick Block only for stands with a Toss Move
+* Fixed an NPE
+
 ## Known Bugs
-* …
+* see https://github.com/JCraft-EoE/jcraft-eoe/issues?q=is%3Aissue%20state%3Aopen%20type%3ABug
 
 
 
 
 ## TODO (SOME UPDATE) :D
 * Spin
-* Throwing
 * MR barrage fire :)
 * Timestop should stop stand anims
 * CRAZY DIAMOND, Hermit Purple, Yellow Temperance

@@ -1,0 +1,38 @@
+{
+  "class": "SPECIAL3",
+  "cooldown_type": "SPECIAL3",
+  "move": {
+    "type": "jcraft:hamon_improviser_move",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 3,
+      "hit_animation": "MID",
+      "stun_type": "WINDED"
+    },
+    "chargePerTick": 0.25,
+    "duration": 1200,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:hamonexhale"
+        }
+      ],
+      "conditions": [
+        {
+          "type": "jcraft:hamon_charge",
+          "min_charge": 0.25
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.hamon.default.improviser_move.description"
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.hamon.default.improviser_move.name"
+      }
+    },
+    "interval": 1
+  }
+}

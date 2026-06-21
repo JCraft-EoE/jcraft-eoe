@@ -33,6 +33,6 @@ public final class HamonConditions {
     }
 
     public static boolean test(@Nullable final LivingEntity user, final int lessonId) {
-        return test(user, lessonId, 1800);
+        return test(user, lessonId, 16 * 60 * 20); // whole minecraft day (16 minutes)
     }
 }

@@ -1,0 +1,48 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_nether_star": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:nether_star"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_redstone_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:redstone_block"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "jcraft:requiem_ruby"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_nether_star",
+      "has_redstone_block",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "jcraft:requiem_ruby"
+    ]
+  },
+  "sends_telemetry_event": false
+}

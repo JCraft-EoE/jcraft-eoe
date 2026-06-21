@@ -8,9 +8,11 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
+import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
@@ -24,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
@@ -64,10 +67,12 @@ public final class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurric
         }
         --hurricaneTime;
 
+        final Predicate<Entity> selector = EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> e != vehicle && e != stand && e != user);
+
         // Homing
         final List<LivingEntity> nearbyEnts = world.getEntitiesOfClass(LivingEntity.class,
                 new AABB(hurricanePos.add(32.0, 32.0, 32.0), hurricanePos.subtract(32.0, 32.0, 32.0)),
-                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> e != vehicle && e != stand && e != user));
+                selector);
 
         if (!nearbyEnts.isEmpty()) {
             Vec3 avgPos = Vec3.ZERO;
@@ -79,10 +84,17 @@ public final class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurric
             hurricanePos = hurricanePos.add(avgPos.subtract(hurricanePos).normalize().scale(0.5));
         }
 
+        // Ignite any gasoline splatters at the hurricane's position
+        if (!world.isClientSide()) {
+            JSplatterManager.get(world)
+                    .getHit(hurricanePos, s -> s instanceof GasolineSplatter)
+                    .forEach(s -> ((GasolineSplatter) s).lightOnFire());
+        }
+
         // Damage
         final List<LivingEntity> toHurt = world.getEntitiesOfClass(LivingEntity.class,
                 new AABB(hurricanePos.add(2.5, 1, 2.5), hurricanePos.subtract(2.5, 1, 2.5)),
-                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> e != stand && e != user && e != vehicle));
+                selector);
 
         for (LivingEntity living : toHurt) {
             LivingEntity target = JUtils.getUserIfStand(living);

@@ -1,0 +1,67 @@
+{
+  "anim_state": "BISECT",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "followup": {
+    "anim_state": "NONE",
+    "class": "ULTIMATE",
+    "cooldown_type": "STAND_ULTIMATE",
+    "move": {
+      "type": "jcraft:metallica_bisect_attack",
+      "cooldown": 0,
+      "duration": 11,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:mcry"
+          },
+          {
+            "type": "jcraft:user_animation",
+            "animation": "mtl.bsc_fire",
+            "run": "at_init"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.metallica.default.null.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.metallica.default.null.followup.name"
+        }
+      },
+      "move_distance": 0.75,
+      "windup": 1
+    }
+  },
+  "move": {
+    "type": "jcraft:metallica_bisect_charge_move",
+    "cooldown": 600,
+    "duration": 80,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mtakethis"
+        },
+        {
+          "type": "jcraft:user_animation",
+          "animation": "mtl.bsc",
+          "run": "at_init"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.metallica.default.bisect.description"
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.metallica.default.bisect.name"
+      }
+    },
+    "minimum_charge": 12,
+    "move_distance": 0.75,
+    "set_move_stun": false,
+    "windup": 81
+  }
+}

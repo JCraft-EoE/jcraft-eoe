@@ -31,9 +31,6 @@
     ],
     "modmenu": [
       "net.arna.jcraft.fabric.client.JModMenuIntegration"
-    ],
-    "fabric-datagen": [
-      "net.arna.jcraft.datagen.JDataGen"
     ]
   },
   "accessWidener": "jcraft.accesswidener",
@@ -42,7 +39,7 @@
     "jcraft-fabric.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.15.11",
+    "fabricloader": ">=0.17.0",
     "minecraft": "~1.20.1",
     "java": ">=17",
     "architectury": ">=9.2.14",
@@ -65,6 +62,10 @@
       "jcraft:hamon",
       "jcraft:vampire",
       "jcraft:texas_hold_em"
-    ]
+    ],
+    "lithium:options": {
+      "mixin.entity.collisions.intersection": false,
+      "mixin.entity.collisions.movement": false
+    }
   }
 }

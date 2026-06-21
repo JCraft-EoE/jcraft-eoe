@@ -105,7 +105,7 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
     public void onUserMoveInput(AbstractMove<?, ? super MandomEntity> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
         if (!pressed) return;
 
-        MoveClass moveClass = type.getMoveClass(standby);
+        MoveClass moveClass = type.getMoveClass();
         if (moveClass == null) return;
 
         if (moveClass == MoveClass.ULTIMATE || moveClass == MoveClass.UTILITY) {

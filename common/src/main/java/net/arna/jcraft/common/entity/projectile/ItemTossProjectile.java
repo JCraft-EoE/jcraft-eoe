@@ -1,16 +1,18 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import com.mojang.datafixers.util.Pair;
+import lombok.Getter;
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.component.living.CommonVampireComponent;
+import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
-import net.arna.jcraft.common.item.BloodBottleItem;
-import net.arna.jcraft.common.spec.VampireSpec;
+import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.mixin.BucketItemAccessor;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
@@ -23,7 +25,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Containers;
@@ -36,7 +37,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.*;
@@ -45,6 +45,8 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -74,6 +76,13 @@ public class ItemTossProjectile extends AbstractArrow {
         RICOCHETS = SynchedEntityData.defineId(ItemTossProjectile.class, EntityDataSerializers.INT);
     }
 
+    private static final float SPIN_DEGREES_PER_VELOCITY = 40f;
+
+    @Getter
+    private float prevSpinAngle = 0f;
+    @Getter
+    private float spinAngle = 0f;
+
     public ItemTossProjectile(final Level level) {
         super(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE.get(), level);
         setItem(ItemStack.EMPTY);
@@ -81,6 +90,7 @@ public class ItemTossProjectile extends AbstractArrow {
 
     public ItemTossProjectile(final LivingEntity shooter, final Level level, final ItemStack item) {
         super(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE.get(), shooter, level);
+        setCritArrow(true); // leverages vanilla's built-in crit particle spawning each tick for a free particle trail
         setItem(item);
         if (getItem().is(JTagRegistry.HEAVY_IMPACT)) {
             this.setBaseDamage(2d);
@@ -90,6 +100,15 @@ public class ItemTossProjectile extends AbstractArrow {
             this.setBaseDamage(0d);
             this.setKnockback(0);
         }
+    }
+
+    @Override
+    public void tick() {
+        prevSpinAngle = spinAngle;
+        if (!inGround) {
+            spinAngle += (float) getDeltaMovement().length() * SPIN_DEGREES_PER_VELOCITY;
+        }
+        super.tick();
     }
 
     public ItemStack getItem() {
@@ -123,7 +142,7 @@ public class ItemTossProjectile extends AbstractArrow {
     @Override
     public boolean isOnFire() {
         // this might be better to move to doPostHurtEffects
-        return getItem().is(JTagRegistry.BURNS_ON_IMPACT);
+        return super.isOnFire() || getItem().is(JTagRegistry.BURNS_ON_IMPACT);
     }
 
     @Override
@@ -140,8 +159,7 @@ public class ItemTossProjectile extends AbstractArrow {
     }
 
     protected boolean maybeExplode() {
-        if (!level().isClientSide && (getItem().is(JTagRegistry.EXPLODES_ON_IMPACT) ||
-                (getOwner() instanceof AbstractKillerQueenEntity<?,?>))) {
+        if (!level().isClientSide && getItem().is(JTagRegistry.EXPLODES_ON_IMPACT)) {
             final boolean grief = level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
             final boolean standGrief = !(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING);
             level().explode(this, getX(), getY(), getZ(), 1, grief && standGrief, Level.ExplosionInteraction.MOB);
@@ -163,7 +181,10 @@ public class ItemTossProjectile extends AbstractArrow {
     }
 
     @Override
-    protected void onHitEntity(final EntityHitResult result) {
+    protected void onHitEntity(final @NonNull EntityHitResult result) {
+        if (level().isClientSide()) {
+            return;
+        }
         // this part has been heavily inspired by AbstractArrow
         Entity entity = result.getEntity();
         Entity entity2 = JUtils.getUserIfStand(this.getOwner());
@@ -177,32 +198,39 @@ public class ItemTossProjectile extends AbstractArrow {
             }
         }
 
-        boolean bl = entity.getType() == EntityType.ENDERMAN;
-        if (this.isOnFire() && !bl) {
+        boolean targetIsEnderman = entity.getType() == EntityType.ENDERMAN;
+
+        if (this.isOnFire() && !targetIsEnderman) {
             entity.setSecondsOnFire(5);
         }
 
-        entity.hurt(damageSource, (float)getBaseDamage());
-        if (bl) {
+        entity.hurt(damageSource, calculateDamage(entity));
+
+        if (targetIsEnderman) {
             return;
+        }
+
+        final int fireSeconds = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FIRE_ASPECT, getItem()) * 4;
+        if (fireSeconds > 0) {
+            entity.setSecondsOnFire(fireSeconds);
         }
 
         boolean effectActivated = false;
 
-        if (entity instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity)entity;
+        if (entity instanceof final LivingEntity livingEntity) {
             // handle knockback
-            if (this.getKnockback() > 0) {
+            float knockback = calculateKnockback();
+            if (knockback > 0) {
                 double d = Math.max(0, 1f - livingEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
-                Vec3 vec3 = this.getDeltaMovement().multiply(1f, 0f, 1f).normalize().scale(getKnockback() * 0.6 * d);
+                Vec3 vec3 = this.getDeltaMovement().multiply(1f, 0f, 1f).normalize().scale(knockback * 0.6 * d);
                 if (vec3.lengthSqr() > 0) {
                     livingEntity.push(vec3.x, 0.1, vec3.z);
                 }
             }
-//            if (!this.level().isClientSide && entity2 instanceof LivingEntity) {
-//                EnchantmentHelper.doPostHurtEffects(livingEntity, entity2);
-//                EnchantmentHelper.doPostDamageEffects((LivingEntity)entity2, livingEntity);
-//            }
+            if (getOwner() instanceof LivingEntity owner) {
+                EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
+                EnchantmentHelper.doPostDamageEffects(owner, livingEntity);
+            }
             this.doPostHurtEffects(livingEntity);
 //            if (entity2 != null && livingEntity != entity2 && livingEntity instanceof Player && entity2 instanceof ServerPlayer && !this.isSilent()) {
 //                ((ServerPlayer)entity2).connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.ARROW_HIT_PLAYER, 0.0F));
@@ -213,9 +241,19 @@ public class ItemTossProjectile extends AbstractArrow {
             return;
         }
 
-        // force stand on target
-        if (entity instanceof LivingEntity livingEntity && (livingEntity instanceof ServerPlayer ||
-                livingEntity.getType().is(JTagRegistry.CAN_HAVE_STAND)) && getItem().is(JItemRegistry.STAND_DISC.get())) {
+        // transfer KQ bomb to hit entity
+        if (getOwner() instanceof AbstractKillerQueenEntity<?, ?> kq && kq.hasUser()) {
+            final CommonBombTrackerComponent.BombData bombData = JComponentPlatformUtils.getBombTracker(kq.getUserOrThrow()).getMainBomb();
+            if (bombData.isEntity && bombData.bombEntityID == this.getId()) {
+                bombData.setBomb(entity);
+                this.discard();
+                return;
+            }
+        }
+
+        // force stand on target — only WhiteSnake can throw discs, and can do so into any living entity
+        if (entity instanceof LivingEntity livingEntity && getOwner() instanceof WhiteSnakeEntity
+                && getItem().is(JItemRegistry.STAND_DISC.get())) {
             // get NBT
             StandType itemStand = null;
             int itemSkin = 0;
@@ -246,26 +284,25 @@ public class ItemTossProjectile extends AbstractArrow {
 
         // force feed
         if (entity instanceof LivingEntity livingEntity && getItem().isEdible()) {
-            // FIXME Vampires can't be force-fed blood bottles
-            if (getItem().getItem() instanceof BloodBottleItem && livingEntity instanceof Player player) {
-                final CommonVampireComponent vampireComponent = JComponentPlatformUtils.getVampirism(player);
-                if (vampireComponent.isVampire()) {
-                    final CompoundTag nbt = getItem().getOrCreateTag();
-                    int blood = (int)Math.floor(nbt.getFloat("Blood"));
-                    vampireComponent.setBlood(Math.min(VampireSpec.MAX_BLOOD, vampireComponent.getBlood() + blood));
-                    effectActivated = true;
+            if (!JComponentPlatformUtils.getVampirism(livingEntity).isVampire()) {
+                livingEntity.eat(level(), getItem());
+                if (getItem().getItem() instanceof BowlFoodItem) {
+                    setItem(Items.BOWL.getDefaultInstance());
+                    dropItem(result.getLocation()); // FIXME doesn't work?
+                }
+                effectActivated = true;
+            }
+        }
+        // force drink potions
+        if (entity instanceof LivingEntity living && getItem().getItem() instanceof PotionItem) {
+            for (MobEffectInstance mobEffectInstance : PotionUtils.getMobEffects(getItem())) {
+                if (mobEffectInstance.getEffect().isInstantenous()) {
+                    mobEffectInstance.getEffect().applyInstantenousEffect(getOwner(), getOwner(), living, mobEffectInstance.getAmplifier(), 1d);
+                } else {
+                    living.addEffect(new MobEffectInstance(mobEffectInstance));
                 }
             }
-            else if (livingEntity instanceof Player player) {
-                if (!JComponentPlatformUtils.getVampirism(player).isVampire()) {
-                    livingEntity.eat(level(), getItem());
-                    if (getItem().getItem() instanceof BowlFoodItem) {
-                        setItem(Items.BOWL.getDefaultInstance());
-                        dropItem(result.getLocation()); // FIXME doesn't work?
-                    }
-                    effectActivated = true;
-                }
-            }
+            effectActivated = true;
         }
 
         // slab iron on iron golem
@@ -308,10 +345,29 @@ public class ItemTossProjectile extends AbstractArrow {
                     getItem().is(JTagRegistry.EXPLODES_ON_IMPACT) ||
                     getItem().is(JTagRegistry.SLOWS_ON_IMPACT) ||
                     getItem().is(JTagRegistry.POISONS_ON_IMPACT))) {
-                dropItem(result.getLocation());
+                // drop at owner position so the item doesn't land on the target and get picked up
+                final Vec3 dropTarget = entity2 != null ? entity2.position() : result.getLocation();
+                dropItem(dropTarget);
             }
             this.discard();
         }
+    }
+
+    private float calculateDamage(final Entity target) {
+        float damage = (float)getBaseDamage();
+        if (!(target instanceof final LivingEntity livingTarget)
+                || !(JUtils.getUserIfStand(getOwner()) instanceof final LivingEntity owner)
+                /*|| !(getItem().getItem() instanceof final TieredItem tieredItem)*/) {
+            return damage;
+        }
+        damage = (float)owner.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        damage += EnchantmentHelper.getDamageBonus(getItem(), livingTarget.getMobType());
+        return damage;
+    }
+
+    private float calculateKnockback() {
+        int knockbackLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.KNOCKBACK, getItem());
+        return getKnockback() + 0.5f * knockbackLevel;
     }
 
     @Override
@@ -359,10 +415,13 @@ public class ItemTossProjectile extends AbstractArrow {
         // blocks get placed if possible
         final BlockPos pos = result.getBlockPos().relative(result.getDirection());
         if (item.getItem() instanceof BlockItem block) {
+            final LivingEntity placer = JUtils.getUserIfStand(getOwner()) instanceof LivingEntity living ? living : null;
             if (item.is(JTagRegistry.BRITTLE) && hardness >= Blocks.STONE.defaultDestroyTime()) {
                 // brittle things get destroyed
-            }
-            else if ((!(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) &&
+            } else if (!JUtils.mayAlter(level(), placer, pos, null)) {
+                // the stand's user may not build where the block landed, so drop it as an item instead of placing
+                dropItem(result.getLocation());
+            } else if ((!(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) &&
                     InteractionResult.SUCCESS != block.place(new BlockPlaceContext(new UseOnContext(level(), null, InteractionHand.MAIN_HAND, item, result)))) {
                 dropItem(result.getLocation());
             }
@@ -375,7 +434,7 @@ public class ItemTossProjectile extends AbstractArrow {
                 level().setBlockAndUpdate(result.getBlockPos(), stripped.get());
                 item.hurtAndBreak(1, (LivingEntity)getOwner(), owner -> {/* do nothing */});
             }
-            dropItem(result.getLocation());
+            stickOrDrop(result.getLocation());
         }
         // hoe get used
         else if (item.getItem() instanceof HoeItem) {
@@ -391,10 +450,10 @@ public class ItemTossProjectile extends AbstractArrow {
                     }
                 }
             }
-            dropItem(result.getLocation());
+            stickOrDrop(result.getLocation());
         }
         // buckets empty their content if any
-        else if (item.getItem() instanceof BucketItem bucket && bucket.content != Fluids.EMPTY) {
+        else if (item.getItem() instanceof BucketItem bucket && ((BucketItemAccessor) bucket).getContent() != Fluids.EMPTY) {
             if (bucket.emptyContents(null, level(), result.getBlockPos(), result)) {
                 bucket.checkExtraContent(null, level(), item, pos);
                 setItem(Items.BUCKET.getDefaultInstance());
@@ -448,12 +507,34 @@ public class ItemTossProjectile extends AbstractArrow {
                 entityType2.spawn((ServerLevel)level(), item, null, pos, MobSpawnType.SPAWN_EGG, true, false);
             }
         }
-        // rest just get dropped
+        // rest just get dropped (or stuck if damageable)
         else {
-            dropItem(result.getLocation());
+            stickOrDrop(result.getLocation());
         }
-        inGround = true;
-        discard();
+        if (pickup == Pickup.ALLOWED) {
+            // Position flush with the block face so the item doesn't sink in
+            final Vec3 loc = result.getLocation();
+            final Vec3 toHit = loc.subtract(getX(), getY(), getZ()).normalize().scale(0.05);
+            setPosRaw(loc.x - toHit.x, loc.y - toHit.y, loc.z - toHit.z);
+            setDeltaMovement(Vec3.ZERO);
+            inGround = true;
+        } else {
+            inGround = true;
+            discard();
+        }
+    }
+
+    /**
+     * Drops the item, or sticks it in the block if it has durability (axes, swords, pickaxes, etc.).
+     * Returns true if sticking, false if dropped.
+     */
+    private boolean stickOrDrop(final Vec3 pos) {
+        if (getItem().getItem() instanceof TieredItem) {
+            pickup = Pickup.ALLOWED;
+            return true;
+        }
+        dropItem(pos);
+        return false;
     }
 
     /**
@@ -506,5 +587,10 @@ public class ItemTossProjectile extends AbstractArrow {
             return 0.1;
         }
         return 1d;
+    }
+
+    public boolean isFerrous() {
+        final ItemStack stack = getItem();
+        return stack != null && stack.is(JTagRegistry.FERROUS_ITEMS);
     }
 }

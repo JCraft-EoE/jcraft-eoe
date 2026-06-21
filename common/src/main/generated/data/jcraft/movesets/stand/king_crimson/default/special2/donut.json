@@ -1,0 +1,48 @@
+{
+  "anim_state": "DONUT",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "move": {
+    "type": "jcraft:kingcrimson_kc_donut_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 18,
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_3",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 48,
+    "damage": 14.0,
+    "duration": 48,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:kcdonut"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact7"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.king_crimson.default.donut.description"
+      },
+      "name": {
+        "translate": "move.jcraft.king_crimson.default.donut.name"
+      }
+    },
+    "hitbox_size": 1.75,
+    "knockback": 1.5,
+    "move_distance": 1.0,
+    "offset": 0.1,
+    "stun": 10,
+    "windup": 30
+  }
+}

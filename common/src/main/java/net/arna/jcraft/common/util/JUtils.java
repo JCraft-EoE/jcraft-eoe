@@ -1,6 +1,5 @@
 package net.arna.jcraft.common.util;
 
-import com.google.common.base.MoreObjects;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import lombok.NonNull;
@@ -8,7 +7,6 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
-import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
@@ -23,6 +21,7 @@ import net.arna.jcraft.common.entity.projectile.GasCanProjectile;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.projectile.ScalpelProjectile;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.item.GasCanItem;
@@ -34,12 +33,15 @@ import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -114,6 +116,14 @@ public final class JUtils {
     public static void setVelocity(Entity entity, double x, double y, double z) {
         entity.setDeltaMovement(x, y, z);
         syncVelocityUpdate(entity);
+    }
+
+    public static double angleBetween(@NonNull final Vec3 a, @NonNull final Vec3 b) {
+        final double aLength = a.length(), bLength = b.length();
+
+        if (aLength == 0 || bLength == 0) return 0.0;
+
+        return a.dot(b) / (aLength * bLength);
     }
 
     public static void syncVelocityUpdate(Entity entity) {
@@ -200,11 +210,11 @@ public final class JUtils {
     }
 
     // Defaults to LivingEntity
-    public static Set<LivingEntity> generateHitbox(Level world, Vec3 center, double hitboxSize, Set<Entity> except) {
+    public static Set<LivingEntity> generateHitbox(@NonNull Level world, @NonNull Vec3 center, double hitboxSize, @NonNull Set<Entity> except) {
         return generateHitbox(world, center, hitboxSize, e -> !except.contains(e));
     }
 
-    public static Set<LivingEntity> generateHitbox(Level world, Vec3 center, double hitboxSize, Predicate<Entity> predicate) {
+    public static Set<LivingEntity> generateHitbox(@NonNull Level world, @NonNull Vec3 center, double hitboxSize, @NonNull Predicate<Entity> predicate) {
         double size = hitboxSize / 2;
 
         Vec3 v1 = center.subtract(size, size, size);
@@ -218,9 +228,8 @@ public final class JUtils {
                 EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(predicate));
         Set<LivingEntity> toReturn = new HashSet<>(hit);
         for (LivingEntity l : hit)
-        //JCraft.LOGGER.info("Stand: " + stand);
         {
-            if (l instanceof StandEntity<?, ?> stand && stand.hasUser()) {
+            if (l instanceof StandEntity<?, ?> stand && stand.hasUser() && predicate.test(stand.getUser())) {
                 toReturn.add(stand.getUserOrThrow());
             }
         }
@@ -503,8 +512,9 @@ public final class JUtils {
             return;
         }
 
+        final boolean fire = modifier.getCreateFire() != null && modifier.getCreateFire();
         Explosion explosion = new Explosion(world, entity, x, y, z, power,
-                MoreObjects.firstNonNull(modifier.getCreateFire(), false), modifier.getBlockInteraction());
+                fire, modifier.getBlockInteraction());
         ((IJExplosion) explosion).jcraft$setModifier(modifier);
         explosion.explode();
         explosion.finalizeExplosion(true);
@@ -512,6 +522,18 @@ public final class JUtils {
         if (world.isClientSide) {
             return;
         }
+
+        // set gasoline on fire (always, independent of fire modifier)
+        /*JSplatterManager splatterManager = JSplatterManager.get(world);
+        Set<Splatter> gasSplatters = new HashSet<>();
+        for (int i = -Math.round(power)-2; i <= Math.round(power)+2; i++) {
+            for (int j = -Math.round(power)-2; j <= Math.round(power)+2; j++) {
+                for (int k = -1; k <= 1; k++)
+                    gasSplatters.addAll(splatterManager.getHit(new Vec3(x+i, y+k, z+j), s -> s instanceof GasolineSplatter));
+            }
+        }
+        gasSplatters.forEach(s -> ((GasolineSplatter) s).lightOnFire());*/
+
         for (ServerPlayer player : around((ServerLevel) world, new Vec3(x, y, z), 64)) {
             JExplosionPacket.send(player, x, y, z, power, explosion, modifier);
         }
@@ -667,13 +689,26 @@ public final class JUtils {
     public static boolean canHoldMove(ServerPlayer player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
         if (stand != null && stand.allowMoveHandling()) {
-            return stand.canHoldMove(type) || type.isHoldable(stand.isStandby());
+            if (!stand.canHoldMove(type) && !type.isHoldable()) {
+                return false;
+            }
+            // If the stand forwards this input to the spec, only treat it as
+            // holdable if the spec also considers it holdable. Otherwise, the
+            // held-tick loop would call spec.initMove() every tick even for
+            // discrete (non-hold) spec actions.
+            if (stand.forwardInputToSpec(type)) {
+                JSpec<?, ?> spec = JUtils.getSpec(player);
+                if (spec != null && !spec.canHoldMove(type)) {
+                    return false;
+                }
+            }
+            return true;
         }
         JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec != null && spec.canHoldMove(type)) {
             return true;
         }
-        return type.isHoldable(stand != null && stand.isStandby());
+        return type.isHoldable();
     }
 
     /**
@@ -720,25 +755,12 @@ public final class JUtils {
 
     public static Collection<ServerPlayer> around(ServerLevel world, Vec3 pos, double radius) {
         double radiusSq = radius * radius;
-
-        List<ServerPlayer> list = new ArrayList<>();
-        for (ServerPlayer p : world.players()) {
-            if (p.distanceToSqr(pos) <= radiusSq) {
-                list.add(p);
-            }
-        }
-        return list;
+        return world.getPlayers(p -> p.distanceToSqr(pos) <= radiusSq);
     }
 
-    public static Collection<ServerPlayer> all(MinecraftServer server) {
-        Objects.requireNonNull(server, "The server cannot be null");
-
+    public static Collection<ServerPlayer> all(@NonNull MinecraftServer server) {
         // return an immutable collection to guard against accidental removals.
-        if (server.getPlayerList() != null) {
-            return Collections.unmodifiableCollection(server.getPlayerList().getPlayers());
-        }
-
-        return Collections.emptyList();
+        return Collections.unmodifiableCollection(server.getPlayerList().getPlayers());
     }
 
     /**
@@ -792,6 +814,10 @@ public final class JUtils {
             return true;
         }
 
+        if (entity instanceof ItemTossProjectile toss && toss.isFerrous()) {
+            return true;
+        }
+
         final String stringName = entity.getName().toString().toLowerCase(Locale.ROOT);
         return stringName.contains("iron") || stringName.contains("ferro"); // Cross-mod compatibility :D
     }
@@ -808,87 +834,87 @@ public final class JUtils {
 
     /**
      * Tosses or shoots the specified item.
+     * @return The spawned projectile entity, or <code>null</code> if nothing was or several entities were spawned.
      */
-    public static void tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, boolean decrement) {
-        if (level.isClientSide() || itemStack.isEmpty()) {
-            return;
-        }
-        if (itemStack.getItem() instanceof final ArrowItem arrow) {
-            final AbstractArrow arrowEntity = arrow.createArrow(level, itemStack, shooter);
-            arrowEntity.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(arrowEntity);
-        }
-        else if (itemStack.getItem() instanceof SnowballItem) {
-            final Snowball snowballEntity = new Snowball(level, shooter);
-            snowballEntity.setItem(itemStack);
-            snowballEntity.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(snowballEntity);
-        }
+    public static @Nullable Entity tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, float inaccurancy, boolean decrement) {
+        return tossItem(shooter, level, itemStack, velocity, inaccurancy, decrement, null);
+    }
 
-        else if (itemStack.getItem() instanceof TridentItem) {
-            final ThrownTrident thrownTrident = new ThrownTrident(level, getUserIfStand(shooter), itemStack);
-            thrownTrident.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(thrownTrident);
+    public static @Nullable Entity tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, float inaccurancy, boolean decrement, @Nullable Vec3 spawnPos) {
+        if (level.isClientSide() || itemStack.isEmpty()) {
+            return null;
         }
-        else if (itemStack.getItem() instanceof ThrowablePotionItem) {
-            final ThrownPotion thrownPotion = new ThrownPotion(level, shooter);
-            thrownPotion.setItem(itemStack);
-            thrownPotion.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(thrownPotion);
-        }
-        else if (itemStack.getItem() instanceof EggItem) {
-            final ThrownEgg thrownEgg = new ThrownEgg(level, shooter);
-            thrownEgg.setItem(itemStack);
-            thrownEgg.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(thrownEgg);
-        }
-        else if (itemStack.getItem() instanceof ScalpelItem) {
-            final ScalpelProjectile scalpelProjectile = new ScalpelProjectile(level, shooter);
-            scalpelProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(scalpelProjectile);
-        }
-        else if (itemStack.getItem() instanceof KnifeBundleItem) {
+        final Vec3 resolvedSpawnPos = spawnPos != null ? spawnPos : shooter.position().add(getEyePos(shooter));
+        // knife bundle needs extra care
+        if (itemStack.getItem() instanceof KnifeBundleItem) {
+            final LivingEntity bundleOwner = getUserIfStand(shooter);
             for (int i = 0; i < 9; i++) {
-                KnifeProjectile knife = new KnifeProjectile(level, shooter);
-                knife.setPos(knife.position().add(
+                KnifeProjectile knife = new KnifeProjectile(level, bundleOwner);
+                knife.setPos(resolvedSpawnPos.add(
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5)
                 ));
-                knife.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 5f);
+                knife.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 5f * inaccurancy);
                 level.addFreshEntity(knife);
             }
+            if (decrement) {
+                itemStack.shrink(1);
+            }
+            return null;
+        }
+        // other cases
+        final Projectile spawned;
+        if (itemStack.getItem() instanceof final ArrowItem arrow) {
+            final Entity arrowOwner = getUserIfStand(shooter);
+            spawned = arrow.createArrow(level, itemStack, arrowOwner instanceof LivingEntity le ? le : shooter);
+        }
+        else if (itemStack.getItem() instanceof SnowballItem) {
+            final Snowball snowballEntity = new Snowball(level, shooter);
+            snowballEntity.setItem(itemStack);
+            spawned = snowballEntity;
+        }
+        else if (itemStack.getItem() instanceof TridentItem) {
+            spawned = new ThrownTrident(level, getUserIfStand(shooter), itemStack);
+        }
+        else if (itemStack.getItem() instanceof ThrowablePotionItem) {
+            final ThrownPotion thrownPotion = new ThrownPotion(level, shooter);
+            thrownPotion.setItem(itemStack);
+            spawned = thrownPotion;
+        }
+        else if (itemStack.getItem() instanceof EggItem) {
+            final ThrownEgg thrownEgg = new ThrownEgg(level, shooter);
+            thrownEgg.setItem(itemStack);
+            spawned = thrownEgg;
+        }
+        else if (itemStack.getItem() instanceof ScalpelItem) {
+            spawned = new ScalpelProjectile(level, getUserIfStand(shooter));
         }
         else if (itemStack.getItem() instanceof KnifeItem) {
-            final KnifeProjectile knifeProjectile = new KnifeProjectile(level, shooter);
-            knifeProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(knifeProjectile);
+            spawned = new KnifeProjectile(level, getUserIfStand(shooter));
         }
         else if (itemStack.getItem() instanceof EnderpearlItem) {
             final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
             enderpearlProjectile.setItem(itemStack);
-            enderpearlProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, 1.5F, 1.0F);
-            level.addFreshEntity(enderpearlProjectile);
+            spawned = enderpearlProjectile;
         }
         else if (itemStack.getItem() instanceof GasCanItem) {
-            final GasCanProjectile gasCan = new GasCanProjectile(JUtils.getUserIfStand(shooter), level);
-            gasCan.setItem(itemStack);
-            gasCan.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, velocity, 1.0F);
-            level.addFreshEntity(gasCan);
+            spawned = new GasCanProjectile(JUtils.getUserIfStand(shooter), level);
         }
         else {
-            final AbstractArrow projectile = new ItemTossProjectile(shooter, level, itemStack);
-            projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(projectile);
-            shooter.playSound(JSoundRegistry.TOSS.get());
+            spawned = new ItemTossProjectile(shooter, level, itemStack);
         }
+        spawned.setPos(resolvedSpawnPos);
+        spawned.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, inaccurancy);
+        level.addFreshEntity(spawned);
         if (decrement) {
             itemStack.shrink(1);
         }
+        return spawned;
     }
 
     public static void tossItem(final Player player) {
-        tossItem(player, player.level(), player.getItemInHand(InteractionHand.MAIN_HAND), 1f, !player.getAbilities().instabuild);
+        tossItem(player, player.level(), player.getItemInHand(InteractionHand.MAIN_HAND), 1f, 1f, !player.getAbilities().instabuild);
     }
 
     public static double nullSafeDistanceSqr(@Nullable Entity a, @Nullable Entity b) {
@@ -964,15 +990,25 @@ public final class JUtils {
         return player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
 
+    private static final Style runStandAboutStyle = Style.EMPTY
+            .withColor(ChatFormatting.AQUA)
+            .withUnderlined(true)
+            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/stand about"));
+
     public static void maySendStandAboutInfo(final ServerPlayer player) {
         if (!hasAdvancement(player, JCraft.id("obtain_stand"))) {
-            player.sendSystemMessage(Component.translatable("info.jcraft.first_stand"));
+            player.sendSystemMessage(Component.translatable("info.jcraft.first_stand").withStyle(runStandAboutStyle));
         }
     }
 
+    private static final Style runSpecAboutStyle = Style.EMPTY
+            .withColor(ChatFormatting.AQUA)
+            .withUnderlined(true)
+            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/spec about"));
+
     public static void maySendSpecAboutInfo(final ServerPlayer player) {
         if (!hasAdvancement(player, JCraft.id("obtain_any_spec"))) {
-            player.sendSystemMessage(Component.translatable("info.jcraft.first_spec"));
+            player.sendSystemMessage(Component.translatable("info.jcraft.first_spec").withStyle(runSpecAboutStyle));
         }
     }
 
@@ -982,6 +1018,11 @@ public final class JUtils {
     public static boolean isMortal(@Nullable final ServerPlayer player) {
         if (player == null) return false;
         return !player.isSpectator() && !player.isCreative() && !player.isInvulnerable();
+    }
+
+    @NonNull
+    public static Vec3 getEyePos(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, (double)ent.getEyeHeight(), 0, GravityChangerAPI.getGravityDirection(ent));
     }
 
     @NonNull
@@ -1029,5 +1070,20 @@ public final class JUtils {
 
         final ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
         return !offHandStack.isEmpty() && !offHandStack.is(JTagRegistry.UNTHROWABLE);
+    }
+
+    /**
+     * Checks if the given entity is currently using KC for Time Erase
+     * @param entity the entity to check, can be <code>null</code>
+     * @return <code>true</code> if the entity is using KC and in Time Erase, else <code>false</code>
+     */
+    public static boolean inTimeErase(Entity entity) {
+        if (!(entity instanceof LivingEntity living)) {
+            return false;
+        }
+        if (!(getStand(living) instanceof KingCrimsonEntity kc)) {
+            return false;
+        }
+        return kc.getTETime() > 0;
     }
 }

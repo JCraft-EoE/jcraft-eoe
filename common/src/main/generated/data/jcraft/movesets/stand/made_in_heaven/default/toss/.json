@@ -1,0 +1,27 @@
+{
+  "anim_state": "ITEM_TOSS_CHARGE",
+  "class": "TOSS",
+  "cooldown_type": "STAND_TOSS",
+  "followup": {
+    "anim_state": "ITEM_TOSS",
+    "class": "TOSS",
+    "cooldown_type": "STAND_TOSS",
+    "move": {
+      "type": "jcraft:shared_toss_move",
+      "cooldown": 0,
+      "duration": 1,
+      "move_distance": 0.75,
+      "spreadMultiplier": 2.0,
+      "velocityMultiplier": 0.5,
+      "windup": 1
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_toss_charge_move",
+    "cooldown": 30,
+    "duration": 20,
+    "minimum_charge": 0,
+    "move_distance": 1.0,
+    "windup": 21
+  }
+}

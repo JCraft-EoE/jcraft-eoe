@@ -7,8 +7,61 @@ plugins {
     id 'signing'
 }
 
+// ---------------------------------------------------------------------------
+// Automatic datagen before platform builds
+// ---------------------------------------------------------------------------
+// Why a nested GradleBuild instead of a direct task dependency?
+//
+// A direct dependency chain would be circular:
+//   runDatagen → :common/:fabric jar (needs compiled classes)
+//              → jar → processResources
+//              → processResources should run after runDatagen  ← cycle!
+//
+// The fix: run datagen in a *child* Gradle invocation that finishes before
+// the parent build reaches processResources. Both :fabric:build and
+// :forge:build depend on the same runDatagenOnce task instance, so Gradle
+// deduplicates it — datagen runs exactly once per `./gradlew build`.
+//
+// Pass -PdatagenChild to the child build so it does not schedule itself
+// again, preventing infinite recursion.
+// ---------------------------------------------------------------------------
+if (!rootProject.hasProperty('datagenChild')) {
+    tasks.register('runDatagenOnce', GradleBuild) {
+        group = 'build'
+        description = 'Runs :datagen:runDatagen in a child build so that freshly ' +
+                'generated resources are present when the platform builds package their jars.'
+        dir = rootDir
+        tasks = [':datagen:runDatagen']
+        startParameter.projectProperties =
+                (startParameter.projectProperties ?: [:]) + [datagenChild: 'true']
+    }
+
+    gradle.projectsEvaluated {
+        // :common:processResources reads src/main/generated and must not race with
+        // datagen writing to that directory. mustRunAfter (not dependsOn) enforces
+        // the ordering when both tasks are scheduled together (e.g. ./gradlew build),
+        // but does NOT pull runDatagenOnce into the graph when running
+        // :datagen:runDatagen directly — which would otherwise cause a double-run.
+        project(':common').tasks.named('processResources').configure {
+            mustRunAfter(rootProject.tasks.named('runDatagenOnce'))
+        }
+        project(':fabric').tasks.named('build').configure {
+            dependsOn(rootProject.tasks.named('runDatagenOnce'))
+        }
+        project(':forge').tasks.named('build').configure {
+            dependsOn(rootProject.tasks.named('runDatagenOnce'))
+        }
+    }
+}
+
 architectury {
     minecraft = project.minecraft_version
+}
+
+ext {
+    // Single source of truth for the Maven repository URL.
+    // Referenced by both the publishing configuration and the sendDiscordWebhook task.
+    planetMavenUrl = 'https://maven.jcraft-eoe.com/releases/'
 }
 
 allprojects {
@@ -118,7 +171,7 @@ subprojects {
         repositories {
             maven {
                 name = 'planetMaven'
-                url = 'https://maven.jcraft-eoe.com/releases/'
+                url = rootProject.ext.planetMavenUrl
                 credentials(org.gradle.api.credentials.PasswordCredentials)
                 authentication {
                     //noinspection GroovyAssignabilityCheck
@@ -131,4 +184,70 @@ subprojects {
     signing {
         sign publishing.publications.mavenJava
     }
+}
+
+// ---------------------------------------------------------------------------
+// Discord release notification
+// ---------------------------------------------------------------------------
+// Reads configuration from environment variables (preferred in CI) with
+// Gradle property fallbacks for local overrides.
+//
+// Required secrets/vars in GitHub Actions:
+//   DISCORD_WEBHOOK_URL  (secret)  — incoming webhook URL
+//   DISCORD_AVATAR_URL   (var)     — bot avatar image URL
+//   DISCORD_USERNAME     (var)     — bot display name
+//   DISCORD_MESSAGE_FORMAT (var)   — message template (see placeholders below)
+//
+// Available {placeholder} tokens in the message format:
+//   {version}              — mod version, e.g. 0.18.1+b3
+//   {filename_fabric}      — fabric jar filename
+//   {filename_forge}       — forge jar filename
+//   {download_url_fabric}  — full Maven download URL for the fabric jar
+//   {download_url_forge}   — full Maven download URL for the forge jar
+//   {compare_url}          — GitHub compare URL (prev tag → current tag)
+//   {compare_range}        — plain compare range string, e.g. v0.18.0...v0.18.1+b3
+// ---------------------------------------------------------------------------
+tasks.register('sendDiscordWebhook', DiscordWebhookTask) {
+    group = 'publishing'
+    description = 'Posts a release notification to a Discord webhook.'
+
+    def envOrProp = { String envKey, String propKey ->
+        providers.environmentVariable(envKey)
+                .orElse(providers.gradleProperty(propKey))
+    }
+
+    webhookUrl    = envOrProp('DISCORD_WEBHOOK_URL', 'discordWebhookUrl')
+    avatarUrl     = envOrProp('DISCORD_AVATAR_URL', 'discordAvatarUrl')
+    username      = envOrProp('DISCORD_USERNAME', 'discordUsername')
+    messageFormat = envOrProp('DISCORD_MESSAGE_FORMAT', 'discordMessageFormat')
+
+    // Skip silently when no webhook URL is configured (e.g. local dev builds)
+    onlyIf { webhookUrl.isPresent() }
+
+    // Placeholder values are computed lazily so all subprojects are fully
+    // evaluated before archivesName / group are read.
+    placeholders.set(provider {
+        def ver       = rootProject.version.toString()
+        def groupPath = rootProject.group.toString().replace('.', '/')
+        def mavenBase = rootProject.ext.planetMavenUrl as String
+        def fabricId  = project(':fabric').base.archivesName.get()
+        def forgeId   = project(':forge').base.archivesName.get()
+        def fabFile   = "${fabricId}-${ver}.jar".toString()
+        def forgeFile = "${forgeId}-${ver}.jar".toString()
+        def curTag    = "v${ver}".toString()
+        def prevTag   = findProperty('discordPrevTag')   as String ?: ''
+        def ghRepo    = findProperty('discordGithubRepo') as String ?: ''
+
+        [
+            version            : ver,
+            filename_fabric    : fabFile,
+            filename_forge     : forgeFile,
+            download_url_fabric: "${mavenBase}${groupPath}/${fabricId}/${ver}/${fabFile}".toString(),
+            download_url_forge : "${mavenBase}${groupPath}/${forgeId}/${ver}/${forgeFile}".toString(),
+            compare_url        : (ghRepo && prevTag)
+                                     ? "https://github.com/${ghRepo}/compare/${prevTag}...${curTag}".toString()
+                                     : ghRepo ? "https://github.com/${ghRepo}/releases/tag/${curTag}".toString() : '',
+            compare_range      : prevTag ? "${prevTag}...${curTag}".toString() : curTag,
+        ]
+    })
 }

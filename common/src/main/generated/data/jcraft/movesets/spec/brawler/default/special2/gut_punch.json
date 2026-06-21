@@ -1,0 +1,39 @@
+{
+  "anim_state": "GUT",
+  "class": "SPECIAL2",
+  "cooldown_type": "SPECIAL2",
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 10,
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 0,
+    "damage": 6.0,
+    "duration": 18,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact3"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.brawler.default.gut_punch.description"
+      },
+      "name": {
+        "translate": "move.jcraft.brawler.default.gut_punch.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.9,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 13,
+    "windup": 11
+  }
+}

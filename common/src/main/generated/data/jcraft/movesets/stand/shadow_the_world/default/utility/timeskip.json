@@ -1,0 +1,26 @@
+{
+  "anim_state": "IDLE",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:shared_time_skip_move",
+    "cooldown": 200,
+    "duration": 0,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.shadow_the_world.default.timeskip.description"
+      },
+      "mobility_type": "TELEPORT",
+      "name": {
+        "translate": "move.jcraft.shadow_the_world.default.timeskip.name"
+      }
+    },
+    "move_distance": 0.0,
+    "range": 7.0,
+    "sounds": [
+      "jcraft:timeskip",
+      "jcraft:stwzap"
+    ],
+    "windup": 0
+  }
+}

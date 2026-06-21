@@ -48,7 +48,7 @@ public class HGNetRenderer extends AbstractEntityRenderer<HGNetEntity> {
                 .addRenderLayer(new HGNetGlowLayer())
                 .setShadowRadius(1.25f)
                 .build(),
-                context, ID);
+                context);
     }
 
     @Override

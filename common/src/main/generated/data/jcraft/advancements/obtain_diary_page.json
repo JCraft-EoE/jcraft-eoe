@@ -1,0 +1,41 @@
+{
+  "parent": "jcraft:obtain_meteorite_iron_ore",
+  "criteria": {
+    "has_diary_page": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:diary_page"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_diary_page.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:diary_page"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_diary_page.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_diary_page"
+    ]
+  ],
+  "rewards": {
+    "experience": 100
+  },
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "#jcraft:stands",
+    "jcraft:playerclone"
+  ]
+}

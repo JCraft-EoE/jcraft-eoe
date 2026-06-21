@@ -211,9 +211,9 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final TossMove<GEREntity> TOSS = new TossMove<GEREntity>(0, 1, 1, 0.75f)
+    public static final TossMove<GEREntity> TOSS = new TossMove<GEREntity>(0, 1, 1, 0.75f,0.13f)
             .withAnim(GEREntity.State.ITEM_TOSS);
-    public static final TossChargeMove<GEREntity> TOSS_CHARGE = new TossChargeMove<GEREntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+    public static final TossChargeMove<GEREntity> TOSS_CHARGE = new TossChargeMove<GEREntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Integer> FLIGHT_TIME = SynchedEntityData.defineId(GEREntity.class, EntityDataSerializers.INT);
@@ -321,10 +321,6 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                 for (int i = 0; i < 12; i++) {
                     level().addParticle(ParticleTypes.WITCH, x, y, z, random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
                 }
-            }
-
-            if (getUser() instanceof Player player && !player.isCreative() && !player.isSpectator()) {
-                player.getAbilities().flying = (getFlightTime() > 1);
             }
         }
     }

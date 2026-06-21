@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "jcraft:monastery/lower_center_pool",
+      "required": false
+    }
+  ]
+}

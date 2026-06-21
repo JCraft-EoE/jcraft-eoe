@@ -1,0 +1,32 @@
+{
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "crouching_variant": {
+    "class": "UTILITY",
+    "cooldown_type": "UTILITY",
+    "move": {
+      "type": "jcraft:shared_pilot_mode_move",
+      "cooldown": 20,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.purple_haze_distortion.default.pilot_mode.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.purple_haze_distortion.default.pilot_mode.cr.name"
+        }
+      }
+    }
+  },
+  "move": {
+    "type": "jcraft:purplehaze_distortion_distortion_move",
+    "cooldown": 20,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.purple_haze_distortion.default.distortion.description"
+      },
+      "name": {
+        "translate": "move.jcraft.purple_haze_distortion.default.distortion.name"
+      }
+    }
+  }
+}

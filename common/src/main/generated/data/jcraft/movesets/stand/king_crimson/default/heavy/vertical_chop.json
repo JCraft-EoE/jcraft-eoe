@@ -1,0 +1,94 @@
+{
+  "anim_state": "HEAVY",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "followup": {
+    "anim_state": "OVERHEAD",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:shared_knockdown_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 10,
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_3",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 0,
+      "damage": 9.0,
+      "duration": 32,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:kcheavy2"
+          }
+        ],
+        "armor": 2147483647,
+        "description": {
+          "translate": "move.jcraft.king_crimson.default.overhead_hook.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.king_crimson.default.overhead_hook.followup.name"
+        }
+      },
+      "hitbox_size": 2.0,
+      "knockback": 1.5,
+      "knockdown_duration": 35,
+      "move_distance": 0.85,
+      "offset": 0.0,
+      "stun": 11,
+      "windup": 22
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 10,
+      "extra_hit_boxes": [
+        {
+          "size": 1.0,
+          "vertical_offset": 0.5
+        }
+      ],
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 0,
+    "damage": 6.0,
+    "duration": 19,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:kcheavy"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact9"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.king_crimson.default.vertical_chop.description"
+      },
+      "followup_frame": 7,
+      "name": {
+        "translate": "move.jcraft.king_crimson.default.vertical_chop.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.6,
+    "move_distance": 0.85,
+    "offset": 0.0,
+    "stun": 25,
+    "windup": 12
+  }
+}

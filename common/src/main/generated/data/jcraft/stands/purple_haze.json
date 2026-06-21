@@ -1,0 +1,29 @@
+{
+  "idle_rotation": 225.0,
+  "info": {
+    "con_count": 2,
+    "free_space": {
+      "translate": "entity.jcraft.purple_haze.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.purple_haze"
+    },
+    "pro_count": 3,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.purple_haze.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.purple_haze.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.purple_haze.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:phsummon"
+    }
+  }
+}

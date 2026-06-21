@@ -1,0 +1,21 @@
+{
+  "anim_state": "INHALE",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:starplatinum_inhale_attack",
+    "cooldown": 800,
+    "duration": 5,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.star_platinum.default.inhale.description"
+      },
+      "name": {
+        "translate": "jcraft.starplatinum.ult"
+      }
+    },
+    "inhale_duration": 80,
+    "move_distance": 1.0,
+    "windup": 5
+  }
+}

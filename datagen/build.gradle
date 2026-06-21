@@ -17,7 +17,7 @@ loom {
             name "Data Generation"
             vmArg "-Dfabric-api.datagen"
             vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file("src/main/generated")}"
-            vmArg "-Dfabric-api.datagen.modid=jcraft"
+            vmArg "-Dfabric-api.datagen.modid=jcraft_datagen"
             vmArg "-Djcraft.datagen.resources-source=${project(":common").file("src/main/resources")}"
 
             runDir "build/datagen"
@@ -51,6 +51,20 @@ configurations {
     shadowBundle {
         canBeResolved = true
         canBeConsumed = false
+    }
+}
+
+tasks.register("copyAccessWidener", Copy) {
+    from(project(":common").file("src/main/resources/jcraft.accesswidener"))
+    into(sourceSets.named("main").get().resources.srcDirs.first())
+}
+
+processResources {
+    dependsOn("copyAccessWidener")
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
     }
 }
 

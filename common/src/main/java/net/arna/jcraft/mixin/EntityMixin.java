@@ -1,12 +1,17 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.arna.jcraft.common.effects.FlammableEffect;
+import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.events.EntityTickEvent;
+import net.arna.jcraft.common.events.JEntityEvents;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.mixin_logic.EntityAddon;
 import net.arna.jcraft.mixin_logic.EntityMixinLogic;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,6 +35,13 @@ public abstract class EntityMixin implements EntityAddon {
         EntityMixinLogic.jcraft$updatePassengerPosition((Entity)(Object)this, passenger, positionUpdater, info);
     }
 
+    @Inject(method = "setRemainingFireTicks", at = @At("HEAD"), cancellable = true)
+    private void jcraft$preventExtinguish(int ticks, CallbackInfo ci) {
+        if (ticks <= 0 && (Object) this instanceof LivingEntity living && FlammableEffect.isFlammable(living) && living.isOnFire()) {
+            ci.cancel();
+        }
+    }
+
     /**
      * Disables sprinting particles during time erase
      */
@@ -44,6 +56,29 @@ public abstract class EntityMixin implements EntityAddon {
     @Inject(method = "tick", at = @At("HEAD"))
     private void preTick(CallbackInfo ci) {
         EntityTickEvent.ENTITY_PRE.invoker().tick((Entity) (Object) this);
+    }
+
+    @Inject(method = "isInvulnerable", at = @At("HEAD"), cancellable = true)
+    private void invulnerableIfCreaming(CallbackInfoReturnable<Boolean> cir) {
+        if (CreamEntity.isCreaming((Entity) (Object) this))
+            cir.setReturnValue(true);
+    }
+
+    @SuppressWarnings("ConstantValue")
+    @ModifyExpressionValue(method = "isInvulnerableTo", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/Entity;invulnerable:Z", opcode = Opcodes.GETFIELD))
+    private boolean invulnerableIfCreaming(boolean original) {
+        return original || CreamEntity.isCreaming((Entity) (Object) this);
+    }
+
+    @Inject(method = "checkInsideBlocks", at = @At("HEAD"), cancellable = true)
+    private void jcraft$ignoreBlockPushingIfCreaming(CallbackInfo ci) {
+        if (CreamEntity.isCreaming((Entity) (Object) this))
+            ci.cancel();
+    }
+
+    @Inject(method = "setRemoved", at = @At("RETURN"))
+    private void jcraft$fireRemovedEvent(Entity.RemovalReason removalReason, CallbackInfo ci) {
+        JEntityEvents.REMOVE.invoker().remove((Entity) (Object) this, removalReason);
     }
 
     @Override

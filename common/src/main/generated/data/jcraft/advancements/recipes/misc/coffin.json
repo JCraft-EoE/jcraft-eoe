@@ -1,0 +1,230 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_black_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:black_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_blue_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:blue_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_brown_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:brown_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_cyan_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:cyan_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_gray_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:gray_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_green_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:green_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_light_blue_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:light_blue_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_light_grey_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:light_gray_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_lime_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:lime_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_magenta_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:magenta_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_orange_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:orange_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_pink_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:pink_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_purple_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:purple_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_red_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:red_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "jcraft:coffin"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_white_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:white_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_yellow_bed": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:yellow_bed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_black_bed",
+      "has_blue_bed",
+      "has_brown_bed",
+      "has_cyan_bed",
+      "has_gray_bed",
+      "has_green_bed",
+      "has_light_blue_bed",
+      "has_light_grey_bed",
+      "has_lime_bed",
+      "has_magenta_bed",
+      "has_orange_bed",
+      "has_pink_bed",
+      "has_purple_bed",
+      "has_red_bed",
+      "has_white_bed",
+      "has_yellow_bed",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "jcraft:coffin"
+    ]
+  },
+  "sends_telemetry_event": false
+}

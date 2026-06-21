@@ -1,0 +1,29 @@
+{
+  "idle_rotation": -45.0,
+  "info": {
+    "con_count": 2,
+    "free_space": {
+      "translate": "entity.jcraft.the_hand.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.the_hand"
+    },
+    "pro_count": 4,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.the_hand.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.the_hand.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.the_hand.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:thsummon"
+    }
+  }
+}
