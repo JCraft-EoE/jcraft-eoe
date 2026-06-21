@@ -120,7 +120,7 @@ public class TCBEntity extends StandEntity<TCBEntity, TCBEntity.State> {
             return;
         }
 
-        MoveClass moveClass = type.getMoveClass(standby);
+        MoveClass moveClass = type.getMoveClass();
         if (moveClass == null) return;
 
         // ULTIMATE is TCB's own ability (Absolute Defense)

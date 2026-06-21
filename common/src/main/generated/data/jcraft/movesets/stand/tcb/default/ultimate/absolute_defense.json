@@ -1,0 +1,21 @@
+{
+  "anim_state": "ABSOLUTE_DEFENSE",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:tcb_absolute_defense_move",
+    "cooldown": 0,
+    "duration": 2147483647,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.tcb.default.absolute_defense.description"
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.tcb.default.absolute_defense.name"
+      }
+    },
+    "move_distance": 0.0,
+    "windup": 7
+  }
+}

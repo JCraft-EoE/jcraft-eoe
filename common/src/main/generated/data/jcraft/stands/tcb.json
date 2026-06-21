@@ -1,0 +1,21 @@
+{
+  "block_distance": 0.0,
+  "idle_distance": 0.0,
+  "idle_rotation": 0.0,
+  "info": {
+    "con_count": 4,
+    "free_space": {
+      "translate": "entity.jcraft.tcb.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.tcb"
+    },
+    "pro_count": 2,
+    "skin_names": []
+  },
+  "summon_data": {
+    "sound": {
+      "sound_id": "jcraft:standsummon"
+    }
+  }
+}
