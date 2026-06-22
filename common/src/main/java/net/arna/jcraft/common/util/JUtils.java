@@ -1114,17 +1114,17 @@ public final class JUtils {
         // Collect each generic superclass edge from the concrete class up to (and including) the base class,
         // in bottom-up order. Each entry's type arguments are expressed in terms of the class below it.
         List<ParameterizedType> chain = new ArrayList<>();
-        Class<?> klass = object.getClass();
+        Class<?> clazz = object.getClass();
 
-        while (klass != null && klass != baseClass) {
-            Type genericSuper = klass.getGenericSuperclass();
+        while (clazz != null && clazz != baseClass) {
+            Type genericSuper = clazz.getGenericSuperclass();
             if (genericSuper instanceof ParameterizedType pt) {
                 chain.add(pt);
                 if (pt.getRawType() == baseClass) {
                     break;
                 }
             }
-            klass = klass.getSuperclass();
+            clazz = clazz.getSuperclass();
         }
 
         if (chain.isEmpty()) return null;
@@ -1170,8 +1170,8 @@ public final class JUtils {
      * (recursively reduced) first upper bound.
      */
     private static Class<?> toClass(@Nullable Type type) {
-        if (type instanceof Class<?> klass) {
-            return klass;
+        if (type instanceof Class<?> clazz) {
+            return clazz;
         } else if (type instanceof ParameterizedType pt) {
             return toClass(pt.getRawType());
         } else if (type instanceof TypeVariable<?> tv) {
