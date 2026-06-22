@@ -23,6 +23,7 @@ public interface JCommandRegistry {
         GravityCommand.register(dispatcher);
         JConfigCommand.register(dispatcher);
         JCraftHelpCommand.register(dispatcher);
+        JCraftMenuCommand.register(dispatcher);
         JCraftChangesCommand.register(dispatcher);
         CooldownCancelCommand.register(dispatcher);
     }
