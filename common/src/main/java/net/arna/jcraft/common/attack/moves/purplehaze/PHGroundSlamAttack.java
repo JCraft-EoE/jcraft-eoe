@@ -11,19 +11,19 @@ import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Set;
 
-public class PHGroundSlamAttack extends AbstractSimpleAttack<PHGroundSlamAttack, AbstractPurpleHazeEntity<?, ?>> {
+public class PHGroundSlamAttack<A extends AbstractPurpleHazeEntity<? extends A, ?>> extends AbstractSimpleAttack<PHGroundSlamAttack<A>, A> {
     public PHGroundSlamAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                               float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
     }
 
     @Override
-    public @NonNull MoveType<PHGroundSlamAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<PHGroundSlamAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(AbstractPurpleHazeEntity<?, ?> attacker, LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user) {
         Set<LivingEntity> targets = super.perform(attacker, user);
 
         final PurpleHazeCloudEntity cloud = new PurpleHazeCloudEntity(attacker.level(), 3.0f, attacker.getPoisonType());
@@ -35,21 +35,21 @@ public class PHGroundSlamAttack extends AbstractSimpleAttack<PHGroundSlamAttack,
     }
 
     @Override
-    protected @NonNull PHGroundSlamAttack getThis() {
+    protected @NonNull PHGroundSlamAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull PHGroundSlamAttack copy() {
-        return copyExtras(new PHGroundSlamAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull PHGroundSlamAttack<A> copy() {
+        return copyExtras(new PHGroundSlamAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<PHGroundSlamAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<PHGroundSlamAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<PHGroundSlamAttack>, PHGroundSlamAttack> buildCodec(RecordCodecBuilder.Instance<PHGroundSlamAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<PHGroundSlamAttack<?>>, PHGroundSlamAttack<?>> buildCodec(RecordCodecBuilder.Instance<PHGroundSlamAttack<?>> instance) {
             return attackDefault(instance, PHGroundSlamAttack::new);
         }
     }

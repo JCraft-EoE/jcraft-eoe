@@ -4,6 +4,7 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.moves.AbstractTossMove;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
@@ -17,7 +18,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Magician's Red throw move. Thrown items deal fire damage on hit.
  */
-public final class MagiciansRedTossMove extends AbstractTossMove<MagiciansRedTossMove, MagiciansRedEntity> {
+public final class MagiciansRedTossMove<A extends IAttacker<? extends A, ?>> extends AbstractTossMove<MagiciansRedTossMove<A>, A> {
 
     public MagiciansRedTossMove(final int cooldown, final int windup, final int duration, final float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
@@ -32,8 +33,8 @@ public final class MagiciansRedTossMove extends AbstractTossMove<MagiciansRedTos
     }
 
     @Override
-    public @NonNull MoveType<MagiciansRedTossMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<MagiciansRedTossMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
@@ -54,27 +55,27 @@ public final class MagiciansRedTossMove extends AbstractTossMove<MagiciansRedTos
     }
 
     @Override
-    protected void onTossed(final MagiciansRedEntity attacker, final LivingEntity user, final Entity thrown) {
+    protected void onTossed(final A attacker, final LivingEntity user, final Entity thrown) {
         if (thrown != null) {
             thrown.setSecondsOnFire(600); //makes thrown entities appear on fire
         }
     }
 
     @Override
-    protected @NonNull MagiciansRedTossMove getThis() {
+    protected @NonNull MagiciansRedTossMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull MagiciansRedTossMove copy() {
-        return copyExtras(new MagiciansRedTossMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getVelocityMultiplier(), getSpreadMultiplier()));
+    public @NonNull MagiciansRedTossMove<A> copy() {
+        return copyExtras(new MagiciansRedTossMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getVelocityMultiplier(), getSpreadMultiplier()));
     }
 
-    public static class Type extends AbstractTossMove.Type<MagiciansRedTossMove> {
+    public static class Type extends AbstractTossMove.Type<MagiciansRedTossMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<MagiciansRedTossMove>, MagiciansRedTossMove> buildCodec(final RecordCodecBuilder.Instance<MagiciansRedTossMove> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<MagiciansRedTossMove<?>>, MagiciansRedTossMove<?>> buildCodec(final RecordCodecBuilder.Instance<MagiciansRedTossMove<?>> instance) {
             return instance.group(cooldown(), windup(), duration(), moveDistance(), velocityMultiplier(), spreadMultiplier()).apply(instance, MagiciansRedTossMove::new);
         }
     }

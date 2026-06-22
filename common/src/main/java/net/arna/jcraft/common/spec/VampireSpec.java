@@ -24,7 +24,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 @Getter
 public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
-    public static final MoveSet<VampireSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.VAMPIRE, VampireSpec::registerMoves, State.class);
+    public static final MoveSet<VampireSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.VAMPIRE, VampireSpec::registerMoves, VampireSpec.class, State.class);
     public static final SpecData DATA = SpecData.builder()
             .name(Component.translatable("spec.jcraft.vampire"))
             .description(Component.literal("Supernatural all-ranger"))
@@ -76,7 +76,7 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             .withHitSpark(JParticleType.BACK_STAB) // todo: bloodsuck particles
             .withInfo(Component.literal("Blood Suck"), Component.literal("blockable grab"));
 
-    public static final SpaceRipperAttack SPACE_RIPPER_ATTACK = new SpaceRipperAttack(300, 1, 10, 1f)
+    public static final SpaceRipperAttack<VampireSpec> SPACE_RIPPER_ATTACK = new SpaceRipperAttack<VampireSpec>(300, 1, 10, 1f)
             .withInfo(Component.literal("Space Ripper Stingy Eyes (Fire)"), Component.empty());
     public static final SimpleHoldableMove<VampireSpec> SPACE_RIPPER_CHARGE = new SimpleHoldableMove<VampireSpec>(
             300, 0, 32, 1f, 14)
@@ -89,10 +89,10 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
                     After charging for 1.2s, becomes unblockable.
                     """));
 
-    public static final NightVisionMove TOGGLE_NV = new NightVisionMove(20)
+    public static final NightVisionMove<VampireSpec> TOGGLE_NV = new NightVisionMove<VampireSpec>(20)
             .withInfo(Component.literal("Toggle Night Vision"), Component.empty());
 
-    public static final ReviveMove REVIVE_MOVE = new ReviveMove(300, 16, 20, 5)
+    public static final ReviveMove<VampireSpec> REVIVE_MOVE = new ReviveMove<VampireSpec>(300, 16, 20, 5)
             .withCrouchingVariant(TOGGLE_NV)
             .withSound(JSoundRegistry.VAMPIRE_REANIMATE)
             .withInfo(Component.literal("Resurrection"), Component.literal("revives humanoid/undead enemies within 5 meters, that died within the last 1 minute"));

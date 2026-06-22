@@ -67,7 +67,7 @@ import java.util.List;
  */
 public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.State> {
     public static final MoveSet<TheFoolEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_FOOL,
-            TheFoolEntity::registerMoves, State.class);
+            TheFoolEntity::registerMoves, TheFoolEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .idleDistance(2f)
@@ -132,14 +132,14 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                     Component.literal("Swipe"),
                     Component.literal("Slow, long-reaching poke.")
             );
-    public static final AirBarrageAttack AIR_BARRAGE = new AirBarrageAttack(240,
+    public static final AirBarrageAttack<TheFoolEntity> AIR_BARRAGE = new AirBarrageAttack<TheFoolEntity>(240,
             0, 30,1f, 1f, 10, 2f, 0.1f, 0f, 3)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withInfo(
                     Component.literal("Burn Rubber"),
                     Component.literal("Slows down all movement, combo starter/extender.")
             );
-    public static final TFComboAttack COMBO = new TFComboAttack(200,
+    public static final TFComboAttack<TheFoolEntity> COMBO = new TFComboAttack<TheFoolEntity>(200,
             29, 1.5f, 4.5f,20, 1.75f, 0.1f, -0.1f, IntSet.of(6, 14, 18, 19))
             .withAerialVariant(AIR_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -204,7 +204,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                     Component.literal("Sandwave"),
                     Component.literal("The Fool turns into a quick sandwave that knocks anything it touches down.")
             );
-    public static final SandTornadoMove SAND_TORNADO = new SandTornadoMove(200, 12, 13, 1f)
+    public static final SandTornadoMove<TheFoolEntity> SAND_TORNADO = new SandTornadoMove<TheFoolEntity>(200, 12, 13, 1f)
             .withSound(JSoundRegistry.FOOL_LAUNCH)
             .withInfo(
                     Component.literal("Sand Tornado"),
@@ -222,7 +222,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
                     Component.literal("Charge"),
                     Component.literal("The Fool detaches from the user and charges forward, launches on hit.")
             );
-    public static final SandstormAttack SANDSTORM = new SandstormAttack(800, 28, 41, 1.5f,
+    public static final SandstormAttack<TheFoolEntity> SANDSTORM = new SandstormAttack<TheFoolEntity>(800, 28, 41, 1.5f,
             7f, 20, 2f, 0.1f, 0f)
             .withSound(JSoundRegistry.FOOL_ULT)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)

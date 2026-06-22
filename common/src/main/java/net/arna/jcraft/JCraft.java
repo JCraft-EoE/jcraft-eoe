@@ -1,9 +1,11 @@
 package net.arna.jcraft;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.brigadier.StringReader;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.registries.DeferredRegister;
+import dev.architectury.registry.registries.RegistrySupplier;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -35,6 +37,10 @@ import net.arna.jcraft.common.network.RemoteStandInteractPacket;
 import net.arna.jcraft.common.network.c2s.*;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
+import net.arna.jcraft.common.spec.AnubisSpec;
+import net.arna.jcraft.common.spec.BrawlerSpec;
+import net.arna.jcraft.common.spec.HamonSpec;
+import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.tickable.JEnemies;
 import net.arna.jcraft.common.tickable.MoveTickQueue;
 import net.arna.jcraft.common.tickable.PastDimensions;
@@ -85,6 +91,9 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 import static net.arna.jcraft.api.component.world.CommonShockwaveHandlerComponent.Shockwave;
@@ -112,6 +121,9 @@ public final class JCraft {
     public static final int QUEUE_MOVESTUN_LIMIT = 7; // exclusive, 6 -> 0.3s window for queueing moves
 
     public static final GravityChangerConfig gravityConfig = new GravityChangerConfig(); // TODO incorporate this into our own config
+
+    // List of spec classes that will be initialized to get their movesets.
+    public static final List<Class<?>> SPEC_CLASSES = ImmutableList.of(BrawlerSpec.class, HamonSpec.class, VampireSpec.class, AnubisSpec.class);
 
     //Obligatory lazy Registry
 
@@ -247,6 +259,8 @@ public final class JCraft {
         VillagerTradesModifier.init();
         ConditionalFlightHandler.init();
 
+        initMoveSets();
+
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
@@ -284,6 +298,41 @@ public final class JCraft {
                 return knife;
             }
         });
+    }
+
+    private static void initMoveSets() {
+        // Movesets are defined in static fields in the stand/spec classes.
+        // These classes aren't loaded until the stand or spec is first used in-game.
+        // This is too late as we want the movesets to be instantiated before they're loaded,
+        // so the compatibility check happens during data load.
+
+        // To fix this, we'll be collecting all stand classes from JEntityTypeRegistry
+        // and instantiating them here, thus instantiating their movesets.
+
+        List<Class<?>> classes = new ArrayList<>();
+        for (Field field : JEntityTypeRegistry.class.getFields()) {
+            Type type = field.getGenericType();
+            // Check if the type of the field is RegistrySupplier<EntityType<? extends StandEntity<?, ?>>
+            if (type instanceof ParameterizedType regSupType
+                    && regSupType.getRawType() == RegistrySupplier.class
+                    && regSupType.getActualTypeArguments().length == 1
+                    && regSupType.getActualTypeArguments()[0] instanceof ParameterizedType entTypeType
+                    && entTypeType.getActualTypeArguments().length == 1
+                    && entTypeType.getActualTypeArguments()[0] instanceof Class<?> entityClass
+                    && StandEntity.class.isAssignableFrom(entityClass)) {
+                classes.add(entityClass);
+            }
+        }
+
+        classes.addAll(SPEC_CLASSES);
+
+        // Initialize classes
+        // This will initialize their static fields which will initialize all move sets.
+        for (Class<?> c : classes) {
+            try {
+                Class.forName(c.getName(), true, JCraft.class.getClassLoader());
+            } catch (ClassNotFoundException ignored) {}
+        }
     }
 
     public static void registerEntitySelectorOptions(EntitySelectorOptionsRegistrar registrar) {

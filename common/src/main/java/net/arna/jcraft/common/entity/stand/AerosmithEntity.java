@@ -60,7 +60,7 @@ import org.joml.Vector3f;
 
 public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntity.State> {
     public static final MoveSet<AerosmithEntity, AerosmithEntity.State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.AEROSMITH,
-            AerosmithEntity::registerDefaultMoves, AerosmithEntity.State.class);
+            AerosmithEntity::registerDefaultMoves, AerosmithEntity.class, AerosmithEntity.State.class);
 
     public static final EntityDataAccessor<Float> OVERHEAT = SynchedEntityData.defineId(AerosmithEntity.class, EntityDataSerializers.FLOAT);
     public static final float OVERHEAT_MAX = 15f;
@@ -160,7 +160,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Orders Aerosmith to fly to a given location, returning after arriving.")
             );
 
-    public static final BombThrowAttack BOMB_THROW = new BombThrowAttack(200, 9, 42, 1.2f)
+    public static final BombThrowAttack<AerosmithEntity> BOMB_THROW = new BombThrowAttack<AerosmithEntity>(200, 9, 42, 1.2f)
             .withSound(JSoundRegistry.AS_BARRAGE)
             .withInfo(
                     Component.literal("Loft Bombing"),

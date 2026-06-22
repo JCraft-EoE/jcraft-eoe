@@ -74,9 +74,9 @@ import java.util.List;
 @Getter
 public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final MoveSet<CreamEntity, CreamEntity.State> DEFAULT_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CREAM,
-            CreamEntity::registerDefaultMoves, State.class);
+            CreamEntity::registerDefaultMoves, CreamEntity.class, State.class);
     public static final MoveSet<CreamEntity, CreamEntity.State> HALF_BALL_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CREAM,
-            "half_ball", CreamEntity::registerHalfBallMoves, State.class);
+            "half_ball", CreamEntity::registerHalfBallMoves, CreamEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .info(StandInfo.builder()
@@ -135,7 +135,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withInfo(
                     Component.literal("Vertical Chop"),
                     Component.literal("slow, uninterruptible combo starter"));
-    public static final CreamComboAttack COMBO = new CreamComboAttack(0,
+    public static final CreamComboAttack<CreamEntity> COMBO = new CreamComboAttack<CreamEntity>(0,
             36, 0.75f,5f, 20, 2f, 0.2f, 0f, IntSet.of(10, 17, 25))
             .withSound(JSoundRegistry.CREAM_COMBO)
             .withImpactSound(JSoundRegistry.IMPACT_3)
@@ -175,7 +175,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     Component.literal("Charge"),
                     Component.literal("4 block range, unblockable knockdown")
             );
-    public static final DestroyAttack DESTROY = new DestroyAttack(100, 21, 30, 1f,
+    public static final DestroyAttack<CreamEntity> DESTROY = new DestroyAttack<CreamEntity>(100, 21, 30, 1f,
             8f, 5, 2f, 1.25f, 0f, 35)
             .withCrouchingVariant(CHARGE)
             .withSound(JSoundRegistry.CREAM_OVERHEAD)

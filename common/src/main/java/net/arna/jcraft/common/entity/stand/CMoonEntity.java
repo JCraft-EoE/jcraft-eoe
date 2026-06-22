@@ -24,7 +24,6 @@ import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
-import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -53,7 +52,7 @@ import java.util.List;
  * @see LaunchAttack
  */
 public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
-    public static final MoveSet<CMoonEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.C_MOON, CMoonEntity::registerMoves, State.class);
+    public static final MoveSet<CMoonEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.C_MOON, CMoonEntity::registerMoves, CMoonEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .evolution(true)
@@ -132,7 +131,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     Component.literal("Gut Punch"),
                     Component.literal("slow, uninterruptible combo finisher")
             );
-    public static final LaunchAttack LAUNCH = new LaunchAttack(60,
+    public static final LaunchAttack<CMoonEntity> LAUNCH = new LaunchAttack<CMoonEntity>(60,
             14, 21, 0.75f,5f, 19, 1.75f, 0.9f, 0.3f)
             .withSound(JSoundRegistry.CMOON_GROUNDSHOOT)
             .withImpactSound(JSoundRegistry.IMPACT_5)
@@ -142,7 +141,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     Component.literal("Block Launch"),
                     Component.literal("lifts a block from the ground and launches it at a delay/crouching and using this button resets the delay on nearby blocks")
             );
-    public static final GravPunchAttack GRAV_PUNCH = new GravPunchAttack(300,
+    public static final GravPunchAttack<CMoonEntity> GRAV_PUNCH = new GravPunchAttack<CMoonEntity>(300,
             20, 32, 1f,8f, 45, 1.75f, 0.35f, -0.3f)
             .withSound(JSoundRegistry.CMOON_GRAV_PUNCH)
             .withImpactSound(JSoundRegistry.CMOON_GRAV_PUNCH_HIT)
@@ -154,7 +153,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     Component.literal("Only One Punch"),
                     Component.literal("inverts enemy gravity and floats on hit (3s), high stun")
             );
-    public static final CGroundSlamAttack GROUND_SLAM = new CGroundSlamAttack(18,
+    public static final CGroundSlamAttack<CMoonEntity> GROUND_SLAM = new CGroundSlamAttack<CMoonEntity>(18,
             10, 18, 1f, 7f, 17, 3f, 0.2f, 1.4f)
             .withSound(JSoundRegistry.CMOON_GROUNDSLAM)
             .withImpactSound(JSoundRegistry.IMPACT_10)
@@ -166,7 +165,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                     Component.literal("Ground Slam"),
                     Component.literal("launches downwards, combo starter/extender, knocks down if it hits while user is crouching")
             );
-    public static final GravityShiftMove GRAV_SHIFT = new GravityShiftMove(1400, 20, 32, 1f)
+    public static final GravityShiftMove<CMoonEntity> GRAV_SHIFT = new GravityShiftMove<CMoonEntity>(1400,
+            20, 32, 1f)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT)
             .withInfo(
                     Component.literal("Gravity Shift Radial"),
@@ -175,7 +175,8 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                             lasts 10 seconds
                             swap between attraction/repulsion by pressing ultimate again""")
             );
-    public static final GravityShiftPulseMove GRAV_SHIFT_PULSE = new GravityShiftPulseMove(1400, 20, 32, 1f, 16)
+    public static final GravityShiftPulseMove<CMoonEntity> GRAV_SHIFT_PULSE = new GravityShiftPulseMove<CMoonEntity>(
+            1400, 20, 32, 1f, 16)
             .withCrouchingVariant(GRAV_SHIFT)
             .withSound(JSoundRegistry.CMOON_GRAVSHIFT_DIRECTIONAL)
             .withInfo(
@@ -187,7 +188,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
                             affected entities lose the gravity shift if they move 100m away from the user
                             """)
             );
-    public static final GravitationalHopMove GRAVITATIONAL_HOP = new GravitationalHopMove(340, 200, 60)
+    public static final GravitationalHopMove<CMoonEntity> GRAVITATIONAL_HOP = new GravitationalHopMove<CMoonEntity>(340, 200, 60)
             .withInfo(
                     Component.literal("Gravitational Hop/Local Gravity Change"),
                     Component.literal("if used mid air, jumps up and grants 2s slow falling/otherwise changes your gravitational direction")
@@ -195,7 +196,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
 
     // TODO add move info x2
     // TODO balance x2
-    public static final CMoonTossMove TOSS = new CMoonTossMove(0, 1, 1, 0.75f)
+    public static final CMoonTossMove<CMoonEntity> TOSS = new CMoonTossMove<CMoonEntity>(0, 1, 1, 0.75f)
             .withAnim(CMoonEntity.State.ITEM_TOSS);
     public static final TossChargeMove<CMoonEntity> TOSS_CHARGE = new TossChargeMove<CMoonEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);

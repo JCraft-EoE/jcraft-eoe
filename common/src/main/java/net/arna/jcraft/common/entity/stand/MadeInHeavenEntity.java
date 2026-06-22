@@ -72,7 +72,7 @@ import java.util.UUID;
  */
 public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHeavenEntity.State> {
     public static final MoveSet<MadeInHeavenEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.MADE_IN_HEAVEN,
-            MadeInHeavenEntity::registerMoves, State.class);
+            MadeInHeavenEntity::registerMoves, MadeInHeavenEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-45f)
             .evolution(true)
@@ -177,7 +177,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     Component.literal("Low Kick"),
                     Component.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack")
             );
-    public static final FuryChopAttack FURY_CHOP = new FuryChopAttack(24,
+    public static final FuryChopAttack<MadeInHeavenEntity> FURY_CHOP = new FuryChopAttack<MadeInHeavenEntity>(24,
             15, 24, 0.85f,7f, 20, 1.6f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.MIH_FURYCHOP)
             .withImpactSound(JSoundRegistry.IMPACT_2)

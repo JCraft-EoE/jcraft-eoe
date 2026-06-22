@@ -22,7 +22,7 @@ import net.minecraft.world.level.Level;
 
 public class CrazyDiamondEntity extends StandEntity<CrazyDiamondEntity, CrazyDiamondEntity.State> {
     public static final MoveSet<CrazyDiamondEntity, CrazyDiamondEntity.State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CRAZY_DIAMOND,
-            CrazyDiamondEntity::registerDefaultMoves, CrazyDiamondEntity.State.class);
+            CrazyDiamondEntity::registerDefaultMoves, CrazyDiamondEntity.class, CrazyDiamondEntity.State.class);
 
     // TODO Ayutac copied the values from CreamEntity
     public static final RestorationAttack<CrazyDiamondEntity> PUNCH = RestorationAttack.<CrazyDiamondEntity>lightAttack(
