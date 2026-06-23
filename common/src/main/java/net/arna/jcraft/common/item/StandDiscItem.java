@@ -137,7 +137,7 @@ public class StandDiscItem extends Item {
                 .withStyle(s -> s.withColor(SKIN_LEVEL_COLORS[skin])));
     }
 
-    public static ItemStack createDiscStack(StandType type, int skin) {
+    public static ItemStack createDiscStack(StandType type, int skin, boolean oneUse) {
         if (skin < 0 || skin >= type.getData().getInfo().getSkinCount()) {
             throw new IndexOutOfBoundsException("Skin out of bounds");
         }
@@ -146,8 +146,15 @@ public class StandDiscItem extends Item {
         CompoundTag nbt = stack.getOrCreateTag();
         nbt.putString("StandID", type.getId().toString());
         nbt.putInt("Skin", skin);
+        if (oneUse) {
+            nbt.putByte("OneUse", (byte) 1);
+        }
 
         return stack;
+    }
+
+    public static ItemStack createDiscStack(StandType type, int skin) {
+        return createDiscStack(type, skin, false);
     }
 
     public static boolean isEmptyDisc(ItemStack stack) {
