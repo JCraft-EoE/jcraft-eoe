@@ -749,8 +749,6 @@
   "move.jcraft.anubis.default.slash.name": "斬撃",
   "move.jcraft.anubis.default.unsheathing_attack.description": "アヌビス神の抜刀。",
   "move.jcraft.anubis.default.unsheathing_attack.name": "抜刀攻撃",
-  "move.jcraft.anubis.default.unsheating_sweep.cr.description": "2ヒット、ダウン。",
-  "move.jcraft.anubis.default.unsheating_sweep.cr.name": "抜刀足払い",
   "move.jcraft.brawler.default.combo.description": "3回攻撃、コンボの開始技/延長技に欠かせない。",
   "move.jcraft.brawler.default.combo.name": "コンボ",
   "move.jcraft.brawler.default.gut_punch.description": "優れたスタン、遅い発生。",

@@ -768,8 +768,6 @@
   "move.jcraft.anubis.default.slash.name": "베기",
   "move.jcraft.anubis.default.unsheathing_attack.description": "아누비스 검집에서 뺌.",
   "move.jcraft.anubis.default.unsheathing_attack.name": "발도 공격",
-  "move.jcraft.anubis.default.unsheating_sweep.cr.description": "2타, 기절.",
-  "move.jcraft.anubis.default.unsheating_sweep.cr.name": "발도 휘두르기",
   "move.jcraft.brawler.default.combo.description": "3타, 콤보 스타터/연계기.",
   "move.jcraft.brawler.default.combo.name": "콤보",
   "move.jcraft.brawler.default.gut_punch.description": "좋은 스턴, 느린 발동 시간차.",
