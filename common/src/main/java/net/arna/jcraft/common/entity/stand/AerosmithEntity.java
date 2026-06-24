@@ -142,7 +142,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             0, 24, 0.9f, 1f, 13, 1.5f, 0.1f, 0f, 3, Blocks.OAK_LEAVES.defaultDestroyTime())
             .withSound(JSoundRegistry.AS_NAME)
             .withImpactSound(JSoundRegistry.AS_BARRAGE_HIT)
-            .withAerialVariant(CHARGE)
+            .withCrouchingVariant(CHARGE)
             .withInfo(
                     Component.literal("Propeller Strike"),
                     Component.literal("A makeshift barrage wielding Aerosmith as a saw-blade.")
@@ -306,7 +306,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     private static void registerDefaultMoves(final @NonNull MoveMap<AerosmithEntity, AerosmithEntity.State> moves) {
         moves.register(MoveClass.LIGHT, BULLET, State.LIGHT);
         moves.register(MoveClass.HEAVY, BOMB_DROP, State.ACTIVE);
-        moves.register(MoveClass.BARRAGE, SAWBLADE, State.SAWBLADE).withAerialVariant(State.CHARGE);
+        moves.register(MoveClass.BARRAGE, SAWBLADE, State.SAWBLADE).withCrouchingVariant(State.CHARGE);
         moves.register(MoveClass.SPECIAL1, FLYBY);
         moves.register(MoveClass.SPECIAL2, BOMB_THROW, State.BOMB);
         moves.register(MoveClass.SPECIAL3, XRAY);

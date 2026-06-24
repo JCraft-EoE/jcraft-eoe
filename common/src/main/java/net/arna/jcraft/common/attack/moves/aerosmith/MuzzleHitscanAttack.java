@@ -93,9 +93,13 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
     public void tick(AerosmithEntity attacker) {
         super.tick(attacker);
 
-        if (wantToContinue && attacker.getMoveStun() < 1) {
-            attacker.cancelMove(false);
-            attacker.initMove(getMoveClass());
+        if (attacker.getCurrentMove() == this) {
+            if (wantToContinue && attacker.getMoveStun() < 1) {
+                attacker.cancelMove(false);
+                attacker.initMove(getMoveClass());
+            }
+        } else {
+            wantToContinue = false;
         }
     }
 
