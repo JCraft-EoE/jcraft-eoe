@@ -60,6 +60,11 @@ public class MoveSetImpl<A extends IAttacker<? extends A, S>, S extends Enum<S>>
     }
 
     @Override
+    public ResourceLocation getTypeId() {
+        return type.getId();
+    }
+
+    @Override
     public <T> DataResult<Pair<MoveMap<A, S>, T>> load(final DynamicOps<T> ops, T t, final Executor gameExecutor) {
         final DataResult<Pair<MoveMap<A, S>, T>> res = codec.decode(ops, t);
         if (res.result().isEmpty()) {

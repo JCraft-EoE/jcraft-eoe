@@ -259,8 +259,6 @@ public final class JCraft {
         VillagerTradesModifier.init();
         ConditionalFlightHandler.init();
 
-        initMoveSets();
-
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
@@ -282,6 +280,7 @@ public final class JCraft {
         initDispenserBehaviors();
         JStatRegistry.initFormatters();
         registerAzArmor();
+        initMoveSets();
     }
 
     private static void initBlockPostLoad() {
