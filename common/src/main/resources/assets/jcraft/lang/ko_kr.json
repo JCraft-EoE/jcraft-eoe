@@ -844,8 +844,6 @@
   "move.jcraft.cream.half_ball.void_charge.name": "암흑공간 돌진",
   "move.jcraft.d4c.default.barrage.description": "빠르고 안정적인 콤보 스타터/연계기, 긴 스턴",
   "move.jcraft.d4c.default.barrage.name": "연타",
-  "move.jcraft.d4c.default.charge.description": "술사와 스탠드가 앞으로 돌진, 끊기지 않는 발사",
-  "move.jcraft.d4c.default.charge.name": "돌진",
   "move.jcraft.d4c.default.chop.description": "상대적으로 빠른 콤보 스타터",
   "move.jcraft.d4c.default.chop.name": "손날치기",
   "move.jcraft.d4c.default.counter.description": "발동 시간차 0.25초, 지속 시간 1.5초, 데미지 높음, 피격 시 뒤로 밀어냄",

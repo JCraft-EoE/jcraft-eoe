@@ -825,8 +825,6 @@
   "move.jcraft.cream.half_ball.void_charge.name": "暗黒空間チャージ",
   "move.jcraft.d4c.default.barrage.description": "速く確実なコンボの開始技/延長技、強度のスタン",
   "move.jcraft.d4c.default.barrage.name": "ラッシュ",
-  "move.jcraft.d4c.default.charge.description": "使用者&スタンドが前進、中断不能の浮かせ技",
-  "move.jcraft.d4c.default.charge.name": "チャージ",
   "move.jcraft.d4c.default.chop.description": "比較的素早いコンボの開始技",
   "move.jcraft.d4c.default.chop.name": "手刀",
   "move.jcraft.d4c.default.counter.description": "発生0.25秒、効果時間1.5秒、大ダメージ、ヒット時ノックバック",
