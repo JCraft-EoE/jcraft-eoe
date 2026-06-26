@@ -186,14 +186,17 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     public boolean initMove(MoveClass moveClass) {
-        if (getCurrentMove() != null) {
-            if (getCurrentMove().onInitMove(getThis(), moveClass)) {
+        if (curMove != null) {
+            if (curMove.onInitMove(getThis(), moveClass)) {
                 return true;
             }
 
-            if (getCurrentMove().getFollowup() != null && getCurrentMove().getFollowupFrame().isPresent() &&
-                    getCurrentMove().getMoveClass() == moveClass && getMoveStun() <= getCurrentMove().getFollowupFrame().getAsInt()) {
-                moveMap.initiateFollowup(getThis(), getCurrentMove(), false, 0);
+            if (
+                    moveStun > 0 &&
+                    curMove.getFollowup() != null && curMove.getFollowupFrame().isPresent() &&
+                    curMove.getMoveClass() == moveClass && moveStun <= curMove.getFollowupFrame().getAsInt()
+            ) {
+                moveMap.initiateFollowup(getThis(), curMove, true, 0);
             }
         }
 

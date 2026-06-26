@@ -1,0 +1,89 @@
+{
+  "anim_state": "KNEE",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "followup": {
+    "anim_state": "KICK",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_1",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 0,
+      "damage": 5.5,
+      "duration": 14,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact6"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.spin.default.kick.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.spin.default.kick.followup.name"
+        }
+      },
+      "hitbox_size": 1.4,
+      "knockback": 0.85,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "stun": 7,
+      "windup": 8
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "extra_hit_boxes": [
+        {
+          "forward_offset": 0.25,
+          "size": 1.0
+        }
+      ],
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_1",
+      "static_height": true
+    },
+    "cooldown": 0,
+    "damage": 4.0,
+    "duration": 11,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact6"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.spin.default.knee.description"
+      },
+      "followup_frame": 5,
+      "name": {
+        "translate": "move.jcraft.spin.default.knee.name"
+      }
+    },
+    "hitbox_size": 1.25,
+    "knockback": 0.15,
+    "move_distance": 1.0,
+    "offset": 0.35,
+    "stun": 10,
+    "windup": 6
+  }
+}

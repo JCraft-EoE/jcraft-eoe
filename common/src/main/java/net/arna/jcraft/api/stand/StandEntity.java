@@ -797,14 +797,18 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @return Whether the move was initiated.
      */
     public boolean initMove(MoveClass moveClass) {
-        if (getCurrentMove() != null) {
-            if (getCurrentMove().onInitMove(getThis(), moveClass)) {
+        final AbstractMove<?, ? super E> curMove = getCurrentMove();
+
+        if (curMove != null) {
+            if (curMove.onInitMove(getThis(), moveClass)) {
                 return true;
             }
 
-            if (getCurrentMove().getFollowup() != null && getCurrentMove().getFollowupFrame().isPresent() &&
-                    getCurrentMove().getMoveClass() == moveClass && getMoveStun() <= getCurrentMove().getFollowupFrame().getAsInt()) {
-                moveMap.initiateFollowup(getThis(), getCurrentMove(), false, 0);
+            if (
+                    curMove.getFollowup() != null && curMove.getFollowupFrame().isPresent() &&
+                    curMove.getMoveClass() == moveClass && getMoveStun() <= curMove.getFollowupFrame().getAsInt()
+            ) {
+                moveMap.initiateFollowup(getThis(), curMove, false, 0);
             }
         }
 
