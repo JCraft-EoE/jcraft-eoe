@@ -20,6 +20,7 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.common.attack.actions.EffectAction;
 import net.arna.jcraft.common.attack.moves.madeinheaven.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
@@ -433,7 +434,10 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
         if (user.isSprinting()) {
             user.setMaxUpStep(AUTOSTEP_HEIGHT);
-            setAfterimage(true);
+
+            if (!JClientConfig.getInstance().isDisableMihAfterimages()) {
+                setAfterimage(true);
+            }
             user.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 2,10));
             user.addEffect(new MobEffectInstance(JStatusRegistry.WATER_WALKING.get(), 2));
         }
