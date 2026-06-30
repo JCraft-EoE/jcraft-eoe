@@ -721,8 +721,6 @@
   "move.jcraft.aerosmith.default.bomb_drop.name": "爆弾投下",
   "move.jcraft.aerosmith.default.breath_detection.description": "エアロスミスが周囲の生き物の呼吸している位置を検知する。",
   "move.jcraft.aerosmith.default.breath_detection.name": "呼吸検知",
-  "move.jcraft.aerosmith.default.dive_charge.air.description": "非遠隔操作：まっすぐ突進し、最後に上昇する。エアロスミスと共に敵を運ぶ。",
-  "move.jcraft.aerosmith.default.dive_charge.air.name": "ダイブチャージ",
   "move.jcraft.aerosmith.default.fire_gunpods.description": "エアロスミスの前で超音速の弾丸を発射する。長時間使用すると銃が過熱し、命中精度が著しく低下する。",
   "move.jcraft.aerosmith.default.fire_gunpods.name": "ガンポッド発射",
   "move.jcraft.aerosmith.default.fly_by_location.description": "エアロスミスに指定された場所へ飛行し、到着後に帰還するよう命令する。",
