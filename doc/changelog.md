@@ -1,5 +1,6 @@
 # Changelog
 ## General
+* Datapacks now throw errors if they configure moves wrongly during loading instead of during runtime
 ### Stands & Specs
 * Disabled damage scaling for bosses and horses
 * Throwing now force-feeds potions
@@ -19,11 +20,18 @@
     * creates Hunger (configurable)
     * gives Water Walking and Dolphin's Grace
     * gives Exhaustion
-  * improved Hit Detection for MIH Cr Sp 3
+  * improved Hit Detection for MiH Cr Sp 3
+* Added new m1 chain + skin1 for D4C
+* Whitesnake
+  * nerved stand disc attack
+  * buffed memory disc attack, now inflicts specless state
+* Added vamp cr.sp2, a feeding-oriented variant + new hitsparks for both
 * Added description for Hamon Charge in `/spec about`
 * Missing with Stands/Specs now makes miss sounds (whiff)
+* generalized a lot of moves to make it possible to be used by other stands via datapacks
 ### Effects
 * Exhaustion I to IV, works against regeneration from 25% to 100%
+* Specless, which disables your Spec
 ### Structures
 * made Vampire Lairs rarer
 ### Configs
@@ -33,6 +41,8 @@
 * Added tooltips to all server config options
 * `block_breakage_multiplier` to scale the effectiveness of Block Breaking
 * Server config is now part of the API (for add-ons)
+* String Option configs added (currently not used by us, but possible for add-ons)
+* Client config option to show MiH afterimages, off by default because it is buggy still
 ### Tags
 * `jcraft:bosses` describes what constitutes bosses for JCraft purposes (for now Ender Dragon, Wither, Warden, Elder Guardian and Tonpetty) 
 * `jcraft:ignores_damage_scaling` describes which entities ignore Stand/Spec damage scaling (for now bosses and horses)
@@ -45,8 +55,10 @@
 * Fixed bound sounds lingering when spamming
 * Fixed Spec moves holding when Stand is out
 * Fixed Stand throwing into claims
+* Fixed an Item throwing bug
 * Fixed D4C explosions not respecting claims
 * Fixed an absurd jump boost by using The Fool with Elytra
+* Fixed GE Tree not launching the user
 * Disabled Pick Block only for stands with a Toss Move
 * Fixed an NPE
 
