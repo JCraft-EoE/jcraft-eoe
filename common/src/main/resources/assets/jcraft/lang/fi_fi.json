@@ -791,5 +791,19 @@
   "move.jcraft.c_moon.default.gravity_shift_directional.description": "Vaihtaa painovoiman käyttäjän katsottuun suuntaan\n30 sekunttia\nKaikki hirviöt saa putoamisvahinkoa\n100 metrin päästä kaikki hirviöt palaavat omaan painovoimaansa\n",
   "move.jcraft.c_moon.default.gravity_shift_directional.name": "Painovoiman sääntö katsottuun suuntaan",
   "move.jcraft.c_moon.default.gravity_shift_radial.cr.description": "työntää tai vetää puoleensa hirviöitä 64m säteessä\nKestää 10 sekunttia\nVoi vaihtaa suuntaa painamalla erikoiskykynappia uudestaan",
-  "move.jcraft.c_moon.default.gravity_shift_radial.cr.name": "Painovoiman sääntö sisään/ulospäin"
+  "move.jcraft.c_moon.default.gravity_shift_radial.cr.name": "Painovoiman sääntö sisään/ulospäin",
+  "move.jcraft.c_moon.default.ground_slam.description": "Heittää alsapäin. Hyvä yhdistelmän aloitus, kaataa jos omistaja kyykkää",
+  "move.jcraft.c_moon.default.ground_slam.name": "Maanpaiskaus",
+  "move.jcraft.c_moon.default.gut_punch.description": "hidas, keskeyttämätön yhdistelmänlopetus",
+  "move.jcraft.c_moon.default.gut_punch.name": "Suoli-isku",
+  "move.jcraft.c_moon.default.inversion_punch.cr.description": "pieni lamautus, viiveinen hidastus",
+  "move.jcraft.c_moon.default.inversion_punch.cr.name": "Käänteinen Nyrkki",
+  "move.jcraft.c_moon.default.only_one_punch.description": "Vaihtaa vastustajan painovoiman hetkeksi aikaa. Lamauttaa",
+  "move.jcraft.c_moon.default.only_one_punch.name": "Yksinäinen Isku",
+  "move.jcraft.c_moon.default.punch.description": "nopea yhdistelmän aloittaja",
+  "move.jcraft.c_moon.default.punch.followup.description": "nopea lopettamaan yhdistelmän",
+  "move.jcraft.c_moon.default.punch.followup.name": "Isku",
+  "move.jcraft.c_moon.default.punch.name": "Isku",
+  "move.jcraft.cinderella.default.punch.description": "nopea aloittamaan yhdistelmän",
+  "move.jcraft.cinderella.default.punch.name": "Isku"
 }
