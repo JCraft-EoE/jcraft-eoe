@@ -38,7 +38,7 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Component.literal("Buttstroke"),
                     Component.literal("Heavy downwards blow with high stun. Slower, longer cooldown.")
             );
-    public static final SimpleUppercutAttack<RangerSpec> SHOULDER_BASH = new SimpleUppercutAttack<RangerSpec>(60, 7, 14,
+    public static final SimpleUppercutAttack<RangerSpec> SHOULDER_BASH = new SimpleUppercutAttack<RangerSpec>(30, 7, 14,
             1f, 5f, 14, 1.5f, 0.2f, 0f, 0.4f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
@@ -48,7 +48,7 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Component.literal("Shoulder Bash"),
                     Component.literal("Springs up from a squat, launching enemies. 1 point of armor.")
             );
-    public static final SimpleAttack<RangerSpec> WHIP = new SimpleAttack<RangerSpec>(20, 5, 8,
+    public static final SimpleAttack<RangerSpec> WHIP = new SimpleAttack<RangerSpec>(15, 5, 8,
             1f, 4f, 7, 1.25f, 0.2f, 0f)
             .withAerialVariant(BUTTSTROKE)
             .withCrouchingVariant(SHOULDER_BASH)
@@ -58,18 +58,18 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Component.literal("Fast strike with the held item.")
             );
 
-    public static final RangerSlideMove SLIDE = new RangerSlideMove(140, 0, 30, 0f, 10)
-            .withInfo(
-                    Component.literal("Slide"),
-                    Component.literal("Held. Fast crawl that carries hit enemies, launching them up for juggles.")
-            );
     public static final RangerRollMove ROLL = new RangerRollMove(100, 0, 20, 0f)
-            .withCrouchingVariant(SLIDE)
             .withInfo(
                     Component.literal("Roll"),
                     Component.literal("Combat roll that greatly reduces your hitbox and negates fall damage, but exhausts you at the end.")
             );
 
+    public static final RangerSlideMove SLIDE = new RangerSlideMove(140, 0, 30, 0f, 10)
+            .withCrouchingVariant(ROLL)
+            .withInfo(
+                    Component.literal("Slide"),
+                    Component.literal("Held. Fast crawl that carries hit enemies, launching them up for juggles.")
+            );
     public RangerSpec(LivingEntity livingEntity) {
         super(JSpecTypeRegistry.RANGER.get(), livingEntity);
     }
@@ -79,8 +79,8 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
         hvy.withCrouchingVariant(State.BASH);
         hvy.withAerialVariant(State.BUTTSTROKE);
 
-        moves.register(MoveClass.BARRAGE, ROLL, CooldownType.BARRAGE, State.ROLL)
-                .withCrouchingVariant(State.SLIDE_START);
+        moves.register(MoveClass.BARRAGE, SLIDE, CooldownType.BARRAGE, State.SLIDE_START)
+                .withCrouchingVariant(State.ROLL);
     }
 
     @Override

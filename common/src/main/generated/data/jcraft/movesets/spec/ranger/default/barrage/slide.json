@@ -1,0 +1,45 @@
+{
+  "anim_state": "SLIDE_START",
+  "class": "BARRAGE",
+  "cooldown_type": "BARRAGE",
+  "crouching_variant": {
+    "anim_state": "ROLL",
+    "class": "BARRAGE",
+    "cooldown_type": "BARRAGE",
+    "move": {
+      "type": "jcraft:ranger_roll_move",
+      "cooldown": 100,
+      "duration": 20,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.ranger.default.roll.cr.description"
+        },
+        "mobility_type": "DASH",
+        "name": {
+          "translate": "move.jcraft.ranger.default.roll.cr.name"
+        }
+      },
+      "move_distance": 0.0,
+      "windup": 0
+    }
+  },
+  "move": {
+    "type": "jcraft:ranger_slide_move",
+    "cooldown": 140,
+    "duration": 30,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.ranger.default.slide.description"
+      },
+      "is_holdable": true,
+      "mobility_type": "DASH",
+      "name": {
+        "translate": "move.jcraft.ranger.default.slide.name"
+      }
+    },
+    "minimum_charge": 10,
+    "move_distance": 0.0,
+    "set_move_stun": false,
+    "windup": 0
+  }
+}

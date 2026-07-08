@@ -54,7 +54,7 @@
         "hit_spark": "HIT_SPARK_2",
         "static_height": true
       },
-      "cooldown": 60,
+      "cooldown": 30,
       "damage": 5.0,
       "duration": 14,
       "extras": {
@@ -91,7 +91,7 @@
       "hit_animation": "MID",
       "hit_spark": "HIT_SPARK_1"
     },
-    "cooldown": 20,
+    "cooldown": 15,
     "damage": 4.0,
     "duration": 8,
     "extras": {
