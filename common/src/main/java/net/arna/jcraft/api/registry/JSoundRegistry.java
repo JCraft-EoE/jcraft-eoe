@@ -344,6 +344,8 @@ public interface JSoundRegistry {
 
     RegistrySupplier<SoundEvent> RANGER_UNHOLSTER = register("rangerunholster");
     RegistrySupplier<SoundEvent> RANGER_REHOLSTER = register("rangerreholster");
+    RegistrySupplier<SoundEvent> RANGER_FOCUS = register("rangerfocus");
+    RegistrySupplier<SoundEvent> RANGER_FOCUS_START = register("rangerfocus_start");
 
     //// OTHER
     RegistrySupplier<SoundEvent> BULLET_RICOCHET = register("bulletricochet");

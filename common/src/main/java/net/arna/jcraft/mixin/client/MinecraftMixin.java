@@ -8,8 +8,11 @@ import com.mojang.blaze3d.platform.Window;
 import net.arna.jcraft.api.attack.moves.AbstractTossMove;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.rendering.api.callbacks.DisplayResizeCallback;
+import net.arna.jcraft.common.attack.moves.ranger.RangerFocusMove;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
+import net.arna.jcraft.common.spec.RangerSpec;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
@@ -66,5 +69,14 @@ public class MinecraftMixin {
     @ModifyReturnValue(method = "shouldEntityAppearGlowing", at = @At("RETURN"))
     private boolean jcraft$makeAerosmithGlowWhenNotInLos(boolean original, @Local(argsOnly = true) Entity entity) {
         return original || entity instanceof AerosmithEntity as && as.isRemote() && !as.isInLineOfSight() && as.getUser() == player;
+    }
+
+    // Highlights targets of the ranger's Focus, only on the focusing player's client
+    @ModifyReturnValue(method = "shouldEntityAppearGlowing", at = @At("RETURN"))
+    private boolean jcraft$rangerFocusGlow(boolean original, @Local(argsOnly = true) Entity entity) {
+        if (original || player == null) return original;
+        return JUtils.getSpec(player) instanceof RangerSpec &&
+                JComponentPlatformUtils.getGunslinger(player).isFocusActive() &&
+                RangerFocusMove.isFocusTarget(player, entity);
     }
 }

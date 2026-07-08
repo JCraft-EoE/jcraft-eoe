@@ -7,6 +7,7 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.common.spec.HamonSpec;
+import net.arna.jcraft.common.spec.RangerSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.fabricmc.api.EnvType;
@@ -39,6 +40,7 @@ public class JCraftHudOverlay {
             TIME_ACCEL_GAUGE = new Gauge(1.0f, 0.8f, 0.0f, MadeInHeavenEntity.MAXIMUM_SPEEDOMETER),
             BLOODLUST_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, 5),
             HAMON_GAUGE = new Gauge(0.8f, 0.5f, 0.2f, (int) HamonSpec.MAX_CHARGE),
+            FOCUS_GAUGE = new Gauge(0.4f, 0.75f, 0.5f, (int) RangerSpec.MAX_FOCUS),
             IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX),
             OVERHEAT_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, (int) AerosmithEntity.OVERHEAT_MAX),
             PH_OBEDIENCE_GAUGE = new Gauge(0.8f, 0.3f, 0.9f, PurpleHazeEntity.MAX_OBEDIENCE);
@@ -123,6 +125,13 @@ public class JCraftHudOverlay {
             final int charge = (int) hamon.getHamonCharge();
             final Vector3f color = hamon.isHamonizeReady() ? new Vector3f(1.0f, 1.0f, 0.6f) : HAMON_GAUGE.colorCopy();
             HAMON_GAUGE.render(ctx, color.x, color.y, color.z, gaugeX, height + gaugeHeightOffset, charge);
+        } else if (spec instanceof RangerSpec) {
+            final var gunslinger = JComponentPlatformUtils.getGunslinger(player);
+            final int focus = (int) gunslinger.getFocus();
+            if (gunslinger.isFocusActive() || focus < RangerSpec.MAX_FOCUS) {
+                final Vector3f color = gunslinger.isFocusActive() ? new Vector3f(0.7f, 1.0f, 0.8f) : FOCUS_GAUGE.colorCopy();
+                FOCUS_GAUGE.render(ctx, color.x, color.y, color.z, gaugeX, height + gaugeHeightOffset, focus);
+            }
         }
     }
 

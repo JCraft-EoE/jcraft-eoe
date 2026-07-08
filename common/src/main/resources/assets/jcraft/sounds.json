@@ -1240,6 +1240,16 @@
       "jcraft:specs/ranger/unholster"
     ]
   },
+  "rangerfocus": {
+    "sounds": [
+      "jcraft:specs/ranger/focus"
+    ]
+  },
+  "rangerfocus_start": {
+    "sounds": [
+      "jcraft:specs/ranger/focus_start"
+    ]
+  },
   "bulletricochet": {
     "sounds": [
       "jcraft:projectiles/bullet/ricochet"

@@ -3,7 +3,7 @@
   "cooldown_type": "SPECIAL2",
   "move": {
     "type": "jcraft:ranger_holster_move",
-    "cooldown": 20,
+    "cooldown": 10,
     "duration": 0,
     "extras": {
       "description": {

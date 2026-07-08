@@ -15,4 +15,12 @@ public interface CommonGunslingerComponent extends JComponent {
         return !getHolsteredItem().isEmpty();
     }
 
+    boolean isFocusActive();
+
+    void setFocusActive(final boolean active);
+
+    float getFocus();
+
+    void setFocus(final float focus);
+
 }

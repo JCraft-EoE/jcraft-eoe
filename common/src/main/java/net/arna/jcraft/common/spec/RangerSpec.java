@@ -4,23 +4,36 @@ import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.component.living.CommonGunslingerComponent;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecData;
+import net.arna.jcraft.common.attack.moves.ranger.RangerFocusMove;
 import net.arna.jcraft.common.attack.moves.ranger.RangerHolsterMove;
 import net.arna.jcraft.common.attack.moves.ranger.RangerRollMove;
 import net.arna.jcraft.common.attack.moves.ranger.RangerSlideMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleUppercutAttack;
 import net.arna.jcraft.common.util.CooldownType;
+import net.arna.jcraft.common.util.IJInputStateManagerHolder;
+import net.arna.jcraft.common.util.InputStateManager;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.SpecAnimationState;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 
 public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
+    public static final float MAX_FOCUS = 100f; // 5 seconds of use
+    public static final float FOCUS_DRAIN = 1f;
+    public static final float FOCUS_REGEN = 1f; // empty to full in 5 seconds
+    public static final float CROUCH_FOCUS_REGEN = 0.7f;
+
     public static final MoveSet<RangerSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.RANGER, RangerSpec::registerMoves, RangerSpec.class, State.class);
     public static final SpecData DATA = SpecData.builder()
             .name(Component.translatable("spec.jcraft.ranger"))
@@ -78,6 +91,14 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Component.literal("Stows the held non-stackable item, or draws the stowed one. Swaps if holding another.")
             );
 
+    public static final RangerFocusMove FOCUS = new RangerFocusMove(10)
+            .withSound(JSoundRegistry.RANGER_FOCUS)
+            .withSound(JSoundRegistry.RANGER_FOCUS_START)
+            .withInfo(
+                    Component.literal("Focus"),
+                    Component.literal("Slows you to a crawl and guides your projectiles towards the target closest to your crosshair. Can shoot other projectiles out of the air.")
+            );
+
     public RangerSpec(LivingEntity livingEntity) {
         super(JSpecTypeRegistry.RANGER.get(), livingEntity);
     }
@@ -90,7 +111,46 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
         moves.register(MoveClass.BARRAGE, SLIDE, CooldownType.BARRAGE, State.SLIDE_START)
                 .withCrouchingVariant(State.ROLL);
 
+        moves.register(MoveClass.SPECIAL1, FOCUS, CooldownType.SPECIAL1, null);
         moves.register(MoveClass.SPECIAL2, HOLSTER, CooldownType.SPECIAL2, null);
+    }
+
+    @Override
+    public void tickSpec() {
+        super.tickSpec();
+
+        if (getEntityWorld().isClientSide || (user != null && user.isSpectator())) {
+            return;
+        }
+
+        final CommonGunslingerComponent gunslinger = JComponentPlatformUtils.getGunslinger(user);
+        if (gunslinger.isFocusActive()) {
+            final float focus = gunslinger.getFocus() - FOCUS_DRAIN;
+            gunslinger.setFocus(Math.max(focus, 0f));
+            if (focus <= 0f) {
+                gunslinger.setFocusActive(false);
+            } else {
+                user.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 5, 4, true, false));
+            }
+        } else if (gunslinger.getFocus() < MAX_FOCUS) {
+            final float regen = getFocusRegen();
+            gunslinger.setFocus(Math.min(gunslinger.getFocus() + regen, MAX_FOCUS));
+        }
+    }
+
+    private float getFocusRegen() {
+        if (user instanceof ServerPlayer player) {
+            final InputStateManager input = ((IJInputStateManagerHolder) player).jcraft$getJInputStateManager();
+            final boolean moving = input.calcForward() != 0 || input.calcSide() != 0;
+            if (!moving) {
+                return FOCUS_REGEN;
+            }
+            return input.sneaking ? CROUCH_FOCUS_REGEN : 0f;
+        }
+        if (user.getDeltaMovement().horizontalDistanceSqr() <= 1.0E-4) {
+            return FOCUS_REGEN;
+        }
+        return user.isShiftKeyDown() ? CROUCH_FOCUS_REGEN : 0f;
     }
 
     @Override

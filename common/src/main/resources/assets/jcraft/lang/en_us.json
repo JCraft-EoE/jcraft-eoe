@@ -1208,6 +1208,8 @@
   "move.jcraft.purple_haze_distortion.default.uppercut.name": "Uppercut",
   "move.jcraft.ranger.default.buttstroke.air.description": "Heavy downwards blow with high stun. Slower, longer cooldown.",
   "move.jcraft.ranger.default.buttstroke.air.name": "Buttstroke",
+  "move.jcraft.ranger.default.focus.description": "Slows you to a crawl and guides your projectiles towards the target closest to your crosshair. Can shoot other projectiles out of the air.",
+  "move.jcraft.ranger.default.focus.name": "Focus",
   "move.jcraft.ranger.default.holster.description": "Stows the held non-stackable item, or draws the stowed one. Swaps if holding another.",
   "move.jcraft.ranger.default.holster.name": "Holster",
   "move.jcraft.ranger.default.roll.cr.description": "Combat roll that greatly reduces your hitbox and negates fall damage, but exhausts you at the end.",
