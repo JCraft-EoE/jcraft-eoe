@@ -9,6 +9,7 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecData;
+import net.arna.jcraft.common.attack.moves.ranger.RangerHolsterMove;
 import net.arna.jcraft.common.attack.moves.ranger.RangerRollMove;
 import net.arna.jcraft.common.attack.moves.ranger.RangerSlideMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
@@ -70,6 +71,13 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Component.literal("Slide"),
                     Component.literal("Held. Fast crawl that carries hit enemies, launching them up for juggles.")
             );
+
+    public static final RangerHolsterMove HOLSTER = new RangerHolsterMove(10, 0, 0, 0f)
+            .withInfo(
+                    Component.literal("Holster"),
+                    Component.literal("Stows the held non-stackable item, or draws the stowed one. Swaps if holding another.")
+            );
+
     public RangerSpec(LivingEntity livingEntity) {
         super(JSpecTypeRegistry.RANGER.get(), livingEntity);
     }
@@ -81,6 +89,8 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
 
         moves.register(MoveClass.BARRAGE, SLIDE, CooldownType.BARRAGE, State.SLIDE_START)
                 .withCrouchingVariant(State.ROLL);
+
+        moves.register(MoveClass.SPECIAL2, HOLSTER, CooldownType.SPECIAL2, null);
     }
 
     @Override

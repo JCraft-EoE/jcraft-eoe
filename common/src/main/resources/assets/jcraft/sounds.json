@@ -1230,6 +1230,16 @@
       "jcraft:specs/hamon/exhale"
     ]
   },
+  "rangerreholster": {
+    "sounds": [
+      "jcraft:specs/ranger/reholster"
+    ]
+  },
+  "rangerunholster": {
+    "sounds": [
+      "jcraft:specs/ranger/unholster"
+    ]
+  },
   "bulletricochet": {
     "sounds": [
       "jcraft:projectiles/bullet/ricochet"

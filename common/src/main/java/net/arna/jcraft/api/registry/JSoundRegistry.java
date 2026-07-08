@@ -340,6 +340,11 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> HAMON_CRACKLES = register("hamoncrackles");
     RegistrySupplier<SoundEvent> HAMON_EXHALE = register("hamonexhale");
 
+    // Ranger
+
+    RegistrySupplier<SoundEvent> RANGER_UNHOLSTER = register("rangerunholster");
+    RegistrySupplier<SoundEvent> RANGER_REHOLSTER = register("rangerreholster");
+
     //// OTHER
     RegistrySupplier<SoundEvent> BULLET_RICOCHET = register("bulletricochet");
     RegistrySupplier<SoundEvent> BULLET_PENETRATE = register("bulletpenetrate");
