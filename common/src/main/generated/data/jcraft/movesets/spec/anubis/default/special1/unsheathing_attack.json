@@ -28,10 +28,10 @@
         ],
         "armor": 1,
         "description": {
-          "translate": "move.jcraft.anubis.default.unsheating_sweep.cr.description"
+          "translate": "move.jcraft.anubis.default.unsheathing_sweep.cr.description"
         },
         "name": {
-          "translate": "move.jcraft.anubis.default.unsheating_sweep.cr.name"
+          "translate": "move.jcraft.anubis.default.unsheathing_sweep.cr.name"
         }
       },
       "hit_moments": [

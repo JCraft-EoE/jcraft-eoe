@@ -20,6 +20,7 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.common.attack.actions.EffectAction;
 import net.arna.jcraft.common.attack.moves.madeinheaven.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
@@ -72,7 +73,7 @@ import java.util.UUID;
  */
 public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHeavenEntity.State> {
     public static final MoveSet<MadeInHeavenEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.MADE_IN_HEAVEN,
-            MadeInHeavenEntity::registerMoves, State.class);
+            MadeInHeavenEntity::registerMoves, MadeInHeavenEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-45f)
             .evolution(true)
@@ -98,12 +99,13 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .summonData(SummonData.of(JSoundRegistry.MIH_SUMMON))
             .build();
 
-    public static final SimpleAttack<MadeInHeavenEntity> SPEED_CHOP = new SimpleAttack<MadeInHeavenEntity>(0,
+    public static final SimpleAttack<MadeInHeavenEntity> SPEED_CHOP = new SimpleAttack<MadeInHeavenEntity>(15,
             6, 11, 0.75f, 3f, 8, 1.5f, 0.5f, -0.1f)
             .withAnim(State.SPEED_CHOP)
             .withAction(EffectAction.inflict(JStatusRegistry.BLEEDING, 80, 1, true, false, true))
             .withImpactSound(SoundEvents.TRIDENT_HIT)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
+            .withBlockStun(3)
             .withInfo(
                     Component.literal("Speed Chop"),
                     Component.literal("tiny stun, procs bleed")
@@ -178,7 +180,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     Component.literal("Low Kick"),
                     Component.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack")
             );
-    public static final FuryChopAttack FURY_CHOP = new FuryChopAttack(24,
+    public static final FuryChopAttack<MadeInHeavenEntity> FURY_CHOP = new FuryChopAttack<MadeInHeavenEntity>(24,
             15, 24, 0.85f,7f, 20, 1.6f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.MIH_FURYCHOP)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -434,6 +436,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
         if (user.isSprinting()) {
             user.setMaxUpStep(AUTOSTEP_HEIGHT);
+
             setAfterimage(true);
             user.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 2,10));
             user.addEffect(new MobEffectInstance(JStatusRegistry.WATER_WALKING.get(), 2));

@@ -69,7 +69,7 @@ import java.util.Objects;
  */
 public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.State> {
     public static final MoveSet<TheSunEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_SUN,
-            TheSunEntity::registerMoves, State.class);
+            TheSunEntity::registerMoves, TheSunEntity.class, State.class);
 
     private static final EntityDataAccessor<Boolean> PASSIVE = SynchedEntityData.defineId(TheSunEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(TheSunEntity.class, EntityDataSerializers.FLOAT);

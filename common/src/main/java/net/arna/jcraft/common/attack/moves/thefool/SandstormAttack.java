@@ -3,9 +3,9 @@ package net.arna.jcraft.common.attack.moves.thefool;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
-import net.arna.jcraft.common.entity.stand.TheFoolEntity;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JBlockRegistry;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public final class SandstormAttack extends AbstractSimpleAttack<SandstormAttack, TheFoolEntity> {
+public final class SandstormAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<SandstormAttack<A>, A> {
     private WeakReference<LivingEntity> superTarget = new WeakReference<>(null);
     private final List<WeakReference<FallingBlockEntity>> sandEntities = new ArrayList<>();
 
@@ -35,18 +35,18 @@ public final class SandstormAttack extends AbstractSimpleAttack<SandstormAttack,
     }
 
     @Override
-    public @NonNull MoveType<SandstormAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<SandstormAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void tick(final TheFoolEntity attacker) {
+    public void tick(final A attacker) {
         if (attacker.hasUser())
             tickSandstorm(attacker);
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final TheFoolEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Set<LivingEntity> targets = super.perform(attacker, user);
         if (targets.isEmpty()) {
             return targets;
@@ -56,7 +56,7 @@ public final class SandstormAttack extends AbstractSimpleAttack<SandstormAttack,
         this.superTarget = new WeakReference<>(superTarget);
 
         for (int i = 0; i < 8; i++) {
-            final FallingBlockEntity sand = FallingBlockEntity.fall(attacker.level(), superTarget.blockPosition(),
+            final FallingBlockEntity sand = FallingBlockEntity.fall(attacker.getEntityWorld(), superTarget.blockPosition(),
                     JBlockRegistry.FOOLISH_SAND_BLOCK.get().defaultBlockState());
             sand.time = -160;
             sand.noPhysics = true;
@@ -69,7 +69,7 @@ public final class SandstormAttack extends AbstractSimpleAttack<SandstormAttack,
         return targets;
     }
 
-    public void tickSandstorm(final TheFoolEntity attacker) {
+    public void tickSandstorm(final A attacker) {
         LivingEntity superTarget = this.superTarget.get();
 
         if (superTarget == null) {
@@ -94,7 +94,7 @@ public final class SandstormAttack extends AbstractSimpleAttack<SandstormAttack,
                 new MobEffectInstance(MobEffects.BLINDNESS, 40, 0, true, false)
         );
 
-        final int age = attacker.tickCount;
+        final int age = attacker.getBaseEntity().tickCount;
         if (age % 20 == 0) {
             // Remove the oldest sand entity and any that may have been removed or killed.
             for (int i = 0; i < sandEntities.size(); i++) {
@@ -111,7 +111,7 @@ public final class SandstormAttack extends AbstractSimpleAttack<SandstormAttack,
             }
         }
 
-        final RandomSource random = attacker.getRandom();
+        final RandomSource random = attacker.getBaseEntity().getRandom();
         final Vec3 targetPos = superTarget.position().add(0, superTarget.getBbHeight() / 2, 0);
 
         int i = 0;
@@ -141,7 +141,7 @@ public final class SandstormAttack extends AbstractSimpleAttack<SandstormAttack,
         }
     }
 
-    public void discardSands(final TheFoolEntity attacker) {
+    public void discardSands(final A attacker) {
         sandEntities.stream()
                 .map(WeakReference::get)
                 .filter(Objects::nonNull)
@@ -150,21 +150,21 @@ public final class SandstormAttack extends AbstractSimpleAttack<SandstormAttack,
     }
 
     @Override
-    protected @NonNull SandstormAttack getThis() {
+    protected @NonNull SandstormAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull SandstormAttack copy() {
-        return copyExtras(new SandstormAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull SandstormAttack<A> copy() {
+        return copyExtras(new SandstormAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<SandstormAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<SandstormAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<SandstormAttack>, SandstormAttack> buildCodec(RecordCodecBuilder.Instance<SandstormAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<SandstormAttack<?>>, SandstormAttack<?>> buildCodec(RecordCodecBuilder.Instance<SandstormAttack<?>> instance) {
             return attackDefault(instance, SandstormAttack::new);
         }
     }

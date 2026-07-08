@@ -3,7 +3,7 @@
   "class": "SPECIAL3",
   "cooldown_type": "SPECIAL3",
   "move": {
-    "type": "jcraft:anubis_low_kick_attack",
+    "type": "jcraft:shared_simple_uppercut_attack",
     "attack_extras": {
       "backstab": true,
       "block_stun": 10,
@@ -21,6 +21,11 @@
           "bind": false,
           "run": "on_hit",
           "sound": "jcraft:impact3"
+        },
+        {
+          "type": "jcraft:anubis_blood_lust",
+          "reset_only": true,
+          "run": "on_strike"
         }
       ],
       "description": {

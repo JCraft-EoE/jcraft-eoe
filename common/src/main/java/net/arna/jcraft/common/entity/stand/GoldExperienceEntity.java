@@ -46,7 +46,7 @@ import org.joml.Vector3f;
  */
 public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, GoldExperienceEntity.State> {
     public static final MoveSet<GoldExperienceEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.GOLD_EXPERIENCE,
-            GoldExperienceEntity::registerMoves, State.class);
+            GoldExperienceEntity::registerMoves, GoldExperienceEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-30f)
             .info(StandInfo.builder()
@@ -68,7 +68,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .build();
 
     // JCraft.lightCooldown -> 0 | 0.5f -> 0.35f
-    public static final BerryBushAttack BERRY_BUSH = new BerryBushAttack(40,
+    public static final BerryBushAttack<GoldExperienceEntity> BERRY_BUSH = new BerryBushAttack<GoldExperienceEntity>(40,
             16, 20, 1.25f, 4f, 5, 1.5f, 0.75f, 0.2f)
             .withAnim(State.LIFE_GIVER)
             .withImpactSound(JSoundRegistry.IMPACT_4)
@@ -134,7 +134,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     Component.literal("Healing Hand"),
                     Component.literal("standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs")
             );
-    public static final TreeAttack TREE = new TreeAttack(280, 10, 24, 1f, 5f,
+    public static final TreeAttack<GoldExperienceEntity> TREE = new TreeAttack<GoldExperienceEntity>(280, 10, 24, 1f, 5f,
             15, 1.75f, 0.2f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withSound(JSoundRegistry.GE_TREE)
@@ -142,7 +142,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     Component.literal("Tree Summon"),
                     Component.literal("two-hitting launch")
             );
-    public static final LifeGiverAttack LIFE_GIVER = new LifeGiverAttack(300, 16, 25, 1f)
+    public static final LifeGiverAttack<GoldExperienceEntity> LIFE_GIVER = new LifeGiverAttack<GoldExperienceEntity>(300, 16, 25, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(
                     Component.literal("Life Giver"),
@@ -151,7 +151,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                             CROUCHING: turns any stackable item into a frog, lasts for 15s and reflects damage, follows user
                             AERIAL: turns any item into a butterfly, lasts forever""")
             );
-    public static final OverclockAttack OVERCLOCK = new OverclockAttack(920, 22, 31, 1f,
+    public static final OverclockAttack<GoldExperienceEntity> OVERCLOCK = new OverclockAttack<GoldExperienceEntity>(920, 22, 31, 1f,
             9f, 60, 2f, 0.9f, 0f)
 //            .withSound(JSoundRegistry.GE_ULT)
             .withImpactSound(JSoundRegistry.IMPACT_10)

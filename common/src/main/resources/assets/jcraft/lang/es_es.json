@@ -659,8 +659,6 @@
   "move.jcraft.anubis.default.slash.name": "Corte",
   "move.jcraft.anubis.default.unsheathing_attack.description": "Desenfunda su Anubis",
   "move.jcraft.anubis.default.unsheathing_attack.name": "Ataque al desenvainar",
-  "move.jcraft.anubis.default.unsheating_sweep.cr.description": "2 golpes, derribe",
-  "move.jcraft.anubis.default.unsheating_sweep.cr.name": "barrido al desenvainar",
   "move.jcraft.brawler.default.combo.description": "pegar 3 veces, combo inicial/extensor",
   "move.jcraft.brawler.default.combo.name": "Combo",
   "move.jcraft.brawler.default.gut_punch.description": "Buen aturdimiento",

@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
  */
 public class FooFightersEntity extends StandEntity<FooFightersEntity, FooFightersEntity.State> {
     public static final MoveSet<FooFightersEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.FOO_FIGHTERS,
-            FooFightersEntity::registerMoves, State.class);
+            FooFightersEntity::registerMoves, FooFightersEntity.class, State.class);
     public static final StandData DATA = StandData.of(StandInfo.of(Component.translatable("entity.jcraft.foo_fighters")))
             .withObtainable(false);
 

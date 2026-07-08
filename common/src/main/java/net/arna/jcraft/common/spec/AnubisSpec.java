@@ -12,8 +12,14 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecData;
-import net.arna.jcraft.common.attack.moves.anubis.*;
+import net.arna.jcraft.common.attack.actions.AnubisBloodLustMoveAction;
+import net.arna.jcraft.common.attack.conditions.HoldingAnubisCondition;
+import net.arna.jcraft.common.attack.moves.anubis.Rekka3Attack;
+import net.arna.jcraft.common.attack.moves.anubis.SimpleAnubisMultiHitAttack;
+import net.arna.jcraft.common.attack.moves.anubis.UnsheathingAttack;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownMultiHitAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleUppercutAttack;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
@@ -32,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 
 public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
-    public static final MoveSet<AnubisSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.ANUBIS, AnubisSpec::registerMoves, State.class);
+    public static final MoveSet<AnubisSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.ANUBIS, AnubisSpec::registerMoves, AnubisSpec.class, State.class);
     public static final SpecData DATA = SpecData.builder()
             .name(Component.translatable("spec.jcraft.anubis"))
             .description(Component.literal("Accelerating offense"))
@@ -42,29 +48,46 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
                     Not hitting opponents reduces Bloodlust by one stack every 4 seconds."""))
             .build();
 
-    public static final SimpleAnubisAttack AERIAL_CLEAVE = new SimpleAnubisAttack(0, 9, 15, 1f, 5f,
-            15, 1.75f, 0.4f, 0.3f, true, true)
+    public static final SimpleAttack<AnubisSpec> AERIAL_CLEAVE = new SimpleAttack<AnubisSpec>(0, 9, 15, 1f, 5f,
+            15, 1.75f, 0.4f, 0.3f)
             .withSound(JSoundRegistry.ANUBIS_SLASH)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
             .withHitSpark(JParticleType.SWEEP_ATTACK)
-            .withInfo(Component.literal("Aerial Cleave"), Component.literal("Interruptible, faster recovery."));
-    public static final SimpleAnubisAttack SLASH = new SimpleAnubisAttack(20, 9, 20, 1f, 6f,
-            15, 1.75f, 0.9f, 0f, true, true)
+            .withCondition(HoldingAnubisCondition.holdingAnubis())
+            .withAction(AnubisBloodLustMoveAction.incrementBloodlust())
+            .withInfo(
+                    Component.literal("Aerial Cleave"),
+                    Component.literal("Interruptible, faster recovery.")
+            );
+    public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(20, 9, 20, 1f, 6f,
+            15, 1.75f, 0.9f, 0f)
             .withAerialVariant(AERIAL_CLEAVE)
             .withSound(JSoundRegistry.ANUBIS_SLASH)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
             .withHitSpark(JParticleType.SWEEP_ATTACK)
-            .withInfo(Component.literal("Slash"), Component.literal("Uninterruptible get-off-me tool. Great stun."));
-    public static final SimpleAnubisAttack POMMEL = new SimpleAnubisAttack(20, 5, 8,
-            1f, 4f, 7, 1.25f, 0.2f, 0f, false, true)
+            .withCondition(HoldingAnubisCondition.holdingAnubis())
+            .withAction(AnubisBloodLustMoveAction.incrementBloodlust())
+            .withInfo(
+                    Component.literal("Slash"),
+                    Component.literal("Uninterruptible get-off-me tool. Great stun.")
+            );
+    public static final SimpleAttack<AnubisSpec> POMMEL = new SimpleAttack<AnubisSpec>(20, 5, 8,
+            1f, 4f, 7, 1.25f, 0.2f, 0f)
             .withSound(JSoundRegistry.ANUBIS_POMMEL)
             .withImpactSound(JSoundRegistry.IMPACT_3)
-            .withInfo(Component.literal("Pommel Strike"), Component.literal("Fast jab."));
+            .withAction(AnubisBloodLustMoveAction.incrementBloodlust())
+            .withInfo(
+                    Component.literal("Pommel Strike"),
+                    Component.literal("Fast jab.")
+            );
     public static final SimpleAnubisMultiHitAttack REKKA2 = new SimpleAnubisMultiHitAttack(30,
             26, 1f, 4f, 15, 1.75f, 0.2f, -0.1f, IntSet.of(8, 20), false)
             .withSound(JSoundRegistry.ANUBIS_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_9)
-            .withInfo(Component.literal("Cleaving Strikes (2 Hits)"), Component.literal("Two-strike attack"));
+            .withInfo(
+                    Component.literal("Cleaving Strikes (2 Hits)"),
+                    Component.literal("Two-strike attack")
+            );
     public static final KnockdownMultiHitAttack<AnubisSpec> REKKA_FINISHER = new KnockdownMultiHitAttack<AnubisSpec>(
             0, 40, 1f, 7f, 15, 2f, 0.9f, 0f,
             IntSet.of(32), 35)
@@ -74,24 +97,38 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             .withFollowup(REKKA_FINISHER)
             .withSound(JSoundRegistry.ANUBIS_REKKA3)
             .withImpactSound(JSoundRegistry.IMPACT_9)
-            .withInfo(Component.literal("Cleaving Strikes (3 Hits)"), Component.literal("Last hit knocks down if on 0 Bloodlust."));
-    public static final LowKickAttack LOW_KICK = new LowKickAttack(10, 10, 17,
+            .withAction(AnubisBloodLustMoveAction.incrementBloodlust())
+            .withInfo(
+                    Component.literal("Cleaving Strikes (3 Hits)"),
+                    Component.literal("Last hit knocks down if on 0 Bloodlust.")
+            );
+    public static final SimpleUppercutAttack<AnubisSpec> LOW_KICK = new SimpleUppercutAttack<AnubisSpec>(10, 10, 17,
             1.5f, 6f, 15, 1.33f, 0.3f, 0f, 0.3f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withStaticY()
-            .withInfo(Component.literal("Low Kick"), Component.literal("Sheathed-only, launches slightly up."));
+            .withAction(AnubisBloodLustMoveAction.resetLastHitTicks())
+            .withInfo(
+                    Component.literal("Low Kick"),
+                    Component.literal("Sheathed-only, launches slightly up.")
+            );
     public static final SimpleAnubisMultiHitAttack UNSHEATHING_SWEEP = new SimpleAnubisMultiHitAttack(5, 16, 1f,
             3f, 10, 1.25f, 0.3f, 0.3f, IntSet.of(6, 10), true)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withArmor(1)
-            .withInfo(Component.literal("Unsheating Sweep"), Component.literal("2 hits, knocks down."));
+            .withInfo(
+                    Component.literal("Unsheathing Sweep"),
+                    Component.literal("2 hits, knocks down.")
+            );
     public static final UnsheathingAttack UNSHEATHING_ATTACK = new UnsheathingAttack(5, 6, 12, 1f, 5f,
             13, 1.75f, 0.5f, 0f)
             .withCrouchingVariant(UNSHEATHING_SWEEP)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
             .withHitSpark(JParticleType.SWEEP_ATTACK)
             .withArmor(1)
-            .withInfo(Component.literal("Unsheathing Attack"), Component.literal("Unsheathes Anubis."));
+            .withInfo(
+                    Component.literal("Unsheathing Attack"),
+                    Component.literal("Unsheathes Anubis.")
+            );
 
     @Setter
     private int ticksSinceLastHit = 0;

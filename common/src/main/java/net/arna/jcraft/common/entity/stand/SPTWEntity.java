@@ -39,7 +39,7 @@ import org.joml.Vector3f;
  */
 public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPTWEntity.State> {
     public static final MoveSet<SPTWEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.STAR_PLATINUM_THE_WORLD,
-            SPTWEntity::registerMoves, State.class);
+            SPTWEntity::registerMoves, SPTWEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(315f)
             .evolution(true)
@@ -58,7 +58,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .summonData(SummonData.of(JSoundRegistry.STAR_PLATINUM_SUMMON))
             .build();
 
-    public static final SPTWGroundSlamAttack GROUND_SLAM = new SPTWGroundSlamAttack(0,
+    public static final SPTWGroundSlamAttack<SPTWEntity> GROUND_SLAM = new SPTWGroundSlamAttack<SPTWEntity>(0,
             12, 19,0.75f, 7f, 11, 1.8f, 0f, 0.8f)
             .withAnim(State.GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_8)
@@ -98,7 +98,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                     Component.translatable("jcraft.generic.barrage"),
                     Component.literal("fast reliable combo starter/extender, high stun")
             );
-    public static final TimeStrikeAttack TIME_STRIKE = new TimeStrikeAttack(300,
+    public static final TimeStrikeAttack<SPTWEntity> TIME_STRIKE = new TimeStrikeAttack<SPTWEntity>(300,
             7, 11, 0.75f, 5f, 12, 1.5f, 0.6f, -0.25f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(1f)

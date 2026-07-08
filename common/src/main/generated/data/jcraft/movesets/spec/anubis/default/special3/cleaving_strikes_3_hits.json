@@ -59,6 +59,11 @@
           "bind": false,
           "run": "on_hit",
           "sound": "jcraft:impact9"
+        },
+        {
+          "type": "jcraft:anubis_blood_lust",
+          "reset_only": false,
+          "run": "on_strike"
         }
       ],
       "description": {

@@ -54,7 +54,7 @@ import static net.arna.jcraft.api.component.living.CommonHitPropertyComponent.Hi
  */
 public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
     public static final MoveSet<GEREntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.GOLD_EXPERIENCE_REQUIEM,
-            GEREntity::registerMoves, State.class);
+            GEREntity::registerMoves, GEREntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-30f)
             .evolution(true)
@@ -98,7 +98,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                     Component.literal("Downward Kick"),
                     Component.literal("medium stun combo starter, low hitbox, low blockstun")
             );
-    public static final OverheadKickAttack OVERHEAD_KICK = new OverheadKickAttack(24,
+    public static final OverheadKickAttack<GEREntity> OVERHEAD_KICK = new OverheadKickAttack<GEREntity>(24,
             14, 24, 1f, 9f, 40, 1.5f, 0.8f, 0.25f)
             .withSound(JSoundRegistry.GER_HEAVY)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -175,7 +175,7 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                     Component.literal("Healing Hand"),
                     Component.literal("standing: heals user for 2 hearts, crouching: heals others for 3 hearts, pacifies angered mobs")
             );
-    public static final LifeBeamAttack LIFE_BEAM = new LifeBeamAttack(0, 1, 10, 1.1f)
+    public static final LifeBeamAttack<GEREntity> LIFE_BEAM = new LifeBeamAttack<GEREntity>(0, 1, 10, 1.1f)
             .withSound(JSoundRegistry.GER_LASER_FIRE)
             .withInfo(
                     Component.literal("Life Beam"),
@@ -197,7 +197,9 @@ public class GEREntity extends StandEntity<GEREntity, GEREntity.State> {
                     Component.literal("Nullification"),
                     Component.literal("0.25s windup, 1.5s counter, stuns on hit")
             );
-    public static final ReturnToZeroMove RETURN_TO_ZERO = new ReturnToZeroMove(1200, 30, 32, 1f, 64, 200, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
+    public static final ReturnToZeroMove<GEREntity> RETURN_TO_ZERO = new ReturnToZeroMove<GEREntity>(1200,
+            30, 32, 1f, 64, 200, CountdownMove.ENTITY_STUFF_TO_SAVE,
+            JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
             .withSound(JSoundRegistry.GER_SETUP)
             .withInfo(
                     Component.literal("Return to Zero"),

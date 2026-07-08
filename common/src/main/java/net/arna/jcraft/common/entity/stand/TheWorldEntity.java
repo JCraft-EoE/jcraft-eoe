@@ -45,7 +45,7 @@ import java.util.function.Supplier;
  */
 public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity, TheWorldEntity.State> {
     public static final MoveSet<TheWorldEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_WORLD,
-            TheWorldEntity::registerMoves, State.class);
+            TheWorldEntity::registerMoves, TheWorldEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .evolution(true)
             .info(StandInfo.builder()
@@ -170,7 +170,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
                     Component.literal("Feign Barrage"),
                     Component.literal("counter, 0.25s windup, 2.25s duration, teleports and knocks down on hit")
             );
-    public static final TWDonutAttack DONUT = new TWDonutAttack(42,
+    public static final TWDonutAttack<TheWorldEntity> DONUT = new TWDonutAttack<TheWorldEntity>(42,
             20, 42, 1f,9f, 52, 2f, 1f, 0f)
             .withSound(JSoundRegistry.TW_DONUT)
             .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
@@ -206,7 +206,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withImpactSound(JSoundRegistry.TW_CHARGE_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
-            .withBlockStun(11)
+            .withBlockStun(8)
             .withInfo(
                     Component.literal("Forward Charge"),
                     Component.literal("The World detaches from the user and lunges forward, combo starter")

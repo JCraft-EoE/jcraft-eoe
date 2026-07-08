@@ -63,9 +63,9 @@ import java.util.List;
  */
 public class SilverChariotEntity extends StandEntity<SilverChariotEntity, SilverChariotEntity.State> {
     public static final MoveSet<SilverChariotEntity, State> DEFAULT_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.SILVER_CHARIOT,
-            SilverChariotEntity::registerDefaultMoves, State.class);
+            SilverChariotEntity::registerDefaultMoves, SilverChariotEntity.class, State.class);
     public static final MoveSet<SilverChariotEntity, State> POSSESSED_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.SILVER_CHARIOT,
-            "possessed", SilverChariotEntity::registerPossessedMoves, State.class);
+            "possessed", SilverChariotEntity::registerPossessedMoves, SilverChariotEntity.class, State.class);
 
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
@@ -142,7 +142,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     Component.literal("slow, uninterruptible launcher")
             );
 
-    public static final SpinBarrageAttack ANUBIS_SPIN_BARRAGE = new SpinBarrageAttack(0,
+    public static final SpinBarrageAttack<SilverChariotEntity> ANUBIS_SPIN_BARRAGE = new SpinBarrageAttack<SilverChariotEntity>(0,
             7, 24,0.65f, 1f, 10, 2f, 0.15f, -0.2f, 2)
             .withAnim(State.SPIN_2)
             .withCondition(HoldingAnubisCondition.holdingAnubis())
@@ -161,7 +161,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     Component.literal("fast reliable combo starter/extender, low stun")
             );
 
-    public static final RayDartAttack RAY_DART_LOW = new RayDartAttack(100,
+    public static final RayDartAttack<SilverChariotEntity> RAY_DART_LOW = new RayDartAttack<SilverChariotEntity>(100,
             10, 18,0.65f, 6f, 20, 1.75f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.SC_CHARGE)
             .withSound(SoundEvents.PLAYER_ATTACK_SWEEP)
@@ -170,7 +170,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     Component.literal("Lacerate"),
                     Component.literal("Anubis Chariot and the user charge forward, high stun, low blockstun.")
             );
-    public static final RayDartAttack RAY_DART_HIGH = new RayDartAttack(100,
+    public static final RayDartAttack<SilverChariotEntity> RAY_DART_HIGH = new RayDartAttack<SilverChariotEntity>(100,
             12, 20,0.65f, 6f, 15, 2.0f, 0.25f, 0.2f)
             .withCrouchingVariant(RAY_DART_LOW)
             .withSound(JSoundRegistry.SC_CHARGE)
@@ -181,7 +181,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     Component.literal("Split"),
                     Component.literal("Anubis Chariot and the user charge forward, low stun, high blockstun.")
             );
-    public static final CleaveAttack CLEAVE = new CleaveAttack(0, 12, 21, 0.75f, 9f,
+    public static final CleaveAttack<SilverChariotEntity> CLEAVE = new CleaveAttack<SilverChariotEntity>(0, 12, 21, 0.75f, 9f,
             20, 2.5f, 0.8f, 0f)
             .withSound(JSoundRegistry.SC_CLEAVE)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
@@ -213,7 +213,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     Component.literal("God of Death (Final Hit)"),
                     Component.empty()
             );
-    public static final GodOfDeathHitAttack GOD_OF_DEATH_HIT = new GodOfDeathHitAttack(0, 59, 0.65f,
+    public static final GodOfDeathHitAttack<SilverChariotEntity> GOD_OF_DEATH_HIT = new GodOfDeathHitAttack<SilverChariotEntity>(0, 59, 0.65f,
             4.5f, 32, 2f, 0.25f, 0f, IntSet.of(13, 23))
             .withFollowup(GOD_OF_DEATH_FINAL)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -238,7 +238,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     Component.literal("Armor Off"),
                     Component.literal("25s of faster moves")
             );
-    public static final CircleSlashAttack CIRCLE_SLASH = new CircleSlashAttack(0, 2, 20,
+    public static final CircleSlashAttack<SilverChariotEntity> CIRCLE_SLASH = new CircleSlashAttack<SilverChariotEntity>(0, 2, 20,
             0.65f, 5f, 20, 1.75f, 0f, 0f)
             .withExtraHitBox(-0.65, 0, 2)
             .withLaunch()

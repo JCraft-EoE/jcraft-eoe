@@ -4,11 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.core.MoveCondition;
 import net.arna.jcraft.api.attack.core.MoveConditionType;
-import net.arna.jcraft.api.stand.StandEntity;
 
-public class RemoteCondition extends MoveCondition<RemoteCondition, StandEntity<?, ?>> {
+public class RemoteCondition extends MoveCondition<RemoteCondition, IAttacker<?, ?>> {
     @Getter
     private final boolean requireRemote;
 
@@ -17,7 +17,7 @@ public class RemoteCondition extends MoveCondition<RemoteCondition, StandEntity<
     }
 
     @Override
-    public boolean test(StandEntity<?, ?> attacker) {
+    public boolean test(IAttacker<?, ?> attacker) {
         return attacker.isRemote() == requireRemote;
     }
 

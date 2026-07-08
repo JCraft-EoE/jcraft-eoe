@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     public static final MoveSet<HGEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.HIEROPHANT_GREEN,
-            HGEntity::registerMoves, State.class);
+            HGEntity::registerMoves, HGEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .info(StandInfo.builder()
@@ -179,7 +179,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                     Component.literal("Hierophant extends its arm upward in a far-reaching attack")
             );
 
-    public static final EmeraldSplashAttack EMERALD_SPLASH = new EmeraldSplashAttack(0, 12,
+    public static final EmeraldSplashAttack<HGEntity> EMERALD_SPLASH = new EmeraldSplashAttack<HGEntity>(0, 12,
             1, 0, 0, 0, 0, IntSet.of(1, 3, 5), 1.5f, false)
             .withSound(JSoundRegistry.HG_SPLASH)
             .withInfo(
@@ -195,7 +195,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                             Fires 3 bursts of emeralds at the opponent.
                             Bursts contain 3-6 emeralds depending on how long you hold."""));
 
-    public static final NetSetMove NET_SET = new NetSetMove(200, 9, 15, 1f)
+    public static final NetSetMove<HGEntity> NET_SET = new NetSetMove<HGEntity>(200, 9, 15, 1f)
             .withSound(JSoundRegistry.HG_NET_SET)
             .withInfo(
                     Component.literal("Tentacle Place"),
@@ -211,7 +211,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                     Component.empty()
             );
 
-    public static final EmeraldSplashAttack EMERALD_SUPER = new EmeraldSplashAttack(500, 40,
+    public static final EmeraldSplashAttack<HGEntity> EMERALD_SUPER = new EmeraldSplashAttack<HGEntity>(500, 40,
             1, 0, 0, 0, 0, IntSet.of(12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32), 2f, true)
             .withReflect()
             .withSound(JSoundRegistry.HG_SPLASH)

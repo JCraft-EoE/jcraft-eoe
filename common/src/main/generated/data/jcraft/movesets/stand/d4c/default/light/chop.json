@@ -30,28 +30,15 @@
       "type": "jcraft:shared_simple_attack",
       "attack_extras": {
         "backstab": true,
-        "block_stun": 4,
-        "extra_hit_boxes": [
-          {
-            "size": 1.0
-          }
-        ],
-        "hit_animation": "LAUNCH",
-        "hit_spark": "HIT_SPARK_2",
-        "override_stun": true,
-        "shockwaves": true,
-        "stun_type": "LAUNCH"
+        "block_stun": 9,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
       },
       "cooldown": 0,
-      "damage": 7.0,
-      "duration": 14,
+      "damage": 5.0,
+      "duration": 12,
       "extras": {
         "actions": [
-          {
-            "type": "jcraft:play_sound",
-            "run": "at_init",
-            "sound": "jcraft:d4clight"
-          },
           {
             "type": "jcraft:play_sound",
             "bind": false,
@@ -60,39 +47,39 @@
           }
         ],
         "description": {
-          "translate": "move.jcraft.d4c.default.deadly_blow.followup.description"
+          "translate": "move.jcraft.d4c.default.elbow_strike.followup.description"
         },
         "look_tracking": true,
         "name": {
-          "translate": "move.jcraft.d4c.default.deadly_blow.followup.name"
+          "translate": "move.jcraft.d4c.default.elbow_strike.followup.name"
         }
       },
-      "hitbox_size": 1.75,
-      "knockback": 1.25,
+      "hitbox_size": 1.5,
+      "knockback": 1.0,
       "move_distance": 0.75,
-      "offset": -0.1,
-      "stun": 8,
-      "windup": 9
+      "offset": 0.0,
+      "stun": 7,
+      "windup": 7
     }
   },
   "move": {
     "type": "jcraft:shared_simple_attack",
     "attack_extras": {
       "backstab": true,
-      "block_stun": 9,
+      "block_stun": 8,
       "hit_animation": "HIGH",
       "hit_spark": "HIT_SPARK_1"
     },
     "cooldown": 20,
-    "damage": 5.0,
-    "duration": 15,
+    "damage": 4.5,
+    "duration": 12,
     "extras": {
       "actions": [
         {
           "type": "jcraft:play_sound",
           "bind": false,
           "run": "on_hit",
-          "sound": "jcraft:impact2"
+          "sound": "jcraft:impact9"
         }
       ],
       "description": {
@@ -108,7 +95,7 @@
     "knockback": 0.25,
     "move_distance": 0.75,
     "offset": -0.1,
-    "stun": 20,
-    "windup": 9
+    "stun": 14,
+    "windup": 7
   }
 }

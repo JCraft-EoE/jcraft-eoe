@@ -54,6 +54,33 @@ configurations {
     }
 }
 
+tasks.register("copyAccessWidener", Copy) {
+    from(project(":common").file("src/main/resources/jcraft.accesswidener"))
+    into(sourceSets.named("main").get().resources.srcDirs.first())
+}
+
+processResources {
+    dependsOn("copyAccessWidener")
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+sourcesJar {
+    dependsOn "copyAccessWidener"
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE // Ignore duplicate jcraft.accesswidener files
+
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+
+    def fabricSources = project(":fabric").sourcesJar
+    dependsOn fabricSources
+    from fabricSources.archiveFile.map { zipTree(it) }
+}
+
 // Ensure fabric project is evaluated before this project
 evaluationDependsOn(':fabric')
 

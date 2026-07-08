@@ -13,6 +13,8 @@ public interface JStatusRegistry {
 
     RegistrySupplier<MobEffect> WSPOISON = EFFECTS.register("ws_poison", WSPoisonEffect::new);
     RegistrySupplier<MobEffect> STANDLESS = EFFECTS.register("standless", StandlessEffect::new);
+    RegistrySupplier<MobEffect> SPECLESS = EFFECTS.register("specless", SpeclessEffect::new);
+
     RegistrySupplier<MobEffect> OUTOFBODY = EFFECTS.register("outofbody", OutOfBodyEffect::new);
     RegistrySupplier<MobEffect> WEIGHTLESS = EFFECTS.register("weightless", WeightlessStatusEffect::new);
     RegistrySupplier<MobEffect> BLEEDING = EFFECTS.register("jbleeding", BleedingEffect::new);

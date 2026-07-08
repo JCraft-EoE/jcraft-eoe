@@ -681,8 +681,6 @@
   "move.jcraft.aerosmith.default.bomb_drop.name": "Скидання бомби",
   "move.jcraft.aerosmith.default.breath_detection.description": "Aerosmith сканує навколишнє середовище, шукаючи продукти дихання живиї організмів.",
   "move.jcraft.aerosmith.default.breath_detection.name": "Детектор Дихання",
-  "move.jcraft.aerosmith.default.dive_charge.air.description": "Не віддалений: прямий політ, що підіймається угору під кінець. Несе ворогів з Aerosmith.",
-  "move.jcraft.aerosmith.default.dive_charge.air.name": "Атака з Ривком",
   "move.jcraft.aerosmith.default.fire_gunpods.description": "Стріляє надшвидкими кулями перед Aerosmith. Довге використання викликає перегрівання пушок, роблячи їх набагато менш точними.",
   "move.jcraft.aerosmith.default.fly_by_location.description": "Наказує Aerosmith летіти до наданого місця, повертається після досягання цілі.",
   "move.jcraft.aerosmith.default.fly_by_location.name": "Політ на Вказане Місце",

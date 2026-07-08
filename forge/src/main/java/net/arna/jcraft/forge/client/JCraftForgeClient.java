@@ -78,6 +78,7 @@ public class JCraftForgeClient {
         event.registerSpriteSet(JParticleTypeRegistry.HITSPARK_1.get(), provider -> new HitsparkParticle.Factory(provider, 0.4f, 5));
         event.registerSpriteSet(JParticleTypeRegistry.HITSPARK_2.get(), provider -> new HitsparkParticle.Factory(provider, 0.66f, 6));
         event.registerSpriteSet(JParticleTypeRegistry.HITSPARK_3.get(), provider -> new HitsparkParticle.Factory(provider, 1f, 8));
+        event.registerSpriteSet(JParticleTypeRegistry.BLOOD_HITSPARK_2.get(), provider -> new HitsparkParticle.Factory(provider, 0.66f, 6));
         event.registerSpriteSet(JParticleTypeRegistry.INVERTED_HITSPARK_3.get(), provider -> new InvertedHitsparkParticle.Factory(provider, 1f, 8));
         event.registerSpriteSet(JParticleTypeRegistry.STUN_SLASH.get(), provider -> new HitsparkParticle.Factory(provider, 0.6f, 6));
         event.registerSpriteSet(JParticleTypeRegistry.STUN_PIERCE.get(), provider -> new HitsparkParticle.Factory(provider, 0.6f, 6));

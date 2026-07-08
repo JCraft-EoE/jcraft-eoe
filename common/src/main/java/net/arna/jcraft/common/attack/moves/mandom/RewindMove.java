@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.marker.BlockMarker;
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Set;
 
-public final class RewindMove extends AbstractMove<RewindMove, MandomEntity> {
+public final class RewindMove<A extends StandEntity<? extends A, ?>> extends AbstractMove<RewindMove<A>, A> {
 
     @Getter
     private final int reach; // in Euclidean distance in meters
@@ -34,12 +35,12 @@ public final class RewindMove extends AbstractMove<RewindMove, MandomEntity> {
     }
 
     @Override
-    public @NotNull MoveType<RewindMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<RewindMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final MandomEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         CountdownMove countdownMove = attacker.getMove(CountdownMove.class);
         if (countdownMove == null || !countdownMove.isCountdownActive()) {
             return Set.of();
@@ -78,20 +79,20 @@ public final class RewindMove extends AbstractMove<RewindMove, MandomEntity> {
     }
 
     @Override
-    protected @NonNull RewindMove getThis() {
+    protected @NonNull RewindMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull RewindMove copy() {
-        return copyExtras(new RewindMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), 200));
+    public @NonNull RewindMove<A> copy() {
+        return copyExtras(new RewindMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), 200));
     }
 
-    public static final class Type extends AbstractMove.Type<RewindMove> {
+    public static final class Type extends AbstractMove.Type<RewindMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<RewindMove>, RewindMove> buildCodec(RecordCodecBuilder.Instance<RewindMove> instance) {
+        protected @NotNull App<RecordCodecBuilder.Mu<RewindMove<?>>, RewindMove<?>> buildCodec(RecordCodecBuilder.Instance<RewindMove<?>> instance) {
             return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("reach").forGetter(RewindMove::getReach)).apply(instance, applyExtras(RewindMove::new));
         }
     }

@@ -9,10 +9,12 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.common.events.JEntityEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -39,6 +41,7 @@ public class BoundSoundClient {
     private static final Long2ObjectMap<BoundSoundInstance> playingSounds = new Long2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<List<BoundSoundInstance>> byEntity = new Int2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<EntityRemovalCountdown> removedEntities = new Int2ObjectOpenHashMap<>();
+    private static final Int2ObjectMap<List<QueuedEntitySound>> queuedSounds = new Int2ObjectOpenHashMap<>();
 
     public static void init() {
         ClientTickEvent.CLIENT_POST.register(BoundSoundClient::tick);
@@ -75,6 +78,29 @@ public class BoundSoundClient {
             }
         });
         entitiesToRemove.forEach(removedEntities::remove);
+
+        // Tick queued entity sounds
+        if (client.level == null) queuedSounds.clear();
+        IntSet queuedEntitiesToRemove = new IntOpenHashSet();
+        for (Int2ObjectMap.Entry<List<QueuedEntitySound>> entry : queuedSounds.int2ObjectEntrySet()) {
+            Entity entity = client.level.getEntity(entry.getIntKey());
+
+            if (entity == null) {
+                entry.getValue().removeIf(QueuedEntitySound::tick);
+                if (entry.getValue().isEmpty())
+                    queuedEntitiesToRemove.add(entry.getIntKey());
+                continue;
+            }
+
+            queuedEntitiesToRemove.add(entry.getIntKey());
+
+            if (!(entity instanceof LivingEntity le)) continue;
+            // Play queued sounds
+            entry.getValue().stream()
+                    .map(qes -> qes.createInstance(client.level, le))
+                    .forEach(inst -> playSound(client, inst));
+        }
+        queuedEntitiesToRemove.forEach(queuedSounds::remove);
     }
 
     private static EventResult onEntityAdded(Entity entity, Level level) {
@@ -172,7 +198,8 @@ public class BoundSoundClient {
                 int entityId = buf.readVarInt();
                 Entity entity = level.getEntity(entityId);
                 if (!(entity instanceof LivingEntity le)) {
-                    JCraft.LOGGER.warn("Got bound sound with invalid entity: {}.", entityId);
+                    QueuedEntitySound qes = new QueuedEntitySound(id, sound, category, volume, pitch, entityId);
+                    queuedSounds.computeIfAbsent(entityId, k -> new ArrayList<>()).add(qes);
                     yield null;
                 }
 
@@ -192,7 +219,11 @@ public class BoundSoundClient {
             // Warning was already logged, exit.
             return;
 
-        playingSounds.put(id, inst);
+        playSound(client, inst);
+    }
+
+    private static void playSound(Minecraft client, BoundSoundInstance inst) {
+        playingSounds.put(inst.getId(), inst);
         if (inst.getBoundEntity() != null)
             byEntity.computeIfAbsent(inst.getBoundEntity().getId(), e -> new ArrayList<>()).add(inst);
         client.execute(() -> client.getSoundManager().queueTickingSound(inst));
@@ -210,6 +241,24 @@ public class BoundSoundClient {
 
         public boolean tick() {
             return ticks-- == 0;
+        }
+    }
+
+    @RequiredArgsConstructor
+    private static class QueuedEntitySound {
+        private final long id;
+        private final SoundEvent sound;
+        private final SoundSource category;
+        private final float volume, pitch;
+        private final int entityId;
+        private int ticksLeft = 20;
+
+        public boolean tick() {
+            return ticksLeft-- > 0;
+        }
+
+        public BoundSoundInstance createInstance(ClientLevel level, LivingEntity entity) {
+            return new BoundSoundInstance(id, entity, sound, category, volume, pitch);
         }
     }
 }

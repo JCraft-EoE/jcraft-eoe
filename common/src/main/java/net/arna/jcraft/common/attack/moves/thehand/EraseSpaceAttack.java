@@ -6,7 +6,7 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
-import net.arna.jcraft.common.entity.stand.TheHandEntity;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public class EraseSpaceAttack extends AbstractEraseAttack<EraseSpaceAttack> {
+public class EraseSpaceAttack<A extends StandEntity<? extends A, ?>> extends AbstractEraseAttack<EraseSpaceAttack<A>, A> {
     public EraseSpaceAttack(int cooldown, int windup, int duration, float moveDistance, float damage, int stun,
                             float hitboxSize, float knockback, float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
@@ -29,12 +29,12 @@ public class EraseSpaceAttack extends AbstractEraseAttack<EraseSpaceAttack> {
     }
 
     @Override
-    public @NonNull MoveType<EraseSpaceAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<EraseSpaceAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(TheHandEntity attacker, LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user) {
         Set<LivingEntity> targets = super.perform(attacker, user);
 
         final Vec3 rotVec = user.getLookAngle();
@@ -62,21 +62,21 @@ public class EraseSpaceAttack extends AbstractEraseAttack<EraseSpaceAttack> {
     }
 
     @Override
-    protected @NonNull EraseSpaceAttack getThis() {
+    protected @NonNull EraseSpaceAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull EraseSpaceAttack copy() {
-        return copyExtras(new EraseSpaceAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull EraseSpaceAttack<A> copy() {
+        return copyExtras(new EraseSpaceAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<EraseSpaceAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<EraseSpaceAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<EraseSpaceAttack>, EraseSpaceAttack> buildCodec(RecordCodecBuilder.Instance<EraseSpaceAttack> instance) {
+        protected @NotNull App<RecordCodecBuilder.Mu<EraseSpaceAttack<?>>, EraseSpaceAttack<?>> buildCodec(RecordCodecBuilder.Instance<EraseSpaceAttack<?>> instance) {
             return attackDefault(instance, EraseSpaceAttack::new);
         }
     }

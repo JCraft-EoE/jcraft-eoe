@@ -58,9 +58,7 @@ import net.arna.jcraft.common.attack.moves.whitesnake.StealStandAttack;
 public interface JMoveTypeRegistry {
     DeferredRegister<MoveType<?>> MOVE_TYPE_REGISTRY = DeferredRegister.create(JCraft.MOD_ID, JRegistries.MOVE_TYPE_REGISTRY_KEY);
 
-    RegistrySupplier<MoveType<?>> ANUBIS_LOW_KICK_ATTACK = register("anubis_low_kick_attack", LowKickAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> ANUBIS_REKKA_3_ATTACK = register("anubis_rekka_3_attack", Rekka3Attack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> ANUBIS_SIMPLE_ANUBIS_ATTACK = register("anubis_simple_anubis_attack", SimpleAnubisAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> ANUBIS_SIMPLE_ANUBIS_MULTI_HIT_ATTACK = register("anubis_simple_anubis_multi_hit_attack", SimpleAnubisMultiHitAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> ANUBIS_UNSHEATHING_ATTACK = register("anubis_unsheathing_attack", UnsheathingAttack.Type.INSTANCE);
 

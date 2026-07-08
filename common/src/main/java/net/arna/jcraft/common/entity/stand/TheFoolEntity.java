@@ -67,7 +67,7 @@ import java.util.List;
  */
 public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.State> {
     public static final MoveSet<TheFoolEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_FOOL,
-            TheFoolEntity::registerMoves, State.class);
+            TheFoolEntity::registerMoves, TheFoolEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .idleDistance(2f)
@@ -107,7 +107,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withExtraHitBox(1.75, -0.1, 0.75)
             .withInfo(
                     Component.literal("Drill"),
-                    Component.literal("fast, multi-hitting combo starter, low stun and blockstun")
+                    Component.literal("Fast, multi-hitting combo starter, low stun and blockstun.")
             );
     public static final SimpleAttack<TheFoolEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheFoolEntity>(0,
             9, 16, 1.5f, 6f, 9, 2f, 1.5f, 0)
@@ -120,7 +120,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withLookTracking()
             .withInfo(
                     Component.literal("Swipe"),
-                    Component.literal("quick combo finisher")
+                    Component.literal("Quick combo finisher.")
             );
     public static final SimpleAttack<TheFoolEntity> LIGHT = new SimpleAttack<TheFoolEntity>(30, 7,
             14, 1.5f, 6, 15, 2, 0.5f, -0.1f)
@@ -132,16 +132,16 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withLookTracking()
             .withInfo(
                     Component.literal("Swipe"),
-                    Component.literal("slow, long-reaching poke")
+                    Component.literal("Slow, long-reaching poke.")
             );
-    public static final AirBarrageAttack AIR_BARRAGE = new AirBarrageAttack(240,
+    public static final AirBarrageAttack<TheFoolEntity> AIR_BARRAGE = new AirBarrageAttack<TheFoolEntity>(240,
             0, 30,1f, 1f, 10, 2f, 0.1f, 0f, 3)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withInfo(
                     Component.literal("Burn Rubber"),
-                    Component.literal("slows down all movement, combo starter/extender")
+                    Component.literal("Slows down all movement, combo starter/extender.")
             );
-    public static final TFComboAttack COMBO = new TFComboAttack(200,
+    public static final TFComboAttack<TheFoolEntity> COMBO = new TFComboAttack<TheFoolEntity>(200,
             29, 1.5f, 4.5f,20, 1.75f, 0.1f, -0.1f, IntSet.of(6, 14, 18, 19))
             .withAerialVariant(AIR_BARRAGE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -155,11 +155,12 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withAction(EffectAction.inflict(MobEffects.LEVITATION, 5, 19, true, false))
             .withExtraHitBox(1.5)
             .withHitSpark(JParticleType.HIT_SPARK_3)
+            .withBlockStun(4)
             .withHyperArmor()
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(
                     Component.literal("Launch"),
-                    Component.literal("uninterruptible, slow, vertically launching uppercut")
+                    Component.literal("Uninterruptible, slow, vertically launching uppercut. Low blockstun.")
             );
     public static final SlamAttack SLAM = new SlamAttack(10,
             4, 10, 1.25f, 4f,24, 2f, 0.2f, 0.1f)
@@ -181,7 +182,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.LOW)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(Component.literal("Pound"), Component.literal("""
-                    has followups which create different sand patterns based on which key was pressed:
+                    Has followups which create different sand patterns based on which key was pressed:
                     SPECIAL 1 - no sand
                     SPECIAL 2 - semicircle
                     SPECIAL 3 - diagonal pattern (influenced by where the user is looking)"""));
@@ -189,13 +190,13 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withSound(SoundEvents.SAND_PLACE)
             .withInfo(
                     Component.literal("Sand Manipulation"),
-                    Component.literal("creates a blinding sand cloud, then a clone or (if crouching) circles of sand")
+                    Component.literal("Creates a blinding sand cloud, then a clone or (if crouching) circles of sand.")
             );
     public static final GlideMove GLIDE = new GlideMove(300, 5, 125, 0f)
             .withSound(JSoundRegistry.FOOL_GLIDE)
             .withInfo(
                     Component.literal("Glider"),
-                    Component.literal("turns The Fool into a glider for 6s")
+                    Component.literal("Turns The Fool into a glider for 6s.")
             );
     public static final SandWaveAttack SAND_WAVE = new SandWaveAttack(340, 0, 80, 0f,
             1f, 0, 2f, 0.1f, 0f, 3, 15)
@@ -203,13 +204,13 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withBackstab(false)
             .withInfo(
                     Component.literal("Sandwave"),
-                    Component.literal("The Fool turns into a quick sandwave that knocks anything it touches down")
+                    Component.literal("The Fool turns into a quick sandwave that knocks anything it touches down.")
             );
-    public static final SandTornadoMove SAND_TORNADO = new SandTornadoMove(200, 12, 13, 1f)
+    public static final SandTornadoMove<TheFoolEntity> SAND_TORNADO = new SandTornadoMove<TheFoolEntity>(200, 12, 13, 1f)
             .withSound(JSoundRegistry.FOOL_LAUNCH)
             .withInfo(
                     Component.literal("Sand Tornado"),
-                    Component.literal("summons a slow, stunning sand tornado")
+                    Component.literal("Summons a slow, long-lasting sand tornado. Use to control space.")
             );
     public static final TFChargeAttack CHARGE = new TFChargeAttack(200, 5, 20, 7f,
             6f, 10, 1.5f, 1.2f, 0f)
@@ -221,9 +222,9 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(
                     Component.literal("Charge"),
-                    Component.literal("The Fool detaches from the user and charges forward, launches on hit")
+                    Component.literal("The Fool detaches from the user and charges forward, launches on hit.")
             );
-    public static final SandstormAttack SANDSTORM = new SandstormAttack(800, 28, 41, 1.5f,
+    public static final SandstormAttack<TheFoolEntity> SANDSTORM = new SandstormAttack<TheFoolEntity>(800, 28, 41, 1.5f,
             7f, 20, 2f, 0.1f, 0f)
             .withSound(JSoundRegistry.FOOL_ULT)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
@@ -233,7 +234,7 @@ public class TheFoolEntity extends StandEntity<TheFoolEntity, TheFoolEntity.Stat
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(
                     Component.literal("Suffocating Sandstorm"),
-                    Component.literal("very slow, traps the opponent in a cloud of blinding and slowing sand")
+                    Component.literal("Very slow, unblockable, uninterruptible, traps the victims in a cloud of blinding and slowing sand.")
             );
     private static final BlockState sandState = Blocks.SAND.defaultBlockState();
 
