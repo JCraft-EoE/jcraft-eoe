@@ -12,11 +12,11 @@ import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -24,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -191,23 +192,14 @@ public class Peacemaker extends Item {
 
         BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 5);
         bullet.shootFromRotation(user, user.getXRot(), user.getYRot(), 0f, 10, 0f);
-
-        // Add campfire smoke particles at bullet spawn position
-        if (world instanceof ServerLevel serverLevel) {
-            // Get the bullet's initial position (slightly in front of the player)
-            double bulletX = bullet.getX();
-            double bulletY = bullet.getY();
-            double bulletZ = bullet.getZ();
-
-            // Spawn small campfire smoke particles
-            serverLevel.sendParticles(
-                    net.minecraft.core.particles.ParticleTypes.CAMPFIRE_COSY_SMOKE,
-                    bulletX, bulletY, bulletZ,
-                    5, // particle count
-                    0.1, 0.1, 0.1, // spread
-                    0.02 // speed
-            );
-        }
+        final Vec3 forward = Vec3.directionFromRotation(0f, user.getYRot());
+        final boolean offhand = user.getOffhandItem() == itemStack;
+        final boolean rightArm = user.getMainArm() == HumanoidArm.RIGHT;
+        final double side = rightArm != offhand ? 0.35 : -0.35;
+        final Vec3 armPosition = user.getEyePosition().add(forward.scale(0.25))
+                .add(forward.cross(new Vec3(0, 1, 0)).scale(side))
+                .add(0, -0.35, 0);
+        bullet.setPos(armPosition);
 
         world.addFreshEntity(bullet);
 
