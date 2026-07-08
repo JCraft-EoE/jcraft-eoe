@@ -8,6 +8,8 @@ import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.common.attack.moves.hamon.ImproviserAttack;
+import net.arna.jcraft.common.attack.moves.ranger.RangerRollMove;
+import net.arna.jcraft.common.attack.moves.ranger.RangerSlideMove;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.food.IFoodData;
@@ -153,15 +155,29 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
         }
     }
 
-    // KNOCKDOWN and poison preventing pose updating
+    // KNOCKDOWN, poison and ranger mobility moves preventing pose updating
     @Inject(cancellable = true, at = @At("HEAD"), method = "updatePlayerPose")
     public void jcraft$updatePose(CallbackInfo info) {
         if (
                 ((Player) (Object) this).hasEffect(JStatusRegistry.KNOCKDOWN.get())
                         || ((Player) (Object) this).hasEffect(JStatusRegistry.WSPOISON.get())
+                        || jcraft$inRangerMobilityMove()
         ) {
             info.cancel();
         }
+    }
+
+    @Unique
+    private boolean jcraft$inRangerMobilityMove() {
+        final JSpec<?, ?> spec = JComponentPlatformUtils.getSpecData((Player) (Object) this).getSpec();
+        if (spec == null || spec.moveStun <= 0) {
+            return false;
+        }
+        // The roll releases its pose during recovery so it can blend back while the animation finishes
+        if (spec.getCurrentMove() instanceof RangerRollMove) {
+            return spec.moveStun > RangerRollMove.RECOVERY_TICKS;
+        }
+        return spec.getCurrentMove() instanceof RangerSlideMove;
     }
 
     // Can't M1/Light in TS or during spec moves, LivingEntity does not override this

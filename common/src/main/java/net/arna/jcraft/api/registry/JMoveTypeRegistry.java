@@ -29,6 +29,8 @@ import net.arna.jcraft.common.attack.moves.mandom.RewindMove;
 import net.arna.jcraft.common.attack.moves.metallica.*;
 import net.arna.jcraft.common.attack.moves.purplehaze.*;
 import net.arna.jcraft.common.attack.moves.purplehaze.distortion.DistortionMove;
+import net.arna.jcraft.common.attack.moves.ranger.RangerRollMove;
+import net.arna.jcraft.common.attack.moves.ranger.RangerSlideMove;
 import net.arna.jcraft.common.attack.moves.shadowtheworld.ImpalingThrustAttack;
 import net.arna.jcraft.common.attack.moves.shadowtheworld.STWChargeAttack;
 import net.arna.jcraft.common.attack.moves.shadowtheworld.STWCounterAttack;
@@ -263,6 +265,9 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> HAMON_ZOOM_PUNCH_ATTACK = register("hamon_zoom_punch_attack", ZoomPunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_ATTACK = register("hamon_improviser_attack", ImproviserAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_MOVE = register("hamon_improviser_move", ImproviserMove.Type.INSTANCE);
+
+    RegistrySupplier<MoveType<?>> RANGER_ROLL_MOVE = register("ranger_roll_move", RangerRollMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> RANGER_SLIDE_MOVE = register("ranger_slide_move", RangerSlideMove.Type.INSTANCE);
 
 
     RegistrySupplier<MoveType<?>> WHITESNAKE_CHARGED_SPEW_ATTACK = register("whitesnake_charged_spew_attack", ChargedSpewAttack.Type.INSTANCE);
