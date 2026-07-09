@@ -10,22 +10,22 @@ import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.spec.RangerSpec;
 import net.arna.jcraft.common.util.InputStateManager;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove, RangerSpec> {
     private static final double SLIDE_SPEED = 0.75;
     private static final int SLIDE_START_TICKS = 12;
+    private static final double END_HITBOX_SIZE = 0.75;
 
-    private final Map<RangerSpec, Set<LivingEntity>> carriedTargets = new WeakHashMap<>();
-    private Vec3 slideVector = Vec3.ZERO;
+    private Vec3 lockedDirection; // null while steering with the camera
 
     public RangerSlideMove(final int cooldown, final int windup, final int duration, final float moveDistance,
                            final float damage, final int stun, final float hitboxSize, final float knockback, final float offset) {
@@ -37,10 +37,15 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
     @Override
     public void onInitiate(final RangerSpec attacker) {
         super.onInitiate(attacker);
-        carriedTargets.remove(attacker);
-        final LivingEntity user = attacker.getUser();
+        lockedDirection = null;
 
-        slideVector = createSlideVector(user);
+        // A/S/D locks the slide to the direction faced at the start; forward or no input stays steerable
+        if (attacker.getUser() instanceof ServerPlayer player) {
+            final InputStateManager input = PlayerInputPacket.getInputStateManager(player);
+            if (input.calcSide() != 0 || input.calcForward() == -1) {
+                lockedDirection = Vec3.directionFromRotation(0, player.getYRot()).scale(SLIDE_SPEED);
+            }
+        }
     }
 
     @Override
@@ -57,10 +62,12 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
 
         // user.setPose(Pose.SWIMMING);
 
-        final Vec3 delta = user.getDeltaMovement();
-        final Vec3 next = delta.add(slideVector).scale(0.5);
-        user.setDeltaMovement(next.x, delta.y, next.z);
-        user.hurtMarked = true;
+        if (user.onGround()) {
+            final Vec3 delta = user.getDeltaMovement();
+            final Vec3 next = delta.add(slideDirection(user)).scale(0.5);
+            user.setDeltaMovement(next.x, delta.y, next.z);
+            user.hurtMarked = true;
+        }
 
         if (getDuration() - moveStun == SLIDE_START_TICKS) {
             attacker.setState(RangerSpec.State.SLIDE_LOOP);
@@ -69,51 +76,36 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
         super.activeTick(attacker, moveStun);
     }
 
-    private Vec3 createSlideVector(final LivingEntity user) {
-        int forward = 1;
-        int side = 0;
-
-        if (user instanceof ServerPlayer player) {
-            final InputStateManager input = PlayerInputPacket.getInputStateManager(player);
-            forward = input.calcForward();
-            side = input.calcSide();
-            if (forward == 0 && side == 0) {
-                forward = 1;
-            }
-        }
-
-        double speed = SLIDE_SPEED;
-
-        if (side != 0) {
-            speed *= 0.75;
-        }
-
-        if (forward == -1) {
-            speed *= 0.75;
-        }
-
-        final float angle = (float) Math.atan2(side, forward);
-        return Vec3.directionFromRotation(0, user.getYRot()).yRot(angle).scale(speed);
+    // Slides forward steered by the camera, unless locked to an input direction
+    private Vec3 slideDirection(final LivingEntity user) {
+        return lockedDirection != null ? lockedDirection
+                : Vec3.directionFromRotation(0, user.getYRot()).scale(SLIDE_SPEED);
     }
 
     @Override
     public boolean shouldPerform(final RangerSpec attacker, final int moveStun) {
-        return attacker.hasUser();
+        return attacker.hasUser() && moveStun % 2 == 0;
     }
 
     @Override
     protected Set<AABB> calculateBoxes(final RangerSpec attacker, final LivingEntity user, final Vec3 rotVec,
                                        final Vec3 upVec, final Vec3 hPos, final Vec3 fPos) {
-        return Set.of(createBox(user.getBoundingBox().getCenter(), getHitboxSize()).expandTowards(slideVector));
+        // Shrinks from the configured size down to END_HITBOX_SIZE over the slide's duration
+        final double progress = 1.0 - (double) attacker.getMoveStun() / getDuration();
+        final double size = Mth.lerp(progress, getHitboxSize(), END_HITBOX_SIZE);
+        return Set.of(createBox(user.getBoundingBox().getCenter(), size).expandTowards(slideDirection(user)));
     }
 
     @Override
-    protected Set<LivingEntity> validateTargets(final RangerSpec attacker, final Set<LivingEntity> targets) {
-        super.validateTargets(attacker, targets);
-        final Set<LivingEntity> carried = carriedTargets.computeIfAbsent(attacker, a -> new HashSet<>());
-        targets.removeIf(carried::contains);
-        carried.addAll(targets);
-        return targets;
+    protected void performHook(final RangerSpec attacker, final Set<LivingEntity> targets, final Set<AABB> boxes,
+                               final DamageSource damageSource, final Vec3 forwardPos, final Vec3 rotationVector) {
+        final LivingEntity user = attacker.getUserOrThrow();
+        final Vec3 forward = Vec3.directionFromRotation(0, user.getYRot());
+        for (final LivingEntity target : targets) {
+            // vacuum victims to front, carrying them along with the slide
+            final Vec3 forceInFront = user.position().add(forward).subtract(target.position()).normalize().scale(0.65);
+            JUtils.setVelocity(target, user.getDeltaMovement().scale(0.8).add(forceInFront));
+        }
     }
 
     @Override

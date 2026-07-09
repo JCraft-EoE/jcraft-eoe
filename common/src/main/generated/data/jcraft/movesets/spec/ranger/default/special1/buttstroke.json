@@ -1,7 +1,7 @@
 {
   "anim_state": "BUTTSTROKE",
   "class": "SPECIAL1",
-  "cooldown_type": "STAND_SP1",
+  "cooldown_type": "SPECIAL1",
   "move": {
     "type": "jcraft:shared_simple_attack",
     "attack_extras": {

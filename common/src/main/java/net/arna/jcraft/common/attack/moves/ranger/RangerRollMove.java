@@ -6,9 +6,10 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.spec.RangerSpec;
-import net.minecraft.world.effect.MobEffectInstance;
+import net.arna.jcraft.common.util.InputStateManager;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -18,8 +19,9 @@ import java.util.WeakHashMap;
 
 public final class RangerRollMove extends AbstractMove<RangerRollMove, RangerSpec> {
     public static final int RECOVERY_TICKS = 4;
-    private static final int EXHAUSTION_DURATION = 20 * 3;
     private static final double ROLL_SPEED = 0.5;
+    private static final float AUTOSTEP_HEIGHT = 1.0f; // roll straight up full blocks
+    private static final float DEFAULT_STEP_HEIGHT = 0.6f; // vanilla player/mob step height
 
     private final Map<RangerSpec, Vec3> rollVectors = new WeakHashMap<>();
 
@@ -33,8 +35,35 @@ public final class RangerRollMove extends AbstractMove<RangerRollMove, RangerSpe
         super.onInitiate(attacker);
         final LivingEntity user = attacker.getUser();
         if (user != null) {
-            rollVectors.put(attacker, Vec3.directionFromRotation(0, user.getYRot()).scale(ROLL_SPEED));
+            rollVectors.put(attacker, createRollVector(user));
         }
+    }
+
+    private static Vec3 createRollVector(final LivingEntity user) {
+        int forward = 1;
+        int side = 0;
+
+        if (user instanceof ServerPlayer player) {
+            final InputStateManager input = PlayerInputPacket.getInputStateManager(player);
+            forward = input.calcForward();
+            side = input.calcSide();
+            if (forward == 0 && side == 0) {
+                forward = 1;
+            }
+        }
+
+        double speed = ROLL_SPEED;
+
+        if (side != 0) {
+            speed *= 0.75;
+        }
+
+        if (forward == -1) {
+            speed *= 0.75;
+        }
+
+        final float angle = (float) Math.atan2(side, forward);
+        return Vec3.directionFromRotation(0, user.getYRot()).yRot(angle).scale(speed);
     }
 
     @Override
@@ -51,6 +80,8 @@ public final class RangerRollMove extends AbstractMove<RangerRollMove, RangerSpe
         if (moveStun > RECOVERY_TICKS) {
             // user.setPose(Pose.SWIMMING); // Pose recalculation is suppressed in PlayerMixin
 
+            user.setMaxUpStep(AUTOSTEP_HEIGHT);
+
             final Vec3 rollVector = rollVectors.get(attacker);
             if (rollVector != null) {
                 final Vec3 delta = user.getDeltaMovement();
@@ -58,10 +89,17 @@ public final class RangerRollMove extends AbstractMove<RangerRollMove, RangerSpe
                 user.setDeltaMovement(next.x, delta.y, next.z);
                 user.hurtMarked = true;
             }
+        } else {
+            user.setMaxUpStep(DEFAULT_STEP_HEIGHT);
         }
+    }
 
-        if (moveStun == 1) {
-            user.addEffect(new MobEffectInstance(JStatusRegistry.EXHAUSTION.get(), EXHAUSTION_DURATION, 1));
+    @Override
+    public void onDeactivate(final RangerSpec attacker) {
+        super.onDeactivate(attacker);
+        final LivingEntity user = attacker.getUser();
+        if (user != null) {
+            user.setMaxUpStep(DEFAULT_STEP_HEIGHT);
         }
     }
 

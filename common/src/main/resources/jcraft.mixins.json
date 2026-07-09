@@ -21,6 +21,7 @@
     "client.ClientPlayerEntityMixin",
     "client.ClientWorldMixin",
     "client.EffectProgramMixin",
+    "client.EntityMixin",
     "client.EntityRenderDispatcherMixin",
     "client.GameNarratorMixin",
     "client.GameRendererMixin",

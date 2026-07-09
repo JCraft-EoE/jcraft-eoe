@@ -1,11 +1,11 @@
 {
   "anim_state": "WHIP",
   "class": "HEAVY",
-  "cooldown_type": "STAND_HEAVY",
+  "cooldown_type": "HEAVY",
   "crouching_variant": {
     "anim_state": "BASH",
     "class": "HEAVY",
-    "cooldown_type": "STAND_HEAVY",
+    "cooldown_type": "HEAVY",
     "move": {
       "type": "jcraft:shared_simple_attack",
       "attack_extras": {

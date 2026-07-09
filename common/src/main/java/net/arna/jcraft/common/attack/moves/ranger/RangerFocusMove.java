@@ -27,6 +27,8 @@ public final class RangerFocusMove extends AbstractMove<RangerFocusMove, RangerS
     private static final double MIN_TARGET_DOT = 0.866;
     private static final float MAX_TURN_DEGREES = 6.0f;
     private static final double SHOOTDOWN_RANGE = 1.0;
+    // Outline color for glowing focus targets (ARGB), overriding the default team-color white
+    public static final int GLOW_COLOR = 0xFFFF5555;
 
     public RangerFocusMove(final int cooldown) {
         super(cooldown, 0, 0, 0f);

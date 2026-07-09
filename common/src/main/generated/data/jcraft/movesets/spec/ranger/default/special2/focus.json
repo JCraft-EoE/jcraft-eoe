@@ -1,6 +1,6 @@
 {
   "class": "SPECIAL2",
-  "cooldown_type": "STAND_SP2",
+  "cooldown_type": "SPECIAL2",
   "move": {
     "type": "jcraft:ranger_focus_move",
     "cooldown": 0,

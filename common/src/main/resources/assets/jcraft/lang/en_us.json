@@ -1213,7 +1213,7 @@
   "move.jcraft.ranger.default.focus.name": "Focus",
   "move.jcraft.ranger.default.holster.description": "Stows the held non-stackable item, or draws the stowed one. Swaps if holding another.",
   "move.jcraft.ranger.default.holster.name": "Holster",
-  "move.jcraft.ranger.default.roll.cr.description": "Combat roll that greatly reduces your hitbox and negates fall damage, but exhausts you at the end.",
+  "move.jcraft.ranger.default.roll.cr.description": "Combat roll that greatly reduces your hitbox, negates fall damage and rolls up blocks.",
   "move.jcraft.ranger.default.roll.cr.name": "Roll",
   "move.jcraft.ranger.default.shoulder_bash.cr.description": "Springs up from a squat, launching enemies. 1 point of armor.",
   "move.jcraft.ranger.default.shoulder_bash.cr.name": "Shoulder Bash",

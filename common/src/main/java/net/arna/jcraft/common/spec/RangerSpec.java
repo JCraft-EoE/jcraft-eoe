@@ -26,8 +26,8 @@ import net.minecraft.world.entity.LivingEntity;
 public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
     public static final float MAX_FOCUS = 100f; // 5 seconds of use
     public static final float FOCUS_DRAIN = 1f;
-    public static final float FOCUS_REGEN = 1f; // empty to full in 5 seconds
-    public static final float CROUCH_FOCUS_REGEN = 0.7f;
+    public static final float FOCUS_REGEN = 1.5f; // empty to full in ~3.3 seconds
+    public static final float MOVING_FOCUS_REGEN = 0.525f;
 
     public static final MoveSet<RangerSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.RANGER, RangerSpec::registerMoves, RangerSpec.class, State.class);
     public static final SpecData DATA = SpecData.builder()
@@ -70,11 +70,11 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
     public static final RangerRollMove ROLL = new RangerRollMove(100, 0, 20, 0f)
             .withInfo(
                     Component.literal("Roll"),
-                    Component.literal("Combat roll that greatly reduces your hitbox and negates fall damage, but exhausts you at the end.")
+                    Component.literal("Combat roll that greatly reduces your hitbox, negates fall damage and rolls up blocks.")
             );
 
     public static final RangerSlideMove SLIDE = new RangerSlideMove(140, 0, 30, 0f,
-            2f, 10, 1.5f, 2f, 0f)
+            1f, 10, 1.5f, 2f, 0f)
             .withCrouchingVariant(ROLL)
             .withLaunchNoShockwave()
             .withBackstab(false)
@@ -140,15 +140,9 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
         if (user instanceof ServerPlayer serverPlayer) {
             final InputStateManager input = ((IJInputStateManagerHolder) serverPlayer).jcraft$getJInputStateManager();
             final boolean moving = input.calcForward() != 0 || input.calcSide() != 0;
-            if (!moving) {
-                return FOCUS_REGEN;
-            }
-            return input.sneaking ? CROUCH_FOCUS_REGEN : 0f;
+            return moving ? MOVING_FOCUS_REGEN : FOCUS_REGEN;
         }
-        if (user.getDeltaMovement().horizontalDistanceSqr() <= 1.0E-4) {
-            return FOCUS_REGEN;
-        }
-        return user.isShiftKeyDown() ? CROUCH_FOCUS_REGEN : 0f;
+        return user.getDeltaMovement().horizontalDistanceSqr() <= 1.0E-4 ? FOCUS_REGEN : MOVING_FOCUS_REGEN;
     }
 
     @Override
