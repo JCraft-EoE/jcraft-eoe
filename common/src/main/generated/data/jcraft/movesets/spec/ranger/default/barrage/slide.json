@@ -25,7 +25,15 @@
   },
   "move": {
     "type": "jcraft:ranger_slide_move",
+    "attack_extras": {
+      "block_stun": 6,
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_1",
+      "override_stun": true,
+      "stun_type": "LAUNCH"
+    },
     "cooldown": 140,
+    "damage": 2.0,
     "duration": 30,
     "extras": {
       "description": {
@@ -37,9 +45,11 @@
         "translate": "move.jcraft.ranger.default.slide.name"
       }
     },
-    "minimum_charge": 10,
+    "hitbox_size": 1.5,
+    "knockback": 2.0,
     "move_distance": 0.0,
-    "set_move_stun": false,
+    "offset": 0.0,
+    "stun": 10,
     "windup": 0
   }
 }

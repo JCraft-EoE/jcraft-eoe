@@ -78,8 +78,11 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Component.literal("Combat roll that greatly reduces your hitbox and negates fall damage, but exhausts you at the end.")
             );
 
-    public static final RangerSlideMove SLIDE = new RangerSlideMove(140, 0, 30, 0f, 10)
+    public static final RangerSlideMove SLIDE = new RangerSlideMove(140, 0, 30, 0f,
+            2f, 10, 1.5f, 2f, 0f)
             .withCrouchingVariant(ROLL)
+            .withLaunchNoShockwave()
+            .withBackstab(false)
             .withInfo(
                     Component.literal("Slide"),
                     Component.literal("Held. Fast crawl that carries hit enemies, launching them up for juggles.")
