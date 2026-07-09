@@ -41,22 +41,23 @@
 
 ## Adding a Stand
 1. Create the class `MyEntity` (replacing `My` with its name of course), subclassing `StandEntity`.
-2. Create an inner `enum` called `State` that implements `StandAnimationState` with at least two entries: `IDLE` and `BLOCK`.
-3. Implement `getThis()` (just returning `this`), `getStateValues()` (returning `State.values()`), `getSummonAnimation()` (returning `"animation.my.summon"`) and `getBlockState()` (returning `State.BLOCK`).
+2. Create an inner `enum` called `State` that implements `StandAnimationState` with at least two entries: `IDLE` and `BLOCK`. You should add an enum constructor that takes an AzCommand and caches it, e.g. as `animator`. The parameter for e.g. the idle state could be `AzCommand.create(JCraft.BASE_CONTROLLER, "animation.my.idle", AzPlayBehaviors.LOOP)`. Also implement `playAnimation(final @NonNull MyEntity attacker)` via `animator.sendForEntity(attacker)` or a custom implementation.
+3. Implement `getThis()` (just returning `this`), `getStateValues()` (returning `State.values()`) and `getBlockState()` (returning `State.BLOCK`).
 4. Create a default moveset. If you're making an add-on, add this moveset to your moveset data provider; this is not needed if you're forking this mod.
 5. Add a constructor that only takes a `Level` as a parameter. Ignore the missing type for the `super` call right now.
 6. Add the type of the stand to `JEntityTypeRegistry` (for addons, this is `EntityTypeRegistry`). The dimension parameter is the hitbox of the stand in blocks.
 7. Register the stand attributes in `JEntityTypeRegistry#registerAttributes` (for addons, this is `EntityTypeRegistry#registerAttributes`).
 8. Add an entry in `JStandTypeRegistry` (or `StandTypeRegistry` for addons).
 9. Use this new `StandType` entry in the `super` constructor of `MyEntity`.
-10. Create the class `MyModel` extending `StandEntityModel`.
-11. Create the class `MyRenderer` extending `StandEntityRenderer`.
-12. Add `MyRenderer` to `JEntityRendererRegister` (or `EntityRendererRegister` for addons).
+10. Add a static field `DATA` of type `StandData` to your stand and fill it.
+11. If needed, create the class `MyRenderer` extending `StandEntityRenderer`.
+12. Add `MyRenderer` to `JEntityRendererRegister` (or `EntityRendererRegister` for addons); if you haven't created the class add something like `context -> new StandEntityRenderer<>(context, JStandTypeRegistry.MY.get())` to it.
 13. Add the different skin PNGs, `my.geo.json` and `my.animation.json` from the `my.bbmodel` file from our modelers.
 14. Let someone take care of the animations.
 15. Add an English translation of the stand and its description to `en_us.json`.
 16. If the stand is obtainable in survival, add it to the list of obtainables in `JAdvancementProvider`.
-17. Test your addition.
+17. Run datagen.
+18. Test your addition.
 
 ## Adding an Entity (Type)
 1. Create the class `MyEntity` (replacing `My` with its name of course), subclassing `Entity` or one of its subclasses (like `PathAwareEntity`).
@@ -108,7 +109,7 @@
 1. Create a move class (preferably in some subpackage in `net.arna.jcraft.attack.moves` in the `common` project) that derives from some base class (see `net.arna.jcraft.attack.moves.base`).
    The most basic moves should at least derive from `AbstractMove`.
 2. If the move is not abstract or is abstract and adds any field that should be serialized, make sure to add an (abstract) type class in it that extends from the type class of the super class as well.
-3. Register the move's type in `MoveSetLoader`. Preferably ensure the type has a `public static final INSTANCE` field, although this should not make a difference.
+3. Register the move's type in `JMoveTypeRegistry`. Preferably ensure the type has a `public static final INSTANCE` field, although this should not make a difference.
 
 ## Adding move actions and conditions
 1. Create a class deriving from MoveAction/MoveCondition and implement it.

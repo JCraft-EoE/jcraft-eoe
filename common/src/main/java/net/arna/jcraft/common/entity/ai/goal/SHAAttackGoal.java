@@ -61,7 +61,7 @@ public class SHAAttackGoal extends Goal {
 
         if (cooldown-- <= 0 && e <= d) {
             cooldown = 100;
-            sha.Explode();
+            sha.explode();
         }
     }
 }

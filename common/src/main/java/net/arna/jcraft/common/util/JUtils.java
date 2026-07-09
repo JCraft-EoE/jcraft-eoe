@@ -1,42 +1,50 @@
 package net.arna.jcraft.common.util;
 
-import com.google.common.base.MoreObjects;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.stand.StandType;
-import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.api.spec.JSpecHolder;
+import net.arna.jcraft.api.splatter.JSplatterManager;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.compat.FtbChunksCompat;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.entity.projectile.GasCanProjectile;
 import net.arna.jcraft.common.entity.projectile.ItemTossProjectile;
-import net.arna.jcraft.common.entity.projectile.JAttackEntity;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.projectile.ScalpelProjectile;
-import net.arna.jcraft.api.spec.JSpecHolder;
-import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.RotationUtil;
+import net.arna.jcraft.common.item.GasCanItem;
 import net.arna.jcraft.common.item.KnifeBundleItem;
 import net.arna.jcraft.common.item.KnifeItem;
 import net.arna.jcraft.common.item.ScalpelItem;
 import net.arna.jcraft.common.network.s2c.JExplosionPacket;
 import net.arna.jcraft.common.network.s2c.PlayerAnimPacket;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.common.splatter.JSplatterManager;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JEntityTypeRegistry;
-import net.arna.jcraft.api.registry.JStatusRegistry;
-import net.arna.jcraft.api.registry.JTagRegistry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
@@ -58,21 +66,11 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.entity.projectile.Snowball;
-import net.minecraft.world.entity.projectile.ThrownEgg;
-import net.minecraft.world.entity.projectile.ThrownPotion;
-import net.minecraft.world.entity.projectile.ThrownTrident;
-import net.minecraft.world.item.ArrowItem;
-import net.minecraft.world.item.EggItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SnowballItem;
-import net.minecraft.world.item.ThrowablePotionItem;
-import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.entity.projectile.*;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SupportType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -80,6 +78,9 @@ import net.minecraft.world.phys.*;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -118,6 +119,14 @@ public final class JUtils {
     public static void setVelocity(Entity entity, double x, double y, double z) {
         entity.setDeltaMovement(x, y, z);
         syncVelocityUpdate(entity);
+    }
+
+    public static double angleBetween(@NonNull final Vec3 a, @NonNull final Vec3 b) {
+        final double aLength = a.length(), bLength = b.length();
+
+        if (aLength == 0 || bLength == 0) return 0.0;
+
+        return a.dot(b) / (aLength * bLength);
     }
 
     public static void syncVelocityUpdate(Entity entity) {
@@ -204,11 +213,11 @@ public final class JUtils {
     }
 
     // Defaults to LivingEntity
-    public static Set<LivingEntity> generateHitbox(Level world, Vec3 center, double hitboxSize, Set<Entity> except) {
+    public static Set<LivingEntity> generateHitbox(@NonNull Level world, @NonNull Vec3 center, double hitboxSize, @NonNull Set<Entity> except) {
         return generateHitbox(world, center, hitboxSize, e -> !except.contains(e));
     }
 
-    public static Set<LivingEntity> generateHitbox(Level world, Vec3 center, double hitboxSize, Predicate<Entity> predicate) {
+    public static Set<LivingEntity> generateHitbox(@NonNull Level world, @NonNull Vec3 center, double hitboxSize, @NonNull Predicate<Entity> predicate) {
         double size = hitboxSize / 2;
 
         Vec3 v1 = center.subtract(size, size, size);
@@ -222,7 +231,25 @@ public final class JUtils {
                 EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(predicate));
         Set<LivingEntity> toReturn = new HashSet<>(hit);
         for (LivingEntity l : hit)
-        //JCraft.LOGGER.info("Stand: " + stand);
+        {
+            if (l instanceof StandEntity<?, ?> stand && stand.hasUser() && predicate.test(stand.getUser())) {
+                toReturn.add(stand.getUserOrThrow());
+            }
+        }
+
+        return toReturn;
+    }
+
+    public static Set<LivingEntity> generateHitboxNoDisplay(Level world, Vec3 center, double hitboxSize, Predicate<Entity> predicate) {
+        double size = hitboxSize / 2;
+
+        Vec3 v1 = center.subtract(size, size, size);
+        Vec3 v2 = center.add(size, size, size);
+
+        List<LivingEntity> hit = world.getEntitiesOfClass(LivingEntity.class, new AABB(v1, v2),
+                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(predicate));
+        Set<LivingEntity> toReturn = new HashSet<>(hit);
+        for (LivingEntity l : hit)
         {
             if (l instanceof StandEntity<?, ?> stand && stand.hasUser()) {
                 toReturn.add(stand.getUserOrThrow());
@@ -343,33 +370,49 @@ public final class JUtils {
         return ent;
     }
 
-    public static void projectileDamageLogic(Projectile proj, Level world, Entity ent, Vec3 kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun, CommonHitPropertyComponent.HitAnimation hitAnimation) {
-        projectileDamageLogic(proj, world, ent, kb, stunT, stunType, overrideStun, damage, blockstun, hitAnimation, false, false);
+    public static void projectileDamageLogic(Projectile proj, Level world, Entity ent, Vec3 kb, int stunTicks, int stunType, boolean overrideStun,
+                                             float damage, int blockstun, CommonHitPropertyComponent.HitAnimation hitAnimation) {
+        projectileDamageLogic(proj, world, ent, kb, stunTicks, stunType, overrideStun, damage, blockstun, hitAnimation, false, false, true);
     }
 
-    public static void projectileDamageLogic(Projectile proj, Level world, Entity ent, Vec3 kb, int stunT, int stunType, boolean overrideStun, float damage, int blockstun, CommonHitPropertyComponent.HitAnimation hitAnimation, boolean unblockable, boolean canBackstab) {
+    public static void projectileDamageLogic(Projectile proj, Level world, Entity ent, Vec3 kb, int stunTicks, int stunType, boolean overrideStun,
+                                             float damage, int blockstun, CommonHitPropertyComponent.HitAnimation hitAnimation, boolean canBackstab, boolean unblockable) {
+        projectileDamageLogic(proj, world, ent, kb, stunTicks, stunType, overrideStun, damage, blockstun, hitAnimation, canBackstab, unblockable, true);
+    }
+
+    public static void projectileDamageLogic(Projectile proj, Level world, Entity ent, Vec3 kb, int stunTicks, int stunType, boolean overrideStun,
+                                             float damage, int blockstun, CommonHitPropertyComponent.HitAnimation hitAnimation,
+                                             boolean canBackstab, boolean unblockable, boolean cancelMoves) {
+        final Entity owner = proj.getOwner();
+
+        DamageSource source = (owner == null) ?
+                JDamageSources.create(world, DamageTypes.GENERIC) :
+                JDamageSources.create(world, DamageTypes.MOB_PROJECTILE, proj, owner);
+
+        projectileDamageLogic(proj, world, ent, new AttackData(
+                kb, stunTicks, stunType, overrideStun, damage, true,
+                blockstun, source, owner, hitAnimation, null,
+                canBackstab, unblockable, cancelMoves
+        ));
+    }
+
+    public static void projectileDamageLogic(Projectile proj, Level world, Entity ent, AttackData attackData) {
         if (world.isClientSide) {
             return;
         }
         Objects.requireNonNull(proj, "Attempted to run ProjectileDamageLogic with invalid projectile in world " + world);
-        Entity owner = proj.getOwner();
-        DamageSource source;
-        if (owner == null) {
-            source = JDamageSources.create(world, DamageTypes.GENERIC);
-        } else {
-            source = JDamageSources.create(world, DamageTypes.MOB_PROJECTILE, proj, owner);
-        }
 
         if (ent instanceof LivingEntity living) {
             LivingEntity target = living;
             if (ent instanceof StandEntity<?, ?> stand) {
                 target = stand.getUser();
             }
-            damageLogic(world, target, kb, stunT, stunType, overrideStun, damage, false, blockstun, source, owner, hitAnimation, canBackstab, unblockable);
+
+            damageLogic(world, target, attackData);
         }
 
         if (ent instanceof EndCrystal endCrystal) {
-            endCrystal.hurt(source, damage);
+            endCrystal.hurt(attackData.source(), attackData.damage());
         }
     }
 
@@ -472,8 +515,9 @@ public final class JUtils {
             return;
         }
 
+        final boolean fire = modifier.getCreateFire() != null && modifier.getCreateFire();
         Explosion explosion = new Explosion(world, entity, x, y, z, power,
-                MoreObjects.firstNonNull(modifier.getCreateFire(), false), modifier.getBlockInteraction());
+                fire, modifier.getBlockInteraction());
         ((IJExplosion) explosion).jcraft$setModifier(modifier);
         explosion.explode();
         explosion.finalizeExplosion(true);
@@ -481,6 +525,18 @@ public final class JUtils {
         if (world.isClientSide) {
             return;
         }
+
+        // set gasoline on fire (always, independent of fire modifier)
+        /*JSplatterManager splatterManager = JSplatterManager.get(world);
+        Set<Splatter> gasSplatters = new HashSet<>();
+        for (int i = -Math.round(power)-2; i <= Math.round(power)+2; i++) {
+            for (int j = -Math.round(power)-2; j <= Math.round(power)+2; j++) {
+                for (int k = -1; k <= 1; k++)
+                    gasSplatters.addAll(splatterManager.getHit(new Vec3(x+i, y+k, z+j), s -> s instanceof GasolineSplatter));
+            }
+        }
+        gasSplatters.forEach(s -> ((GasolineSplatter) s).lightOnFire());*/
+
         for (ServerPlayer player : around((ServerLevel) world, new Vec3(x, y, z), 64)) {
             JExplosionPacket.send(player, x, y, z, power, explosion, modifier);
         }
@@ -599,27 +655,18 @@ public final class JUtils {
             Map.entry(EntityType.HUSK, 0.1f),
 
             Map.entry(EntityType.VILLAGER, 1.5f),
-            Map.entry(EntityType.PLAYER, 1.5f),
-
-            Map.entry(EntityType.IRON_GOLEM, 0.0f),
-            Map.entry(EntityType.SNOW_GOLEM, 0.0f),
-
-            Map.entry(JEntityTypeRegistry.ROAD_ROLLER.get(), 0.0f),
-
-            Map.entry(JEntityTypeRegistry.SHEER_HEART_ATTACK.get(), 0.0f)
+            Map.entry(EntityType.PLAYER, 1.5f)
     );
 
     public static float getBloodMult(LivingEntity entity) {
         EntityType<?> type = entity.getType();
 
-        if (entity instanceof StandEntity<?,?>) return 0;
+        if (type.is(JTagRegistry.BLOODLESS_ENTITIES)) {
+            return 0;
+        }
 
         if (type.is(EntityTypeTags.RAIDERS)) {
             return 1.5f;
-        }
-
-        if (type.is(EntityTypeTags.SKELETONS) || entity instanceof JAttackEntity) {
-            return 0;
         }
 
         if (type.is(EntityTypeTags.AXOLOTL_HUNT_TARGETS)) // Fishes
@@ -644,10 +691,27 @@ public final class JUtils {
 
     public static boolean canHoldMove(ServerPlayer player, MoveInputType type) {
         StandEntity<?, ?> stand = JUtils.getStand(player);
-        JSpec<?, ?> spec;
-        return stand != null && stand.canHoldMove(type) ||
-                (spec = JUtils.getSpec(player)) != null && spec.canHoldMove(type) ||
-                type.isHoldable(stand != null && stand.isStandby());
+        if (stand != null && stand.allowMoveHandling()) {
+            if (!stand.canHoldMove(type) && !type.isHoldable()) {
+                return false;
+            }
+            // If the stand forwards this input to the spec, only treat it as
+            // holdable if the spec also considers it holdable. Otherwise, the
+            // held-tick loop would call spec.initMove() every tick even for
+            // discrete (non-hold) spec actions.
+            if (stand.forwardInputToSpec(type)) {
+                JSpec<?, ?> spec = JUtils.getSpec(player);
+                if (spec != null && !spec.canHoldMove(type)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        JSpec<?, ?> spec = JUtils.getSpec(player);
+        if (spec != null && spec.canHoldMove(type)) {
+            return true;
+        }
+        return type.isHoldable();
     }
 
     /**
@@ -694,25 +758,12 @@ public final class JUtils {
 
     public static Collection<ServerPlayer> around(ServerLevel world, Vec3 pos, double radius) {
         double radiusSq = radius * radius;
-
-        List<ServerPlayer> list = new ArrayList<>();
-        for (ServerPlayer p : world.players()) {
-            if (p.distanceToSqr(pos) <= radiusSq) {
-                list.add(p);
-            }
-        }
-        return list;
+        return world.getPlayers(p -> p.distanceToSqr(pos) <= radiusSq);
     }
 
-    public static Collection<ServerPlayer> all(MinecraftServer server) {
-        Objects.requireNonNull(server, "The server cannot be null");
-
+    public static Collection<ServerPlayer> all(@NonNull MinecraftServer server) {
         // return an immutable collection to guard against accidental removals.
-        if (server.getPlayerList() != null) {
-            return Collections.unmodifiableCollection(server.getPlayerList().getPlayers());
-        }
-
-        return Collections.emptyList();
+        return Collections.unmodifiableCollection(server.getPlayerList().getPlayers());
     }
 
     /**
@@ -766,6 +817,10 @@ public final class JUtils {
             return true;
         }
 
+        if (entity instanceof ItemTossProjectile toss && toss.isFerrous()) {
+            return true;
+        }
+
         final String stringName = entity.getName().toString().toLowerCase(Locale.ROOT);
         return stringName.contains("iron") || stringName.contains("ferro"); // Cross-mod compatibility :D
     }
@@ -782,75 +837,87 @@ public final class JUtils {
 
     /**
      * Tosses or shoots the specified item.
+     * @return The spawned projectile entity, or <code>null</code> if nothing was or several entities were spawned.
      */
-    public static void tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, boolean decrement) {
-        if (level.isClientSide() || itemStack.isEmpty()) {
-            return;
-        }
-        if (itemStack.getItem() instanceof final ArrowItem arrow) {
-            final AbstractArrow arrowEntity = arrow.createArrow(level, itemStack, shooter);
-            arrowEntity.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(arrowEntity);
-        }
-        else if (itemStack.getItem() instanceof SnowballItem) {
-            final Snowball snowballEntity = new Snowball(level, shooter);
-            snowballEntity.setItem(itemStack);
-            snowballEntity.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(snowballEntity);
-        }
+    public static @Nullable Entity tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, float inaccurancy, boolean decrement) {
+        return tossItem(shooter, level, itemStack, velocity, inaccurancy, decrement, null);
+    }
 
-        else if (itemStack.getItem() instanceof TridentItem) {
-            final ThrownTrident thrownTrident = new ThrownTrident(level, shooter, itemStack);
-            thrownTrident.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(thrownTrident);
+    public static @Nullable Entity tossItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, float velocity, float inaccurancy, boolean decrement, @Nullable Vec3 spawnPos) {
+        if (level.isClientSide() || itemStack.isEmpty()) {
+            return null;
         }
-        else if (itemStack.getItem() instanceof ThrowablePotionItem) {
-            final ThrownPotion thrownPotion = new ThrownPotion(level, shooter);
-            thrownPotion.setItem(itemStack);
-            thrownPotion.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(thrownPotion);
-        }
-        else if (itemStack.getItem() instanceof EggItem) {
-            final ThrownEgg thrownEgg = new ThrownEgg(level, shooter);
-            thrownEgg.setItem(itemStack);
-            thrownEgg.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(thrownEgg);
-        }
-        else if (itemStack.getItem() instanceof ScalpelItem) {
-            final ScalpelProjectile scalpelProjectile = new ScalpelProjectile(level, shooter);
-            scalpelProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(scalpelProjectile);
-        }
-        else if (itemStack.getItem() instanceof KnifeBundleItem) {
+        final Vec3 resolvedSpawnPos = spawnPos != null ? spawnPos : shooter.position().add(getEyePos(shooter));
+        // knife bundle needs extra care
+        if (itemStack.getItem() instanceof KnifeBundleItem) {
+            final LivingEntity bundleOwner = getUserIfStand(shooter);
             for (int i = 0; i < 9; i++) {
-                KnifeProjectile knife = new KnifeProjectile(level, shooter);
-                knife.setPos(knife.position().add(
+                KnifeProjectile knife = new KnifeProjectile(level, bundleOwner);
+                knife.setPos(resolvedSpawnPos.add(
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5),
                         level.random.triangle(0, 0.5)
                 ));
-                knife.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 5f);
+                knife.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 5f * inaccurancy);
                 level.addFreshEntity(knife);
             }
+            if (decrement) {
+                itemStack.shrink(1);
+            }
+            return null;
+        }
+        // other cases
+        final Projectile spawned;
+        if (itemStack.getItem() instanceof final ArrowItem arrow) {
+            final Entity arrowOwner = getUserIfStand(shooter);
+            spawned = arrow.createArrow(level, itemStack, arrowOwner instanceof LivingEntity le ? le : shooter);
+        }
+        else if (itemStack.getItem() instanceof SnowballItem) {
+            final Snowball snowballEntity = new Snowball(level, shooter);
+            snowballEntity.setItem(itemStack);
+            spawned = snowballEntity;
+        }
+        else if (itemStack.getItem() instanceof TridentItem) {
+            spawned = new ThrownTrident(level, getUserIfStand(shooter), itemStack);
+        }
+        else if (itemStack.getItem() instanceof ThrowablePotionItem) {
+            final ThrownPotion thrownPotion = new ThrownPotion(level, shooter);
+            thrownPotion.setItem(itemStack);
+            spawned = thrownPotion;
+        }
+        else if (itemStack.getItem() instanceof EggItem) {
+            final ThrownEgg thrownEgg = new ThrownEgg(level, shooter);
+            thrownEgg.setItem(itemStack);
+            spawned = thrownEgg;
+        }
+        else if (itemStack.getItem() instanceof ScalpelItem) {
+            spawned = new ScalpelProjectile(level, getUserIfStand(shooter));
         }
         else if (itemStack.getItem() instanceof KnifeItem) {
-            final KnifeProjectile knifeProjectile = new KnifeProjectile(level, shooter);
-            knifeProjectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(knifeProjectile);
+            spawned = new KnifeProjectile(level, getUserIfStand(shooter));
+        }
+        else if (itemStack.getItem() instanceof EnderpearlItem) {
+            final ThrownEnderpearl enderpearlProjectile = new ThrownEnderpearl(level, JUtils.getUserIfStand(shooter));
+            enderpearlProjectile.setItem(itemStack);
+            spawned = enderpearlProjectile;
+        }
+        else if (itemStack.getItem() instanceof GasCanItem) {
+            spawned = new GasCanProjectile(JUtils.getUserIfStand(shooter), level);
         }
         else {
-            final AbstractArrow projectile = new ItemTossProjectile(shooter, level, itemStack);
-            projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, 1f);
-            level.addFreshEntity(projectile);
-            shooter.playSound(JSoundRegistry.TOSS.get());
+            spawned = new ItemTossProjectile(shooter, level, itemStack);
         }
+        spawned.setPos(resolvedSpawnPos);
+        spawned.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, inaccurancy);
+        level.addFreshEntity(spawned);
         if (decrement) {
             itemStack.shrink(1);
         }
+        return spawned;
     }
 
     public static void tossItem(final Player player) {
-        tossItem(player, player.level(), player.getItemInHand(InteractionHand.MAIN_HAND), 1f, !player.getAbilities().instabuild);
+        tossItem(player, player.level(), player.getItemInHand(InteractionHand.MAIN_HAND), 1f, 1f, !player.getAbilities().instabuild);
     }
 
     public static double nullSafeDistanceSqr(@Nullable Entity a, @Nullable Entity b) {
@@ -876,7 +943,241 @@ public final class JUtils {
      */
     @SafeVarargs
     public static <T> @NonNull T chooseRandom(@NonNull RandomSource rng, T... items) {
-        if (items == null || items.length == 0) throw new IllegalArgumentException("At least one item must be provided.");
+        if (items == null || items.length == 0) {
+            throw new IllegalArgumentException("At least one item must be provided.");
+        }
         return items[rng.nextInt(items.length)];
+    }
+
+    /**
+     * Selects a random element from the given collection using the provided {@link RandomSource}.
+     *
+     * @throws IllegalArgumentException If no items are provided.
+     */
+    public static <T> @NonNull T chooseRandom(@NonNull RandomSource rng, Collection<T> items) {
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("At least one item must be provided.");
+        }
+        final Iterator<T> it = items.iterator();
+        int selection = rng.nextInt(items.size());
+        while (selection > 0) {
+            it.next();
+            selection--;
+        }
+        return it.next();
+    }
+
+    public static void awardAdvancement(final ServerPlayer player, final ResourceLocation advancementLoc) {
+        final MinecraftServer server = player.getServer();
+        if (server == null) {
+            return;
+        }
+        final Advancement advancement = server.getAdvancements().getAdvancement(advancementLoc);
+        if (advancement == null) {
+            return;
+        }
+        for (final String criterion : advancement.getCriteria().keySet()) {
+            player.getAdvancements().award(advancement, criterion);
+        }
+    }
+
+    public static boolean hasAdvancement(final ServerPlayer player, final ResourceLocation advancementLoc) {
+        final MinecraftServer server = player.getServer();
+        if (server == null) {
+            return false;
+        }
+        final Advancement advancement = server.getAdvancements().getAdvancement(advancementLoc);
+        if (advancement == null) {
+            return false;
+        }
+        return player.getAdvancements().getOrStartProgress(advancement).isDone();
+    }
+
+    private static final Style runStandAboutStyle = Style.EMPTY
+            .withColor(ChatFormatting.AQUA)
+            .withUnderlined(true)
+            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/stand about"));
+
+    public static void maySendStandAboutInfo(final ServerPlayer player) {
+        if (!hasAdvancement(player, JCraft.id("obtain_stand"))) {
+            player.sendSystemMessage(Component.translatable("info.jcraft.first_stand").withStyle(runStandAboutStyle));
+        }
+    }
+
+    private static final Style runSpecAboutStyle = Style.EMPTY
+            .withColor(ChatFormatting.AQUA)
+            .withUnderlined(true)
+            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/spec about"));
+
+    public static void maySendSpecAboutInfo(final ServerPlayer player) {
+        if (!hasAdvancement(player, JCraft.id("obtain_any_spec"))) {
+            player.sendSystemMessage(Component.translatable("info.jcraft.first_spec").withStyle(runSpecAboutStyle));
+        }
+    }
+
+    /**
+     * @return Whether the player is 'mortal', i.e. vulnerable, not in creative or spectator.
+     */
+    public static boolean isMortal(@Nullable final ServerPlayer player) {
+        if (player == null) return false;
+        return !player.isSpectator() && !player.isCreative() && !player.isInvulnerable();
+    }
+
+    @NonNull
+    public static Vec3 getEyePos(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, (double)ent.getEyeHeight(), 0, GravityChangerAPI.getGravityDirection(ent));
+    }
+
+    @NonNull
+    public static Vec3 getLocalUp(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, 1.0d, 0, GravityChangerAPI.getGravityDirection(ent));
+    }
+
+    @NonNull
+    public static Vec3 getLocalDown(@NonNull final LivingEntity ent) {
+        return RotationUtil.vecPlayerToWorld(0, -1.0d, 0, GravityChangerAPI.getGravityDirection(ent));
+    }
+
+    public static boolean mayAlter(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
+                                   @Nullable Predicate<BlockState> pred) {
+        return mayAlter(level, user, pos, pred, true);
+    }
+
+    public static boolean mayAlter(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
+                                   @Nullable Predicate<BlockState> pred, boolean checkMayBuild) {
+        ServerLevel serverLevel = level instanceof ServerLevel sl ? sl : null;
+        ServerPlayer player = user instanceof ServerPlayer p ? p : null;
+
+        boolean isPlayer = player != null;
+        boolean mobGriefing = level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        boolean isSpawnProtected = serverLevel != null && player != null && pos != null &&
+                serverLevel.getServer().isUnderSpawnProtection(serverLevel, pos, player);
+        boolean mayBuild = !isPlayer || pos == null || (!checkMayBuild || player.mayBuild()) &&
+                FtbChunksCompat.get().mayEdit(player, serverLevel, pos);
+
+        boolean mayAttempt = (isPlayer || mobGriefing) && !isSpawnProtected && mayBuild;
+        if (!mayAttempt || pos == null || pred == null) return mayAttempt;
+
+        // The move may attempt to destroy this block, check if it should be possible to.
+        BlockState state = level.getBlockState(pos);
+        return pred.test(state);
+    }
+
+    public static boolean isHoldingSomethingThrowable(LivingEntity user) {
+        if (user == null) return false;
+
+        final ItemStack mainHandStack = user.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!mainHandStack.isEmpty() && !mainHandStack.is(JTagRegistry.UNTHROWABLE)) {
+            return true;
+        }
+
+        final ItemStack offHandStack = user.getItemInHand(InteractionHand.OFF_HAND);
+        return !offHandStack.isEmpty() && !offHandStack.is(JTagRegistry.UNTHROWABLE);
+    }
+
+    /**
+     * Checks if the given entity is currently using KC for Time Erase
+     * @param entity the entity to check, can be <code>null</code>
+     * @return <code>true</code> if the entity is using KC and in Time Erase, else <code>false</code>
+     */
+    public static boolean inTimeErase(Entity entity) {
+        if (!(entity instanceof LivingEntity living)) {
+            return false;
+        }
+        if (!(getStand(living) instanceof KingCrimsonEntity kc)) {
+            return false;
+        }
+        return kc.getTETime() > 0;
+    }
+
+    /**
+     * Resolves the concrete class bound to the base class's second type parameter ({@code A})
+     * for the given object instance.
+     * <p>
+     * Walks the class hierarchy from the object's concrete class up to the base class, collecting
+     * each {@code extends} clause. Resolution then flows <b>bottom-up</b>: the concrete subclass supplies
+     * the actual types that resolve its superclass's type variables, and each step rebinds the next
+     * superclass's type parameters in terms of those. This correctly handles intermediate classes that
+     * add, remove, or reorder type parameters, and {@code A} being introduced at any level. If {@code A}
+     * cannot be resolved to a concrete type (e.g. the object's class is itself still generic), the type
+     * variable's upper bound is returned instead (usually StandEntity, JSpec or IAttacker).
+     * <p>
+     * In all cases where the implementation hierarchy is correct, this method should return a non-null value.
+     * A null value may be returned if any class in the hierarchy extends an unparameterized version of
+     * an otherwise generic class.
+     *
+     * @param baseClass The base class to walk up to. Should have two generic type parameters where the second one is the attacker.
+     * @param object The object whose attacker class should be resolved.
+     * @return The class of the {@code A} type argument (or its upper bound), or {@code null} if it can't be determined.
+     */
+    public static Class<?> resolveAttackerClass(Class<?> baseClass, Object object) {
+        // Collect each generic superclass edge from the concrete class up to (and including) the base class,
+        // in bottom-up order. Each entry's type arguments are expressed in terms of the class below it.
+        List<ParameterizedType> chain = new ArrayList<>();
+        Class<?> clazz = object.getClass();
+
+        while (clazz != null && clazz != baseClass) {
+            Type genericSuper = clazz.getGenericSuperclass();
+            if (genericSuper instanceof ParameterizedType pt) {
+                chain.add(pt);
+                if (pt.getRawType() == baseClass) {
+                    break;
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+
+        if (chain.isEmpty()) return null;
+
+        // Walk the edges bottom-up. After each edge, `substitutions` maps the (super)class's own type
+        // variables to their resolved types. The next edge's arguments reference those variables, so we
+        // can rebind them as we climb. Type variables (not positions) are used as keys, so intermediate
+        // classes shifting the position of A are handled transparently.
+        Map<TypeVariable<?>, Type> substitutions = new HashMap<>();
+        Type attackerType = null;
+
+        for (ParameterizedType pt : chain) {
+            Class<?> rawClass = (Class<?>) pt.getRawType();
+            TypeVariable<?>[] params = rawClass.getTypeParameters();
+            Type[] args = pt.getActualTypeArguments();
+
+            Map<TypeVariable<?>, Type> next = new HashMap<>();
+            for (int i = 0; i < params.length; i++) {
+                Type arg = args[i];
+                if (arg instanceof TypeVariable<?> tv) {
+                    // Argument is a type variable of the class below, resolve it through what we know so far.
+                    next.put(params[i], substitutions.getOrDefault(tv, tv));
+                } else {
+                    // Concrete type (Class or ParameterizedType), store directly.
+                    next.put(params[i], arg);
+                }
+            }
+            substitutions = next;
+
+            if (rawClass == baseClass) {
+                // A is always the second type parameter.
+                attackerType = substitutions.get(params[1]);
+                break;
+            }
+        }
+
+        return toClass(attackerType);
+    }
+
+    /**
+     * Reduces a resolved {@link Type} to a concrete {@link Class}.
+     * Parameterized types yield their raw class, and unresolved type variables fall back to their
+     * (recursively reduced) first upper bound.
+     */
+    private static Class<?> toClass(@Nullable Type type) {
+        if (type instanceof Class<?> clazz) {
+            return clazz;
+        } else if (type instanceof ParameterizedType pt) {
+            return toClass(pt.getRawType());
+        } else if (type instanceof TypeVariable<?> tv) {
+            Type[] bounds = tv.getBounds();
+            return bounds.length > 0 ? toClass(bounds[0]) : null;
+        }
+        return null;
     }
 }

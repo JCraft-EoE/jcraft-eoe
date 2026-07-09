@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * @see ClusterTemplatePiece
+ */
 public class ClusterStructure extends Structure {
 
     private static boolean overlapsAny(BoundingBox candidate, BoundingBox[] existing) {

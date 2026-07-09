@@ -17,7 +17,7 @@ so yeah we wanted to add jojo stands to mc
 [[dependencies.jcraft]]
 modId = "forge"
 mandatory = true
-versionRange = "[47,)"
+versionRange = "[47.4,)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -38,7 +38,7 @@ side = "BOTH"
 [[dependencies.jcraft]]
 modId = "azurelib"
 mandatory = true
-versionRange = "[1.0.34,)"
+versionRange = "[1.3.2,)"
 ordering = "AFTER"
 side = "BOTH"
 

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "jcraft_datagen_api",
+  "version": "${version}",
+  "name": "JCraft Datagen API",
+  "description": "Data generation API for JCraft addons",
+  "license": "All Rights Reserved",
+  "environment": "*",
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  }
+}

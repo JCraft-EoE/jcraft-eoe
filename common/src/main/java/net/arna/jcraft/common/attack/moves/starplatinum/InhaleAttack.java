@@ -56,8 +56,6 @@ public final class InhaleAttack extends AbstractMove<InhaleAttack, StarPlatinumE
             return;
         }
 
-        if (inhaleTime % 20 == 0) attacker.playSound(JSoundRegistry.INHALE_LOOP.get());
-
         final Vec3 rotVec = attacker.getUserOrThrow().getLookAngle();
         final Vec3 eyePos = attacker.isFree() ?
                 new Vec3(attacker.getFreePos()).add(RotationUtil.vecPlayerToWorld(new Vec3(0, attacker.getBbHeight(), 0), GravityChangerAPI.getGravityDirection(attacker)))
@@ -65,7 +63,13 @@ public final class InhaleAttack extends AbstractMove<InhaleAttack, StarPlatinumE
         final Vec3 fPos = eyePos.add(rotVec.scale(1.75));
         final Vec3 ffPos = eyePos.add(rotVec.scale(3.25));
 
+        // In some rare cases, this appears to be possible, which will crash the game later in the method.
+        if (Double.isNaN(fPos.x) || Double.isNaN(fPos.y) || Double.isNaN(fPos.z))
+            return;
+
         if (attacker.level().isClientSide) {
+            if (inhaleTime % 20 == 0) attacker.playSound(JSoundRegistry.INHALE_LOOP.get());
+
             // Display particles for the two hitboxes
             Vec3 addVel = rotVec.add(random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1);
             Vec3 particlePos = fPos.add(addVel);

@@ -45,15 +45,15 @@ public class StuckKnivesFeatureRenderer<T extends LivingEntity, M extends Ageabl
     @Override
     public void render(final PoseStack matrixStack, final MultiBufferSource vertexConsumerProvider, final int i, final T livingEntity, final float f, final float g, final float h, final float j, final float k, final float l) {
         final int m = this.getObjectCount(livingEntity);
+        if (m <= 0) return;
+
         final RandomSource random = RandomSource.create(livingEntity.getId());
-        if (m <= 0) {
-            return;
-        }
+        final AnimalModelAccessor accessor = (AnimalModelAccessor) getParentModel();
+        final List<ModelPart> parts = Stream.concat(Streams.stream(accessor.callHeadParts()), Streams.stream(accessor.callBodyParts())).toList();
+
         for (int n = 0; n < m; ++n) {
             matrixStack.pushPose();
 
-            final AnimalModelAccessor accessor = (AnimalModelAccessor) getParentModel();
-            final List<ModelPart> parts = Stream.concat(Streams.stream(accessor.callHeadParts()), Streams.stream(accessor.callBodyParts())).toList();
             final ModelPart part = parts.get(random.nextInt(parts.size()));
             if (!part.isEmpty()) {
                 final ModelPart.Cube cuboid = part.getRandomCube(random);

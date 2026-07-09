@@ -1,6 +1,7 @@
 package net.arna.jcraft.forge.capability.impl.entity;
 
 import dev.architectury.networking.NetworkManager;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.entity.CommonTimeStopComponentImpl;
 import net.arna.jcraft.forge.JNetworkingForge;
 import net.arna.jcraft.forge.capability.api.JCapability;
@@ -17,12 +18,10 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 
 import java.util.Optional;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class TimeStopCapability extends CommonTimeStopComponentImpl implements JCapability {
 
-    public static ResourceLocation TIME_S2C = new ResourceLocation(MOD_ID, "time_s2c");
-    public static ResourceLocation TIME_C2S = new ResourceLocation(MOD_ID, "time_c2s");
+    public static ResourceLocation TIME_S2C = JCraft.id("time_s2c");
+    public static ResourceLocation TIME_C2S = JCraft.id("time_c2s");
 
     public static Capability<TimeStopCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
     });

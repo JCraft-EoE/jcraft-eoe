@@ -4,17 +4,20 @@ import net.arna.jcraft.JCraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
 public interface JTagRegistry {
 
     TagKey<Item> EQUIPABLES = TagKey.create(Registries.ITEM, new ResourceLocation("c", "equipables"));
     TagKey<Item> PROTECTS_FROM_SUN = TagKey.create(Registries.ITEM, JCraft.id("protects_from_sun"));
     TagKey<Item> SAND_BLOCKS = TagKey.create(Registries.ITEM, new ResourceLocation("c", "sand_blocks"));
-    TagKey<Item> COSPLAY = TagKey.create(Registries.ITEM, JCraft.id("cosplay"));
+    TagKey<Item> UNTHROWABLE = TagKey.create(Registries.ITEM, JCraft.id("unthrowable"));
     TagKey<Item> BLINDS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("blinds_on_impact"));
     TagKey<Item> SLOWS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("slows_on_impact"));
     TagKey<Item> BURNS_ON_IMPACT = TagKey.create(Registries.ITEM, JCraft.id("burns_on_impact"));
@@ -31,6 +34,7 @@ public interface JTagRegistry {
     TagKey<Item> ACUTE = TagKey.create(Registries.ITEM, JCraft.id("acute"));
     TagKey<Item> OBTUSE = TagKey.create(Registries.ITEM, JCraft.id("obtuse"));
     TagKey<Item> DISCS = TagKey.create(Registries.ITEM, JCraft.id("discs"));
+    TagKey<Item> FERROUS_ITEMS = TagKey.create(Registries.ITEM, JCraft.id("ferrous_items"));
     TagKey<Item> SOUL_LOG_ITEMS = TagKey.create(Registries.ITEM, JCraft.id("soul_logs"));
 
     TagKey<Block> SOUL_LOG_BLOCKS = TagKey.create(Registries.BLOCK, JCraft.id("soul_logs"));
@@ -39,14 +43,33 @@ public interface JTagRegistry {
     TagKey<Block> AU_REPLACED_WITH_AIR = TagKey.create(Registries.BLOCK, JCraft.id("au_replaced_with_air"));
 
     TagKey<EntityType<?>> FERROUS_ENTITIES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("ferrous_entities"));
+    TagKey<EntityType<?>> BLOODLESS_ENTITIES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("bloodless_entities"));
+    TagKey<EntityType<?>> IRONLESS_ENTITIES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("ironless_entities"));
     TagKey<EntityType<?>> CAN_HAVE_STAND = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("can_have_stand"));
     TagKey<EntityType<?>> CANNOT_BE_STUNNED = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cannot_be_stunned"));
     TagKey<EntityType<?>> STANDS = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("stands"));
     TagKey<EntityType<?>> CAN_NEVER_HAVE_STAND = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("can_never_have_stand"));
     TagKey<EntityType<?>> NO_STAND_USER_AI = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("no_stand_user_ai"));
     TagKey<EntityType<?>> SPEC_USER = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("spec_user"));
+    TagKey<EntityType<?>> CANNOT_TAKE_STAND_FROM = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cannot_take_stand_from"));
+    TagKey<EntityType<?>> UNAFFECTED_BY_EPITAPH = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("unaffected_by_epitaph"));
+    TagKey<EntityType<?>> PREFERS_GOLD_DRIP = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("prefer_gold_drip"));
+    TagKey<EntityType<?>> DOESNT_BREATHE = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("doesnt_breathe"));
+    TagKey<EntityType<?>> CANT_BREAK_BLOCKS = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cant_break_blocks"));
+    TagKey<EntityType<?>> CANT_HEAR = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cant_hear"));
+    TagKey<EntityType<?>> BOSSES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("bosses"));
+    TagKey<EntityType<?>> IGNORES_DAMAGE_SCALING = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("ignores_damage_scaling"));
 
     TagKey<Biome> METEORS_CAN_FALL = TagKey.create(Registries.BIOME, JCraft.id("meteors_can_fall"));
+
+    TagKey<StructureTemplatePool> STONE_BASE = TagKey.create(Registries.TEMPLATE_POOL, JCraft.id("stone_base"));
+
+    TagKey<DamageType> STAND_IMMUNE = TagKey.create(Registries.DAMAGE_TYPE, JCraft.id("stand_immune"));
+
+    TagKey<Structure> ON_MONASTERY_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_monastery_maps"));
+    TagKey<Structure> ON_VAMPIRE_LAIR_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_vampire_lair_maps"));
+    TagKey<Structure> ON_CINDERELLA_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_cinderella_maps"));
+    TagKey<Structure> ON_METEORITE_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_meteorite_maps"));
 
     static void init() {
         // intentionally left empty

@@ -1,0 +1,41 @@
+{
+  "parent": "jcraft:obtain_diary_page",
+  "criteria": {
+    "has_diary": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:dios_diary"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.obtain_dios_diary.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:dios_diary"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.obtain_dios_diary.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_diary"
+    ]
+  ],
+  "rewards": {
+    "experience": 800
+  },
+  "sends_telemetry_event": true
+}

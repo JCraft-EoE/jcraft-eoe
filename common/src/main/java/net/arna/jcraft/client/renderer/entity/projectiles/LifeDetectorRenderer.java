@@ -1,39 +1,49 @@
 package net.arna.jcraft.client.renderer.entity.projectiles;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.arna.jcraft.client.model.entity.LifeDetectorModel;
+import lombok.NonNull;
+import mod.azure.azurelib.render.AzRendererPipelineContext;
+import mod.azure.azurelib.render.entity.AzEntityRendererPipeline;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.renderer.BaseModelRenderer;
+import net.arna.jcraft.client.renderer.entity.AbstractEntityRenderer;
 import net.arna.jcraft.common.entity.projectile.LifeDetectorEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
-import org.joml.Quaternionf;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 /**
- * The {@link GeoProjectileRenderer} for {@link LifeDetectorEntity}.
- * @see LifeDetectorModel
+ * The {@link ProjectileRenderer} for {@link LifeDetectorEntity}.
  */
-public class LifeDetectorRenderer extends GeoProjectileRenderer<LifeDetectorEntity> {
-    public LifeDetectorRenderer(final EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, new LifeDetectorModel());
+@Environment(EnvType.CLIENT)
+public class LifeDetectorRenderer extends AbstractEntityRenderer<LifeDetectorEntity> {
+
+    public static final String ID = "detector";
+    private static final RenderType RENDER_TYPE = RenderType.eyes(JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID)));
+
+    public LifeDetectorRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID), b -> b
+                .setRenderType(RENDER_TYPE)
+                .setModelRenderer((pc, layer) -> new BaseModelRenderer<>((AzEntityRendererPipeline<LifeDetectorEntity>) pc, layer) {
+                    @Override
+                    protected void midRender(@NonNull AzRendererPipelineContext<UUID, LifeDetectorEntity> pc) {
+                        ProjectileModelRenderer.faceRotationInverted(pc.poseStack(), pc.animatable(), pc.partialTick());
+                    }
+                }),
+                ID);
     }
 
     @Override
-    protected int getBlockLightLevel(final LifeDetectorEntity entity, final BlockPos pos) {
+    public boolean shouldShowName(@NotNull LifeDetectorEntity entity) {
+        return false;
+    }
+
+    @Override
+    public int getBlockLightLevel(final @NonNull LifeDetectorEntity entity, final @NonNull BlockPos pos) {
         return 15;
-    }
-
-    @Override
-    public RenderType getRenderType(final LifeDetectorEntity animatable, final ResourceLocation texture, final MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.eyes(texture);
-    }
-
-    @Override
-    public void render(final LifeDetectorEntity animatable, final float yaw, final float partialTick, final PoseStack poseStack, final MultiBufferSource bufferSource, final int packedLight) {
-        poseStack.pushPose();
-        poseStack.mulPose(new Quaternionf().rotateXYZ(3.1415f, 3.1415f, 0)); // Why is this necessary???
-        super.render(animatable, yaw, partialTick, poseStack, bufferSource, packedLight);
-        poseStack.popPose();
     }
 }

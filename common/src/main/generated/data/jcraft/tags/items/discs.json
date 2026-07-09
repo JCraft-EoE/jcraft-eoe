@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "jcraft:disc",
+    "jcraft:stand_disc",
+    "jcraft:spec_disc"
+  ]
+}

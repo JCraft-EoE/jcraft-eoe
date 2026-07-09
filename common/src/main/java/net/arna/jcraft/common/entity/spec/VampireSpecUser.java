@@ -10,6 +10,7 @@ import net.minecraft.world.entity.ai.goal.RestrictSunGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public class VampireSpecUser extends SpecUserMob {
@@ -25,6 +26,13 @@ public class VampireSpecUser extends SpecUserMob {
         goalSelector.addGoal(2, new RestrictSunGoal(this));
         goalSelector.addGoal(3, new FleeSunGoal(this, 1.0));
 
+        // Vampires attack Monks
+        targetSelector.addGoal(
+                2,
+                new NearestAttackableTargetGoal<>(this, HamonSpecUser.class, true)
+        );
+
+        targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
         targetSelector.addGoal(3, new NearestAttackableTargetGoal(this, IronGolem.class, true));
         targetSelector.addGoal(3, new NearestAttackableTargetGoal(this, Villager.class, true));
     }

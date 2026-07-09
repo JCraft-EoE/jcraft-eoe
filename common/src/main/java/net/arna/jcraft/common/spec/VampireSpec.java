@@ -24,7 +24,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 @Getter
 public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
-    public static final MoveSet<VampireSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.VAMPIRE, VampireSpec::registerMoves, State.class);
+    public static final MoveSet<VampireSpec, State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.VAMPIRE, VampireSpec::registerMoves, VampireSpec.class, State.class);
     public static final SpecData DATA = SpecData.builder()
             .name(Component.translatable("spec.jcraft.vampire"))
             .description(Component.literal("Supernatural all-ranger"))
@@ -40,14 +40,20 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             .withStaticY()
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
-            .withInfo(Component.literal("Axe Kick"), Component.literal("jab"));
+            .withInfo(
+                    Component.literal("Axe Kick"),
+                    Component.literal("Fast jab. Spikes down on air hit.")
+            );
 
     public static final SimpleUppercutAttack<VampireSpec> SWEEP = new SimpleUppercutAttack<VampireSpec>(0, 6,
             12, 1f, 5f, 12, 1.5f, 0.2f, 0.5f, 0.5f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStaticY()
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.LOW)
-            .withInfo(Component.literal("Sweep Kick"), Component.literal("fast launcher"));
+            .withInfo(
+                    Component.literal("Sweep Kick"),
+                    Component.literal("Fast, vertical launcher.")
+            );
 
     public static final SimpleAttack<VampireSpec> ROUNDHOUSE = new SimpleAttack<VampireSpec>(0, 8,
             15, 1f, 6f, 19, 1.5f, 1.5f, 0f)
@@ -56,27 +62,59 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
-            .withInfo(Component.literal("Wheel Kick"), Component.literal("fast launcher"));
+            .withInfo(
+                    Component.literal("Wheel Kick"),
+                    Component.literal("Launcher with good damage. Slower than the other kicks. Combos into either Blood Suck.")
+            );
 
     public static final SimpleMultiHitAttack<VampireSpec> COMBO = new SimpleMultiHitAttack<VampireSpec>(240,
             23, 1f, 2.5f, 12, 1.5f, 0.2f, -0.1f, IntSet.of(5, 8, 12, 16, 20))
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withBlockStun(5)
-            .withInfo(Component.literal("Beatdown"), Component.literal("hits 5 times, combo starter/extender"));
+            .withInfo(
+                    Component.literal("Beatdown"),
+                    Component.literal("Hits 5 times, combo starter/extender.")
+            );
+
+    public static final SimpleAttack<VampireSpec> FEEDING_BLOODSUCK_LAUNCH = new SimpleAttack<VampireSpec>(0, 38,
+            46, 1f, 3f, 9, 1.5f, 1.5f, 0f)
+            .withImpactSound(JSoundRegistry.TW_KICK_HIT)
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withLaunch()
+            .withInfo(Component.literal("Feeding Blood Suck (Finisher)"), Component.empty());
+    public static final BloodSuckHitsAttack FEEDING_BLOODSUCK_HITS = new BloodSuckHitsAttack(0, 46, 1f,
+            2.5f, 19, 1.5f, 0.6f, -0.1f, IntSet.of(8, 16, 24), 3.0f)
+            .withStunType(StunType.UNBURSTABLE)
+            .withFinisher(24, FEEDING_BLOODSUCK_LAUNCH)
+            .withInfo(Component.literal("Feeding Blood Suck (Hit)"), Component.empty());
+    public static final BloodSuckAttack FEEDING_BLOODSUCK = new BloodSuckAttack(240, 10, 18,
+            1f, 1f, 20, 1.5f, 0f, 0f, FEEDING_BLOODSUCK_HITS,
+            FEEDING_BLOODSUCK_HITS.getDuration(), 2f, true)
+            .withSound(JSoundRegistry.VAMPIRE_GRAB_HIT)
+            .withImpactSound(JSoundRegistry.IMPACT_9)
+            .withHitSpark(JParticleType.BLOOD_SPARK_2)
+            .withInfo(
+                    Component.literal("Feeding Blood Suck"),
+                    Component.literal("Blockable grab. Much more efficient for feeding than Blood Bottles. Launches the victim away.")
+            );
 
     public static final BloodSuckHitsAttack BLOODSUCK_HITS = new BloodSuckHitsAttack(0, 25, 1f,
-            4, 5, 1.5f, 0.6f, -0.1f, IntSet.of(8, 16, 24))
+            4, 5, 1.5f, 0.6f, -0.1f, IntSet.of(8, 16, 24), 2.0f)
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(Component.literal("Blood Suck (Hit)"), Component.empty());
     public static final BloodSuckAttack BLOODSUCK = new BloodSuckAttack(240, 10, 18,
             1f, 1f, BLOODSUCK_HITS.getDuration(), 1.5f, 0f, 0f, BLOODSUCK_HITS,
-            BLOODSUCK_HITS.getDuration(), 2f)
+            BLOODSUCK_HITS.getDuration(), 2f, false)
+            .withCrouchingVariant(FEEDING_BLOODSUCK)
             .withSound(JSoundRegistry.VAMPIRE_GRAB_HIT)
             .withImpactSound(JSoundRegistry.IMPACT_9)
-            .withHitSpark(JParticleType.BACK_STAB) // todo: bloodsuck particles
-            .withInfo(Component.literal("Blood Suck"), Component.literal("blockable grab"));
+            .withHitSpark(JParticleType.BLOOD_SPARK_2)
+            .withInfo(
+                    Component.literal("Blood Suck"),
+                    Component.literal("Blockable grab. More efficient for feeding than Blood Bottles. Allows combo extension.")
+            );
 
-    public static final SpaceRipperAttack SPACE_RIPPER_ATTACK = new SpaceRipperAttack(300, 1, 10, 1f)
+    public static final SpaceRipperAttack<VampireSpec> SPACE_RIPPER_ATTACK = new SpaceRipperAttack<VampireSpec>(300, 1, 10, 1f)
             .withInfo(Component.literal("Space Ripper Stingy Eyes (Fire)"), Component.empty());
     public static final SimpleHoldableMove<VampireSpec> SPACE_RIPPER_CHARGE = new SimpleHoldableMove<VampireSpec>(
             300, 0, 32, 1f, 14)
@@ -87,15 +125,21 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
                     Chargeable laser beam attack.
                     Laser velocity depends on charge time.
                     After charging for 1.2s, becomes unblockable.
-                    """));
+                    """)
+            );
 
-    public static final NightVisionMove TOGGLE_NV = new NightVisionMove(20)
+    public static final NightVisionMove<VampireSpec> TOGGLE_NV = new NightVisionMove<VampireSpec>(20)
             .withInfo(Component.literal("Toggle Night Vision"), Component.empty());
 
-    public static final ReviveMove REVIVE_MOVE = new ReviveMove(300, 16, 20, 5)
+    public static final ReviveMove<VampireSpec> REVIVE_MOVE = new ReviveMove<VampireSpec>(300, 16, 20, 5)
             .withCrouchingVariant(TOGGLE_NV)
             .withSound(JSoundRegistry.VAMPIRE_REANIMATE)
-            .withInfo(Component.literal("Resurrection"), Component.literal("revives humanoid/undead enemies within 5 meters, that died within the last 1 minute"));
+            .withInfo(
+                    Component.literal("Resurrection"),
+                    Component.literal("Revives humanoid/undead enemies within 5 meters, that died within the last 1 minute.")
+            );
+
+    public static final float MAX_BLOOD = 20f;
 
     private final CommonVampireComponent vampireComponent;
 
@@ -112,7 +156,9 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
         moves.register(MoveClass.BARRAGE, COMBO, CooldownType.BARRAGE, State.COMBO);
 
         moves.register(MoveClass.SPECIAL1, SPACE_RIPPER_CHARGE, CooldownType.SPECIAL1, State.SPACE_RIPPER_CHARGE).withFollowup(State.SPACE_RIPPERS);
-        moves.register(MoveClass.SPECIAL2, BLOODSUCK, CooldownType.SPECIAL2, State.BLOODSUCK);
+        moves.register(MoveClass.SPECIAL2, BLOODSUCK, CooldownType.SPECIAL2, State.BLOODSUCK)
+                .withCrouchingVariant(State.FEEDING_BLOODSUCK);
+
         moves.register(MoveClass.SPECIAL3, REVIVE_MOVE, CooldownType.SPECIAL3, State.RESURRECT).withCrouchingVariant(null);
     }
 
@@ -133,6 +179,9 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
 
         BLOODSUCK("vm.bsk"),
         BLOODSUCK_HIT("vm.bsh"),
+
+        FEEDING_BLOODSUCK("vm.fbsk"),
+        FEEDING_BLOODSUCK_HIT("vm.fbsh"),
 
         RESURRECT("vm.rsr");
 

@@ -5,6 +5,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.common.attack.moves.aerosmith.*;
 import net.arna.jcraft.common.attack.moves.anubis.*;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.cream.*;
@@ -14,6 +15,7 @@ import net.arna.jcraft.common.attack.moves.goldexperience.LifeGiverAttack;
 import net.arna.jcraft.common.attack.moves.goldexperience.OverclockAttack;
 import net.arna.jcraft.common.attack.moves.goldexperience.TreeAttack;
 import net.arna.jcraft.common.attack.moves.goldexperience.requiem.*;
+import net.arna.jcraft.common.attack.moves.hamon.*;
 import net.arna.jcraft.common.attack.moves.hierophantgreen.EmeraldSplashAttack;
 import net.arna.jcraft.common.attack.moves.hierophantgreen.NetSetMove;
 import net.arna.jcraft.common.attack.moves.horus.*;
@@ -50,13 +52,13 @@ import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.GiveStandAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
+import net.arna.jcraft.common.attack.moves.whitesnake.StealStandAttack;
 
+@SuppressWarnings("unused")
 public interface JMoveTypeRegistry {
     DeferredRegister<MoveType<?>> MOVE_TYPE_REGISTRY = DeferredRegister.create(JCraft.MOD_ID, JRegistries.MOVE_TYPE_REGISTRY_KEY);
 
-    RegistrySupplier<MoveType<?>> ANUBIS_LOW_KICK_ATTACK = register("anubis_low_kick_attack", LowKickAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> ANUBIS_REKKA_3_ATTACK = register("anubis_rekka_3_attack", Rekka3Attack.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> ANUBIS_SIMPLE_ANUBIS_ATTACK = register("anubis_simple_anubis_attack", SimpleAnubisAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> ANUBIS_SIMPLE_ANUBIS_MULTI_HIT_ATTACK = register("anubis_simple_anubis_multi_hit_attack", SimpleAnubisMultiHitAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> ANUBIS_UNSHEATHING_ATTACK = register("anubis_unsheathing_attack", UnsheathingAttack.Type.INSTANCE);
 
@@ -66,6 +68,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> CMOON_GRAV_PUNCH_ATTACK = register("cmoon_grav_punch_attack", GravPunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CMOON_GROUND_SLAM_ATTACK = register("cmoon_ground_slam_attack", CGroundSlamAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CMOON_LAUNCH_ATTACK = register("cmoon_launch_attack", LaunchAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> CMOON_TOSS_MOVE = register("cmoon_toss_move", CMoonTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> CREAM_BALL_CHARGE_ATTACK = register("cream_ball_charge_attack", BallChargeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CREAM_BALL_MODE_ENTER_MOVE = register("cream_ball_mode_enter_move", BallModeEnterMove.Type.INSTANCE);
@@ -115,6 +118,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_GRAB_ATTACK = register("killerqueen_kq_grab_attack", KQGrabAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_GRAB_HIT_ATTACK = register("killerqueen_kq_grab_hit_attack", KQGrabHitAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_SHEER_HEART_ATTACK_ATTACK = register("killerqueen_sheer_heart_attack_attack", SheerHeartAttackAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> KILLERQUEEN_KQ_TOSS_MOVE = register("killerqueen_kq_toss_move", KQTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> KILLERQUEEN_BITESTHEDUST_BTD_DETONATE_ATTACK = register("killerqueen_bitesthedust_btd_detonate_attack", BTDDetonateAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KILLERQUEEN_BITESTHEDUST_BTD_GRAB_HIT_ATTACK = register("killerqueen_bitesthedust_btd_grab_hit_attack", BTDGrabHitAttack.Type.INSTANCE);
@@ -128,6 +132,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> KINGCRIMSON_KC_DONUT_ATTACK = register("kingcrimson_kc_donut_attack", KCDonutAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KINGCRIMSON_PREDICTION_MOVE = register("kingcrimson_prediction_move", PredictionMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> KINGCRIMSON_TIME_ERASE_MOVE = register("kingcrimson_time_erase_move", TimeEraseMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> KINGCRIMSON_TOSS_MOVE = register("kingcrimson_toss_move", KingCrimsonTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> MADEINHEAVEN_CIRCLE_ATTACK = register("madeinheaven_circle_attack", CircleAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MADEINHEAVEN_FURY_CHOP_ATTACK = register("madeinheaven_fury_chop_attack", FuryChopAttack.Type.INSTANCE);
@@ -142,6 +147,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> MAGICIANSRED_LIFE_DETECTOR_ATTACK = register("magiciansred_life_detector_attack", LifeDetectorAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MAGICIANSRED_RED_BIND_ATTACK = register("magiciansred_red_bind_attack", RedBindAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MAGICIANSRED_REDIRECT_ATTACK = register("magiciansred_redirect_attack", RedirectAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> MAGICIANSRED_TOSS_MOVE = register("magiciansred_toss_move", MagiciansRedTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> METALLICA_GIVE_SCALPEL_MOVE = register("metallica_give_scalpel_move", GiveScalpelMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> METALLICA_BISECT_ATTACK = register("metallica_bisect_attack", BisectAttack.Type.INSTANCE);
@@ -189,10 +195,10 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SHARED_SIMPLE_UPPERCUT_ATTACK = register("shared_simple_uppercut_attack", SimpleUppercutAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TIME_SKIP_MOVE = register("shared_time_skip_move", TimeSkipMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TIME_STOP_MOVE = register("shared_time_stop_move", TimeStopMove.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SHARED_STANDBY_ON_MOVE = register("shared_standby_on_move", StandbyActivationMove.Type.INSTANCE);
-    RegistrySupplier<MoveType<?>> SHARED_STANDBY_OFF_MOVE = register("shared_standby_off_move", StandbyDeactivationMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SHARED_RESTORATION_ATTACK = register("shared_restoration_attack", RestorationAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TOSS_CHARGE_MOVE = register("shared_toss_charge_move", TossChargeMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SHARED_TOSS_MOVE = register("shared_toss_move", TossMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SHARED_SIMPLE_HITSCAN_ATTACK = register("shared_simple_hitscan_attack", SimpleHitscanAttack.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_ARMOR_OFF_ATTACK = register("silverchariot_armor_off_attack", ArmorOffAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_CIRCLE_SLASH_ATTACK = register("silverchariot_circle_slash_attack", CircleSlashAttack.Type.INSTANCE);
@@ -204,6 +210,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_SC_CHARGE_ATTACK = register("silverchariot_sc_charge_attack", SCChargeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_SC_COUNTER_ATTACK = register("silverchariot_sc_counter_attack", SCCounterAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SILVERCHARIOT_SPIN_BARRAGE_ATTACK = register("silverchariot_spin_barrage_attack", SpinBarrageAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SILVERCHARIOT_TOSS_MOVE = register("silverchariot_toss_move", SilverChariotTossMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> STARPLATINUM_BLOCK_BREAKING_ATTACK = register("starplatinum_block_breaking_attack", BlockBreakingAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> STARPLATINUM_INHALE_ATTACK = register("starplatinum_inhale_attack", InhaleAttack.Type.INSTANCE);
@@ -251,14 +258,32 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> VAMPIRE_REVIVE_MOVE = register("vampire_revive_move", ReviveMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> VAMPIRE_SPACE_RIPPER_ATTACK = register("vampire_space_ripper_attack", SpaceRipperAttack.Type.INSTANCE);
 
+    RegistrySupplier<MoveType<?>> HAMON_CHARGE_MOVE = register("hamon_charge_move", ChargeHamonMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> HAMON_RIPPLE_ATTACK = register("hamon_ripple_attack", RippleAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> HAMON_SENDO_ATTACK = register("hamon_sendo_attack", SendoAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> HAMON_ZOOM_PUNCH_ATTACK = register("hamon_zoom_punch_attack", ZoomPunchAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_ATTACK = register("hamon_improviser_attack", ImproviserAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_MOVE = register("hamon_improviser_move", ImproviserMove.Type.INSTANCE);
+
+
     RegistrySupplier<MoveType<?>> WHITESNAKE_CHARGED_SPEW_ATTACK = register("whitesnake_charged_spew_attack", ChargedSpewAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> WHITESNAKE_GIVE_STAND_ATTACK = register("whitesnake_give_stand_attack", GiveStandAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> WHITESNAKE_MELT_YOUR_HEART_ATTACK = register("whitesnake_melt_your_heart_attack", MeltYourHeartAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> WHITESNAKE_POISON_SPEW_ATTACK = register("whitesnake_poison_spew_attack", PoisonSpewAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> WHITESNAKE_STEAL_STAND_ATTACK = register("whitesnake_steal_stand_attack", StealStandAttack.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> MANDOM_COUNTDOWN_MOVE = register("mandom_countdown_move", CountdownMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> MANDOM_REWIND_MOVE = register("mandom_rewind_move", RewindMove.Type.INSTANCE);
 
+    RegistrySupplier<MoveType<?>> AEROSMITH_BULLET_ATTACK = register("aerosmith_bullet_attack", MuzzleHitscanAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_DROP_ATTACK = register("aerosmith_bomb_drop_attack", BombDropAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_BOMB_THROW_ATTACK = register("aerosmith_bomb_throw_attack", BombThrowAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_ITEM_DROP_ATTACK = register("aerosmith_item_drop_attack", ItemDropAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_PATROL_MOVE = register("aerosmith_patrol_move", PatrolMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_FLYBY_MOVE = register("aerosmith_flyby_move", FlybyMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_ATTACK_ORDER_MOVE = register("aerosmith_attack_order_move", AerosmithAttackOrderMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> AEROSMITH_CHARGE_ATTACK = register("aerosmith_charge_attack", AerosmithChargeAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> BREATH_XRAY_MOVE = register("breath_xray_move", BreathXrayMove.Type.INSTANCE);
 
 
     private static RegistrySupplier<MoveType<?>> register(String id, MoveType<?> type) {

@@ -6,9 +6,8 @@ import net.arna.jcraft.forge.capability.api.JCapability;
 import net.arna.jcraft.forge.capability.impl.entity.GravityCapability;
 import net.arna.jcraft.forge.capability.impl.entity.TimeStopCapability;
 import net.arna.jcraft.forge.capability.impl.living.CooldownsCapability;
-import net.arna.jcraft.forge.capability.impl.living.MiscCapability;
 import net.arna.jcraft.forge.capability.impl.player.PhCapability;
-import net.arna.jcraft.forge.capability.impl.player.SpecCapability;
+import net.arna.jcraft.forge.capability.impl.living.SpecCapability;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,7 +22,6 @@ public class JNetworkingForge {
         TimeStopCapability.initServer();
 
         CooldownsCapability.initServer();
-        MiscCapability.initServer();
         PhCapability.initServer();
         SpecCapability.initServer();
         GravityCapability.initServer();

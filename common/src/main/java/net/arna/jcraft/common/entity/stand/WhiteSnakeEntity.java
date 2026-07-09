@@ -1,9 +1,10 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
@@ -18,10 +19,13 @@ import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.attack.moves.shared.PilotModeMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleUppercutAttack;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.attack.moves.whitesnake.ChargedSpewAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.GiveStandAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.MeltYourHeartAttack;
 import net.arna.jcraft.common.attack.moves.whitesnake.PoisonSpewAttack;
+import net.arna.jcraft.common.attack.moves.whitesnake.StealStandAttack;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -35,16 +39,11 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Whitesnake">Whitesnake</a>.
  * @see JStandTypeRegistry#WHITE_SNAKE
- * @see net.arna.jcraft.client.model.entity.stand.WhiteSnakeModel WhiteSnakeModel
  * @see net.arna.jcraft.client.renderer.entity.stands.WhiteSnakeRenderer WhiteSnakeRenderer
  * @see ChargedSpewAttack
  * @see GiveStandAttack
@@ -53,9 +52,9 @@ import java.util.function.Consumer;
  */
 public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEntity.State> {
     public static final MoveSet<WhiteSnakeEntity, State> DEFAULT_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.WHITE_SNAKE,
-            WhiteSnakeEntity::registerDefaultMoves, State.class);
+            WhiteSnakeEntity::registerDefaultMoves, WhiteSnakeEntity.class, State.class);
     public static final MoveSet<WhiteSnakeEntity, State> REMOTE_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.WHITE_SNAKE,
-            "remote", WhiteSnakeEntity::registerRemoteMoves, State.class);
+            "remote", WhiteSnakeEntity::registerRemoteMoves, WhiteSnakeEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .info(StandInfo.builder()
@@ -89,7 +88,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withExtraHitBox(1)
             .withInfo(
                     Component.literal("Uppercut"),
-                    Component.literal("decent stun, launches up")
+                    Component.literal("Good stun, launches up.")
             );
     public static final SimpleAttack<WhiteSnakeEntity> LIGHT_FOLLOWUP = new SimpleAttack<WhiteSnakeEntity>(0,
             7, 13, 0.75f, 6f, 10, 1.5f, 1f, 0.2f)
@@ -100,7 +99,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(
                     Component.literal("Finisher"),
-                    Component.literal("quick combo finisher")
+                    Component.literal("Quick combo finisher.")
             );
     public static final SimpleAttack<WhiteSnakeEntity> LIGHT = SimpleAttack.<WhiteSnakeEntity>lightAttack(
                     7, 11, 0.75f, 5f, 13, 0.2f, 0.2f)
@@ -109,7 +108,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(
                     Component.literal("Punch"),
-                    Component.literal("quick combo starter")
+                    Component.literal("Quick combo starter.")
             );
     public static final SimpleAttack<WhiteSnakeEntity> MEDIUM = new SimpleAttack<WhiteSnakeEntity>(0,
             8, 13, 1, 7f, 16, 1.75f, 0.4f, 0)
@@ -119,7 +118,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(
                     Component.literal("Gut Punch"),
-                    Component.literal("combo starter/extender")
+                    Component.literal("Combo starter/extender. Fast, with good range.")
             );
     public static final MainBarrageAttack<WhiteSnakeEntity> BARRAGE = new MainBarrageAttack<WhiteSnakeEntity>(240,
             0, 40, 0.75f, 1, 20, 2, 0.25f, 0, 3, Blocks.OAK_PLANKS.defaultDestroyTime())
@@ -129,7 +128,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
                     Component.literal("Barrage"),
                     Component.literal("fast reliable combo starter/extender, medium stun")
             );
-    public static final GiveStandAttack GIVE_STAND = new GiveStandAttack(400,
+    public static final GiveStandAttack<WhiteSnakeEntity> GIVE_STAND = new GiveStandAttack<WhiteSnakeEntity>(400,
             22, 34, 1, 1, 2, 0, 0)
             .withSound(JSoundRegistry.WS_STAND_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -138,21 +137,25 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withBlockableType(BlockableType.NON_BLOCKABLE)
             .withInfo(
                     Component.literal("Give Stand Disk"),
-                    Component.literal("gives a single hit target a stand, provided they do not have one already, from a disk in the user's off hand")
+                    Component.literal("Gives a single hit target a stand, provided they do not have one already, from a disk in the user's off hand.")
             );
-    public static final SimpleAttack<WhiteSnakeEntity> STAND_DISC = new SimpleAttack<WhiteSnakeEntity>(480,
-            22, 34, 1, 8f, 20, 2, 0.5f, 0)
+    public static final StealStandAttack<WhiteSnakeEntity> STAND_DISC = new StealStandAttack<WhiteSnakeEntity>(480,
+            22, 34, 1, 8f, 20, 2, 1.1f, 0)
             .withSound(JSoundRegistry.WS_STAND_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)
-            .withAction(EffectAction.inflict(JStatusRegistry.STANDLESS, 160, 0))
+            .withAction(EffectAction.inflict(
+                    new MobEffectInstance(JStatusRegistry.STANDLESS.get(), 160, 0),
+                    new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 20, 0)
+            ))
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
+            .withLaunch()
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withCrouchingVariant(GIVE_STAND)
             .withInfo(
                     Component.literal("Take Stand Disk"),
-                    Component.literal("uninterruptible & unblockable, removes enemy stand for 8s")
+                    Component.literal("Uninterruptible & unblockable, removes enemy stand for 8s. Knocks down for 0.75s.")
             );
     public static final SimpleAttack<WhiteSnakeEntity> LEG_CRUSHER = new SimpleAttack<WhiteSnakeEntity>(0,
             16, 22, 0.75f, 7, 32, 1.75f, 0.35f, 0.4f)
@@ -162,15 +165,17 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.LOW)
             .withInfo(
                     Component.literal("Leg Crusher"),
-                    Component.literal("high stun, medium windup")
+                    Component.literal("High stun, medium windup.")
             );
     public static final SimpleAttack<WhiteSnakeEntity> MEMORY_DISC = new SimpleAttack<WhiteSnakeEntity>(140,
             22, 34, 1, 7f, 20, 2, 0.5f, 0)
             .withSound(JSoundRegistry.WS_MEMORY_DISC)
             .withImpactSound(JSoundRegistry.IMPACT_2)
             .withAction(EffectAction.inflict(
+                    new MobEffectInstance(JStatusRegistry.SPECLESS.get(), 160, 0),
                     new MobEffectInstance(MobEffects.WEAKNESS, 600, 0),
-                    new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 600, 0)
+                    new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 600, 0),
+                    new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 20, 0)
             ))
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHyperArmor()
@@ -178,24 +183,24 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withInfo(
                     Component.literal("Take Memory Disk"),
-                    Component.literal("uninterruptible& unblockable, gives mining fatigue & weakness for 30s")
+                    Component.literal("Uninterruptible & unblockable, gives mining fatigue & weakness for 30s. Disables enemy spec for 8s. Knocks down for 0.75s.")
             );
-    public static final ChargedSpewAttack CHARGED_SPEW = new ChargedSpewAttack(40,
+    public static final ChargedSpewAttack<WhiteSnakeEntity> CHARGED_SPEW = new ChargedSpewAttack<WhiteSnakeEntity>(160,
             20, 26, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withInfo(
                     Component.literal("Poison Spew"),
-                    Component.literal("fires a spread of 5 acid projectiles that slow enemies and persist on the surface they hits for 5s")
+                    Component.literal("Fires a spread of 5 acid projectiles that slow enemies and persist on the surface they hits for 5s.")
             );
-    public static final PoisonSpewAttack POISON_SPEW = new PoisonSpewAttack(20,
+    public static final PoisonSpewAttack<WhiteSnakeEntity> POISON_SPEW = new PoisonSpewAttack<WhiteSnakeEntity>(100,
             10, 14, 0.75f, 0f, 0, 2f, 0f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withCrouchingVariant(CHARGED_SPEW)
             .withInfo(
                     Component.literal("Poison Spew"),
-                    Component.literal("fires an acid projectile that slows enemies and persists on the surface it hits for 5s")
+                    Component.literal("Fires an acid projectile that slows enemies and persists on the surface it hits for 5s.")
             );
-    public static final MeltYourHeartAttack MELT_YOUR_HEART = new MeltYourHeartAttack(800,
+    public static final MeltYourHeartAttack<WhiteSnakeEntity> MELT_YOUR_HEART = new MeltYourHeartAttack<WhiteSnakeEntity>(800,
             40, 50, 1f, 3f, 20, 2f, 1f, 0f)
             .withSound(JSoundRegistry.WS_MYH)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -204,13 +209,19 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             .withLaunch()
             .withInfo(
                     Component.literal("Melt your Heart"),
-                    Component.literal("remote-only and armored, expels a sphere of poison")
+                    Component.literal("Remote-only and armored, expels a sphere of poison.")
             );
     public static final PilotModeMove<WhiteSnakeEntity> PILOT_MODE = new PilotModeMove<WhiteSnakeEntity>(20)
             .withInfo(
                     Component.literal("Pilot Mode"),
                     Component.empty()
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<WhiteSnakeEntity> TOSS = new TossMove<WhiteSnakeEntity>(0, 1, 1, 0.75f,0.13f,1f)
+            .withAnim(WhiteSnakeEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<WhiteSnakeEntity> TOSS_CHARGE = new TossChargeMove<WhiteSnakeEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public WhiteSnakeEntity(Level worldIn) {
         super(JStandTypeRegistry.WHITE_SNAKE.get(), worldIn);
@@ -247,6 +258,8 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         }
 
         moves.register(MoveClass.UTILITY, PILOT_MODE);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -261,6 +274,7 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     @Override
     public void tick() {
         super.tick();
+        idleOverride = isRemote();
 
         if (!isRemoteAndControllable()) {
             return;
@@ -275,18 +289,21 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
             tickRemoteMovement(f, s, jump);
 
-            if (getState() == State.IDLE) { // Replace idle anim
-                if (s > 0) {
-                    setStateNoReset(onGround() ? State.RIGHT : State.RIGHT_DASH);
-                }
-                if (s < 0) {
-                    setStateNoReset(onGround() ? State.LEFT : State.LEFT_DASH);
-                }
-                if (f < 0) {
-                    setStateNoReset(onGround() ? State.BACKWARD : State.BACKWARD_DASH);
-                }
-                if (f > 0) {
-                    setStateNoReset(onGround() ? State.FORWARD : State.FORWARD_DASH);
+            if (getMoveStun() <= 0) {
+                if (f == 0) {
+                    if (s > 0) {
+                        setStateNoReset(onGround() ? State.RIGHT : State.RIGHT_DASH);
+                    }
+                    if (s < 0) {
+                        setStateNoReset(onGround() ? State.LEFT : State.LEFT_DASH);
+                    }
+                } else {
+                    if (f < 0) {
+                        setStateNoReset(onGround() ? State.BACKWARD : State.BACKWARD_DASH);
+                    }
+                    if (f > 0) {
+                        setStateNoReset(onGround() ? State.FORWARD : State.FORWARD_DASH);
+                    }
                 }
             }
         }
@@ -343,8 +360,11 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
             remoteSpeed = userPos.subtract(pos).scale(0.025); // 1/40th so it scales with distance
         }
 
+        if (f == 0 && s == 0 && !jump) {
+            push(-getDeltaMovement().x * 0.4, -getDeltaMovement().y * 0.4, -getDeltaMovement().z * 0.4);
+        }
+
         push(remoteSpeed.x, remoteSpeed.y, remoteSpeed.z);
-        hasImpulse = true;
         hurtMarked = true;
     }
 
@@ -368,54 +388,48 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
 
     // Animation code
     public enum State implements StandAnimationState<WhiteSnakeEntity> {
-        IDLE((whitesnake, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop(whitesnake.isRemote() ? "animation.whitesnake.remote_idle" : "animation.whitesnake.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.block"))),
-        MEDIUM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.medium"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.barrage"))),
-        LEG_CRUSHER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.legcrusher"))),
-        ACID_SPEW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.acidspew"))),
-        ACID_SPEW_CHARGED(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.acidspew_charged"))),
-        DISC_TAKE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.disc_take"))),
-        DISC_GIVE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.disc_give"))),
-        UPPERCUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.uppercut"))),
+        // TODO reenable remote idle
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.block", AzPlayBehaviors.LOOP)),
+        MEDIUM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.medium", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.barrage", AzPlayBehaviors.LOOP)),
+        LEG_CRUSHER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.legcrusher", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ACID_SPEW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.acidspew", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ACID_SPEW_CHARGED(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.acidspew_charged", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DISC_TAKE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.disc_take", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DISC_GIVE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.disc_give", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        FORWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.forw"))),
-        BACKWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.back"))),
-        LEFT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.left"))),
-        RIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.right"))),
-        FORWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.fdash"))),
-        BACKWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.bdash"))),
-        LEFT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.ldash"))),
-        RIGHT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.whitesnake.rdash"))),
+        FORWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.forw", AzPlayBehaviors.LOOP)),
+        BACKWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.back", AzPlayBehaviors.LOOP)),
+        LEFT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.left", AzPlayBehaviors.LOOP)),
+        RIGHT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.right", AzPlayBehaviors.LOOP)),
+        FORWARD_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.fdash", AzPlayBehaviors.LOOP)),
+        BACKWARD_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.bdash", AzPlayBehaviors.LOOP)),
+        LEFT_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.ldash", AzPlayBehaviors.LOOP)),
+        RIGHT_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.rdash", AzPlayBehaviors.LOOP)),
 
-        MELT_YOUR_HEART(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.meltyourheart"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.whitesnake.light_followup")));
+        MELT_YOUR_HEART(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.meltyourheart", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
-        private final BiConsumer<WhiteSnakeEntity, AnimationState<WhiteSnakeEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<WhiteSnakeEntity>> animator) {
-            this((whiteSnake, builder) -> animator.accept(builder));
-        }
-
-        State(BiConsumer<WhiteSnakeEntity, AnimationState<WhiteSnakeEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(WhiteSnakeEntity attacker, AnimationState<WhiteSnakeEntity> builder) {
-            animator.accept(attacker, builder);
+        public void playAnimation(WhiteSnakeEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.whitesnake.summon";
     }
 
     @Override

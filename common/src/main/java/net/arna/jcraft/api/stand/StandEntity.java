@@ -4,21 +4,11 @@ import com.google.common.base.MoreObjects;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.MoveUsage;
-import net.arna.jcraft.api.attack.IAttacker;
-import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.MoveSet;
-import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.attack.*;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
@@ -27,9 +17,12 @@ import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.itfs.ICustomDamageHandler;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
 import net.arna.jcraft.common.ai.CombatEntityContext;
@@ -79,11 +72,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import static net.arna.jcraft.JCraft.comboBreak;
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
 public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S> & StandAnimationState<E>>
-        extends Mob implements GeoEntity, IAttacker<E, S>, ICustomDamageHandler, MoveSet.ReloadListener<E, S> {
+        extends Mob implements IAttacker<E, S>, ICustomDamageHandler, MoveSet.ReloadListener<E, S> {
 
     // TODO: finish custom player idle poses for all stands
 
@@ -101,6 +93,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private static final EntityDataAccessor<Integer> SKIN;
     private static final EntityDataAccessor<Float> ROTATIONOFFSET;
     private static final EntityDataAccessor<Float> DISTANCEOFFSET;
+    private static final EntityDataAccessor<Float> YDISTANCEOFFSET;
 
     private static final EntityDataAccessor<Float> ALPHA_OVERRIDE;
 
@@ -131,10 +124,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     private boolean holding = false;
     protected boolean idleOverride = false;
 
-    @Getter
-    @Setter
-    protected boolean standby = false;
-
     public static final float ATTACK_ROTATION = 90f;
     @Getter
     protected float maxStandGauge = 90f;
@@ -159,14 +148,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     @Setter
     private boolean remoteJumpInput = false, remoteSneakInput = false;
 
+    @Getter
     private boolean playSummonAnim = true;
     @Setter
     private boolean playSummonSound = true, playDesummonSound = true;
 
+    public static final AzCommand SUMMON_ANIMATION = AzCommand.create(JCraft.BASE_CONTROLLER, "summon");
+
     // Data
     @Getter
     private final StandType standType;
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
     protected Vector3f[] auraColors = {new Vector3f(), new Vector3f(1f, 0f, 0f), new Vector3f(0f, 1f, 0f), new Vector3f(0f, 0f, 1f)};
 
     protected StandEntity(StandType type, Level world) {
@@ -177,9 +168,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
         moveSet.registerListener(this);
 
-        noPhysics = true;
         standType = type;
-        this.noCulling = true;
+        noCulling = true;
 
         assert getThis() == this;
     }
@@ -197,6 +187,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         SKIN = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.INT);
         ROTATIONOFFSET = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
         DISTANCEOFFSET = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
+        YDISTANCEOFFSET = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
 
         ALPHA_OVERRIDE = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
 
@@ -210,6 +201,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         FREEZ = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.FLOAT);
 
         USER_POSE = SynchedEntityData.defineId(StandEntity.class, EntityDataSerializers.STRING);
+    }
+
+    /**
+     * @return Whether to forward the input to the user's spec regardless of {@link #allowMoveHandling()}.
+     */
+    public boolean forwardInputToSpec(MoveInputType type) {
+        return false;
+    }
+
+    public boolean acceptsUserMoveInit(MoveInputType type) {
+        return true;
     }
 
     public boolean allowMoveHandling() {
@@ -244,12 +246,20 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return entityData.get(STATE);
     }
 
-    private boolean isReset() {
+    protected boolean isReset() {
         return entityData.get(RESET);
     }
 
     protected void setReset(boolean reset) {
         entityData.set(RESET, reset);
+    }
+
+    /**
+     * Utility for one single hack in {@link net.arna.jcraft.client.renderer.entity.stands.StandEntityRenderer}.
+     * Do not use this.
+     */
+    public final void playStateAnimation() {
+        getState().playAnimation(getThis());
     }
 
     /**
@@ -260,6 +270,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             return;
         }
         setRawStateNoReset(state.ordinal());
+        state.playAnimation(getThis());
     }
 
     public void setRawStateNoReset(int state) {
@@ -271,8 +282,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public void setState(S state) {
         setRawState(state.ordinal());
+        state.playAnimation(getThis());
     }
 
+
+    /**
+     * *Actually* sets the stands state using the ordinal ID. Does not handle setting the animation.
+     * @param state id
+     */
     public void setRawState(int state) {
         int oldState = getRawState();
         boolean sameState = oldState == state || oldState <= 1;
@@ -332,6 +349,14 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      */
     public void setDistanceOffset(float distanceOffset) {
         this.entityData.set(DISTANCEOFFSET, distanceOffset);
+    }
+
+    public float getYDistanceOffset() {
+        return this.entityData.get(YDISTANCEOFFSET);
+    }
+
+    public void setYDistanceOffset(float yDistanceOffset) {
+        this.entityData.set(YDISTANCEOFFSET, yDistanceOffset);
     }
 
     public boolean hasAlphaOverride() {
@@ -576,6 +601,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public void setCurrentMove(@Nullable AbstractMove<?, ? super E> move) {
         prevMove = curMove;
         curMove = move;
+        if (prevMove != null) prevMove.onDeactivate(getThis());
         if (curMove != null) {
             moveUsage = new MoveUsage(tickCount, curMove);
         }
@@ -591,7 +617,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             return;
         }
 
-        MoveClass moveClass = type.getMoveClass(standby);
+        MoveClass moveClass = type.getMoveClass();
         if (moveClass != null) {
             for (MoveMap.Entry<E, S> entry : moveMap.getEntries(moveClass)) {
                 if (!entry.getMove().canBeQueued(getThis())) {
@@ -633,6 +659,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         entityData.define(SKIN, 0);
         entityData.define(ROTATIONOFFSET, -90f);
         entityData.define(DISTANCEOFFSET, 1f);
+        entityData.define(YDISTANCEOFFSET, 0f);
 
         entityData.define(ALPHA_OVERRIDE, -1f);
 
@@ -736,15 +763,16 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
      * @param animState int identifier for which state to put the stand into
      */
     public void setMove(AbstractMove<?, ? super E> move, @Nullable S animState) {
+        setCurrentMove(move);
         move.onInitiate(getThis());
 
         // If the attack has a duration of 0, just perform it immediately.
         if (move.getDuration() == 0) {
             move.doPerform(getThis());
+            setCurrentMove(null);
             return;
         }
 
-        setCurrentMove(move);
         setMoveStun(move.getDuration());
         //setReset(false); // makes it worse
         if (animState != null) {
@@ -784,33 +812,30 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     public boolean canHoldMove(@Nullable MoveInputType type) {
-        if (type == null || type.getMoveClass(standby) == null) {
+        if (type == null || type.getMoveClass() == null) {
             return false;
         }
-        MoveMap.Entry<E, S> entry = getFirstValidEntry(type.getMoveClass(standby));
-        return entry == null ? type.isHoldable(standby) : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable(standby));
+        MoveMap.Entry<E, S> entry = getFirstValidEntry(type.getMoveClass());
+        return entry == null ? type.isHoldable() : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable());
     }
 
     /**
      * Defines what happens while the stand is blocking
      */
     public void standBlock() {
-        if (!hasUser()) {
-            return;
-        }
+        if (user == null) return;
+
         // Projectile deflection
-        List<Projectile> toDeflect = this.level().getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(0.75f), EntitySelector.ENTITY_STILL_ALIVE);
+        final List<Projectile> toDeflect = level().getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(0.75f), EntitySelector.ENTITY_STILL_ALIVE);
 
         for (Projectile projectile : toDeflect) {
-            if (projectile.getOwner() == user) {
-                continue;
-            }
+            if (projectile.getOwner() == user) continue;
             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(-0.5).add(0, -0.1, 0));
             projectile.hurtMarked = true;
         }
 
         JCraft.stun(user, 2, 2);
-        getUserOrThrow().addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 5, 3, false, false, true));
+        user.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 5, 3, false, false, true));
     }
 
     public void tryUnblock() {
@@ -833,8 +858,25 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         discard();
     }
 
-    // Define idle override
+    /**
+     * The function that is executed when the stand should be idle while having idleOverride set to true.
+     * By default, an idle that is meant for remote stands.
+     */
     public void idleOverride() {
+        if (getCurrentMove() != null) setCurrentMove(null);
+
+        setStandGauge(Mth.clamp(this.getStandGauge() + 0.5f, 0, maxStandGauge));
+
+        if (getRawState() != 0 || isReset()) {
+            if (navigation.isDone() && getDeltaMovement().lengthSqr() < 0.001) { // remote stand movement
+                setRawState(0);
+                boxState(0).playAnimation(getThis());
+                setReset(false);
+            }
+
+            setDistanceOffset(getStandData().getIdleDistance());
+            setRotationOffset(getStandData().getIdleRotation());
+        }
     }
 
     public void cancelMove() {
@@ -901,9 +943,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         final boolean client = level().isClientSide;
-        if (tickCount == 1) {
+        if (tickCount == 1 && !client) {
             playSummonSound();
-            if (!client && getUser() instanceof Player player) {
+            if (getUser() instanceof Player player) {
                 player.awardStat(JStatRegistry.STAND_SUMMONED.get());
             }
         }
@@ -979,6 +1021,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         // Tick moves
         moveMap.tickMoves(getThis());
+        moveStun = getMoveStun();
 
         // Block break / Guard crush check
         if (getStandGauge() < 1) {
@@ -1028,10 +1071,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 final float attackDist = move.getMoveDistance();
 
                 if (!move.isCharge()) {
-                    if (!isRemote) {
+/*                    if (!isRemote) {
                         // TODO: find a cleaner way to slow down the users attack speed
                         user.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 4, true, false));
-                    }
+                    }*/
 
                     setAttackRotationOffset();
                     setDistanceOffset(attackDist);
@@ -1056,9 +1099,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
                 setStandGauge(Mth.clamp(this.getStandGauge() + 0.5f, 0, maxStandGauge));
 
-                if (getRawState() != 0 || isReset()) {
-                    setRawState(0);
-                    setReset(false);
+                if ((getRawState() != 0 || isReset()) && !getState().mayLinger()) {
+                    if (!playSummonAnim) {
+                        setState(getIdleState());
+                        setReset(false);
+                    }
 
                     setDistanceOffset(getStandData().getIdleDistance());
                     setRotationOffset(getStandData().getIdleRotation());
@@ -1109,7 +1154,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     setHoldingType(queuedMove);
                 }
             }
-            initMove(queuedMove.getMoveClass(standby));
+            initMove(queuedMove.getMoveClass());
         }
 
         queuedMove = null;
@@ -1143,10 +1188,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         SummonData summonData = getStandData().getSummonData();
         SoundEvent summonSound = summonData.getSound();
         if (summonSound != null) {
-            playSound(summonSound, 1f, 1f);
+            playBoundSound(summonSound, 1f, 1f);
         }
         if (summonSound == null || summonData.isPlayGenericSound()) {
-            playSound(JSoundRegistry.STAND_SUMMON.get(), 1f, 1f);
+            playBoundSound(JSoundRegistry.STAND_SUMMON.get(), 1f, 1f);
         }
     }
 
@@ -1191,14 +1236,17 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     }
 
     @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
     public boolean hurt(@NonNull final DamageSource source, float amount) {
         if (user == null ||
                 source.getEntity() == user ||
                 user.isInvulnerableTo(source) ||
-                source.is(DamageTypes.FALLING_BLOCK) ||
-                source.is(DamageTypes.DROWN)) {
+                source.is(JTagRegistry.STAND_IMMUNE))
             return false;
-        }
 
         // Perfectly block projectiles
         if (blocking && (source.is(DamageTypes.MOB_PROJECTILE) || source.is(DamageTypes.ARROW))) {
@@ -1218,15 +1266,22 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     /**
      * Gets this StandEntity's instance of a specific move class.
+     * @param clazz the move class to check for
+     * @return the first encountered instance of a move of the specified move class (can be a subclass)
+     * or <code>null</code> if none can be found.
      */
-    public @Nullable <T extends AbstractMove<T, ?>> T getMove(Class<T> clazz) {
+    public @Nullable <T extends AbstractMove<T, ?>> T getMove(final @NonNull Class<? extends T> clazz) {
         for (var move : getMoveMap().asMovesList()) {
-            if (move.getClass().isAssignableFrom(clazz)) { // noinspection unchecked
-                return (T)move;
+            if (clazz.isAssignableFrom(move.getClass())) {
+                return clazz.cast(move);
             }
         }
-
         return null;
+    }
+
+    @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayerSquared) {
+        return false;
     }
 
     @Override
@@ -1261,6 +1316,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     public abstract @NonNull E getThis();
 
+    public @Nullable BoundSoundPlayer.EntitySoundHandle playBoundSound(SoundEvent sound, float volume, float pitch) {
+        return isSilent() ? null : BoundSoundPlayer.playSoundFrom(this, sound, getSoundSource(), volume, pitch);
+    }
+
     void randomlyDesireStandOff(int aiLevel, float baseChance, float subtraction, int maxAILevel,
                                 AttackerBrainInfo info, CombatEntityContext attackerCtx, AbstractMove<?, ?> selectedAttack) {
         if (info.getDesiredStandOffTime() > 0) {
@@ -1289,8 +1348,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         final CombatEntityContext attackerCtx = combatCtx.getAttackerCtx();
         final CombatEntityContext targetCtx = combatCtx.getTargetCtx();
 
-        Mob mob = (Mob) attackerCtx.entity(); // Guaranteed by contract
-        PathfinderMob pathfinder = (mob instanceof PathfinderMob pathfinderMob) ? pathfinderMob : null;
+        final Mob mob = (Mob) attackerCtx.entity(); // Guaranteed by contract
+        final PathfinderMob pathfinder = (mob instanceof PathfinderMob pathfinderMob) ? pathfinderMob : null;
         final LivingEntity target = targetCtx.entity();
         final LookControl lookControl = mob.getLookControl();
         final JumpControl jumpControl = mob.getJumpControl();
@@ -1302,6 +1361,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             case IDLE -> {}
             case APPROACH -> {
                 final PathNavigation navigation = mob.getNavigation();
+                if (!target.isAlive()) {
+                    navigation.stop();
+                    break;
+                }
                 navigation.moveTo(target, 1.0);
 
                 lookControl.setLookAt(target);
@@ -1315,6 +1378,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
             }
             case PRESSURE, COMBOING -> {
                 final PathNavigation navigation = mob.getNavigation();
+                if (!target.isAlive()) {
+                    navigation.stop();
+                    break;
+                }
                 Path path = navigation.createPath(target, 2);
                 if (path != null) navigation.moveTo(path, 1.0);
 
@@ -1408,23 +1475,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                 }
             }
             case COMBOED -> {
-                if (aiLevel <= IJAttackerBrain.BEGINNER_LEVEL) return;
-                final MobEffectInstance stun = combatCtx.getAttackerCtx().stun();
-                if (stun == null) return;
-
                 wantToBlock = true;
-
-                final boolean lowHP = user.getHealth() < user.getMaxHealth() / 2.0f || user.getHealth() < 5f;
-                final boolean enemyIsActing = targetCtx.standAttack() != null || targetCtx.specAttack() != null;
-
-                boolean burstCondition;
-                if (aiLevel >= IJAttackerBrain.COMPETITIVE_LEVEL) burstCondition = lowHP && enemyIsActing || random.nextFloat() < 0.02f;
-                else if (aiLevel >= IJAttackerBrain.INTERMEDIATE_LEVEL) burstCondition = lowHP || enemyIsActing || random.nextFloat() < 0.05f;
-                else burstCondition = random.nextFloat() < 0.1f;
-
-                if (burstCondition) {
-                    comboBreak((ServerLevel) level(), user, stun);
-                }
+                decideComboBreak(aiLevel, combatCtx);
             }
             default -> throw new IllegalStateException("Unexpected value: " + info.getState());
         }
@@ -1457,7 +1509,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return user;
     }
 
-    private boolean doAutoBlocking(Mob mob, int aiLevel, int reactionTime, CombatEntityContext enemyCtx, double distance) {
+    protected boolean doAutoBlocking(Mob mob, int aiLevel, int reactionTime, CombatEntityContext enemyCtx, double distance) {
         if (tsTime > 0) return false;
         boolean wantToBlock = this.wantToBlock;
         wantToBlock = this.doCombatBlocking(mob, reactionTime, enemyCtx, distance, wantToBlock);
@@ -1494,6 +1546,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         return wantToBlock;
+    }
+
+    public void playSummonAnimation() {
+        StandEntity.SUMMON_ANIMATION.sendForEntity(this);
     }
 
     public enum DesiredBlocking {
@@ -1614,37 +1670,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         return auraColors[getSkin()];
     }
 
-    // Animation code
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(getThis(), "controller", 0, this::predicate));
-    }
-
-    private PlayState predicate(AnimationState<E> state) {
-        AnimationController<E> controller = state.getController();
-
-        String summonAnimation = getSummonAnimation();
-        if (playSummonAnim && summonAnimation != null) {
-            return state.setAndContinue(RawAnimation.begin().thenPlay(summonAnimation));
-        }
-
-        if (isSameState()) {
-            controller.forceAnimationReset();
-        }
-
-        S superState = getState();
-        superState.playAnimation(getThis(), state);
-        superState.configureController(getThis(), controller);
-
-        return PlayState.CONTINUE;
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
-
     @Override
     public boolean isSilent() {
         // Make stands silent if their users are.
@@ -1697,19 +1722,20 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
                     hit = false;
                 }
             } else {
-                setStandGauge(getStandGauge() - damage * 2);
+                setStandGauge(getStandGauge() - damage * 3);
             }
         }
 
         if (hit) {
-            damageLogic(
-                    level(),
-                    user,
-                    new AttackData(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, moveUsage, canBackstab, unblockable)
-            );
+            AttackData attackData = new AttackData(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun,
+                    source, attacker, hitAnimation, moveUsage, canBackstab, unblockable);
+            onJCraftDamageReceived(attackData);
+            damageLogic(level(), user, attackData);
         }
         return false;
     }
+
+    protected void onJCraftDamageReceived(AttackData attackData) {}
 
     /**
      * Needed because the super constructor invokes some things that need this.
@@ -1741,9 +1767,6 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public boolean isBlocking() {
         return getState() == getBlockState();
     }
-
-    @Nullable
-    protected abstract String getSummonAnimation();
 
     /**
      * Gets called after damage calculation if the damaged entity was slain.

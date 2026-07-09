@@ -7,14 +7,17 @@ import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.effects.FlammableEffect;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.network.s2c.IPSTriggeredPacket;
 import net.arna.jcraft.common.util.IJCraftComboTracker;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.mixin_logic.LivingEntityMixinLogic;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -125,12 +128,23 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
         hitCount = 0;
     }
 
-    // Called serverside if the LivingEntity wasn't removed
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V", shift = At.Shift.AFTER))
     public void jcraft$tick(CallbackInfo callbackInfo) {
         LivingEntity living = LivingEntity.class.cast(this);
         if (hitCount > 0 && !living.hasEffect(JStatusRegistry.DAZED.get())) {
             ((IJCraftComboTracker) this).jcraft$resetCombo();
+        }
+
+        if (!living.level().isClientSide() && FlammableEffect.isFlammable(living)) {
+            if (living.isOnFire() && living.getRemainingFireTicks() <= 1) {
+                living.setRemainingFireTicks(20);
+            }
+
+            BlockPos pos = living.blockPosition();
+            if (living.level().getBlockState(pos).is(BlockTags.FIRE)
+                    || living.level().getBlockState(pos.below()).is(BlockTags.FIRE)) {
+                living.setSecondsOnFire(2);
+            }
         }
     }
 
@@ -166,21 +180,8 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
     // Counter hook - Living entity
     @Inject(cancellable = true, at = @At("HEAD"), method = "actuallyHurt")
     protected void jcraft$applyDamage(DamageSource source, float amount, CallbackInfo info) {
-        LivingEntity player = ((LivingEntity) (Object) this);
-
-        if (!(player.getFirstPassenger() instanceof StandEntity<?, ?> stand)) {
-            return;
-        }
-        AbstractMove<?, ?> attack = stand.getCurrentMove();
-        if (attack == null || !attack.isCounter() || stand.getMoveStun() >= (attack.getDuration() - attack.getWindup())) {
-            return;
-        }
-
-        //noinspection unchecked,rawtypes // Generic types can be annoying sometimes. This is fine.
-        ((AbstractCounterAttack) attack).counter(stand, source.getEntity(), source);
-//        stand.counter(source.getAttacker(), source); // Initiate counter
-        player.removeEffect(JStatusRegistry.DAZED.get());
-        info.cancel();
+        LivingEntity living = ((LivingEntity) (Object) this);
+        AbstractCounterAttack.handleCounter(living, source, amount, info);
     }
 
     // Living entities can't attack while stunned/enslaved/time erased thanks to this and an attack attribute nullifier
@@ -220,6 +221,29 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
         }
 
         if (JComponentPlatformUtils.getMiscData(livingEntity).getMaster() == entity) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(cancellable = true, method = "dropFromLootTable(Lnet/minecraft/world/damagesource/DamageSource;Z)V", at = @At("HEAD"))
+    protected void jcraft$dropFromLootTable(final DamageSource damageSource, final boolean hitByPlayer, final CallbackInfo ci) {
+        LivingEntity living = (LivingEntity) (Object) this;
+        if (JComponentPlatformUtils.getMiscData(living).getMaster() != null) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "canStandOnFluid(Lnet/minecraft/world/level/material/FluidState;)Z", at = @At("RETURN"), cancellable = true)
+    protected void jcraft$walkOnLiquid(final CallbackInfoReturnable<Boolean> cir) {
+        if (!cir.getReturnValueZ()) {
+            final LivingEntity living = (LivingEntity)(Object)this;
+            cir.setReturnValue(LivingEntityMixinLogic.canWalkOnLiquid(living.level(), living));
+        }
+    }
+
+    @Inject(method = "isAffectedByPotions()Z", at = @At("RETURN"), cancellable = true)
+    public void jcraft$dontApplyPotionsToTE(final CallbackInfoReturnable<Boolean> cir) {
+        if (cir.getReturnValue() && JUtils.inTimeErase((LivingEntity)(Object)this)) {
             cir.setReturnValue(false);
         }
     }

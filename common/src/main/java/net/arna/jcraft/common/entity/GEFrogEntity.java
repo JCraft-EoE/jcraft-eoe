@@ -3,7 +3,7 @@ package net.arna.jcraft.common.entity;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.MoveUsage;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
-import net.arna.jcraft.common.util.ICustomDamageHandler;
+import net.arna.jcraft.api.itfs.ICustomDamageHandler;
 import net.arna.jcraft.common.util.IOwnable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;

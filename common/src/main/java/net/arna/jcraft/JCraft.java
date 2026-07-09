@@ -1,9 +1,11 @@
 package net.arna.jcraft;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.brigadier.StringReader;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.registries.DeferredRegister;
+import dev.architectury.registry.registries.RegistrySupplier;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -12,9 +14,12 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import mod.azure.azurelib.animation.cache.AzIdentityRegistry;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.misc.ConditionalFlightHandler;
+import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
@@ -32,11 +37,16 @@ import net.arna.jcraft.common.network.RemoteStandInteractPacket;
 import net.arna.jcraft.common.network.c2s.*;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
+import net.arna.jcraft.common.spec.AnubisSpec;
+import net.arna.jcraft.common.spec.BrawlerSpec;
+import net.arna.jcraft.common.spec.HamonSpec;
+import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.tickable.JEnemies;
 import net.arna.jcraft.common.tickable.MoveTickQueue;
 import net.arna.jcraft.common.tickable.PastDimensions;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
+import net.arna.jcraft.common.villagertrades.VillagerTradesModifier;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
@@ -81,6 +91,9 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 import static net.arna.jcraft.api.component.world.CommonShockwaveHandlerComponent.Shockwave;
@@ -94,6 +107,7 @@ import static net.arna.jcraft.api.registry.JMoveActionTypeRegistry.MOVE_ACTION_T
 import static net.arna.jcraft.api.registry.JMoveConditionTypeRegistry.MOVE_CONDITION_TYPE_REGISTRY;
 import static net.arna.jcraft.api.registry.JMoveTypeRegistry.MOVE_TYPE_REGISTRY;
 import static net.arna.jcraft.api.registry.JSpecTypeRegistry.SPEC_TYPE_REGISTRY;
+import static net.arna.jcraft.api.registry.JSplatterTypeRegistry.SPLATTER_TYPE_REGISTRY;
 import static net.arna.jcraft.api.registry.JStandTypeRegistry.STAND_TYPE_REGISTRY;
 import static net.minecraft.world.level.GameRules.*;
 
@@ -107,6 +121,9 @@ public final class JCraft {
     public static final int QUEUE_MOVESTUN_LIMIT = 7; // exclusive, 6 -> 0.3s window for queueing moves
 
     public static final GravityChangerConfig gravityConfig = new GravityChangerConfig(); // TODO incorporate this into our own config
+
+    // List of spec classes that will be initialized to get their movesets.
+    public static final List<Class<?>> SPEC_CLASSES = ImmutableList.of(BrawlerSpec.class, HamonSpec.class, VampireSpec.class, AnubisSpec.class);
 
     //Obligatory lazy Registry
 
@@ -126,11 +143,17 @@ public final class JCraft {
     public static final GameRules.Key<BooleanValue> ALLOW_MOB_EVOLVED_STANDS = register("allowMobEvolvedStands", Category.MOBS, BooleanValue.create(false));
     public static final GameRules.Key<BooleanValue> STAND_GRIEFING = register("standGriefing", Category.MISC, BooleanValue.create(true));
     public static final GameRules.Key<BooleanValue> KEEP_STAND = register("keepStand", Category.MISC, BooleanValue.create(true));
+    public static final GameRules.Key<BooleanValue> DROP_STAND_AS_DISC = register("dropStandAsDisc", Category.MISC, BooleanValue.create(false));
     public static final GameRules.Key<BooleanValue> KEEP_SPEC = register("keepSpec", Category.MISC, BooleanValue.create(true));
     //public static GameRules.Key<GameRules.IntRule> DAMAGE_MULT = GameRuleRegistry.register("jcraftDamageMult", GameRules.Category.MISC, GameRuleFactory.createIntRule(0, 0, 100));
     public static final GameRules.Key<IntegerValue> STAND_ARROW_BASE_DAMAGE = register("standArrowBaseDamage", Category.MISC, IntegerValue.create(2));
 
     public static final GameRules.Key<BooleanValue> FALLING_METEORS = register("doFallingMeteors", Category.SPAWNING, BooleanValue.create(true));
+
+    /**
+     * String ID of the base controller.
+     */
+    public static final String BASE_CONTROLLER = "base_controller";
 
     // Dimensional travel bullshit
     /**
@@ -179,6 +202,8 @@ public final class JCraft {
         ITEM_REGISTRY.register();
         BLOCK_ENTITY_TYPE_REGISTRY.register();
 
+        JRecipeRegistry.register();
+
         // Custom registries
         STAND_TYPE_REGISTRY.register();
         SPEC_TYPE_REGISTRY.register();
@@ -187,6 +212,7 @@ public final class JCraft {
         MOVE_TYPE_REGISTRY.register();
         EXTRACTOR_REGISTRY.register();
         INJECTOR_REGISTRY.register();
+        SPLATTER_TYPE_REGISTRY.register();
 
         JTagRegistry.init();
         JAdvancementTriggerRegistry.init();
@@ -228,8 +254,10 @@ public final class JCraft {
         STATS.register();
 
         MoveTickQueue.registerMoveTickQueue();
-
         GravityChannel.registerReceivers();
+        JBlockBreaker.init();
+        VillagerTradesModifier.init();
+        ConditionalFlightHandler.init();
 
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);
@@ -241,11 +269,18 @@ public final class JCraft {
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
     }
 
+    private static void registerAzArmor() {
+        AzIdentityRegistry.register(JItemRegistry.STONE_MASK.get());
+        AzIdentityRegistry.register(JItemRegistry.RED_HAT.get());
+    }
+
     public static void postInit() {
         initBlockPostLoad();
         EvolutionItemHandler.init();
         initDispenserBehaviors();
         JStatRegistry.initFormatters();
+        registerAzArmor();
+        initMoveSets();
     }
 
     private static void initBlockPostLoad() {
@@ -262,6 +297,41 @@ public final class JCraft {
                 return knife;
             }
         });
+    }
+
+    private static void initMoveSets() {
+        // Movesets are defined in static fields in the stand/spec classes.
+        // These classes aren't loaded until the stand or spec is first used in-game.
+        // This is too late as we want the movesets to be instantiated before they're loaded,
+        // so the compatibility check happens during data load.
+
+        // To fix this, we'll be collecting all stand classes from JEntityTypeRegistry
+        // and instantiating them here, thus instantiating their movesets.
+
+        List<Class<?>> classes = new ArrayList<>();
+        for (Field field : JEntityTypeRegistry.class.getFields()) {
+            Type type = field.getGenericType();
+            // Check if the type of the field is RegistrySupplier<EntityType<? extends StandEntity<?, ?>>
+            if (type instanceof ParameterizedType regSupType
+                    && regSupType.getRawType() == RegistrySupplier.class
+                    && regSupType.getActualTypeArguments().length == 1
+                    && regSupType.getActualTypeArguments()[0] instanceof ParameterizedType entTypeType
+                    && entTypeType.getActualTypeArguments().length == 1
+                    && entTypeType.getActualTypeArguments()[0] instanceof Class<?> entityClass
+                    && StandEntity.class.isAssignableFrom(entityClass)) {
+                classes.add(entityClass);
+            }
+        }
+
+        classes.addAll(SPEC_CLASSES);
+
+        // Initialize classes
+        // This will initialize their static fields which will initialize all move sets.
+        for (Class<?> c : classes) {
+            try {
+                Class.forName(c.getName(), true, JCraft.class.getClassLoader());
+            } catch (ClassNotFoundException ignored) {}
+        }
     }
 
     public static void registerEntitySelectorOptions(EntitySelectorOptionsRegistrar registrar) {
@@ -459,6 +529,24 @@ public final class JCraft {
         buf.writeDouble(sparkSpeed);
 
         ServerChannelFeedbackPacket.send(JUtils.around(world, new Vec3(x, y, z), 128), buf);
+    }
+
+    public static void createHitscanTraceParticle(ServerLevel world, Vec3 start, Vec3 velocity, JParticleType type) {
+        if (world == null || type == null) {
+            return;
+        }
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+
+        buf.writeShort(14);
+        buf.writeDouble(start.x());
+        buf.writeDouble(start.y());
+        buf.writeDouble(start.z());
+        buf.writeDouble(velocity.x());
+        buf.writeDouble(velocity.y());
+        buf.writeDouble(velocity.z());
+        buf.writeEnum(type);
+
+        ServerChannelFeedbackPacket.send(JUtils.around(world, start, 128), buf);
     }
 
     public static void tryPushBlock(final ServerLevel world, final LivingEntity user, final @NonNull StandEntity<?, ?> stand) {

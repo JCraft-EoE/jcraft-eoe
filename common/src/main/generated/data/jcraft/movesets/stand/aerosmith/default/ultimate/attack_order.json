@@ -1,0 +1,17 @@
+{
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:aerosmith_attack_order_move",
+    "cooldown": 0,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.aerosmith.default.attack_order.description"
+      },
+      "name": {
+        "translate": "move.jcraft.aerosmith.default.attack_order.name"
+      }
+    },
+    "range": 0.0
+  }
+}

@@ -16,7 +16,7 @@ import java.util.Set;
 @RequiredArgsConstructor(staticName = "play")
 public class UserAnimationAction extends MoveAction<UserAnimationAction, IAttacker<?, ?>> {
     private final String animation;
-    private boolean force = false; // not final, but it is immutable.
+    private boolean force = false; // not final, but it is immutable. // why lol
 
     public UserAnimationAction force() {
         return new UserAnimationAction(animation, true);

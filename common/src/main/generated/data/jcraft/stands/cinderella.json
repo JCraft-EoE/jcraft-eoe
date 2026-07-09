@@ -1,0 +1,15 @@
+{
+  "idle_rotation": -45.0,
+  "info": {
+    "con_count": 0,
+    "free_space": {
+      "translate": "entity.jcraft.cinderella.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.cinderella"
+    },
+    "pro_count": 0,
+    "skin_names": []
+  },
+  "obtainable": false
+}

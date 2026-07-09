@@ -1,0 +1,124 @@
+{
+  "aerial_variant": {
+    "anim_state": "AXE_KICK",
+    "class": "HEAVY",
+    "cooldown_type": "HEAVY",
+    "move": {
+      "type": "jcraft:shared_simple_uppercut_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "CRUSH",
+        "hit_spark": "HIT_SPARK_2",
+        "static_height": true
+      },
+      "cooldown": 0,
+      "damage": 5.0,
+      "duration": 12,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.vampire.default.axe_kick.air.description"
+        },
+        "name": {
+          "translate": "move.jcraft.vampire.default.axe_kick.air.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.2,
+      "move_distance": 1.0,
+      "offset": 0.5,
+      "strength": -0.5,
+      "stun": 14,
+      "windup": 6
+    }
+  },
+  "anim_state": "ROUNDHOUSE",
+  "class": "HEAVY",
+  "cooldown_type": "HEAVY",
+  "crouching_variant": {
+    "anim_state": "SWEEP",
+    "class": "HEAVY",
+    "cooldown_type": "HEAVY",
+    "move": {
+      "type": "jcraft:shared_simple_uppercut_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "LOW",
+        "hit_spark": "HIT_SPARK_1",
+        "static_height": true
+      },
+      "cooldown": 0,
+      "damage": 5.0,
+      "duration": 12,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.vampire.default.sweep_kick.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.vampire.default.sweep_kick.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.2,
+      "move_distance": 1.0,
+      "offset": 0.5,
+      "strength": 0.5,
+      "stun": 12,
+      "windup": 6
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 10,
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_2",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 0,
+    "damage": 6.0,
+    "duration": 15,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:twkickhit"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.vampire.default.wheel_kick.description"
+      },
+      "name": {
+        "translate": "move.jcraft.vampire.default.wheel_kick.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 1.5,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 19,
+    "windup": 8
+  }
+}

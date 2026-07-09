@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:anvil",
+    "minecraft:netherite_block",
+    "jcraft:stellar_iron_block",
+    "jcraft:road_roller"
+  ]
+}

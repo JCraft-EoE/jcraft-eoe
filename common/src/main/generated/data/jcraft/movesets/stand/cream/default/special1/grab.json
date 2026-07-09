@@ -1,0 +1,76 @@
+{
+  "anim_state": "GRAB",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:shared_grab_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 7,
+      "blockable_type": "NON_BLOCKABLE",
+      "hit_spark": "HIT_SPARK_1",
+      "override_stun": true,
+      "stun_type": "UNBURSTABLE"
+    },
+    "cooldown": 280,
+    "damage": 3.0,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:creamgrab"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.cream.default.grab.description"
+      },
+      "name": {
+        "translate": "move.jcraft.cream.default.grab.name"
+      }
+    },
+    "grab_duration": 12,
+    "hit_move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 10,
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_2",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 0,
+      "damage": 6.0,
+      "duration": 20,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "name": {
+          "text": "Grab (Hit)"
+        }
+      },
+      "hitbox_size": 2.0,
+      "knockback": 1.5,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "stun": 5,
+      "windup": 13
+    },
+    "hit_state": "GRAB_HIT",
+    "hitbox_size": 1.5,
+    "knockback": 0.0,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 30,
+    "windup": 8
+  }
+}

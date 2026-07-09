@@ -38,11 +38,9 @@ public class ParticleManagerMixin {
     @Inject(method = "tickParticle", at = @At("HEAD"), cancellable = true)
     void jcraft$tickParticle(Particle particle, CallbackInfo info) {
         ParticleAccessor particleAccessor = (ParticleAccessor) particle;
-        if (
-                JClientUtils.isInTSRange(
-                        new Vec3(particleAccessor.getX(), particleAccessor.getY(), particleAccessor.getZ())
-                )
-        ) {
+
+        Vec3 particlePos = new Vec3(particleAccessor.getX(), particleAccessor.getY(), particleAccessor.getZ());
+        if (JClientUtils.isInTSRange(particlePos)) {
             particleAccessor.setPrevX(particleAccessor.getX());
             particleAccessor.setPrevY(particleAccessor.getY());
             particleAccessor.setPrevZ(particleAccessor.getZ());

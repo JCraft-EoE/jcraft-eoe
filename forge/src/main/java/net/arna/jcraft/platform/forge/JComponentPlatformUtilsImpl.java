@@ -12,7 +12,7 @@ import net.arna.jcraft.forge.capability.impl.entity.GravityCapability;
 import net.arna.jcraft.forge.capability.impl.entity.TimeStopCapability;
 import net.arna.jcraft.forge.capability.impl.living.*;
 import net.arna.jcraft.forge.capability.impl.player.PhCapability;
-import net.arna.jcraft.forge.capability.impl.player.SpecCapability;
+import net.arna.jcraft.forge.capability.impl.living.SpecCapability;
 import net.arna.jcraft.forge.capability.impl.world.ShockwaveHandlerCapability;
 import net.arna.jcraft.forge.capability.impl.world.TexasHoldEmCapability;
 import net.minecraft.world.entity.Entity;
@@ -80,6 +80,10 @@ public class JComponentPlatformUtilsImpl {
 
     public static CommonTexasHoldEmComponent getTexasHoldEmHandler(Level world) {
         return TexasHoldEmCapability.getCapability(world);
+    }
+
+    public static CommonHamonComponent getHamon(LivingEntity living) {
+        return HamonCapability.getCapability(living);
     }
 
     public static CommonVampireComponent getVampirism(LivingEntity living) {

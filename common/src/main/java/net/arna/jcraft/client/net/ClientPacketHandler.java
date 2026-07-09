@@ -12,6 +12,9 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.api.splatter.Splatter;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
@@ -21,18 +24,16 @@ import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
 import net.arna.jcraft.client.rendering.handler.CrimsonShaderHandler;
+import net.arna.jcraft.client.rendering.handler.MandomRewindShaderHandler;
 import net.arna.jcraft.client.rendering.handler.ZaWarudoShaderHandler;
+import net.arna.jcraft.client.sound.BoundSoundClient;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.common.config.ConfigOption;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
-import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
-import net.arna.jcraft.common.item.StoneMaskItem;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
-import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.common.splatter.Splatter;
 import net.arna.jcraft.common.util.*;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -56,7 +57,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -89,9 +92,18 @@ public class ClientPacketHandler {
         register(S2C_MAGNETIC_FIELD_PARTICLE, ClientPacketHandler::handleMagneticFieldParticle);
         register(S2C_ATTACKER_DATA, ClientPacketHandler::handleAttackerData);
         register(S2C_MANDOM_DATA, ClientPacketHandler::handleMandomData);
-        register(S2C_STONE_MASK_CLENCH, ClientPacketHandler::handleStoneMaskClench);
         register(S2C_IPS_TRIGGERED, ClientPacketHandler::handleIPSTriggered);
         register(S2C_DAMAGE_NUMBER, ClientPacketHandler::handleDamageNumber);
+        register(S2C_BLOCK_BREAKAGE, ClientPacketHandler::handleBlockBreakage);
+        register(S2C_BOUND_SOUND, ClientPacketHandler::handleBoundSound);
+    }
+
+    private static void handleBoundSound(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
+        BoundSoundClient.onBoundSoundPacket(client, buf);
+    }
+
+    private static void handleBlockBreakage(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
+        BlockBreakerClient.onBreakagePacket(buf);
     }
 
     private static void handleDamageNumber(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
@@ -109,16 +121,6 @@ public class ClientPacketHandler {
 
     private static void handleIPSTriggered(final @NonNull Minecraft client, FriendlyByteBuf buf) {
         JCraftClient.markIPSTriggered();
-    }
-
-    private static void handleStoneMaskClench(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
-        if (client.level == null) {
-            return;
-        }
-
-        Entity entity = client.level.getEntity(buf.readVarInt());
-        if (entity instanceof LivingEntity livingEntity)
-            StoneMaskItem.clench(livingEntity);
     }
 
     private static void handleAttackerData(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
@@ -139,9 +141,14 @@ public class ClientPacketHandler {
         );
 
         client.execute(() -> {
+            if (client.level == null) return;
+
             for (int i = 0; i < NUM_MAGNETIC_CIRCLES; i++) {
                 final double phi = i * Math.PI * 2 / NUM_MAGNETIC_CIRCLES;
-                final Vec3 direction = new Vec3(Math.cos(phi), 0, Math.sin(phi));
+                Vec3 direction = new Vec3(Math.cos(phi), 0, Math.sin(phi));
+
+                if (strength < 0) // exploding
+                    direction = direction.add(JUtils.randUnitVec(client.level.random));
 
                 final Vec3 basePos = pos.add(direction.scale(strength / 2.0));
 
@@ -481,12 +488,29 @@ public class ClientPacketHandler {
                     }
                 });
             }
+
+            // hitscan trace particle
+            case (14) -> {
+                final double x = buf.readDouble();
+                final double y = buf.readDouble();
+                final double z = buf.readDouble();
+                final double velX = buf.readDouble();
+                final double velY = buf.readDouble();
+                final double velZ = buf.readDouble();
+                final JParticleType particleType = buf.readEnum(JParticleType.class);
+
+                client.execute(() -> client.level.addParticle(particleType.getParticleType(), true, x, y, z,
+                        velX, velY, velZ));
+            }
         }
     }
 
     public static void handleMandomData(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
         final int entID = buf.readInt();
         final Vec3 originalPos = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+        final float r = buf.readFloat();
+        final float g = buf.readFloat();
+        final float b = buf.readFloat();
 
         client.execute(() -> {
             final Entity ent = client.level.getEntity(entID);
@@ -497,7 +521,7 @@ public class ClientPacketHandler {
             final Vec3 originalToCurrent = currentPos.subtract(originalPos).normalize();
             for (double h = 0; h < currentPos.distanceTo(originalPos); ++h) {
                 client.level.addParticle(
-                        new DustParticleOptions(new Vector3f(1.0f, 0.2f, 0.6f), 1.0f), // Pink color
+                        new DustParticleOptions(new Vector3f(r, g, b), 1.0f),
                         originalPos.x + originalToCurrent.x * h,
                         originalPos.y + originalToCurrent.y * h,
                         originalPos.z + originalToCurrent.z * h,
@@ -544,6 +568,17 @@ public class ClientPacketHandler {
 
 
             });
+            case MANDOM_REWIND -> {
+                final float r = buf.readFloat();
+                final float g = buf.readFloat();
+                final float b = buf.readFloat();
+                client.execute(() -> {
+                    MandomRewindShaderHandler mandomHandler = MandomRewindShaderHandler.INSTANCE;
+                    mandomHandler.duration = duration;
+                    mandomHandler.shaderColor = new Vector3f(r, g, b);
+                    mandomHandler.shouldRender = true;
+                });
+            }
         }
     }
 
@@ -574,19 +609,19 @@ public class ClientPacketHandler {
 
     public static void handleTimeAccelState(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
         final TimeAccelStatePacket.State state = buf.readEnum(TimeAccelStatePacket.State.class);
-        final Entity e = client.level == null ? null : client.level.getEntity(buf.readVarInt());
+        final int entityId = buf.readVarInt();
 
-        if (!(e instanceof final MadeInHeavenEntity mih) || !mih.isAlive()) {
-            return;
-        }
+//        if (!(e instanceof final MadeInHeavenEntity mih) || !mih.isAlive()) {
+//            return;
+//        }
 
         switch (state) {
             case START -> {
                 final int duration = buf.readVarInt();
                 final long startTime = buf.readLong();
-                TimeAccelStatePacket.addAcceleration(mih.getId(), (int) (duration - (System.currentTimeMillis() - startTime) / 50), startTime);
+                TimeAccelStatePacket.addAcceleration(entityId, (int) (duration - (System.currentTimeMillis() - startTime) / 50), startTime);
             }
-            case STOP -> TimeAccelStatePacket.removeAcceleration(mih.getId());
+            case STOP -> TimeAccelStatePacket.removeAcceleration(entityId);
         }
     }
 
@@ -618,7 +653,7 @@ public class ClientPacketHandler {
         final boolean editable = buf.readBoolean();
         final boolean show = buf.readBoolean();
 
-        ConfigOption.readOptions(buf);
+        JServerConfig.readOptions(buf);
 
         if (show) {
             client.execute(() -> ServerConfigUI.show(editable));
@@ -658,7 +693,7 @@ public class ClientPacketHandler {
 
         final Splatter splatter = JUtils.getSplatterManager(world).readSplatter(buf);
 
-        long ageMs = splatter.getType().getMaxAge() * 50L;
+        long ageMs = splatter.getMaxAge() * 50L;
         AttackHitboxEffectRenderer.addHitbox(splatter.getMainBox(), ageMs, true);
         splatter.getSections().stream()
                 .filter(section -> !section.isRemoved())

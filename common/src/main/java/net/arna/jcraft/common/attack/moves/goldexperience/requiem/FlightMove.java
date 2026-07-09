@@ -56,11 +56,7 @@ public final class FlightMove extends AbstractMove<FlightMove, GEREntity> {
         int flightTime = attacker.getFlightTime();
         flightTime -= 1;
         attacker.setFlightTime(flightTime);
-        if (user instanceof Player playerEntity) {
-            if (!playerEntity.isCreative() && !playerEntity.isSpectator()) {
-                playerEntity.getAbilities().flying = (flightTime > 1);
-            }
-        } else if (flightTime > 1) {
+        if (!(user instanceof Player) && flightTime > 1) {
             double y = user.getY();
             Vec3 vel = new Vec3(user.getDeltaMovement().x, 0.0, user.getDeltaMovement().z);
             // Targetting priority

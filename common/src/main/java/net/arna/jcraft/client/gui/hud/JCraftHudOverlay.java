@@ -2,12 +2,11 @@ package net.arna.jcraft.client.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.entity.stand.MadeInHeavenEntity;
-import net.arna.jcraft.common.entity.stand.MetallicaEntity;
+import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.entity.stand.TheSunEntity;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.common.spec.HamonSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.fabricmc.api.EnvType;
@@ -39,7 +38,10 @@ public class JCraftHudOverlay {
             SUN_SIZE_GAUGE = new Gauge(1.0f, 0.7f, 0.4f, 30),
             TIME_ACCEL_GAUGE = new Gauge(1.0f, 0.8f, 0.0f, MadeInHeavenEntity.MAXIMUM_SPEEDOMETER),
             BLOODLUST_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, 5),
-            IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX);
+            HAMON_GAUGE = new Gauge(0.8f, 0.5f, 0.2f, (int) HamonSpec.MAX_CHARGE),
+            IRON_GAUGE = new Gauge(0.7f, 0.7f, 0.9f, (int) MetallicaEntity.IRON_MAX),
+            OVERHEAT_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, (int) AerosmithEntity.OVERHEAT_MAX),
+            PH_OBEDIENCE_GAUGE = new Gauge(0.8f, 0.3f, 0.9f, PurpleHazeEntity.MAX_OBEDIENCE);
 
     public static void render(final GuiGraphics ctx) {
         final Minecraft client = Minecraft.getInstance();
@@ -98,14 +100,29 @@ public class JCraftHudOverlay {
             if (stand instanceof MetallicaEntity metallica) {
                 IRON_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) metallica.getIron());
             }
+            if (stand instanceof AerosmithEntity aerosmith) {
+                OVERHEAT_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, (int) aerosmith.getOverheat());
+            }
+            if (stand instanceof PurpleHazeEntity purpleHaze) {
+                PH_OBEDIENCE_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, purpleHaze.getObedience());
+            }
         }
 
+        // don't display spec gauges in spectator
+        if (player == null || player.isSpectator()) {
+            return;
+        }
         final JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec instanceof AnubisSpec) {
             final int displayBloodlust = (int) ((JComponentPlatformUtils.getMiscData(player).getAttackSpeedMult() - 1.0f) * 5);
             if (displayBloodlust > 0) {
                 BLOODLUST_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, displayBloodlust);
             }
+        } else if (spec instanceof HamonSpec) {
+            final var hamon = JComponentPlatformUtils.getHamon(player);
+            final int charge = (int) hamon.getHamonCharge();
+            final Vector3f color = hamon.isHamonizeReady() ? new Vector3f(1.0f, 1.0f, 0.6f) : HAMON_GAUGE.colorCopy();
+            HAMON_GAUGE.render(ctx, color.x, color.y, color.z, gaugeX, height + gaugeHeightOffset, charge);
         }
     }
 
@@ -126,6 +143,10 @@ public class JCraftHudOverlay {
             ctx.blit(FULL_GAUGE, x, y, 0, 0, value * gaugeWidth / max, 5, gaugeWidth, 5);
             gaugeHeightOffset -= 6;
             RenderSystem.setShaderColor(1, 1, 1, 1f);
+        }
+
+        public Vector3f colorCopy() {
+            return new Vector3f(red, green, blue);
         }
     }
 }

@@ -1,0 +1,84 @@
+{
+  "anim_state": "UNSHEATHING_ATTACK",
+  "class": "SPECIAL1",
+  "cooldown_type": "SPECIAL1",
+  "crouching_variant": {
+    "anim_state": "UNSHEATHING_SWEEP",
+    "class": "SPECIAL1",
+    "cooldown_type": "SPECIAL1",
+    "move": {
+      "type": "jcraft:anubis_simple_anubis_multi_hit_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 7,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 5,
+      "damage": 3.0,
+      "duration": 16,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact3"
+          }
+        ],
+        "armor": 1,
+        "description": {
+          "translate": "move.jcraft.anubis.default.unsheathing_sweep.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.anubis.default.unsheathing_sweep.cr.name"
+        }
+      },
+      "hit_moments": [
+        6,
+        10
+      ],
+      "hitbox_size": 1.25,
+      "knockback": 0.3,
+      "move_distance": 1.0,
+      "offset": 0.3,
+      "stun": 10,
+      "unsheathe_sweep": true
+    }
+  },
+  "move": {
+    "type": "jcraft:anubis_unsheathing_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "hit_animation": "MID",
+      "hit_spark": "SWEEP_ATTACK"
+    },
+    "cooldown": 5,
+    "damage": 5.0,
+    "duration": 12,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "minecraft:entity.player.attack.sweep"
+        }
+      ],
+      "armor": 1,
+      "description": {
+        "translate": "move.jcraft.anubis.default.unsheathing_attack.description"
+      },
+      "name": {
+        "translate": "move.jcraft.anubis.default.unsheathing_attack.name"
+      }
+    },
+    "hitbox_size": 1.75,
+    "knockback": 0.5,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 13,
+    "windup": 6
+  }
+}

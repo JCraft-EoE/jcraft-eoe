@@ -60,4 +60,7 @@ public interface Identifiers {
 
     // Vampires
     ResourceLocation BLOOD_GAUGE = JCraft.id("blood_gauge");
+
+    // Hamon Users
+    ResourceLocation HAMON_CHARGE = JCraft.id("hamon_charge");
 }

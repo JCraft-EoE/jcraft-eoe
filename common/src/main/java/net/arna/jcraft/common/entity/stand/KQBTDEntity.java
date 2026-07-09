@@ -2,9 +2,11 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.util.RenderUtils;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import mod.azure.azurelib.util.client.RenderUtils;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
@@ -21,10 +23,11 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.common.attack.moves.killerqueen.KQTossMove;
 import net.arna.jcraft.common.attack.moves.killerqueen.bitesthedust.*;
-import net.arna.jcraft.common.attack.moves.mandom.CountdownMove;
 import net.arna.jcraft.common.attack.moves.shared.GrabAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -32,13 +35,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Bites_the_Dust">Killer Queen Bites The Dust</a>.
  * @see JStandTypeRegistry#KILLER_QUEEN_BITES_THE_DUST
- * @see net.arna.jcraft.client.model.entity.stand.KQBTDModel KQBTDModel
  * @see net.arna.jcraft.client.renderer.entity.stands.KQBTDRenderer KQBTDRenderer
  * @see BTDDetonateAttack
  * @see BTDGrabHitAttack
@@ -49,7 +50,7 @@ import java.util.function.Supplier;
  */
 public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQBTDEntity.State> {
     public static final MoveSet<KQBTDEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.KILLER_QUEEN_BITES_THE_DUST,
-            KQBTDEntity::registerMoves, State.class);
+            KQBTDEntity::registerMoves, KQBTDEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-30f)
             .evolution(true)
@@ -68,14 +69,11 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     .skinName(Component.literal("Back from the Dead"))
                     .skinName(Component.literal("Garf"))
                     .build())
-            .summonData(SummonData.builder()
-                    .sound(JSoundRegistry.KQBTD_SUMMON)
-                    .playGenericSound(true)
-                    .build())
+            .summonData(SummonData.of(JSoundRegistry.KQBTD_SUMMON))
             .build();
     public static final Supplier<IPoseModifier> POSE = AbstractKillerQueenEntity.POSE;
 
-    public static final ElbowAttack ELBOW = new ElbowAttack(0, 5, 9, 0.75f,
+    public static final ElbowAttack<KQBTDEntity> ELBOW = new ElbowAttack<KQBTDEntity>(0, 5, 9, 0.75f,
             7.5f, 10, 1f, 1.1f, 0f)
             .withSound(JSoundRegistry.KQBTD_ELBOW)
             .withImpactSound(JSoundRegistry.IMPACT_4)
@@ -90,20 +88,20 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("Stray Cat Counter"),
                     Component.literal("0.25s windup counter, turns opponent into your primary bomb")
             );
-    public static final BubbleAttack BUBBLE = new BubbleAttack(60, 15, 18, 0.75f)
+    public static final BubbleAttack<KQBTDEntity> BUBBLE = new BubbleAttack<KQBTDEntity>(120, 15, 18, 0.75f)
             .withCrouchingVariant(BUBBLE_COUNTER)
-            .withSound(JSoundRegistry.KQ_UPPERCUT)
+            .withSound(JSoundRegistry.KQBTD_BUBBLE)
             .withInfo(
                     Component.literal("Stray Cat Bubble"),
                     Component.literal("launches an explosive bubble guided by your view rotation")
             );
-    public static final BTDDetonateAttack BTD_DETONATE = new BTDDetonateAttack(20, 5, 6, 0.75f, 200)
+    public static final BTDDetonateAttack<KQBTDEntity> BTD_DETONATE = new BTDDetonateAttack<KQBTDEntity>(20, 5, 6, 0.75f, 200)
             .withSound(JSoundRegistry.KQ_DETONATE)
             .withInfo(
                     Component.literal("Detonate"),
                     Component.empty()
             );
-    public static final BTDPlantAttack BTD_PLANT = new BTDPlantAttack(800,
+    public static final BTDPlantAttack<KQBTDEntity> BTD_PLANT = new BTDPlantAttack<KQBTDEntity>(800,
             14, 24, 1f, 10, 1.5f, 0f, BTDPlantAttack.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withBlockStun(8)
@@ -111,8 +109,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("Bites the Dust Plant"),
                     Component.literal("press the same button to detonate, sending the affected enemy back to their previous location")
             );
-    public static final BTDGrabHitAttack GRAB_HIT = new BTDGrabHitAttack(0, 42, 0.75f,
-            5f, 15, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
+    public static final BTDGrabHitAttack<KQBTDEntity> GRAB_HIT = new BTDGrabHitAttack<KQBTDEntity>(0, 42, 0.75f,
+            3f, 15, 2f, 0f, 0.5f, IntSet.of(8, 22, 32))
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(
@@ -126,6 +124,12 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
                     Component.literal("Takedown"),
                     Component.literal("high damage grab")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final KQTossMove<KQBTDEntity> TOSS = new KQTossMove<KQBTDEntity>(0, 1, 1, 0.75f)
+            .withAnim(KQBTDEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<KQBTDEntity> TOSS_CHARGE = new TossChargeMove<KQBTDEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     // Light chain implementation
     public static final SimpleAttack<AbstractKillerQueenEntity<?, ?>> LOW = AbstractKillerQueenEntity.LOW.copy().withAnim(State.LOW);
@@ -170,6 +174,8 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
         moves.register(MoveClass.SPECIAL2, BUBBLE, State.BUBBLE).withCrouchingVariant(State.BUBBLE_COUNTER);
         moves.register(MoveClass.SPECIAL3, GRAB, State.GRAB);
         moves.register(MoveClass.ULTIMATE, BTD_PLANT, State.BTD_PLANT);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -194,42 +200,39 @@ public final class KQBTDEntity extends AbstractKillerQueenEntity<KQBTDEntity, KQ
 
     // Animations
     public enum State implements StandAnimationState<KQBTDEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kqbtd.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kqbtd.block"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.heavy"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kqbtd.barrage"))),
-        DETONATE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.detonate"))),
-        BOMB_PLANT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.bombplant"))),
-        BUBBLE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.bubble"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.light_followup"))),
-        LOW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.low"))),
-        BUBBLE_COUNTER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.bubblecounter"))),
-        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.counter_miss"))),
-        BTD_PLANT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.btdplant"))),
-        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.grab"))),
-        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kqbtd.grab_hit")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.kqbtd.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.kqbtd.block", AzPlayBehaviors.LOOP)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.barrage", AzPlayBehaviors.LOOP)),
+        DETONATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.detonate", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BOMB_PLANT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.bombplant", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BUBBLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.bubble", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LOW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.low", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BUBBLE_COUNTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.bubblecounter", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        COUNTER_MISS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.counter_miss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BTD_PLANT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.btdplant", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kqbtd.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
-        private final Consumer<AnimationState<KQBTDEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<KQBTDEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(KQBTDEntity attacker, AnimationState<KQBTDEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(KQBTDEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @NonNull String getSummonAnimation() {
-        return "animation.kqbtd.summon";
     }
 
     @Override

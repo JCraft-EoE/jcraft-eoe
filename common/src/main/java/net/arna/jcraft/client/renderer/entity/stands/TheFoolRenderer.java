@@ -1,26 +1,30 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import mod.azure.azurelib.cache.object.BakedGeoModel;
-import net.arna.jcraft.client.model.entity.stand.TheFoolModel;
+import lombok.NonNull;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.common.entity.stand.TheFoolEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-/**
- * The {@link StandEntityRenderer} for {@link TheFoolEntity}.
- * @see TheFoolModel
- */
 public class TheFoolRenderer extends StandEntityRenderer<TheFoolEntity> {
-    public TheFoolRenderer(final EntityRendererProvider.Context context) {
-        super(context, new TheFoolModel());
+    public static final ResourceLocation MODEL = JCraft.id("geo/the_fool.geo.json");
+    public static final ResourceLocation SAND_TEXTURE = JCraft.id("textures/entity/stands/the_fool/sand.png");
+
+    public TheFoolRenderer(@NotNull EntityRendererProvider.Context context) {
+        super(context, b -> b.setRenderType(TheFoolRenderer::renderType),
+                entity -> MODEL, TheFoolRenderer::getTexture, JStandTypeRegistry.THE_FOOL.get(),
+                false, false,0.7854f, -0.349f, 30f);
     }
 
-    @Override
-    public void actuallyRender(final PoseStack poseStack, final TheFoolEntity animatable, final BakedGeoModel model, final RenderType renderType, final MultiBufferSource bufferSource, final VertexConsumer buffer, final boolean isReRender, final float partialTick, final int packedLight, final int packedOverlay, final float red, final float green, final float blue, final float alpha) {
-        final float a = StandEntityRenderer.getAlpha(animatable, partialTick);
-        super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, a);
+    private static @NotNull RenderType renderType(final @NonNull TheFoolEntity fool) {
+        return renderTypeOf(fool, getTexture(fool));
+    }
+
+    private static ResourceLocation getTexture(TheFoolEntity fool) {
+        return fool.isSand() ? SAND_TEXTURE : TEXTURE_MAP.computeIfAbsent(new TypeSkin(fool.getStandType(), fool.getSkin()),
+                StandEntityRenderer::typeSkinToTexture);
     }
 }

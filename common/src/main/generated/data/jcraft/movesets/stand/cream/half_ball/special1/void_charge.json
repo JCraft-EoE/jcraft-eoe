@@ -1,0 +1,28 @@
+{
+  "anim_state": "BALL_CONSUME",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:cream_ball_charge_attack",
+    "cooldown": 200,
+    "downward": false,
+    "duration": 28,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:creamballdash"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.cream.half_ball.void_charge.description"
+      },
+      "name": {
+        "translate": "move.jcraft.cream.half_ball.void_charge.name"
+      }
+    },
+    "move_distance": 1.0,
+    "windup": 13
+  }
+}

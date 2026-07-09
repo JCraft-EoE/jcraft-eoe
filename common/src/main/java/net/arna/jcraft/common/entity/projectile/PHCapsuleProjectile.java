@@ -1,10 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.entity.PurpleHazeCloudEntity;
 import net.arna.jcraft.common.entity.stand.AbstractPurpleHazeEntity;
@@ -17,7 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
-public class PHCapsuleProjectile extends AbstractArrow implements GeoAnimatable {
+public class PHCapsuleProjectile extends AbstractArrow {
     private final AbstractPurpleHazeEntity.PoisonType poisonType;
 
     public PHCapsuleProjectile(Level world) {
@@ -54,23 +50,11 @@ public class PHCapsuleProjectile extends AbstractArrow implements GeoAnimatable 
 
         final PurpleHazeCloudEntity cloud = new PurpleHazeCloudEntity(level(), 2.0f, poisonType);
         cloud.copyPosition(this);
+        if (getOwner() instanceof LivingEntity owner) {
+            cloud.setOwner(owner);
+        }
         level().addFreshEntity(cloud);
         discard();
     }
 
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {}
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
-
-    @Override
-    public double getTick(Object object) {
-        return 0;
-    }
 }

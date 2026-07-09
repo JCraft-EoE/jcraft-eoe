@@ -95,10 +95,28 @@ public class MoveSetManager {
      * @return The created move set.
      * @param <A> The type of the attacker.
      * @param <S> The type of the state enum.
+     * @deprecated Use {@link #create(RegistrySupplier, Consumer, Class, Class)} instead
+     */
+    @Deprecated
+    public static <A extends IAttacker<? extends A, S>, S extends Enum<S>> MoveSet<A, S> create(
+            final RegistrySupplier<? extends IAttackerType> type, final Consumer<MoveMap<A, S>> register, final Class<S> stateClass) {
+        return create(type, "default", register, stateClass);
+    }
+
+    /**
+     * Create a new move set for the given attacker type with the name "default".
+     * @param type The attacker type to create the move set for.
+     * @param register The consumer to register moves with.
+     * @param attackerClass The class of the attacker type.
+     * @param stateClass The class of the state enum for the attacker type.
+     * @return The created move set.
+     * @param <A> The type of the attacker.
+     * @param <S> The type of the state enum.
      */
     public static <A extends IAttacker<? extends A, S>, S extends Enum<S>> MoveSet<A, S> create(
-            RegistrySupplier<? extends IAttackerType> type, Consumer<MoveMap<A, S>> register, Class<S> stateClass) {
-        return create(type, "default", register, stateClass);
+            final RegistrySupplier<? extends IAttackerType> type, final Consumer<MoveMap<A, S>> register,
+            final Class<A> attackerClass, final Class<S> stateClass) {
+        return create(type, "default", register, attackerClass, stateClass);
     }
 
     /**
@@ -109,14 +127,33 @@ public class MoveSetManager {
      * @return The created move set.
      * @param <A> The type of the attacker.
      * @param <S> The type of the state enum.
+     * @deprecated Use {@link #create(RegistrySupplier, String, Consumer, Class, Class)} instead
+     */
+    @Deprecated
+    public static <A extends IAttacker<? extends A, S>, S extends Enum<S>> MoveSet<A, S> create(
+            final RegistrySupplier<? extends IAttackerType> type, final String name, final Consumer<MoveMap<A, S>> register,
+            final Class<S> stateClass) {
+        return create(type, name, register, null, stateClass);
+    }
+
+    /**
+     * Create a new move set for the given attacker type with the given name.
+     * @param type The attacker type to create the move set for.
+     * @param register The consumer to register moves with.
+     * @param attackerClass The class of the attacker type.
+     * @param stateClass The class of the state enum for the attacker type.
+     * @return The created move set.
+     * @param <A> The type of the attacker.
+     * @param <S> The type of the state enum.
      */
     public static <A extends IAttacker<? extends A, S>, S extends Enum<S>> MoveSet<A, S> create(
-            final RegistrySupplier<? extends IAttackerType> type, final String name, final Consumer<MoveMap<A, S>> register, final Class<S> stateClass) {
+            final RegistrySupplier<? extends IAttackerType> type, final String name, final Consumer<MoveMap<A, S>> register,
+            final Class<A> attackerClass, final Class<S> stateClass) {
         if (MOVE_SETS.getOrDefault(type.getId(), Collections.emptyMap()).containsKey(name)) {
             throw new IllegalArgumentException("Move set " + name + " for type " + type.getId() + "already exists");
         }
 
-        MoveSet<A, S> moveSet = new MoveSetImpl<>(type, name, register, stateClass);
+        MoveSet<A, S> moveSet = new MoveSetImpl<>(type, name, register, attackerClass, stateClass);
         MOVE_SETS.computeIfAbsent(type.getId(), k -> new HashMap<>()).put(name, moveSet);
 
         // Attempt to load the move set data if there's any pending data for this type and name.

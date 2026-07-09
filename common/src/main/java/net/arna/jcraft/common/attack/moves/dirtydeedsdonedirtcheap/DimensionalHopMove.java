@@ -6,10 +6,10 @@ import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.registry.JTagRegistry;
-import net.arna.jcraft.common.entity.stand.D4CEntity;
 import net.arna.jcraft.common.tickable.PastDimensions;
 import net.arna.jcraft.mixin.ChunkLightProviderAccessor;
 import net.arna.jcraft.mixin.LightStorageAccessor;
@@ -39,7 +39,7 @@ import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public final class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHopMove, D4CEntity> {
+public final class DimensionalHopMove<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<DimensionalHopMove<A>, A> {
 
     @Getter
     private final int dimensionalHopDuration;
@@ -55,33 +55,34 @@ public final class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHo
     }
 
     @Override
-    public @NotNull MoveType<DimensionalHopMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<DimensionalHopMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public boolean conditionsMet(D4CEntity attacker) {
-        return super.conditionsMet(attacker) || attacker.level().dimension().equals(JDimensionRegistry.AU_DIMENSION_KEY);
+    public boolean conditionsMet(A attacker) {
+        return super.conditionsMet(attacker) || attacker.getEntityWorld().dimension().equals(JDimensionRegistry.AU_DIMENSION_KEY);
     }
 
     @Override
-    public void onInitiate(final D4CEntity attacker) {
+    public void onInitiate(final A attacker) {
         super.onInitiate(attacker);
 
-        if (attacker.level() != JCraft.auWorld) {
-            JCraft.auWorld.getChunkSource().addRegionTicket(TicketType.PORTAL, attacker.chunkPosition(), -5, attacker.blockPosition());
+        final LivingEntity baseEntity = attacker.getBaseEntity();
+        if (baseEntity.level() != JCraft.auWorld) {
+            JCraft.auWorld.getChunkSource().addRegionTicket(TicketType.PORTAL, baseEntity.chunkPosition(), -5, baseEntity.blockPosition());
             JCraft.preloadLockTicks = getWindup();
         }
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final D4CEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Set<LivingEntity> targets = super.perform(attacker, user);
         if (dimensionalHopDuration == 0) {
             return targets;
         }
 
-        final ServerLevel world = (ServerLevel) attacker.level();
+        final ServerLevel world = (ServerLevel) attacker.getEntityWorld();
 
         if (world.dimension().equals(JDimensionRegistry.AU_DIMENSION_KEY)) {
             // Logic for cancelling dimhop early, and generating failsafe data
@@ -101,7 +102,8 @@ public final class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHo
             throw new IllegalStateException("Alternate Universe could not be found.");
         }
 
-        fixLightInAU(attacker, world, JCraft.auWorld);
+        final LivingEntity baseEntity = attacker.getBaseEntity();
+        fixLightInAU(baseEntity, world, JCraft.auWorld);
 
         Set<LivingEntity> toHop = new HashSet<>(targets);
         toHop.add(user);
@@ -117,7 +119,7 @@ public final class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHo
 
     //todo: fix fixLightInAU() crashing the server repeatedly (its currently not called)
     @SuppressWarnings("DataFlowIssue") // There is no issue
-    private static void fixLightInAU(final D4CEntity attacker, final ServerLevel world, final ServerLevel auWorld) {
+    private static void fixLightInAU(final LivingEntity attacker, final ServerLevel world, final ServerLevel auWorld) {
         ChunkPos origin = attacker.chunkPosition();
 
         // Lighting providers are too complicated, man. Wth
@@ -247,23 +249,26 @@ public final class DimensionalHopMove extends AbstractSimpleAttack<DimensionalHo
     }
 
     @Override
-    protected @NonNull DimensionalHopMove getThis() {
+    protected @NonNull DimensionalHopMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull DimensionalHopMove copy() {
-        return copyExtras(new DimensionalHopMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull DimensionalHopMove<A> copy() {
+        return copyExtras(new DimensionalHopMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset(), getDimensionalHopDuration()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<DimensionalHopMove> {
+    public static class Type extends AbstractSimpleAttack.Type<DimensionalHopMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<DimensionalHopMove>, DimensionalHopMove> buildCodec(RecordCodecBuilder.Instance<DimensionalHopMove> instance) {
-            return instance.group(cooldown(), windup(), duration(), moveDistance(), damage(),
-                    stun(), hitboxSize(), knockback(), offset(), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("dimensionalHopDuration").forGetter(DimensionalHopMove::getDimensionalHopDuration)).apply(instance, DimensionalHopMove::new);
+        protected @NotNull App<RecordCodecBuilder.Mu<DimensionalHopMove<?>>, DimensionalHopMove<?>> buildCodec(RecordCodecBuilder.Instance<DimensionalHopMove<?>> instance) {
+            return instance.group(extras(), attackExtras(), cooldown(), windup(), duration(), moveDistance(), damage(),
+                    stun(), hitboxSize(), knockback(), offset(),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("dimensionalHopDuration")
+                            .forGetter(DimensionalHopMove::getDimensionalHopDuration))
+                    .apply(instance, applyAttackExtras(DimensionalHopMove::new));
         }
     }
 }

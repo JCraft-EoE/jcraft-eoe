@@ -7,7 +7,6 @@ import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
-import net.arna.jcraft.common.entity.stand.TheHandEntity;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.damagesource.DamageSource;
@@ -18,7 +17,7 @@ import static net.arna.jcraft.api.Attacks.damageLogic;
 import static net.arna.jcraft.api.Attacks.trueDamage;
 
 @Getter
-public abstract class AbstractEraseAttack<T extends AbstractEraseAttack<T>> extends AbstractSimpleAttack<T, TheHandEntity> {
+public abstract class AbstractEraseAttack<T extends AbstractEraseAttack<T, A>, A extends StandEntity<? extends A, ?>> extends AbstractSimpleAttack<T, A> {
     public AbstractEraseAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
                                final float damage, final int stun, final float hitboxSize, final float knockback,
                                final float offset) {
@@ -28,7 +27,7 @@ public abstract class AbstractEraseAttack<T extends AbstractEraseAttack<T>> exte
     }
 
     @Override
-    protected void processTarget(final TheHandEntity attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
+    protected void processTarget(final A attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
         damageLogic(attacker.getEntityWorld(), target, kbVec, getStun(), getStunType().ordinal(), true,
                 0, isLift(), getBlockStun(), damageSource, attacker.getUserOrThrow(), getHitAnimation(), true, true);
 

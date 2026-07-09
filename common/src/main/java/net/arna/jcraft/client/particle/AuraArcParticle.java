@@ -20,20 +20,24 @@ public class AuraArcParticle extends RisingParticle {
         this.quadSize = 0.5f;
         this.lifetime = 7;
         this.parent = parent;
-        tryMatchParent();
         setSpriteFromAge(spriteProvider);
     }
 
     private void tryMatchParent() {
         if (parent != null) {
             Vec3 deltaPos = JUtils.deltaPos(parent);
+
+            if (deltaPos.lengthSqr() > 10000.0) { // 100m/s
+                return;
+            }
+
             setParticleSpeed(deltaPos.x, deltaPos.y, deltaPos.z);
         }
     }
 
     public void tick() {
-        super.tick();
         tryMatchParent();
+        super.tick();
         setSpriteFromAge(spriteProvider);
     }
 
@@ -56,7 +60,9 @@ public class AuraArcParticle extends RisingParticle {
         }
 
         public Particle createParticle(final SimpleParticleType defaultParticleType, final ClientLevel clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-            return new AuraArcParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider, color, parent);
+            var out = new AuraArcParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider, color, parent);
+            out.tryMatchParent();
+            return out;
         }
     }
 }

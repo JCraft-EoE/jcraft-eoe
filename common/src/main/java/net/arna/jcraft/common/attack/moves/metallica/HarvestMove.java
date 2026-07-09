@@ -4,17 +4,17 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.MoveSelectionResult;
-import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.moves.AbstractBarrageAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.common.entity.stand.MetallicaEntity;
-import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.entity.stand.MetallicaEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -53,21 +53,41 @@ public class HarvestMove extends AbstractBarrageAttack<HarvestMove, MetallicaEnt
         super.activeTick(attacker, moveStun);
 
         LivingEntity user = attacker.getUser();
-        if (user instanceof Player) return;
 
-        // AI iron harvest. Cancel automatically if iron is full
-        if (attacker.getIron() >= MetallicaEntity.IRON_MAX)
-            attacker.cancelMove();
+        if (user instanceof Mob mob) { // AI iron harvest
+            final float iron = attacker.getIron();
+            if (iron >= MetallicaEntity.IRON_MAX || (iron >= (MetallicaEntity.IRON_MAX / 3.0f) && mob.getRandom().nextFloat() > 0.1f))
+                // Cancel automatically if iron is full
+                attacker.cancelMove();
+        }
     }
 
     @Override
     public @NonNull Set<LivingEntity> perform(MetallicaEntity attacker, LivingEntity user) {
-        Set<LivingEntity> targets = super.perform(attacker, user);
+        // final Set<LivingEntity> targets = super.perform(attacker, user);
+
+        if (user instanceof Mob mob) {
+            final boolean noBlock = mob.getBlockStateOn().isAir();
+            final BlockPos hitPos = mob.getOnPos();
+
+            attacker.getEntityData().set(SIPHON_POS, noBlock ? Optional.empty() : Optional.of(hitPos));
+            if (noBlock) return Set.of();
+
+            // Add iron
+            float gain = user.level().getBlockState(hitPos).is(JTagRegistry.IRON_BLOCKS) ? 3f : 1.5f;
+            if (attacker.getEntityData().get(MetallicaEntity.INVISIBLE)) gain /= 2.0f;
+
+            attacker.addIron(gain);
+            return Set.of();
+        }
+
         final BlockHitResult hitResult = JUtils.genericBlockRaycast(user.level(), user, 5, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE);
+
         if (hitResult.getType() == HitResult.Type.BLOCK) {
             final BlockPos hitPos = hitResult.getBlockPos();
             attacker.getEntityData().set(SIPHON_POS, Optional.of(hitPos));
 
+            // Add iron
             float gain = user.level().getBlockState(hitPos).is(JTagRegistry.IRON_BLOCKS) ? 3f : 1.5f;
             if (attacker.getEntityData().get(MetallicaEntity.INVISIBLE)) gain /= 2.0f;
 
@@ -76,7 +96,7 @@ public class HarvestMove extends AbstractBarrageAttack<HarvestMove, MetallicaEnt
             attacker.getEntityData().set(SIPHON_POS, Optional.empty());
         }
 
-        return targets;
+        return Set.of();
     }
 
     @Override
@@ -84,7 +104,9 @@ public class HarvestMove extends AbstractBarrageAttack<HarvestMove, MetallicaEnt
                                                                                   LivingEntity target, int stunTicks,
                                                                                   int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand,
                                                                                   AbstractMove<?, ?> enemyAttack) {
-        return attacker.getIron() >= MetallicaEntity.IRON_MAX ? MoveSelectionResult.STOP : MoveSelectionResult.PASS;
+        final float iron = attacker.getIron();
+        if (iron < (MetallicaEntity.IRON_MAX / 3.0f) && mob.getRandom().nextFloat() > 0.1f) return MoveSelectionResult.USE;
+        return iron >= MetallicaEntity.IRON_MAX ? MoveSelectionResult.STOP : MoveSelectionResult.PASS;
     }
 
     @Override

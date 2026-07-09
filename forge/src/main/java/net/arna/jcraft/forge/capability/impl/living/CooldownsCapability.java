@@ -1,6 +1,7 @@
 package net.arna.jcraft.forge.capability.impl.living;
 
 import dev.architectury.networking.NetworkManager;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.living.CommonCooldownsComponentImpl;
 import net.arna.jcraft.forge.JNetworkingForge;
 import net.arna.jcraft.forge.capability.api.JCapability;
@@ -16,12 +17,10 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class CooldownsCapability extends CommonCooldownsComponentImpl implements JCapability {
 
-    public static ResourceLocation CD_S2C = new ResourceLocation(MOD_ID, "cd_s2c");
-    public static ResourceLocation CD_C2S = new ResourceLocation(MOD_ID, "cd_c2s");
+    public static ResourceLocation CD_S2C = JCraft.id("cd_s2c");
+    public static ResourceLocation CD_C2S = JCraft.id("cd_c2s");
 
     public static Capability<CooldownsCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
     });

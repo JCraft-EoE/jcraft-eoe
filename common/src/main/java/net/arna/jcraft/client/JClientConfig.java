@@ -17,6 +17,7 @@ public class JClientConfig implements ConfigData {
     private static JClientConfig instance;
 
     private UIPos uiPosition = UIPos.RIGHT;
+    private UIDuration uiDuration = UIDuration.COOLDOWN;
     // private boolean clientsidePrediction = false;
     private int horizontalHudOffset = 0;
     private int verticalHudOffset = 0;
@@ -31,6 +32,9 @@ public class JClientConfig implements ConfigData {
     private boolean comboCounter = true;
     private boolean dynamicFirstPersonStandOpacity = true;
     private float firstPersonStandOpacityMult = 1.0f;
+    private boolean showStandUserWarningPlayer = true;
+    private boolean showStandUserWarningMob = true;
+    private boolean disableMihAfterimages = true;
 
     public static void load() {
         instance = AutoConfig.getConfigHolder(JClientConfig.class).getConfig();
@@ -47,5 +51,11 @@ public class JClientConfig implements ConfigData {
         LEFT,
         RIGHT,
         MIDDLE
+    }
+
+    public enum UIDuration {
+        ALWAYS,
+        COOLDOWN,
+        NEVER
     }
 }

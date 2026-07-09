@@ -3,6 +3,7 @@ package net.arna.jcraft.forge.capability.impl.living;
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.CommonGravityShiftComponentImpl;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.forge.capability.api.JCapability;
@@ -17,11 +18,9 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class GravityShiftCapability extends CommonGravityShiftComponentImpl implements JCapability {
 
-    public static ResourceLocation GS_S2C = new ResourceLocation(MOD_ID, "gs_s2c");
+    public static ResourceLocation GS_S2C = JCraft.id("gs_s2c");
 
     public static Capability<GravityShiftCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
     });

@@ -6,12 +6,14 @@ import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.api.JRegistries;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.common.entity.stand.GEREntity;
-import net.arna.jcraft.common.marker.*;
-import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.common.marker.EntityMarker;
+import net.arna.jcraft.common.marker.EntityMarkerType;
+import net.arna.jcraft.common.marker.RewindData;
+import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.TriConsumer;
 import net.minecraft.nbt.CompoundTag;
@@ -27,9 +29,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-public final class ReturnToZeroMove extends AbstractMove<ReturnToZeroMove, GEREntity> {
+public final class ReturnToZeroMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<ReturnToZeroMove<A>, A> {
     @Getter
     private final int radius;
     @Getter
@@ -58,19 +59,20 @@ public final class ReturnToZeroMove extends AbstractMove<ReturnToZeroMove, GEREn
     }
 
     @Override
-    public @NotNull MoveType<ReturnToZeroMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<ReturnToZeroMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void tick(final GEREntity attacker) {
+    public void tick(final A attacker) {
         tickReturnInfo(attacker);
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final GEREntity attacker, final LivingEntity user) {
-        final List<Entity> toReturn = attacker.level().getEntitiesOfClass(Entity.class, attacker.getBoundingBox().inflate(radius),
-                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> e != attacker && e != user));
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
+        final LivingEntity baseEntity = attacker.getBaseEntity();
+        final List<Entity> toReturn = baseEntity.level().getEntitiesOfClass(Entity.class, baseEntity.getBoundingBox().inflate(radius),
+                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> e != baseEntity && e != user));
 
         returnEntityMarkers.clear();
         returnInfo.clear();
@@ -86,12 +88,12 @@ public final class ReturnToZeroMove extends AbstractMove<ReturnToZeroMove, GEREn
         return Set.of();
     }
 
-    public boolean returnToZero(final GEREntity attacker) {
+    public boolean returnToZero(final A attacker) {
         if (!started) {
             return false;
         }
 
-        ServerLevel level = (ServerLevel) attacker.level();
+        ServerLevel level = (ServerLevel) attacker.getEntityWorld();
         for (final EntityMarker marker : returnEntityMarkers) {
             if (entityMarkerType.shouldLoad(marker, level)  && (JUtils.nullSafeDistanceSqr(level.getEntity(marker.id()), attacker.getUser()) <= reach * reach)) {
                 entityMarkerType.load(marker, level);
@@ -103,11 +105,11 @@ public final class ReturnToZeroMove extends AbstractMove<ReturnToZeroMove, GEREn
         returnEntityMarkers.clear();
         returnInfo.clear();
 
-        attacker.playSound(JSoundRegistry.GER_RTZ.get(), 1, 1);
+        attacker.getBaseEntity().playSound(JSoundRegistry.GER_RTZ.get(), 1, 1);
         return true;
     }
 
-    public void tickReturnInfo(final GEREntity attacker) {
+    public void tickReturnInfo(final A attacker) {
         if (!(attacker.getUser() instanceof ServerPlayer serverPlayer)) {
             return;
         }
@@ -131,22 +133,29 @@ public final class ReturnToZeroMove extends AbstractMove<ReturnToZeroMove, GEREn
     }
 
     @Override
-    protected @NonNull ReturnToZeroMove getThis() {
+    protected @NonNull ReturnToZeroMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull ReturnToZeroMove copy() {
-        return copyExtras(new ReturnToZeroMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getRadius(), getReach(),
+    public @NonNull ReturnToZeroMove<A> copy() {
+        return copyExtras(new ReturnToZeroMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getRadius(), getReach(),
                 entityMarkerType.getIds(), entityMarkerType.getDataHandler().extractor(), entityMarkerType.getDataHandler().injector()));
     }
 
-    public static class Type extends AbstractMove.Type<ReturnToZeroMove> {
+    public static class Type extends AbstractMove.Type<ReturnToZeroMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<ReturnToZeroMove>, ReturnToZeroMove> buildCodec(RecordCodecBuilder.Instance<ReturnToZeroMove> instance) {
-            return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("radius").forGetter(ReturnToZeroMove::getRadius), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("reach").forGetter(ReturnToZeroMove::getReach), ResourceLocation.CODEC.listOf().xmap(list -> list.stream().collect(Collectors.toSet()), set -> set.stream().toList()).fieldOf("rewindIds").forGetter(move -> move.getEntityMarkerType().getIds()), JRegistries.EXTRACTOR_CODEC.fieldOf("extractor").forGetter(move -> move.getEntityMarkerType().getDataHandler().extractor()), JRegistries.INJECTOR_CODEC.fieldOf("injector").forGetter(move -> move.getEntityMarkerType().getDataHandler().injector())).apply(instance, applyExtras(ReturnToZeroMove::new));
+        protected @NotNull App<RecordCodecBuilder.Mu<ReturnToZeroMove<?>>, ReturnToZeroMove<?>> buildCodec(RecordCodecBuilder.Instance<ReturnToZeroMove<?>> instance) {
+            return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("radius").forGetter(ReturnToZeroMove::getRadius),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("reach").forGetter(ReturnToZeroMove::getReach),
+                    ResourceLocation.CODEC.listOf().<Set<ResourceLocation>>xmap(HashSet::new, ArrayList::new).fieldOf("rewindIds")
+                            .forGetter(move -> move.getEntityMarkerType().getOrderedIds()),
+                    JRegistries.EXTRACTOR_CODEC.fieldOf("extractor").forGetter(move -> move.getEntityMarkerType().getDataHandler().extractor()),
+                    JRegistries.INJECTOR_CODEC.fieldOf("injector").forGetter(move -> move.getEntityMarkerType().getDataHandler().injector()))
+                    .apply(instance, applyExtras(ReturnToZeroMove::new));
         }
     }
 }

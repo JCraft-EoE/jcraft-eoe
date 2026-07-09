@@ -1,10 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
@@ -38,7 +34,7 @@ import java.util.Set;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public class KnifeProjectile extends AbstractArrow implements GeoEntity {
+public class KnifeProjectile extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> LIGHTNING;
     public boolean explosive = false;
     private int ticksInAir;
@@ -208,7 +204,8 @@ public class KnifeProjectile extends AbstractArrow implements GeoEntity {
 
         if (explosive) explode();
 
-        JUtils.projectileDamageLogic(this, level(), entity, Vec3.ZERO, stunT, 1, false, 2, blockstun, CommonHitPropertyComponent.HitAnimation.MID);
+        JUtils.projectileDamageLogic(this, level(), entity, Vec3.ZERO, stunT, 1, false, 2,
+                blockstun, CommonHitPropertyComponent.HitAnimation.MID, false, false, getLightning());
         playSound(SoundEvents.TRIDENT_HIT, 1, 1);
         if (entity instanceof LivingEntity living) {
             JComponentPlatformUtils.getMiscData(living).stab();
@@ -228,19 +225,5 @@ public class KnifeProjectile extends AbstractArrow implements GeoEntity {
         super.readAdditionalSaveData(tag);
         this.ticksInAir = tag.getShort("life");
         setLightning(tag.getBoolean("lightning"));
-    }
-
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
     }
 }

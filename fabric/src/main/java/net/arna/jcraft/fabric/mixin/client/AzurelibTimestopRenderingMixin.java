@@ -1,7 +1,5 @@
 package net.arna.jcraft.fabric.mixin.client;
 
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.util.RenderUtils;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.entity.Entity;
@@ -12,9 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static net.arna.jcraft.client.util.JClientUtils.timestopTimestamps;
 
-@Mixin(GeoEntity.class)
+//@Mixin(GeoEntity.class)
 public interface AzurelibTimestopRenderingMixin {
-    @Inject(method = "getTick", at = @At("HEAD"), cancellable = true, remap = false)
+    /*@Inject(method = "getTick", at = @At("HEAD"), cancellable = true, remap = false)
     default void jcraft$stopTimeTick(Object entity, CallbackInfoReturnable<Double> cir) {
         final Entity ent = (Entity)entity;
 
@@ -24,5 +22,5 @@ public interface AzurelibTimestopRenderingMixin {
         } else {
             timestopTimestamps.remove(ent);
         }
-    }
+    }*/
 }

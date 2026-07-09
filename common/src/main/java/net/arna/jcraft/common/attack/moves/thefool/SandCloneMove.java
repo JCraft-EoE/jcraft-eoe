@@ -96,12 +96,14 @@ public final class SandCloneMove extends AbstractMove<SandCloneMove, TheFoolEnti
             playerCloneEntity.copyPosition(player);
             playerCloneEntity.setMaster(player);
             playerCloneEntity.markSand();
-            playerCloneEntity.disableDrops();
 
             playerCloneEntity.setItemSlot(EquipmentSlot.HEAD, user.getItemBySlot(EquipmentSlot.HEAD).copy());
             playerCloneEntity.setItemSlot(EquipmentSlot.CHEST, user.getItemBySlot(EquipmentSlot.CHEST).copy());
             playerCloneEntity.setItemSlot(EquipmentSlot.LEGS, user.getItemBySlot(EquipmentSlot.LEGS).copy());
             playerCloneEntity.setItemSlot(EquipmentSlot.FEET, user.getItemBySlot(EquipmentSlot.FEET).copy());
+
+            playerCloneEntity.setAllowItemExchange(false);
+            playerCloneEntity.disableDrops();
 
             setSandClone(newClone = playerCloneEntity);
         } else if (user instanceof Mob mob) {

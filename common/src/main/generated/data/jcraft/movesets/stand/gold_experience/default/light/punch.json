@@ -1,0 +1,127 @@
+{
+  "anim_state": "LIGHT",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "crouching_variant": {
+    "anim_state": "LIFE_GIVER",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:goldexperience_berry_bush_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 8,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 40,
+      "damage": 4.0,
+      "duration": 20,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact4"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.gold_experience.default.place_berry_bush.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.gold_experience.default.place_berry_bush.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.75,
+      "move_distance": 1.25,
+      "offset": 0.2,
+      "stun": 5,
+      "windup": 16
+    }
+  },
+  "followup": {
+    "anim_state": "LIGHT_FOLLOWUP",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 4,
+        "extra_hit_boxes": [
+          {
+            "size": 1.0,
+            "vertical_offset": 0.25
+          }
+        ],
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_2",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 0,
+      "damage": 6.0,
+      "duration": 12,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.gold_experience.default.punch.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.gold_experience.default.punch.followup.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 1.0,
+      "move_distance": 0.75,
+      "offset": -0.1,
+      "stun": 7,
+      "windup": 7
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 15,
+    "damage": 5.0,
+    "duration": 9,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.gold_experience.default.punch.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.gold_experience.default.punch.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.2,
+    "move_distance": 0.75,
+    "offset": -0.1,
+    "stun": 7,
+    "windup": 6
+  }
+}

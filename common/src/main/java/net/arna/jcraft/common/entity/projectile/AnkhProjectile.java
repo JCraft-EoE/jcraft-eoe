@@ -1,12 +1,11 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
 import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
+import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.minecraft.core.particles.ParticleTypes;
@@ -22,7 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class AnkhProjectile extends AbstractArrow implements GeoEntity {
+public class AnkhProjectile extends AbstractArrow {
     private int ticksInAir;
     private boolean variation = false;
     private double orbitRange = 3;
@@ -90,13 +89,27 @@ public class AnkhProjectile extends AbstractArrow implements GeoEntity {
 
         entity.setSecondsOnFire(3);
         JUtils.projectileDamageLogic(this, level(), entity, Vec3.ZERO, 5, 1, false, 3.5f, 8, CommonHitPropertyComponent.HitAnimation.MID);
+
+        igniteGasoline(entityHitResult.getLocation());
+
         discard();
     }
 
     @Override
     protected void onHitBlock(final BlockHitResult blockHitResult) {
         MagiciansRedEntity.ignite(level(), blockHitResult.getBlockPos());
+
+        if (!level().isClientSide()) {
+            igniteGasoline(blockHitResult.getLocation());
+        }
+
         super.onHitBlock(blockHitResult);
+    }
+
+    private void igniteGasoline(Vec3 pos) {
+        JSplatterManager.get(level())
+                .getHit(pos, s -> s instanceof GasolineSplatter)
+                .forEach(s -> ((GasolineSplatter) s).lightOnFire());
     }
 
     @Override
@@ -163,6 +176,9 @@ public class AnkhProjectile extends AbstractArrow implements GeoEntity {
                         if (entityHitResult != null) {
                             this.onHitEntity(entityHitResult);
                         }
+
+                        // Ignite gasoline splatters along orbit path each tick
+                        igniteGasoline(pos);
                     }
                 } else {
                     this.variation = false;
@@ -171,16 +187,5 @@ public class AnkhProjectile extends AbstractArrow implements GeoEntity {
                 discard();
             }
         }
-    }
-
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {}
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
     }
 }

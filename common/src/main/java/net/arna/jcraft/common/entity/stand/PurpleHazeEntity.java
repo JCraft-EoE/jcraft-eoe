@@ -2,19 +2,26 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
-import net.arna.jcraft.api.stand.*;
+import net.arna.jcraft.api.attack.StateContainer;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.enums.StunType;
-import net.arna.jcraft.api.attack.MoveSet;
-import net.arna.jcraft.api.attack.StateContainer;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.component.player.CommonPhComponent;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.stand.*;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
+import net.arna.jcraft.common.ai.CombatEntityContext;
+import net.arna.jcraft.common.ai.CombatInstantContext;
 import net.arna.jcraft.common.ai.IJAttackerBrain;
 import net.arna.jcraft.common.ai.brain.StandAttackerBrain;
 import net.arna.jcraft.common.attack.moves.purplehaze.BackhandAttack;
@@ -22,15 +29,14 @@ import net.arna.jcraft.common.attack.moves.purplehaze.PHGroundSlamAttack;
 import net.arna.jcraft.common.attack.moves.purplehaze.PHRekkaAttack;
 import net.arna.jcraft.common.attack.moves.purplehaze.PlayMove;
 import net.arna.jcraft.common.attack.moves.shared.*;
-import net.arna.jcraft.api.component.player.CommonPhComponent;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -39,6 +45,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -51,30 +58,29 @@ import org.joml.Vector3f;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Purple_Haze">Purple Haze</a>.
  * @see JStandTypeRegistry#PURPLE_HAZE
- * @see net.arna.jcraft.client.model.entity.stand.PurpleHazeModel PurpleHazeModel
  * @see net.arna.jcraft.client.renderer.entity.stands.PurpleHazeRenderer PurpleHazeRenderer
  */
 public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeEntity, PurpleHazeEntity.State> {
     public static final MoveSet<PurpleHazeEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.PURPLE_HAZE,
-            PurpleHazeEntity::registerMoves, State.class);
+            PurpleHazeEntity::registerMoves, PurpleHazeEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.purple_haze"))
                     .proCount(3)
-                    .conCount(3)
+                    .conCount(2)
                     .freeSpace(Component.literal("""
                 PASSIVE: Rage
                 Builds up while the stand is summoned.
                 Maxes out after 1 minute. When maxed, aura turns red.
                 Rage decreases by half with each living thing Purple Haze kills.
                 Purple Haze has a chance to target it's own user which increases with rage.
+                
+                Hold Utility to control Purple Haze for a limited time, shown with a purple gauge.
                 
                 EVOLUTION: Give Purple Haze any flower after it has killed a stand user.
                 Doing this 5 times will evolve it into Purple Haze: Distortion."""))
@@ -86,15 +92,15 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             .build();
 
     private static final @NonNull KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> CROUCHING_LIGHT_FOLLOWUP_ATTACK = BACKHAND_FOLLOWUP.copy().withAnim(State.BACKHAND_FOLLOWUP).allowHitUser();
-    private static final @NonNull BackhandAttack CROUCHING_LIGHT_ATTACK = BACKHAND.copy().withFollowup(CROUCHING_LIGHT_FOLLOWUP_ATTACK).allowHitUser();
+    private static final @NonNull BackhandAttack<AbstractPurpleHazeEntity<?, ?>> CROUCHING_LIGHT_ATTACK = BACKHAND.copy().withFollowup(CROUCHING_LIGHT_FOLLOWUP_ATTACK).allowHitUser();
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT_FOLLOWUP_ATTACK = LIGHT_FOLLOWUP.copy().withAnim(State.LIGHT_FOLLOWUP).allowHitUser();
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT_ATTACK = LIGHT.copy().withFollowup(LIGHT_FOLLOWUP_ATTACK).withCrouchingVariant(CROUCHING_LIGHT_ATTACK).allowHitUser();
     private static final @NonNull MainBarrageAttack<AbstractPurpleHazeEntity<?, ?>> BARRAGE_ATTACK = AbstractPurpleHazeEntity.BARRAGE.copy().allowHitUser();
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> HEAVY_ATTACK = HEAVY.copy().allowHitUser();
     private static final @NonNull KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_3 = REKKA3.copy().withAnim(State.REKKA3).allowHitUser();
     private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_2 = REKKA2.copy().withAnim(State.REKKA2).withFollowup(REKKA_3).allowHitUser();
-    private static final @NonNull PHRekkaAttack REKKA_1 = REKKA1.copy().withAnim(State.REKKA1).withFollowup(REKKA_2).allowHitUser();
-    private static final @NonNull PHGroundSlamAttack GROUND_SLAM = AbstractPurpleHazeEntity.GROUND_SLAM.copy().allowHitUser();
+    private static final @NonNull PHRekkaAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_1 = REKKA1.copy().withAnim(State.REKKA1).withFollowup(REKKA_2).allowHitUser();
+    private static final @NonNull PHGroundSlamAttack<AbstractPurpleHazeEntity<?, ?>> GROUND_SLAM = AbstractPurpleHazeEntity.GROUND_SLAM.copy().allowHitUser();
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> GRAB_HIT_FINAL = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(0, 27,
             34, 0.75f, 4f, 8, 2f, 1.25f, 0f)
@@ -128,11 +134,19 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                     Component.literal("unblockable, combo finisher")
             );
 
-    private static final PlayMove PLAY = new PlayMove(0, 30, 31)
+    private static final PlayMove PLAY = new PlayMove<PurpleHazeEntity>(0, 30, 31)
             .withInfo(Component.literal("Playing with flower"), Component.empty());
+
+    public static final int MAX_OBEDIENCE = 60, MAX_OBEDIENCE_GAIN_COOLDOWN = 40;
+    private int obedienceGainCooldown = 0;
+    private static final EntityDataAccessor<Integer> OBEDIENCE = SynchedEntityData.defineId(PurpleHazeEntity.class, EntityDataSerializers.INT);
+    public int getObedience() { return entityData.get(OBEDIENCE); }
+    public void setObedience(int obedience) { entityData.set(OBEDIENCE, obedience); }
 
     public static final int MAX_RAGE = 20 * 60;
     private int rage = 0;
+    private boolean allowMoveUsage = false;
+    private boolean wantToDesummon = false;
     private boolean flowerable = false, hasFlower = false, toEvolve = false;
     private final AttackerBrainInfo attackerBrainInfo = new AttackerBrainInfo(IJAttackerBrain.COMPETITIVE_LEVEL);
     final Comparator<Entity> distanceComparator = (entity1, entity2) -> {
@@ -153,6 +167,12 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     }
 
     @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(OBEDIENCE, 0);
+    }
+
+    @Override
     public Vector3f getAuraColor() {
         if (rage == MAX_RAGE) {
             return new Vector3f(1f, 0f, 0f);
@@ -162,10 +182,18 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     @Override
     public void desummon() {
-        if (toEvolve && hasUser()) {
-            JComponentPlatformUtils.getStandComponent(getUserOrThrow())
-                    .setType(JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get());
-            JCraft.summon(level(), getUserOrThrow());
+        final LivingEntity user = getUser();
+
+        if (user != null) {
+            if (toEvolve) {
+                JComponentPlatformUtils.getStandComponent(getUserOrThrow())
+                        .setType(JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get());
+                JCraft.summon(level(), getUserOrThrow());
+            }
+
+            if (!JUtils.canAct(this) || !JUtils.canAct(user)) {
+                return;
+            }
         }
 
         super.desummon();
@@ -188,27 +216,31 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     @Override
     public void queueMove(MoveInputType type) {
-        if (!remoteControllable() && queuedMove == MoveInputType.STAND_SUMMON) {
+        if (wantToDesummon)
             return;
-        }
+
         super.queueMove(type);
     }
 
     public boolean handleMove(MoveClass moveClass) {
         MoveMap.Entry<PurpleHazeEntity, State> entry = getFirstValidEntry(moveClass);
-        if (entry == null) {
-            return false;
-        }
+        if (entry == null) return false;
 
-        LivingEntity stateChecker = (isRemote() && !remoteControllable()) ? this : getUserOrThrow();
+        final LivingEntity user = getUser();
 
-        if (hasUser() && !stateChecker.onGround() && entry.getAerialVariant() != null) {
+        if (user == null) return false;
+
+        LivingEntity stateChecker = (isRemote() && !remoteControllable()) ? this : user;
+
+        if (!stateChecker.onGround() && entry.getAerialVariant() != null) {
             entry = entry.getAerialVariant();
         }
-        if (hasUser() && stateChecker.isShiftKeyDown() && entry.getCrouchingVariant() != null) {
+
+        if (stateChecker.isShiftKeyDown() && entry.getCrouchingVariant() != null) {
             entry = entry.getCrouchingVariant();
         }
-        if (hasUser() && !stateChecker.onGround() && entry.getAerialVariant() != null) {
+
+        if (!stateChecker.onGround() && entry.getAerialVariant() != null) {
             entry = entry.getAerialVariant();
         }
 
@@ -218,12 +250,39 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     @Override
     public boolean allowMoveHandling() {
-        return remoteControllable();
+        return true;
+    }
+
+    @Override
+    public boolean acceptsUserMoveInit(MoveInputType type) {
+        return allowMoveUsage;
     }
 
     @Override
     public boolean remoteControllable() {
         return false;
+    }
+
+    @Override
+    public boolean forwardInputToSpec(MoveInputType type) {
+        return !allowMoveUsage;
+    }
+
+    @Override
+    public void onUserMoveInput(AbstractMove<?, ? super PurpleHazeEntity> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
+        if (type == MoveInputType.UTILITY) {
+            allowMoveUsage = getObedience() > 0 && pressed;
+            return;
+        }
+
+        if (type == MoveInputType.STAND_SUMMON && pressed && tickCount > 1) {
+            wantToDesummon = true;
+            return;
+        }
+
+        if (allowMoveUsage) {
+            super.onUserMoveInput(currentMove, type, pressed, moveInitiated);
+        }
     }
 
     @Override
@@ -262,16 +321,43 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 desummon();
             }
         } else {
-            if (++rage >= MAX_RAGE) {
-                rage = MAX_RAGE;
-            }
+            if (++rage >= MAX_RAGE) rage = MAX_RAGE;
 
-            if (!hasUser()) {
-                return;
-            }
-            LivingEntity user = getUser();
+            final LivingEntity user = getUser();
+
+            if (user == null) return;
 
             if (!level().isClientSide()) {
+
+                if (wantToDesummon) {
+                    if (queuedMove != null) {
+                        queuedMove = null;
+                    }
+
+                    desummon();
+                    return;
+                }
+
+                if (getTarget() == null) {
+                    wantToBlock = false;
+                }
+
+                // obedience
+                int obedience = getObedience();
+
+                if (allowMoveUsage) {
+                    setObedience(--obedience);
+                    obedienceGainCooldown = MAX_OBEDIENCE_GAIN_COOLDOWN;
+                    if (obedience <= 0)
+                        allowMoveUsage = false;
+                } else {
+                    if (obedienceGainCooldown > 0)
+                        obedienceGainCooldown--;
+                    else if (obedience < MAX_OBEDIENCE)
+                        setObedience(obedience + 1);
+                }
+
+                // targetting and ai ticking
                 boolean isRemote = isRemote();
 
                 if (!remoteControllable()) {
@@ -330,11 +416,28 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                 }
 
                 if (isRemote) {
-                    tickRemoteState(getMoveControl().getSpeedModifier(), getMoveControl().strafeRight, onGround());
-                    StandAttackerBrain.tick(this, attackerBrainInfo);
+                    tickRemoteState(navigation.isInProgress() ? getMoveControl().getSpeedModifier() : 0, getMoveControl().strafeRight, onGround());
+
+                    if (!allowMoveUsage)
+                        StandAttackerBrain.tick(this, attackerBrainInfo);
                 }
             }
         }
+    }
+
+    @Override
+    protected boolean doAutoBlocking(Mob mob, int aiLevel, int reactionTime, CombatEntityContext enemyCtx, double distance) {
+        return false;
+    }
+
+    @Override
+    public void executePlan(int aiLevel, AttackerBrainInfo info, CombatInstantContext combatCtx) {
+        super.executePlan(aiLevel, info, combatCtx);
+
+        final var user = getUser();
+
+        if (user instanceof Mob)
+            info.setDesiredStandOffTime(getTarget() == user ? random.nextInt(80) : 0);
     }
 
     @Override
@@ -350,19 +453,24 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
     @Override
     protected void tickRemoteState(double f, double s, boolean dashing) {
         LivingEntity user = getUserOrThrow();
-        if (getState() == State.IDLE) {
+
+        if (getMoveStun() <= 0) {
             if (JUtils.canAct(user)) {
-                if (s > 0) {
-                    setStateNoReset(dashing ? State.RIGHT : State.RIGHT_DASH);
-                }
-                if (s < 0) {
-                    setStateNoReset(dashing ? State.LEFT : State.LEFT_DASH);
-                }
-                if (f < 0) {
-                    setStateNoReset(dashing ? State.BACKWARD : State.BACKWARD_DASH);
-                }
-                if (f > 0) {
-                    setStateNoReset(dashing ? State.FORWARD : State.FORWARD_DASH);
+                if (f == 0) {
+                    if (s > 0) {
+                        setStateNoReset(onGround() ? State.RIGHT : State.RIGHT_DASH);
+                    } else if (s < 0) {
+                        setStateNoReset(onGround() ? State.LEFT : State.LEFT_DASH);
+                    } else {
+                        setStateNoReset(State.IDLE);
+                    }
+                } else {
+                    if (f < 0) {
+                        setStateNoReset(onGround() ? State.BACKWARD : State.BACKWARD_DASH);
+                    }
+                    if (f > 0) {
+                        setStateNoReset(onGround() ? State.FORWARD : State.FORWARD_DASH);
+                    }
                 }
             } else {
                 setStateNoReset(State.HURT);
@@ -414,65 +522,56 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     // Animation code
     public enum State implements StandAnimationState<PurpleHazeEntity> {
-        IDLE((PurpleHaze, builder) -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.idle"))),
-        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.block"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.heavy"))),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.idle", AzPlayBehaviors.LOOP)),
+        PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.block", AzPlayBehaviors.LOOP)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        FULL_RELEASE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.full_release"))),
-        GROUND_SLAM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.ground_slam"))),
+        FULL_RELEASE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.full_release", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GROUND_SLAM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.ground_slam", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.barrage"))),
-        LAUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.launch"))),
-        LAUNCH2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.launch2"))),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.barrage", AzPlayBehaviors.LOOP)),
+        LAUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.launch", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LAUNCH2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.launch2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        REKKA1(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.rekka1"))),
-        REKKA2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.rekka2"))),
-        REKKA3(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.rekka3"))),
+        REKKA1(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.rekka1", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        REKKA2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.rekka2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        REKKA3(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.rekka3", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.grab"))),
-        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.grab_hit"))),
+        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        BACKHAND(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.backhand"))),
-        BACKHAND_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.backhand_followup"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.light_followup"))),
-        HURT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.hurt"))),
-        PLAY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.purple_haze.play"))),
+        BACKHAND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.backhand", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BACKHAND_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.backhand_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HURT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.hurt", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        PLAY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.purple_haze.play", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
 
-        FORWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.forw"))),
-        BACKWARD(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.back"))),
-        LEFT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.left"))),
-        RIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.right"))),
-        FORWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.fdash"))),
-        BACKWARD_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.bdash"))),
-        LEFT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.ldash"))),
-        RIGHT_DASH(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.purple_haze.rdash"))),
+        FORWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.forw", AzPlayBehaviors.LOOP)),
+        BACKWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.back", AzPlayBehaviors.LOOP)),
+        LEFT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.left", AzPlayBehaviors.LOOP)),
+        RIGHT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.right", AzPlayBehaviors.LOOP)),
+        FORWARD_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.fdash", AzPlayBehaviors.LOOP)),
+        BACKWARD_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.bdash", AzPlayBehaviors.LOOP)),
+        LEFT_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.ldash", AzPlayBehaviors.LOOP)),
+        RIGHT_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.purple_haze.rdash", AzPlayBehaviors.LOOP)),
         ;
 
-        private final BiConsumer<PurpleHazeEntity, AnimationState<PurpleHazeEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<PurpleHazeEntity>> animator) {
-            this((silverChariot, builder) -> animator.accept(builder));
-        }
-
-        State(BiConsumer<PurpleHazeEntity, AnimationState<PurpleHazeEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(PurpleHazeEntity attacker, AnimationState<PurpleHazeEntity> state) {
-            animator.accept(attacker, state);
+        public void playAnimation(PurpleHazeEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @NonNull String getSummonAnimation() {
-        return "animation.purple_haze.summon";
     }
 
     @Override

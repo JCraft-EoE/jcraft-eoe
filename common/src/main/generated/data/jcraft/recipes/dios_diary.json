@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "N": {
+      "item": "minecraft:nether_star"
+    },
+    "P": {
+      "item": "jcraft:diary_page"
+    }
+  },
+  "pattern": [
+    "PLP",
+    "PNP",
+    "PPP"
+  ],
+  "result": {
+    "item": "jcraft:dios_diary"
+  },
+  "show_notification": true
+}

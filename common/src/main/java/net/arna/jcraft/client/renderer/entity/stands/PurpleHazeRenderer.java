@@ -1,28 +1,24 @@
 package net.arna.jcraft.client.renderer.entity.stands;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
-import mod.azure.azurelib.cache.object.BakedGeoModel;
-import mod.azure.azurelib.cache.object.GeoBone;
-import mod.azure.azurelib.renderer.layer.BlockAndItemGeoLayer;
-import net.arna.jcraft.client.model.entity.stand.PurpleHazeModel;
+import lombok.NonNull;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.common.entity.stand.AbstractPurpleHazeEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShieldItem;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The {@link StandEntityRenderer} for {@link net.arna.jcraft.common.entity.stand.PurpleHazeEntity PurpleHazeEntity}.
- * @see PurpleHazeModel
  */
+@Environment(EnvType.CLIENT)
 public class PurpleHazeRenderer extends StandEntityRenderer<AbstractPurpleHazeEntity<?, ?>> {
-    public PurpleHazeRenderer(final EntityRendererProvider.Context context) {
+
+    public PurpleHazeRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, b -> b.addRenderLayer(new StandEntityRenderer.StandHandItemsRenderLayer<>()),
+                JStandTypeRegistry.PURPLE_HAZE.get(), 0f, 0f);
+    }
+
+    /*public PurpleHazeRenderer(final EntityRendererProvider.Context context) {
         super(context, new PurpleHazeModel(false));
 
         addRenderLayer(new BlockAndItemGeoLayer<>(this) {
@@ -89,5 +85,5 @@ public class PurpleHazeRenderer extends StandEntityRenderer<AbstractPurpleHazeEn
         this.mainHandItem = animatable.getMainHandItem();
         this.offHandItem = animatable.getOffhandItem();
         super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, a);
-    }
+    }*/
 }

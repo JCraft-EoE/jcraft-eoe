@@ -7,8 +7,19 @@ import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.WeakHashMap;
 
 public class PurpleInfectionEffect extends MobEffect {
+    private static final WeakHashMap<LivingEntity, LivingEntity> INFECTORS = new WeakHashMap<>();
+
+    public static void trackInfector(LivingEntity victim, @Nullable LivingEntity infector) {
+        if (infector != null) {
+            INFECTORS.put(victim, infector);
+        }
+    }
+
     public PurpleInfectionEffect() {
         super(MobEffectCategory.HARMFUL, 0xA34AB5);
     }
@@ -30,6 +41,7 @@ public class PurpleInfectionEffect extends MobEffect {
         if (standType == JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get()) {
             damage /= 3.0f;
         }
-        entity.hurt(JDamageSources.phpoison(entity.level()), damage);
+        LivingEntity infector = INFECTORS.get(entity);
+        entity.hurt(infector != null ? JDamageSources.phpoison(entity.level(), infector) : JDamageSources.phpoison(entity.level()), damage);
     }
 }

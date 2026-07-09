@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Either;
 import lombok.NonNull;
 import net.arna.jcraft.api.registry.JBlockEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
+import net.arna.jcraft.common.block.tile.CoffinTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -20,6 +21,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -111,9 +114,8 @@ public final class CoffinBlock extends BedBlock {
      * Creates the block entity that we have playing our animations and rendering
      * the block
      */
-    @Nullable
     @Override
-    public BlockEntity newBlockEntity(@NonNull final BlockPos pos, @NonNull final BlockState state) {
+    public @NonNull BlockEntity newBlockEntity(@NonNull final BlockPos pos, @NonNull final BlockState state) {
         return JBlockEntityTypeRegistry.COFFIN_TILE.get().create(pos, state);
     }
 
@@ -141,6 +143,11 @@ public final class CoffinBlock extends BedBlock {
                 case EAST -> WEST_SHAPE;
                 default -> Shapes.block(); // shouldn't happen
             };
+    }
+
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(final @NonNull Level level, final @NonNull BlockState state, final @NonNull BlockEntityType<T> type) {
+        return level.isClientSide() && type == JBlockEntityTypeRegistry.COFFIN_TILE.get() ? (l, p, s, e) ->  CoffinTileEntity.tickClient(l, p, s, (CoffinTileEntity) e) : null;
     }
 
     static {

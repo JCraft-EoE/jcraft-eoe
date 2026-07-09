@@ -1,0 +1,217 @@
+package net.arna.jcraft.api.attack.moves;
+
+import com.mojang.datafixers.Products;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.util.Function9;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.Getter;
+import lombok.NonNull;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.AttackData;
+import net.arna.jcraft.api.attack.IAttacker;
+import net.arna.jcraft.api.misc.JBlockBreaker;
+import net.arna.jcraft.common.attack.core.data.AttackMoveExtras;
+import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.JParticleType;
+import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.*;
+
+import java.util.Set;
+
+import static net.arna.jcraft.api.Attacks.damageLogic;
+
+/**
+ * A simple attack that uses ray-cast to hitscan.
+ *
+ * @param <T>
+ * @param <A>
+ */
+@SuppressWarnings("UnusedReturnValue")
+@Getter
+public abstract class AbstractHitscanAttack<T extends AbstractHitscanAttack<T, A>, A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<T, A> {
+    protected float range;
+    protected float spread;
+    @Getter
+    protected boolean cancelMoves = true;
+    protected @NonNull JParticleType shootSpark = JParticleType.LEMON;
+
+    protected AbstractHitscanAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage,
+                                    final int stun, final float knockback, final float range, final float spread) {
+        super(cooldown, windup, duration, moveDistance, damage, stun, 0f, knockback, 0f);
+
+        this.range = range;
+        this.spread = spread;
+    }
+
+    public T withRange(final float range) {
+        this.range = range;
+        return getThis();
+    }
+
+    public T withSpread(final float spread) {
+        this.spread = spread;
+        return getThis();
+    }
+
+    public T withCancelMoves(final boolean cancel) {
+        this.cancelMoves = cancel;
+        return getThis();
+    }
+
+    public T withShootSpark(final JParticleType shootSpark) {
+        this.shootSpark = shootSpark;
+        return getThis();
+    }
+
+    @Override
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
+        if (user != null) {
+            fire(attacker, user, user.position().add(GravityChangerAPI.getEyeOffset(user)), user.getLookAngle());
+        }
+
+        return Set.of();
+    }
+
+    @Override
+    protected void processTarget(final A attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
+        damageLogic(
+                attacker.getEntityWorld(),
+                target,
+                new AttackData(
+                        kbVec, getStun(), getStunType().ordinal(), isOverrideStun(),
+                        getDamage(), isLift(), getBlockStun(), damageSource, attacker.getUserOrThrow(),
+                        getHitAnimation(), attacker.getMoveUsage(), isCanBackstab(), getBlockableType().isNonBlockable(),
+                        cancelMoves
+                )
+        );
+    }
+
+    public Vec3 fire(final A attacker, final LivingEntity user, final Vec3 start, final Vec3 direction) {
+        final RandomSource random = user.getRandom();
+        final LivingEntity base = attacker.getBaseEntity();
+        // finding target
+        final HitResult goal = JUtils.raycastAll(attacker.isRemote() ? base : user, start, start.add(direction.scale(getRange())), ClipContext.Fluid.NONE,
+                EntitySelector.LIVING_ENTITY_STILL_ALIVE
+                        .and(EntitySelector.NO_SPECTATORS)
+        );
+        final Vec3 rawGoalLocation = goal.getLocation();
+        final Vec3 goalLocation = rawGoalLocation.add(direction);
+        final Vec3 attackerEyePos = base.position().add(GravityChangerAPI.getEyeOffset(base));
+        final Vec3 attackVector = goalLocation.subtract(attackerEyePos)
+                .xRot((float)random.nextGaussian() * getSpread())
+                .yRot((float)random.nextGaussian() * getSpread())
+                .zRot((float)random.nextGaussian() * getSpread());
+
+        final HitResult hitResult = JUtils.raycastAll(base, attackerEyePos, attackerEyePos.add(attackVector), ClipContext.Fluid.ANY,
+                EntitySelector.LIVING_ENTITY_STILL_ALIVE
+                        .and(EntitySelector.NO_SPECTATORS)
+        );
+
+        final Vec3 hitPos = hitResult.getLocation();
+
+        // entity hit
+        if (hitResult.getType() == HitResult.Type.ENTITY) {
+            final Entity hitEntity = ((EntityHitResult)hitResult).getEntity();
+            if (hitEntity instanceof LivingEntity living) { // should always happen
+                final Vec3 kbVec = direction.scale(getKnockback()).add(new Vec3(0.0, Math.abs(getKnockback()) / 4, 0.0));
+                processTarget(attacker, living, kbVec, attacker.getDamageSource());
+            }
+        }
+        // block mining
+        else if (hitResult.getType() == HitResult.Type.BLOCK && user.level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) {
+            final BlockPos pos = ((BlockHitResult)hitResult).getBlockPos();
+            final BlockState state = user.level().getBlockState(pos);
+            if (state.getFluidState().isEmpty() && mayBreak(user, pos)) {
+                AABB box = AABB.ofSize(hitResult.getLocation(), 1, 1, 1);
+                Level level = attacker.getEntityWorld();
+                float breakage = getBreakage(attacker, level, pos, box);
+                JBlockBreaker.setBreakState(level, user, pos, breakage);
+            }
+        }
+
+        // TODO Arna add hit/block particles?
+        if (hitResult.getType() != HitResult.Type.MISS) {
+            JCraft.createParticle((ServerLevel)user.level(),
+                    hitResult.getLocation().x() + random.nextGaussian() * 0.25,
+                    hitResult.getLocation().y() + random.nextGaussian() * 0.25,
+                    hitResult.getLocation().z() + random.nextGaussian() * 0.25,
+                    hitSpark);
+        }
+
+        JCraft.createHitscanTraceParticle(
+                (ServerLevel)user.level(),
+                hitscanTraceParticleOrigin(attacker),
+                hitscanTraceParticleVelocity(attacker, hitPos),
+                shootSpark
+        );
+
+        return hitPos;
+    }
+
+    protected Vec3 hitscanTraceParticleOrigin(final A attacker) {
+        return attacker.getBaseEntity().getEyePosition();
+    }
+
+    protected Vec3 hitscanTraceParticleVelocity(final A attacker, final Vec3 goal) {
+        return goal.subtract(attacker.getBaseEntity().getEyePosition());
+    }
+
+    @Override
+    protected @NonNull T copyExtras(@NonNull final T base) {
+        T copy = super.copyExtras(base);
+        copy.withShootSpark(shootSpark);
+        return copy;
+    }
+
+    protected abstract static class Type<M extends AbstractHitscanAttack<? extends M, ?>> extends AbstractSimpleAttack.Type<M> {
+        protected RecordCodecBuilder<M, Float> range() {
+            return Codec.FLOAT.fieldOf("range").forGetter(AbstractHitscanAttack::getRange);
+        }
+
+        protected RecordCodecBuilder<M, Float> spread() {
+            return Codec.FLOAT.fieldOf("spread").forGetter(AbstractHitscanAttack::getSpread);
+        }
+
+        protected RecordCodecBuilder<M, JParticleType> shootSpark() {
+            return JParticleType.CODEC.optionalFieldOf("shootSpark", JParticleType.FLASH)
+                    .forGetter(AbstractHitscanAttack::getShootSpark);
+        }
+
+        protected RecordCodecBuilder<M, Boolean> cancelMoves() {
+            return Codec.BOOL.fieldOf("cancelMoves")
+                    .forGetter(AbstractHitscanAttack::isCancelMoves);
+        }
+
+        protected Products.P13<RecordCodecBuilder.Mu<M>, BaseMoveExtras, AttackMoveExtras, Integer, Integer, Integer, Float,
+                Float, Integer, Float, Float, Float, JParticleType, Boolean>
+        hitscanDefault(RecordCodecBuilder.Instance<M> instance) {
+            return instance.group(extras(), attackExtras(), cooldown(), windup(), duration(), moveDistance(), damage(), stun(),
+                    knockback(), range(), spread(), shootSpark(), cancelMoves());
+        }
+
+        protected App<RecordCodecBuilder.Mu<M>, M> hitscanDefault(RecordCodecBuilder.Instance<M> instance, Function9<Integer, Integer, Integer, Float,
+                                                                        Float, Integer, Float, Float, Float, M> function) {
+            return hitscanDefault(instance).apply(instance, applyAttackExtras(
+                    (cooldown, windup, duration,
+                     moveDistance, damage, stun, knockback, range,
+                     spread, shootSpark, cancelMoves) -> {
+                M move = function.apply(cooldown, windup, duration, moveDistance, damage, stun, knockback, range, spread);
+                move.withShootSpark(shootSpark);
+                move.withCancelMoves(cancelMoves);
+                return move;
+            }));
+        }
+    }
+}

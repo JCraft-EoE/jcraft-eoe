@@ -14,10 +14,10 @@ public enum CooldownType {
     STAND_SP2,
     STAND_SP3,
     STAND_ULTIMATE(Category.STAND, true, true),
-    STAND_STANDBY,
     STAND_TOSS,
 
     // Spec Cooldowns
+    LIGHT(Category.SPEC),
     HEAVY(Category.SPEC),
     BARRAGE(Category.SPEC, true),
     SPECIAL1(Category.SPEC),

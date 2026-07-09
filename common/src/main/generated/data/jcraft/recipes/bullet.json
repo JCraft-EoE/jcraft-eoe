@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "item": "minecraft:gold_nugget"
+    },
+    "B": {
+      "item": "minecraft:polished_blackstone_button"
+    },
+    "C": {
+      "item": "minecraft:gunpowder"
+    },
+    "D": {
+      "item": "minecraft:copper_ingot"
+    }
+  },
+  "pattern": [
+    " D ",
+    "ACA",
+    "ABA"
+  ],
+  "result": {
+    "count": 8,
+    "item": "jcraft:bullet"
+  },
+  "show_notification": true
+}

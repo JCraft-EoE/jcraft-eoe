@@ -1,5 +1,6 @@
 package net.arna.jcraft.api.attack.moves;
 
+import com.google.common.base.MoreObjects;
 import com.mojang.datafixers.Products;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.util.*;
@@ -12,27 +13,39 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.MoveSelectionResult;
-import net.arna.jcraft.api.attack.*;
+import net.arna.jcraft.api.attack.IAttacker;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.core.MoveAction;
 import net.arna.jcraft.api.attack.core.MoveCondition;
-import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.core.RunMoment;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
+import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
 import net.arna.jcraft.common.attack.core.data.BaseMoveExtras;
-import net.arna.jcraft.common.util.ExtraProducts;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.util.ExtraProducts;
+import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -40,9 +53,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@SuppressWarnings("UnusedReturnValue")
+@SuppressWarnings({"UnusedReturnValue", "unused"}) // API, s
 @Getter
 public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAttacker<? extends A, ?>> {
     // Used to store the time this move was charged for, if any.
@@ -56,6 +70,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * This is for internal use only.
      */
     private T originalMove = getThis();
+    private Class<? extends A> attackerClass;
     private MoveClass moveClass;
     private int cooldown;
     private int windup, duration;
@@ -74,6 +89,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     private Boolean isHoldable;
     private boolean loopPrevention = true;
     private OptionalInt followupFrame = OptionalInt.empty();
+    private boolean lingeringSounds;
 
     // Properties that are NOT serialized (usually set in constructor)
     // Used to help AI know how and when to use this attack.
@@ -91,6 +107,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     // How long this move was charged for, if any.
     @Getter @Setter
     private int chargeTime = 0;
+    private final Map<A, List<BoundSoundPlayer.SoundHandle>> activeSounds = new WeakHashMap<>();
 
     protected AbstractMove(int cooldown, int windup, int duration, float moveDistance) {
         this.cooldown = cooldown;
@@ -495,6 +512,26 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    /**
+     * Makes sounds played by this move linger.
+     * I.e., they aren't stopped when the move is cancelled.
+     * @return This move
+     */
+    public T withLingeringSounds() {
+        return withLingeringSounds(true);
+    }
+
+    /**
+     * Makes sounds played by this move linger.
+     * I.e., they aren't stopped when the move is cancelled.
+     * @param lingeringSounds Whether sounds on this move should linger
+     * @return This move
+     */
+    public T withLingeringSounds(final boolean lingeringSounds) {
+        this.lingeringSounds = lingeringSounds;
+        return getThis();
+    }
+
     // Lombok does not understand these variable names already start with 'is',
     // even though IntelliJ thinks it does.
     // Also, for some reason, suppressing the warning gives a warning about the suppression being redundant,
@@ -529,6 +566,21 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return getThis();
     }
 
+    /**
+     * Returns the class of the {@link A} type arg or the upper bound if not specified.
+     * Used to check whether the moves added by data files are compatible with the attacker.
+     * @return The class of the {@link A} type arg.
+     */
+    @SuppressWarnings("unchecked")
+    public Class<? extends A> getAttackerClass() {
+        if (attackerClass == null) {
+            // Default to IAttacker if somehow this is null.
+            Class<?> resolvedClass = JUtils.resolveAttackerClass(AbstractMove.class, this);
+            attackerClass = (Class<? extends A>) MoreObjects.firstNonNull(resolvedClass, IAttacker.class);
+        }
+
+        return attackerClass;
+    }
 
     /**
      * Called when this move is registered to a {@link MoveMap MoveMap}.
@@ -610,6 +662,8 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * By default, only plays the sound(s) and invokes the init actions, if any.
      */
     public void onInitiate(final A attacker) {
+        activeSounds.remove(attacker);
+
         LivingEntity user = attacker.getUser();
         Set<LivingEntity> targets = Set.of(); // Obviously none yet
         for (final MoveAction<?, ? super A> action : actions) {
@@ -623,6 +677,117 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      * Called when this move is canceled. Does nothing by default.
      */
     public void onCancel(final A attacker) {}
+
+    /**
+     * Adds a sound handle to the list of active sounds for the given attacker.
+     * These sounds will be cancelled if the move is cancelled.
+     * @param attacker The attacker the sound is playing for
+     * @param handle The sound handle
+     */
+    public void submitBoundSound(final A attacker, final BoundSoundPlayer.SoundHandle handle) {
+        activeSounds.computeIfAbsent(attacker, a -> new ArrayList<>()).add(handle);
+    }
+
+    /**
+     * Called when the move is deactivated. I.e., when the current move of the attacker changes
+     * from this move to something else.
+     * <p>
+     * Stops ongoing sounds by default unless the move ended naturally (move stun = 0)
+     * @param attacker The attacker that deactivated this move.
+     */
+    public void onDeactivate(final A attacker) {
+        List<BoundSoundPlayer.SoundHandle> sounds = activeSounds.remove(attacker);
+
+        // Stop sounds if there are any, unless this move ended naturally (move sound 0),
+        // this move has lingering sounds, or we switched to this move's finisher or followup.
+        if (sounds != null && !sounds.isEmpty() && shouldCancelSounds(attacker)) {
+            BoundSoundPlayer.stopAll(sounds);
+        }
+    }
+
+    /**
+     * Verifies whether the provided attacker is compatible with this move.
+     * <p>
+     * Being compatible in this case means all the following:
+     * <ul>
+     *     <li>It's a subclass of {@link A}</li>
+     *     <li>The attacker type of each action is a superclass of the attacker</li>
+     *     <li>The attacker type of each condition is a superclass of the attacker</li>
+     *     <li>It's compatible with the followup (if applicable)</li>
+     *     <li>It's compatible with the aerial variant (if applicable)</li>
+     *     <li>It's compatible with the crouching variant (if applicable)</li>
+     *     <li>It's compatible with the finisher (if applicable)</li>
+     * </ul>
+     *
+     * If the first condition is met, the remaining ones are too, assuming no generic type constraints were violated.
+     * However, data driven moves allow the user to violate these constraints easily, hence we check them anyway.
+     * @param moveId The id of this move, used in errors.
+     * @param attackerId The id of the attacker, used in errors.
+     * @param attackerClass The class of the attacker. Used to check compatibility.
+     */
+    public final void verifyCompatibility(final @NonNull ResourceLocation moveId, final ResourceLocation attackerId,
+                                    final Class<? extends A> attackerClass) {
+        verifyCompatibility(moveId, attackerId, attackerClass, null);
+    }
+
+    protected void verifyCompatibility(final @NonNull ResourceLocation moveId, final ResourceLocation attackerId,
+                                    final Class<? extends A> attackerClass, final String variant) {
+        String variantText = variant == null ? "" : " + " + variant;
+        String moveText = moveId + variantText;
+
+        if (getAttackerClass() != null && !getAttackerClass().isAssignableFrom(attackerClass)) {
+            throw new IllegalStateException("Move " + moveText + " is incompatible with attacker " + attackerId + ".");
+        }
+
+        for (MoveAction<?, ? super A> action : getActions()) {
+            if (action.getAttackerClass() == null) continue;
+
+            if (!action.getAttackerClass().isAssignableFrom(attackerClass)) {
+                ResourceLocation actionTypeId = JRegistries.MOVE_ACTION_TYPE_REGISTRY.getId(action.getType());
+                throw new IllegalStateException("Move " + moveText + " has an action that's incompatible with attacker " +
+                        attackerId + ": " + actionTypeId + ".");
+            }
+        }
+
+        for (MoveCondition<?, ? super A> condition : getConditions()) {
+            if (condition.getAttackerClass() == null) continue;
+
+            if (!condition.getAttackerClass().isAssignableFrom(attackerClass)) {
+                ResourceLocation conditionTypeId = JRegistries.MOVE_CONDITION_TYPE_REGISTRY.getId(condition.getType());
+                throw new IllegalStateException("Move " + moveText + " has a condition that's incompatible with attacker " +
+                        attackerId + ": " + conditionTypeId + ".");
+            }
+        }
+
+        String variantPrefix = variant == null ? "" : variant + " + ";
+        AbstractMove<?, ? super A> followup = getFollowup();
+        if (followup != null)
+            followup.verifyCompatibility(moveId, attackerId, attackerClass, variantPrefix + "followup");
+
+        AbstractMove<?, ? super A> aerial = getAerialVariant();
+        if (aerial != null)
+            aerial.verifyCompatibility(moveId, attackerId, attackerClass, variantPrefix + "aerial");
+
+        AbstractMove<?, ? super A> crouching = getCrouchingVariant();
+        if (crouching != null)
+            crouching.verifyCompatibility(moveId, attackerId, attackerClass, variantPrefix + "crouching");
+
+        AbstractMove<?, ? super A> finisher = getFinisher() == null ? null : getFinisher().right();
+        if (finisher != null)
+            finisher.verifyCompatibility(moveId, attackerId, attackerClass, variantPrefix + "finisher");
+    }
+
+    /**
+     * Determines whether the sounds from this move should be cancelled when the move is deactivated.
+     * Should be overridden by moves that want sounds to linger under certain conditions.
+     * @param attacker The attacker to check for
+     * @return Whether sounds should be cancelled.
+     */
+    protected boolean shouldCancelSounds(final A attacker) {
+        return attacker.getMoveStun() != 0 && !isLingeringSounds() &&
+                (finisher == null || attacker.getCurrentMove() != finisher.right()) &&
+                (followup == null || attacker.getCurrentMove() != followup);
+    }
 
     /**
      * Whether this attack should be allowed to move onto its finisher.
@@ -700,6 +865,9 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
 
         Set<LivingEntity> targets = perform(attacker, user);
         boolean hit = !targets.isEmpty();
+        if (!hit) {
+            playWhiffSound(attacker);
+        }
 
         for (final MoveAction<?, ? super A> action : actions) {
             if (action.getRunMoment() == RunMoment.ON_STRIKE || hit && action.getRunMoment() == RunMoment.ON_HIT) {
@@ -707,6 +875,21 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
             }
         }
         attacker.onPerform(this, targets);
+    }
+
+    protected boolean shouldPlayWhiffSound(final A attacker) {
+        return false;
+    }
+
+    private void playWhiffSound(final A attacker) {
+        if (!shouldPlayWhiffSound(attacker) || attacker.getEntityWorld().isClientSide || attacker.getCurrentMove() != this) {
+            return;
+        }
+
+        final RandomSource random = attacker.getBaseEntity().getRandom();
+        final float volume = 0.6f + random.nextFloat() * 0.35f;
+        final float pitch = 0.85f + random.nextFloat() * 0.3f;
+        attacker.playAttackerSound(JSoundRegistry.WHIFF.get(), volume, pitch, false, true);
     }
 
     /**
@@ -790,9 +973,67 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
         return attacker.getBaseEntity().position().add(heightOffset);
     }
 
-    protected boolean mayGrief(final LivingEntity user) {
-        return (user instanceof Player || user.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) &&
-                user.level().getGameRules().getBoolean(JCraft.STAND_GRIEFING);
+    /**
+     * Helper method that determines whether the given user may break the given block.
+     * For a general check, you can pass {@code null} as the pos.
+     * @param user The user to check for
+     * @param pos The position to check for, or null if no position is applicable yet.
+     * @return Whether the user may break either the given blocks or blocks in general.
+     */
+    public static boolean mayBreak(final LivingEntity user, @Nullable final BlockPos pos) {
+        return mayBreak(user, pos, null);
+    }
+
+    /**
+     * Helper method that determines whether the given user may break the given block.
+     * For a general check, you can pass {@code null} as the pos.
+     * @param user The user to check for
+     * @param pos The position to check for, or null if no position is applicable yet.
+     * @param pred An optional predicate to add extra checks for a state (such as explosion resistance).
+     *             Prevents the need to acquire the state again for such checks afterward.
+     * @return Whether the user may break either the given blocks or blocks in general.
+     */
+    public static boolean mayBreak(final LivingEntity user, @Nullable final BlockPos pos, @Nullable Predicate<BlockState> pred) {
+        return mayBreak(user.level(), user, pos, pred);
+    }
+
+    /**
+     * Helper method that determines whether the given user may break the given block.
+     * For a general check, you can pass {@code null} as the pos.
+     * @param level The level to check in
+     * @param user The user to check for
+     * @param pos The position to check for, or null if no position is applicable yet.
+     * @param pred An optional predicate to add extra checks for a state (such as explosion resistance).
+     *             Prevents the need to acquire the state again for such checks afterward.
+     * @return Whether the user may break either the given blocks or blocks in general.
+     */
+    public static boolean mayBreak(final @NonNull Level level, @Nullable final LivingEntity user, @Nullable final BlockPos pos,
+                                   @Nullable Predicate<BlockState> pred) {
+        if (user != null) {
+            if (user.getType().is(JTagRegistry.CANT_BREAK_BLOCKS)) {
+                return false;
+            }
+            // special case for brawler attacking training dummy
+            if (user.getType() == JEntityTypeRegistry.BRAWLER_SPEC_USER.get() && user instanceof Mob brawler &&
+                    brawler.getTarget() != null && brawler.getTarget().getType() == JEntityTypeRegistry.TRAINING_DUMMY.get()) {
+                return false;
+            }
+        }
+        Predicate<BlockState> isDestructable = state -> {
+            if (state.isAir()) {
+                return true;
+            }
+            else {
+                Block block = state.getBlock();
+                float destroyTime = block.defaultDestroyTime();
+
+                return destroyTime > 0;
+            }
+        };
+
+        boolean standGriefing = level.getGameRules().getBoolean(JCraft.STAND_GRIEFING);
+        pred = pred == null ? isDestructable : pred.and(isDestructable);
+        return standGriefing && JUtils.mayAlter(level, user, pos, pred);
     }
 
     /**
@@ -869,6 +1110,7 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
     protected @NonNull T copyExtras(final @NonNull T base) {
         AbstractMove<T, A> cast = base; // Required to access private fields
         cast.originalMove = originalMove;
+        cast.attackerClass = attackerClass;
         cast.moveClass = moveClass;
         cast.name = name;
         cast.description = description;

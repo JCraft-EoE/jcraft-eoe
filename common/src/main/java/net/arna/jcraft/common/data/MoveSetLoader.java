@@ -30,11 +30,15 @@ public class MoveSetLoader {
     public static void attemptLoad(final MoveSet<?, ?> moveSet) {
         // This method is called when a MoveSet is created.
         // It will load the move set data if it exists.
-        final ResourceLocation typeLoc = moveSet.getType().getId();
+        final ResourceLocation typeLoc = moveSet.getTypeId();
         final String moveSetName = moveSet.getName();
 
-        if (PENDING_MOVE_SET_DATA.getOrDefault(typeLoc, Collections.emptyMap()).containsKey(moveSetName)) {
-            Map<String, Collection<Pair<ResourceLocation, JsonObject>>> typeMoveSets = PENDING_MOVE_SET_DATA.get(typeLoc);
+        Map<String, Collection<Pair<ResourceLocation, JsonObject>>> typeMoveSets = PENDING_MOVE_SET_DATA
+                .getOrDefault(typeLoc, Collections.emptyMap());
+        if (typeMoveSets.containsKey(moveSetName)) {
+            JCraft.LOGGER.warn("Moveset '{}' for attacker {} was not instantiated until after data was loaded. " +
+                    "This is deprecated behaviour. Please ensure all moveset instances have been instantiated " +
+                    "by the time data is loaded.", moveSetName, typeLoc);
             moveSet.load(JsonOps.INSTANCE, typeMoveSets.get(moveSetName), null);
             typeMoveSets.remove(moveSetName);
 

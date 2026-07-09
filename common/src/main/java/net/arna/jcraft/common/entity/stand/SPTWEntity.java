@@ -2,8 +2,10 @@ package net.arna.jcraft.common.entity.stand;
 
 import com.mojang.datafixers.util.Either;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
@@ -29,18 +31,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import org.joml.Vector3f;
 
-import java.util.function.Consumer;
-
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Star_Platinum">Star Platinum The World</a>.
  * @see JStandTypeRegistry#STAR_PLATINUM_THE_WORLD
- * @see net.arna.jcraft.client.model.entity.stand.StarPlatinumModel StarPlatinumModel
  * @see net.arna.jcraft.client.renderer.entity.stands.SPTWRenderer SPTWRenderer
  * @see SPTWGroundSlamAttack
  */
 public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPTWEntity.State> {
     public static final MoveSet<SPTWEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.STAR_PLATINUM_THE_WORLD,
-            SPTWEntity::registerMoves, State.class);
+            SPTWEntity::registerMoves, SPTWEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(315f)
             .evolution(true)
@@ -59,7 +58,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
             .summonData(SummonData.of(JSoundRegistry.STAR_PLATINUM_SUMMON))
             .build();
 
-    public static final SPTWGroundSlamAttack GROUND_SLAM = new SPTWGroundSlamAttack(0,
+    public static final SPTWGroundSlamAttack<SPTWEntity> GROUND_SLAM = new SPTWGroundSlamAttack<SPTWEntity>(0,
             12, 19,0.75f, 7f, 11, 1.8f, 0f, 0.8f)
             .withAnim(State.GROUND_SLAM)
             .withImpactSound(JSoundRegistry.IMPACT_8)
@@ -97,7 +96,7 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                     Component.translatable("jcraft.generic.barrage"),
                     Component.literal("fast reliable combo starter/extender, high stun")
             );
-    public static final TimeStrikeAttack TIME_STRIKE = new TimeStrikeAttack(300,
+    public static final TimeStrikeAttack<SPTWEntity> TIME_STRIKE = new TimeStrikeAttack<SPTWEntity>(300,
             7, 11, 0.75f, 5f, 12, 1.5f, 0.6f, -0.25f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withExtraHitBox(1f)
@@ -168,12 +167,18 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
                     Component.translatable("jcraft.generic.ts"),
                     Component.literal("1.75 seconds, extremely low windup")
             );
-    public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(300, 14)
+    public static final TimeSkipMove<SPTWEntity> TIME_SKIP = new TimeSkipMove<SPTWEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.STAR_PLATINUM_TIMESKIP)
             .withInfo(
                     Component.translatable("jcraft.generic.tp"),
                     Component.literal("14m range")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<SPTWEntity> TOSS = new TossMove<SPTWEntity>(0, 1, 1, 0.75f, 0.15f)
+            .withAnim(SPTWEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<SPTWEntity> TOSS_CHARGE = new TossChargeMove<SPTWEntity>(70, 1 * 20 + 1, 3 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public SPTWEntity(Level worldIn) {
         super(JStandTypeRegistry.STAR_PLATINUM_THE_WORLD.get(), worldIn);
@@ -198,6 +203,8 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
         moves.register(MoveClass.ULTIMATE, TIME_STOP, State.TIME_STOP);
 
         moves.register(MoveClass.UTILITY, TIME_SKIP, State.TIME_SKIP);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -222,42 +229,39 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
 
     // Animation code
     public enum State implements StandAnimationState<SPTWEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sptw.idle"))),
-        PUNCH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.punch"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sptw.block"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.heavy"))),
-        GROUND_BREAKER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.ground_break"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sptw.barrage"))),
-        TIME_STRIKE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.timestrike"))),
-        TIME_STOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.timestop"))),
-        BACKHAND(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.backhand"))),
-        GRAB(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.grab"))),
-        GRAB_HIT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.grabhit"))),
-        GRAB_HIT2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.grabhit2"))),
-        TIME_SKIP(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sptw.idle"))),
-        GROUND_SLAM(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.ground_slam"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.sptw.light_followup")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sptw.idle", AzPlayBehaviors.LOOP)),
+        PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.punch", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sptw.block", AzPlayBehaviors.LOOP)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GROUND_BREAKER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.ground_break", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.barrage", AzPlayBehaviors.LOOP)),
+        TIME_STRIKE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.timestrike", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TIME_STOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.timestop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BACKHAND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.backhand", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grabhit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB_HIT2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grabhit2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TIME_SKIP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.idle", AzPlayBehaviors.LOOP)),
+        GROUND_SLAM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.ground_slam", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
-        private final Consumer<AnimationState<SPTWEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<SPTWEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(SPTWEntity attacker, AnimationState<SPTWEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(SPTWEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected String getSummonAnimation() {
-        return "animation.sptw.summon";
     }
 
     @Override

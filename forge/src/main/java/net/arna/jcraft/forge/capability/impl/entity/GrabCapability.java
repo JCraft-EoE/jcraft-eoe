@@ -2,6 +2,7 @@ package net.arna.jcraft.forge.capability.impl.entity;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.entity.CommonGrabComponentImpl;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.forge.capability.api.JCapability;
@@ -15,11 +16,9 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.LazyOptional;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class GrabCapability extends CommonGrabComponentImpl implements JCapability {
 
-    public static ResourceLocation GRAB_S2C = new ResourceLocation(MOD_ID, "grab_s2c");
+    public static ResourceLocation GRAB_S2C = JCraft.id("grab_s2c");
 
     public static Capability<GrabCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
     });

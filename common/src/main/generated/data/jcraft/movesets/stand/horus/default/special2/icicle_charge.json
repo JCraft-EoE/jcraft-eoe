@@ -1,0 +1,44 @@
+{
+  "anim_state": "CHARGE_ICICLE",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "followup": {
+    "anim_state": "CHARGE_FIRE",
+    "class": "SPECIAL2",
+    "cooldown_type": "STAND_SP2",
+    "move": {
+      "type": "jcraft:horus_icicle_fire_attack",
+      "cooldown": 0,
+      "duration": 11,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.horus.default.icicle_fire.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.horus.default.icicle_fire.followup.name"
+        }
+      },
+      "move_distance": 0.75,
+      "windup": 1
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_holdable_move",
+    "cooldown": 0,
+    "duration": 30,
+    "extras": {
+      "armor": 3,
+      "description": {
+        "translate": "move.jcraft.horus.default.icicle_charge.description"
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.horus.default.icicle_charge.name"
+      }
+    },
+    "minimum_charge": 9,
+    "move_distance": 0.75,
+    "set_move_stun": false,
+    "windup": 31
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "crouching_variant": {
+    "class": "UTILITY",
+    "cooldown_type": "UTILITY",
+    "move": {
+      "type": "jcraft:shared_no_op_move",
+      "cooldown": 0,
+      "duration": 0,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.the_sun.default.move.cr.description"
+        },
+        "is_holdable": true,
+        "name": {
+          "translate": "move.jcraft.the_sun.default.move.cr.name"
+        }
+      },
+      "move_distance": 0.0
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_no_op_move",
+    "cooldown": 0,
+    "duration": 0,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.the_sun.default.toggle_passive.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_sun.default.toggle_passive.name"
+      }
+    },
+    "move_distance": 0.0
+  }
+}

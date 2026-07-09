@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.arna.jcraft.api.attack.core.MoveAction;
 import net.arna.jcraft.api.attack.core.MoveActionType;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -19,7 +20,16 @@ public class MetallicaAddIronAction extends MoveAction<MetallicaAddIronAction, M
 
     @Override
     public void perform(MetallicaEntity attacker, LivingEntity user, Set<LivingEntity> targets) {
-        attacker.addIron(iron);
+        boolean foundIronEntity = false;
+        for (final LivingEntity target : targets) {
+            if (!target.getType().is(JTagRegistry.IRONLESS_ENTITIES)) {
+                foundIronEntity = true;
+                break;
+            }
+        }
+        if (foundIronEntity) {
+            attacker.addIron(iron);
+        }
     }
 
     @Override

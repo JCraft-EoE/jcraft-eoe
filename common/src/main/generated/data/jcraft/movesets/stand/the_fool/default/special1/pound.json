@@ -1,0 +1,89 @@
+{
+  "anim_state": "POUND_UP",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "followup": {
+    "anim_state": "POUND_UP",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:thefool_slam_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 5,
+        "hit_animation": "CRUSH",
+        "hit_spark": "HIT_SPARK_2"
+      },
+      "cooldown": 10,
+      "damage": 4.0,
+      "duration": 10,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:foolbark1"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact2"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.the_fool.default.slam.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.the_fool.default.slam.followup.name"
+        }
+      },
+      "hitbox_size": 2.0,
+      "knockback": 0.2,
+      "move_distance": 1.25,
+      "offset": 0.1,
+      "stun": 24,
+      "windup": 4
+    }
+  },
+  "move": {
+    "type": "jcraft:thefool_pound_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "LOW",
+      "hit_spark": "HIT_SPARK_2",
+      "lift": false
+    },
+    "cooldown": 0,
+    "damage": 4.0,
+    "duration": 22,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:foolbark2"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact2"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_fool.default.pound.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_fool.default.pound.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.1,
+    "move_distance": 1.25,
+    "offset": -0.1,
+    "stun": 25,
+    "windup": 7
+  }
+}

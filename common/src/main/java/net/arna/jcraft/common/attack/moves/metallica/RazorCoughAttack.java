@@ -3,14 +3,17 @@ package net.arna.jcraft.common.attack.moves.metallica;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
+import net.arna.jcraft.api.MoveSelectionResult;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.arna.jcraft.common.tickable.MagneticFields;
 import net.arna.jcraft.common.tickable.RazorCoughs;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,29 +21,42 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RazorCoughAttack extends AbstractMove<RazorCoughAttack, MetallicaEntity> {
+public class RazorCoughAttack<A extends IAttacker<? extends A, ?>> extends AbstractMove<RazorCoughAttack<A>, A> {
     public RazorCoughAttack(int cooldown, int windup, int duration) {
         super(cooldown, windup, duration, 0);
     }
 
     @Override
-    public @NonNull MoveType<RazorCoughAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<RazorCoughAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(MetallicaEntity attacker, LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user) {
         final Set<Entity> filter = new HashSet<>(2);
         filter.add(user);
-        filter.add(attacker);
+        filter.add(attacker.getBaseEntity());
         if (user.isVehicle()) {
             filter.addAll(user.getPassengers());
         }
 
         MagneticFields.forAllOfOwner(user, (field) -> {
-            Set<LivingEntity> hit = JUtils.generateHitbox(attacker.level(), field.pos, field.getStrength(), filter);
+            Set<LivingEntity> hit = JUtils.generateHitbox(attacker.getBaseEntity().level(), field.pos, field.getStrength(), filter);
             for (LivingEntity target : hit) {
+                if (target instanceof StandEntity<?, ?> stand) {
+                    final LivingEntity targetUser = stand.getUser();
+
+                    if (targetUser == null) {
+                        continue;
+                    } else if (hit.contains(targetUser)) { // handled later in the iteration
+                        continue;
+                    } else {
+                        target = targetUser;
+                    }
+                }
+
                 RazorCoughs.add(user, target);
                 target.playSound(JSoundRegistry.METALLICA_RAZOR_VOMIT_PREPARE.get());
 
@@ -65,20 +81,43 @@ public class RazorCoughAttack extends AbstractMove<RazorCoughAttack, MetallicaEn
     }
 
     @Override
-    protected @NonNull RazorCoughAttack getThis() {
+    public MoveSelectionResult specificMoveSelectionCriterion(
+            A attacker, LivingEntity mob, LivingEntity target,
+            int stunTicks, int enemyMoveStun, double distance,
+            StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
+        final LivingEntity user = attacker.getUserOrThrow();
+        final AtomicBoolean hitFound = new AtomicBoolean(false);
+        final Set<Entity> filter = Set.of(attacker.getBaseEntity(), user);
+
+        MagneticFields.forAllOfOwner(user, (field) -> {
+            final Set<LivingEntity> hit = JUtils.generateHitboxNoDisplay(attacker.getBaseEntity().level(), field.pos, field.getStrength(), e -> !filter.contains(e));
+
+            if (!hit.isEmpty()) {
+                hitFound.set(true);
+                return false;
+            }
+
+            return true;
+        });
+
+        return hitFound.get() ? MoveSelectionResult.USE : MoveSelectionResult.STOP;
+    }
+
+    @Override
+    protected @NonNull RazorCoughAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull RazorCoughAttack copy() {
-        return copyExtras(new RazorCoughAttack(getCooldown(), getWindup(), getDuration()));
+    public @NonNull RazorCoughAttack<A> copy() {
+        return copyExtras(new RazorCoughAttack<>(getCooldown(), getWindup(), getDuration()));
     }
 
-    public static class Type extends AbstractMove.Type<RazorCoughAttack> {
+    public static class Type extends AbstractMove.Type<RazorCoughAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<RazorCoughAttack>, RazorCoughAttack> buildCodec(RecordCodecBuilder.Instance<RazorCoughAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<RazorCoughAttack<?>>, RazorCoughAttack<?>> buildCodec(RecordCodecBuilder.Instance<RazorCoughAttack<?>> instance) {
             return instance.group(extras(), cooldown(), windup(), duration()).apply(instance, applyExtras(RazorCoughAttack::new));
         }
     }

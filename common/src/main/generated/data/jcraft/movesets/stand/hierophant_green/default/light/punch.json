@@ -1,0 +1,210 @@
+{
+  "aerial_variant": {
+    "anim_state": "AIR_LIGHT",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_simple_uppercut_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 0,
+      "damage": 5.0,
+      "duration": 14,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact3"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.hierophant_green.default.backward_flip_kick.air.description"
+        },
+        "name": {
+          "translate": "move.jcraft.hierophant_green.default.backward_flip_kick.air.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.4,
+      "move_distance": 0.75,
+      "offset": -0.3,
+      "strength": 0.4,
+      "stun": 15,
+      "windup": 7
+    }
+  },
+  "anim_state": "LIGHT",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "crouching_variant": {
+    "anim_state": "CROUCHING_LIGHT",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "followup": {
+      "anim_state": "CROUCHING_LIGHT_FOLLOWUP",
+      "class": "LIGHT",
+      "cooldown_type": "STAND_LIGHT",
+      "move": {
+        "type": "jcraft:shared_knockdown_attack",
+        "attack_extras": {
+          "backstab": true,
+          "block_stun": 10,
+          "hit_animation": "MID",
+          "hit_spark": "HIT_SPARK_2"
+        },
+        "cooldown": 0,
+        "damage": 6.0,
+        "duration": 16,
+        "extras": {
+          "actions": [
+            {
+              "type": "jcraft:play_sound",
+              "run": "at_init",
+              "sound": "jcraft:hgcrouchlight"
+            },
+            {
+              "type": "jcraft:play_sound",
+              "bind": false,
+              "run": "on_hit",
+              "sound": "jcraft:impact1"
+            }
+          ],
+          "description": {
+            "translate": "move.jcraft.hierophant_green.default.sweep.followup.description"
+          },
+          "name": {
+            "translate": "move.jcraft.hierophant_green.default.sweep.followup.name"
+          }
+        },
+        "hitbox_size": 1.75,
+        "knockback": 0.75,
+        "knockdown_duration": 35,
+        "move_distance": 0.75,
+        "offset": 0.4,
+        "stun": 13,
+        "windup": 9
+      }
+    },
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 23,
+      "damage": 5.0,
+      "duration": 11,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact4"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.hierophant_green.default.low_punch.cr.description"
+        },
+        "loop_prevention": false,
+        "name": {
+          "translate": "move.jcraft.hierophant_green.default.low_punch.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.15,
+      "move_distance": 0.75,
+      "offset": 0.3,
+      "stun": 12,
+      "windup": 7
+    }
+  },
+  "followup": {
+    "anim_state": "LIGHT_FOLLOWUP",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_simple_uppercut_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 4,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_2"
+      },
+      "cooldown": 0,
+      "damage": 6.0,
+      "duration": 15,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:hglightfollowup"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact3"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.hierophant_green.default.uppercut.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.hierophant_green.default.uppercut.followup.name"
+        }
+      },
+      "hitbox_size": 1.75,
+      "knockback": 0.5,
+      "move_distance": 0.75,
+      "offset": -0.2,
+      "strength": 0.4,
+      "stun": 13,
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 19,
+    "damage": 5.0,
+    "duration": 9,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact4"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.hierophant_green.default.punch.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.hierophant_green.default.punch.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.15,
+    "move_distance": 0.75,
+    "offset": 0.2,
+    "stun": 10,
+    "windup": 7
+  }
+}

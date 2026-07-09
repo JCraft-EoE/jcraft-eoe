@@ -51,6 +51,16 @@
       "jcraft:generic/cooldown_cancel"
     ]
   },
+  "whiff": {
+    "sounds": [
+      "jcraft:generic/whiff1",
+      "jcraft:generic/whiff2",
+      "jcraft:generic/whiff3",
+      "jcraft:generic/whiff4",
+      "jcraft:generic/whiff5",
+      "jcraft:generic/whiff6"
+    ]
+  },
   "impact1": {
     "sounds": [
       "jcraft:generic/impact1"
@@ -424,6 +434,11 @@
       "jcraft:stands/cream/overhead"
     ]
   },
+  "kqsummon": {
+    "sounds": [
+      "jcraft:stands/killerqueen/summon"
+    ]
+  },
   "kqheavy": {
     "sounds": [
       "jcraft:stands/killerqueen/heavy"
@@ -446,7 +461,17 @@
   },
   "kqexplode": {
     "sounds": [
-      "jcraft:stands/killerqueen/explode"
+      "jcraft:stands/killerqueen/explode1",
+      "jcraft:stands/killerqueen/explode2",
+      "jcraft:stands/killerqueen/explode3",
+      "jcraft:stands/killerqueen/explode4",
+      "jcraft:stands/killerqueen/explode5",
+      "jcraft:stands/killerqueen/explode6"
+    ]
+  },
+  "kqnuke": {
+    "sounds": [
+      "jcraft:stands/killerqueen/nuke"
     ]
   },
   "kqbtdelbow": {
@@ -457,6 +482,11 @@
   "kqbtdsummon": {
     "sounds": [
       "jcraft:stands/kqbtd/summon"
+    ]
+  },
+  "kqbtdbubble": {
+    "sounds": [
+      "jcraft:stands/kqbtd/bubble"
     ]
   },
   "wssummon": {
@@ -703,6 +733,11 @@
   "twohknives": {
     "sounds": [
       "jcraft:stands/theworldoverheaven/air_knives"
+    ]
+  },
+  "foolsummon": {
+    "sounds": [
+      "jcraft:stands/fool/summon"
     ]
   },
   "foolbark1": {
@@ -1060,6 +1095,16 @@
       "jcraft:stands/metallica/razor_vomit_prepare"
     ]
   },
+  "mcry": {
+    "sounds": [
+      "jcraft:stands/metallica/metallica"
+    ]
+  },
+  "mtakethis": {
+    "sounds": [
+      "jcraft:stands/metallica/takethis"
+    ]
+  },
   "mandomcountdown": {
     "sounds": [
       "jcraft:stands/mandom/countdown"
@@ -1140,6 +1185,51 @@
       "jcraft:specs/vampire/spec_change"
     ]
   },
+  "hamoncrash": {
+    "sounds": [
+      "jcraft:specs/hamon/crash"
+    ]
+  },
+  "hamonecho": {
+    "sounds": [
+      "jcraft:specs/hamon/echo"
+    ]
+  },
+  "hamonring": {
+    "sounds": [
+      "jcraft:specs/hamon/ring"
+    ]
+  },
+  "hamonsurge": {
+    "sounds": [
+      "jcraft:specs/hamon/surge"
+    ]
+  },
+  "hamonswoosh": {
+    "sounds": [
+      "jcraft:specs/hamon/swoosh"
+    ]
+  },
+  "hamoncrackleimpact": {
+    "sounds": [
+      "jcraft:specs/hamon/crackle_impact"
+    ]
+  },
+  "hamoncrackles": {
+    "sounds": [
+      "jcraft:specs/hamon/crackles"
+    ]
+  },
+  "hamonbreathe": {
+    "sounds": [
+      "jcraft:specs/hamon/breathe"
+    ]
+  },
+  "hamonexhale": {
+    "sounds": [
+      "jcraft:specs/hamon/exhale"
+    ]
+  },
   "bulletricochet": {
     "sounds": [
       "jcraft:projectiles/bullet/ricochet"
@@ -1158,6 +1248,14 @@
   "shatread": {
     "sounds": [
       "jcraft:sheerheartattack/sha_tread"
+    ]
+  },
+  "shaexplode": {
+    "sounds": [
+      "jcraft:sheerheartattack/sha_explode1",
+      "jcraft:sheerheartattack/sha_explode2",
+      "jcraft:sheerheartattack/sha_explode3",
+      "jcraft:sheerheartattack/sha_explode4"
     ]
   },
   "rrhit": {
@@ -1183,6 +1281,111 @@
   "rrignition": {
     "sounds": [
       "jcraft:vehicles/roadroller/ignition"
+    ]
+  },
+  "asshoot": {
+    "sounds": [
+      "jcraft:stands/aerosmith/burst1",
+      "jcraft:stands/aerosmith/burst2",
+      "jcraft:stands/aerosmith/burst3",
+      "jcraft:stands/aerosmith/burst4",
+      "jcraft:stands/aerosmith/burst5"
+    ]
+  },
+  "assummon": {
+    "sounds": [
+      "jcraft:stands/aerosmith/summon"
+    ]
+  },
+  "asbombdrop": {
+    "sounds": [
+      "jcraft:stands/aerosmith/bombdrop"
+    ]
+  },
+  "asbombland": {
+    "sounds": [
+      "jcraft:stands/aerosmith/bombland"
+    ]
+  },
+  "asradarping": {
+    "sounds": [
+      "jcraft:stands/aerosmith/radarping"
+    ]
+  },
+  "asradarscan": {
+    "sounds": [
+      "jcraft:stands/aerosmith/radarscan"
+    ]
+  },
+  "asbarrage": {
+    "sounds": [
+      "jcraft:stands/aerosmith/standcry"
+    ]
+  },
+  "asbarragehit": {
+    "sounds": [
+      "jcraft:stands/aerosmith/slices"
+    ]
+  },
+  "asdist": {
+    "sounds": [
+      "jcraft:stands/aerosmith/idle_dist"
+    ]
+  },
+  "asidle": {
+    "sounds": [
+      {
+        "name": "jcraft:stands/aerosmith/idle_close",
+        "attenuation_distance": 50
+      }
+    ]
+  },
+  "asmaneuver": {
+    "sounds": [
+      {
+        "name": "jcraft:stands/aerosmith/maneuver",
+        "attenuation_distance": 50
+      }
+    ]
+  },
+  "asshout": {
+    "sounds": [
+      "jcraft:stands/aerosmith/shout"
+    ]
+  },
+  "asname": {
+    "sounds": [
+      "jcraft:stands/aerosmith/aerosmith"
+    ]
+  },
+  "asvola": {
+    "sounds": [
+      "jcraft:stands/aerosmith/vola"
+    ]
+  },
+  "aslanding": {
+    "sounds": [
+      "jcraft:stands/aerosmith/landing"
+    ]
+  },
+  "gas_can_toss": {
+    "sounds": [
+      "jcraft:projectiles/gas_can/toss"
+    ]
+  },
+  "gas_can_spill": {
+    "sounds": [
+      "jcraft:projectiles/gas_can/spill"
+    ]
+  },
+  "gas_can_crash": {
+    "sounds": [
+      "jcraft:projectiles/gas_can/crash"
+    ]
+  },
+  "matchbox_use": {
+    "sounds": [
+      "jcraft:projectiles/matchbox/use"
     ]
   }
 }

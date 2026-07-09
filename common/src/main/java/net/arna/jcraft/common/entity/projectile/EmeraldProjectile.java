@@ -1,13 +1,11 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.util.AzureLibUtil;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.api.misc.JBlockBreaker;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -25,8 +23,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
-public class EmeraldProjectile extends AbstractArrow implements GeoEntity {
+public class EmeraldProjectile extends AbstractArrow {
+    private static final float BLOCK_BREAK_STRENGTH = 2f;
     private int ticksInAir;
     private int bouncesLeft = 5;
     private boolean reflect = false;
@@ -138,6 +138,23 @@ public class EmeraldProjectile extends AbstractArrow implements GeoEntity {
     }
 
     @Override
+    protected void onHitBlock(@NotNull BlockHitResult result) {
+        super.onHitBlock(result);
+
+        if (level().isClientSide()) {
+            return;
+        }
+
+        LivingEntity owner = getOwner() instanceof LivingEntity le ? le : null;
+        if (AbstractMove.mayBreak(level(), owner, result.getBlockPos(), null)) {
+            float breakage = JBlockBreaker.calcBreakageForProjectile(level(), result.getBlockPos(), getDeltaMovement(),
+                    BLOCK_BREAK_STRENGTH);
+            JBlockBreaker.setBreakState(level(), owner, result.getBlockPos(), breakage);
+        }
+        discard();
+    }
+
+    @Override
     protected float getWaterInertia() {
         // Not actually drag, just a multiplier
         return 0.8F;
@@ -156,6 +173,7 @@ public class EmeraldProjectile extends AbstractArrow implements GeoEntity {
     }
 
     // Animations
+    /*
     private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
 
     @Override
@@ -164,5 +182,5 @@ public class EmeraldProjectile extends AbstractArrow implements GeoEntity {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
-    }
+    }*/
 }

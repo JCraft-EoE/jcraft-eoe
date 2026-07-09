@@ -1,0 +1,137 @@
+{
+  "anim_state": "LIGHT",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "crouching_variant": {
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:killerqueen_detonate_attack",
+      "cooldown": 20,
+      "duration": 6,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.killer_queen_bites_the_dust.default.detonate.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.killer_queen_bites_the_dust.default.detonate.cr.name"
+        }
+      },
+      "move_distance": 1.0,
+      "windup": 5
+    }
+  },
+  "followup": {
+    "anim_state": "LIGHT_FOLLOWUP",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "followup": {
+      "anim_state": "LOW",
+      "class": "LIGHT",
+      "cooldown_type": "STAND_LIGHT",
+      "move": {
+        "type": "jcraft:shared_simple_attack",
+        "attack_extras": {
+          "backstab": true,
+          "block_stun": 8,
+          "hit_animation": "MID",
+          "hit_spark": "HIT_SPARK_1"
+        },
+        "cooldown": 0,
+        "damage": 4.0,
+        "duration": 13,
+        "extras": {
+          "actions": [
+            {
+              "type": "jcraft:play_sound",
+              "bind": false,
+              "run": "on_hit",
+              "sound": "jcraft:impact1"
+            }
+          ],
+          "description": {
+            "translate": "move.jcraft.killer_queen_bites_the_dust.default.low_punch.followup.description"
+          },
+          "name": {
+            "translate": "move.jcraft.killer_queen_bites_the_dust.default.low_punch.followup.name"
+          }
+        },
+        "hitbox_size": 1.5,
+        "knockback": 0.25,
+        "move_distance": 0.85,
+        "offset": 0.1,
+        "stun": 10,
+        "windup": 8
+      }
+    },
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 7,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_2"
+      },
+      "cooldown": 0,
+      "damage": 3.0,
+      "duration": 13,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.killer_queen_bites_the_dust.default.second_punch.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.killer_queen_bites_the_dust.default.second_punch.followup.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.5,
+      "move_distance": 0.8,
+      "offset": 0.1,
+      "stun": 20,
+      "windup": 6
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 7,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 25,
+    "damage": 3.0,
+    "duration": 10,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact6"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.punch.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.killer_queen_bites_the_dust.default.punch.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.25,
+    "move_distance": 0.75,
+    "offset": 0.1,
+    "stun": 10,
+    "windup": 6
+  }
+}

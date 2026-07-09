@@ -28,14 +28,17 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
     @Shadow @Final private DataSlot cost;
     @Shadow private String itemName;
 
+    @Shadow
+    private int repairItemCountCost;
+
     private AnvilMenuMixin(@Nullable MenuType<?> type, int containerId, Inventory playerInventory, ContainerLevelAccess access) {
         super(type, containerId, playerInventory, access);
     }
 
     @Inject(method = "createResult()V", at = @At("RETURN"))
-    private void jcraft$injectCinderella(final CallbackInfo ci) {
-        ItemStack item1 = inputSlots.getItem(0); // Stand disc or unenchanted Cindarella mask
-        ItemStack item2 = inputSlots.getItem(1); // enchanted Cinderella mask or enchantment
+    private void jcraft$injectAnvil(final CallbackInfo ci) {
+        ItemStack item1 = inputSlots.getItem(0);
+        ItemStack item2 = inputSlots.getItem(1);
         if (item1.is(JItemRegistry.CINDERELLA_MASK.get()) && item2.is(Items.ENCHANTED_BOOK)) {
             jcraft$enchantMask(item1, item2);
         }
@@ -59,8 +62,9 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
             return;
         }
         // prepare the result
+        final int newEnchantedLevel = enchantedLevel.equals(enchantLevel) ? enchantedLevel + 1 : Math.max(enchantedLevel, enchantLevel);
         final ItemStack enchantedMask = new ItemStack(JItemRegistry.CINDERELLA_MASK.get());
-        EnchantmentHelper.setEnchantments(Map.of(JEnchantmentRegistry.CINDERELLAS_KISS.get(), c), enchantedMask);
+        EnchantmentHelper.setEnchantments(Map.of(JEnchantmentRegistry.CINDERELLAS_KISS.get(), newEnchantedLevel), enchantedMask);
         // check for custom item name
         if (itemName != null && !Util.isBlank(itemName)) {
             if (!itemName.equals(mask.getHoverName().getString())) {
@@ -84,7 +88,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
     }
 
     @Unique
-    private void jcraft$switchSkin(ItemStack disc, ItemStack mask) {
+    private void jcraft$switchSkin(final ItemStack disc, final ItemStack mask) {
         // If the disc is empty, return.
         StandType standType = StandDiscItem.getStandType(disc);
         if (standType == null)
@@ -95,6 +99,8 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
         if (level >= standType.getData().getInfo().getSkinCount() || level == StandDiscItem.getSkin(disc)) {
             return;
         }
+        // hack to make it not consume multiple Cinderella masks at once
+        repairItemCountCost = 1;
         // prepare the result
         final ItemStack newDisc = StandDiscItem.createDiscStack(standType, level);
         int c = 5;

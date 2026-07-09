@@ -1,30 +1,40 @@
 package net.arna.jcraft.client.renderer.entity.projectiles;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.arna.jcraft.client.model.JProjectileModel;
+import lombok.NonNull;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.renderer.entity.AbstractEntityRenderer;
 import net.arna.jcraft.common.entity.projectile.BlockProjectile;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * The {@link GeoProjectileRenderer} for {@link BlockProjectile}.
+ * The {@link ProjectileRenderer} for {@link BlockProjectile}.
  */
-public class BlockProjectileRenderer extends GeoProjectileRenderer<BlockProjectile> {
+@Environment(EnvType.CLIENT)
+public class BlockProjectileRenderer extends AbstractEntityRenderer<BlockProjectile> {
     private final ItemRenderer itemRenderer;
 
-    public BlockProjectileRenderer(final EntityRendererProvider.Context ctx) {
-        super(ctx, new JProjectileModel<>("block", true));
-        this.itemRenderer = ctx.getItemRenderer();
+    public static final String ID = "block";
+    private static final RenderType RENDER_TYPE = RenderType.eyes(JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID)));
+
+    public BlockProjectileRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID), b -> b
+                        .setRenderType(RENDER_TYPE),
+                ID);
+        this.itemRenderer = context.getItemRenderer();
     }
 
     @Override
-    public RenderType getRenderType(final BlockProjectile animatable, final ResourceLocation texture, final MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.eyes(texture);
+    public boolean shouldShowName(@NotNull BlockProjectile entity) {
+        return false;
     }
 
     @Override

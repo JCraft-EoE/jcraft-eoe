@@ -1,6 +1,7 @@
 package net.arna.jcraft.forge.capability.impl.entity;
 
 import dev.architectury.networking.NetworkManager;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.component.impl.entity.CommonGravityComponentImpl;
 import net.arna.jcraft.forge.JNetworkingForge;
 import net.arna.jcraft.forge.capability.api.JCapability;
@@ -17,11 +18,9 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 
 import java.util.Optional;
 
-import static net.arna.jcraft.JCraft.MOD_ID;
-
 public class GravityCapability extends CommonGravityComponentImpl implements JCapability {
-    public static ResourceLocation G_S2C = new ResourceLocation(MOD_ID, "g_s2c");
-    public static ResourceLocation G_C2S = new ResourceLocation(MOD_ID, "g_c2s");
+    public static ResourceLocation G_S2C = JCraft.id("g_s2c");
+    public static ResourceLocation G_C2S = JCraft.id("g_c2s");
 
     public static Capability<GravityCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
     });

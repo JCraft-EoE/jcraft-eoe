@@ -1,0 +1,98 @@
+{
+  "anim_state": "CHARGE_HIGH",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "crouching_variant": {
+    "anim_state": "CHARGE_LOW",
+    "class": "SPECIAL2",
+    "cooldown_type": "STAND_SP2",
+    "move": {
+      "type": "jcraft:silverchariot_ray_dart_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 100,
+      "damage": 6.0,
+      "duration": 18,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:sccharge"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "minecraft:entity.player.attack.sweep"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.silver_chariot.possessed.lacerate.cr.description"
+        },
+        "mobility_type": "DASH",
+        "name": {
+          "translate": "move.jcraft.silver_chariot.possessed.lacerate.cr.name"
+        },
+        "ranged": true
+      },
+      "hitbox_size": 1.75,
+      "knockback": 0.25,
+      "move_distance": 0.65,
+      "offset": 0.2,
+      "stun": 20,
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:silverchariot_ray_dart_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 16,
+      "extra_hit_boxes": [
+        {
+          "forward_offset": 1.0,
+          "size": 1.0,
+          "vertical_offset": 1.0
+        }
+      ],
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 100,
+    "damage": 6.0,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:sccharge"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.silver_chariot.possessed.split.description"
+      },
+      "mobility_type": "DASH",
+      "name": {
+        "translate": "move.jcraft.silver_chariot.possessed.split.name"
+      },
+      "ranged": true
+    },
+    "hitbox_size": 2.0,
+    "knockback": 0.25,
+    "move_distance": 0.65,
+    "offset": 0.2,
+    "stun": 15,
+    "windup": 12
+  }
+}

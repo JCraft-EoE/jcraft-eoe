@@ -3,8 +3,10 @@ package net.arna.jcraft.common.attack.moves.metallica;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
+import net.arna.jcraft.api.MoveSelectionResult;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.tickable.MagneticFields;
@@ -21,6 +23,8 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Set;
 
 public class CreateMagneticFieldMove extends AbstractMove<CreateMagneticFieldMove, MetallicaEntity> {
+    public static final float IRON_COST = 10.0f;
+
     public CreateMagneticFieldMove(int cooldown, int windup, int duration) {
         super(cooldown, windup, duration, 0);
     }
@@ -39,7 +43,7 @@ public class CreateMagneticFieldMove extends AbstractMove<CreateMagneticFieldMov
 
         final Vec3 hitPos = hitResult.getLocation();
 
-        JComponentPlatformUtils.getCooldowns(user).setCooldown(CooldownType.SPECIAL2, 400);
+        JComponentPlatformUtils.getCooldowns(user).setCooldown(CooldownType.STAND_SP2, 400);
 
         MagneticFields.createField(
                 (ServerLevel) user.level(),
@@ -51,7 +55,14 @@ public class CreateMagneticFieldMove extends AbstractMove<CreateMagneticFieldMov
                 )
         );
 
+        attacker.drainIron(IRON_COST);
+
         return Set.of();
+    }
+
+    @Override
+    public MoveSelectionResult specificMoveSelectionCriterion(MetallicaEntity attacker, LivingEntity mob, LivingEntity target, int stunTicks, int enemyMoveStun, double distance, StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack) {
+        return (attacker.distanceToSqr(target) > 4.0 && attacker.getRandom().nextFloat() < 0.03f) ? MoveSelectionResult.USE : MoveSelectionResult.PASS;
     }
 
     @Override

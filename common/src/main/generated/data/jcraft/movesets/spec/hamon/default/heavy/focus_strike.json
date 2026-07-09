@@ -1,0 +1,44 @@
+{
+  "class": "HEAVY",
+  "cooldown_type": "HEAVY",
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 0,
+    "damage": 5.0,
+    "duration": 14,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact6"
+        },
+        {
+          "type": "jcraft:user_animation",
+          "animation": "hm.fcs",
+          "force": true,
+          "run": "at_init"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.hamon.default.focus_strike.description"
+      },
+      "name": {
+        "translate": "move.jcraft.hamon.default.focus_strike.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 1.0,
+    "move_distance": 1.5,
+    "offset": 0.0,
+    "stun": 11,
+    "windup": 8
+  }
+}

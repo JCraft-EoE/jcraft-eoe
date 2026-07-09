@@ -1,0 +1,96 @@
+{
+  "anim_state": "LUNGE",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "crouching_variant": {
+    "anim_state": "GUARD_CANCEL",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:shared_knockdown_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 11,
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_3",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 0,
+      "damage": 7.0,
+      "duration": 16,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:stwwarble"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:twkickhit"
+          }
+        ],
+        "armor": 2147483647,
+        "description": {
+          "translate": "move.jcraft.shadow_the_world.default.shoulder_bash.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.shadow_the_world.default.shoulder_bash.cr.name"
+        }
+      },
+      "hitbox_size": 1.75,
+      "knockback": 2.0,
+      "knockdown_duration": 25,
+      "move_distance": 0.75,
+      "offset": 0.0,
+      "stun": 12,
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:theworld_overheaven_lunge_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 12,
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "begin_move_stun": 10,
+    "cooldown": 0,
+    "damage": 8.0,
+    "duration": 20,
+    "end_move_stun": 6,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:stwwarble"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:twkickhit"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.shadow_the_world.default.lunge.description"
+      },
+      "name": {
+        "translate": "move.jcraft.shadow_the_world.default.lunge.name"
+      },
+      "ranged": true
+    },
+    "hitbox_size": 1.6,
+    "knockback": 2.0,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 19,
+    "windup": 14
+  }
+}

@@ -45,11 +45,16 @@ public class EntityMixinLogic {
             float y = thisEntity.getYRot() + stand.getRotationOffset();
             y *= (float) Math.PI / 180;
 
-            final double heightOffset = stand.shouldOffsetHeight() ? Vec3.directionFromRotation(thisEntity.getXRot(), thisEntity.getYRot()).y : 0;
+            // When the stand should track the user's look pitch (i.e. during attacks), position it along the
+            // full look direction at `dist` so it follows where the user is looking, instead of staying at a
+            // fixed horizontal distance with only a small vertical nudge.
+            final float pitch = stand.shouldOffsetHeight() ? thisEntity.getXRot() * Mth.DEG_TO_RAD : 0f;
+            final double horizontalDist = dist * Mth.cos(pitch);
+            final double heightOffset = -dist * Mth.sin(pitch);
             final Vec3 adjustedOffset = RotationUtil.vecPlayerToWorld(
-                    Mth.cos(y) * dist,
-                    passenger.getMyRidingOffset() + heightOffset,
-                    Mth.sin(y) * dist,
+                    Mth.cos(y) * horizontalDist,
+                    passenger.getMyRidingOffset() + heightOffset + stand.getYDistanceOffset(),
+                    Mth.sin(y) * horizontalDist,
                     GravityChangerAPI.getGravityDirection(thisEntity)
             );
             positionUpdater.accept(passenger, thisEntity.getX() + adjustedOffset.x, thisEntity.getY() + adjustedOffset.y, thisEntity.getZ() + adjustedOffset.z);

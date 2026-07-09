@@ -4,9 +4,9 @@ import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.architectury.platform.Platform;
 import net.arna.jcraft.client.rendering.shader.ShaderUniformHandler;
 import net.arna.jcraft.client.util.RenderUtils;
-import net.arna.jcraft.platform.JPlatformUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 public class RenderHandler {
     public static HashMap<RenderType, BufferBuilder> BUFFERS = new HashMap<>();
-    public static boolean LARGER_BUFFER_SOURCES = JPlatformUtils.isModLoaded("sodium");
+    public static boolean LARGER_BUFFER_SOURCES = Platform.isModLoaded("sodium");
 
     public static HashMap<RenderType, ShaderUniformHandler> UNIFORM_HANDLERS = new HashMap<>();
     public static MultiBufferSource.BufferSource DELAYED_RENDER;

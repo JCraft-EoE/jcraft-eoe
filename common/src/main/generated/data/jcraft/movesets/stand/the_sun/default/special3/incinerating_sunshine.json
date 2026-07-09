@@ -1,0 +1,21 @@
+{
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:thesun_fire_sun_beam_attack",
+    "beams": 3,
+    "cooldown": 180,
+    "divergence": 2.5,
+    "duration": 24,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.the_sun.default.incinerating_sunshine.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_sun.default.incinerating_sunshine.name"
+      },
+      "ranged": true
+    },
+    "windup": 8
+  }
+}

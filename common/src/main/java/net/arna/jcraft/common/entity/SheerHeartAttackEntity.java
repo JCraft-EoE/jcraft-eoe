@@ -1,29 +1,24 @@
 package net.arna.jcraft.common.entity;
 
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.common.entity.ai.goal.SHAAttackGoal;
-import net.arna.jcraft.common.util.IOwnable;
-import net.arna.jcraft.common.util.JExplosionModifier;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.entity.ai.goal.SHAAttackGoal;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.arna.jcraft.common.util.IOwnable;
+import net.arna.jcraft.common.util.JExplosionModifier;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -35,13 +30,17 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
-public class SheerHeartAttackEntity extends Mob implements GeoEntity, IOwnable {
+import static net.arna.jcraft.api.Attacks.damageLogic;
+
+public class SheerHeartAttackEntity extends Mob implements IOwnable {
     private static final EntityDataAccessor<Optional<UUID>> OWNER_ID = SynchedEntityData.defineId(SheerHeartAttackEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     private LivingEntity master;
 
@@ -88,23 +87,28 @@ public class SheerHeartAttackEntity extends Mob implements GeoEntity, IOwnable {
         if (source.is(DamageTypes.EXPLOSION)) {
             return;
         }
+
         super.actuallyHurt(source, amount);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag nbt) {
+    public void addAdditionalSaveData(@NotNull CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);
-        nbt.putUUID("Owner", getOwnerId());
+        UUID ownerId = getOwnerId();
+
+        if (ownerId != null)
+            nbt.putUUID("Owner", ownerId);
+        else nbt.remove("Owner");
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag nbt) {
+    public void readAdditionalSaveData(@NotNull CompoundTag nbt) {
         super.readAdditionalSaveData(nbt);
         setOwnerId(nbt.getUUID("Owner"));
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurt(@NotNull DamageSource source, float amount) {
         // 256 value is arbitrary, to stop /kill from also killing the owner
         if (master != null && amount < 256) {
             master.hurt(source, amount / 4); // Reflect damage to owner (SHA is the right hand of KQ)
@@ -128,11 +132,7 @@ public class SheerHeartAttackEntity extends Mob implements GeoEntity, IOwnable {
                 final UUID ownerId = getOwnerId();
                 if (ownerId != null) {
                     ServerLevel serverWorld = (ServerLevel) level();
-                    for (ServerPlayer serverPlayerEntity : (serverWorld).players()) {
-                        if (serverPlayerEntity.getUUID().equals(ownerId)) {
-                            master = serverPlayerEntity;
-                        }
-                    }
+                    master = serverWorld.getServer().getPlayerList().getPlayer(ownerId);
                 }
             }
 
@@ -203,28 +203,43 @@ public class SheerHeartAttackEntity extends Mob implements GeoEntity, IOwnable {
         }
     }
 
-    public void Explode() {
+    public void explode() {
+        final boolean mayAlter = JUtils.mayAlter(level(), getMaster(), getOnPos(), null);
+        final boolean griefing = level().getGameRules().getBoolean(JCraft.STAND_GRIEFING);
         JUtils.explode(level(), this, getX(), getY(), getZ(), 1.8f,
                 JExplosionModifier.builder().particle(JParticleTypeRegistry.BOOM_1.get())
-                        .blockInteraction(
-                                level().getGameRules().getBoolean(JCraft.STAND_GRIEFING) ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP)
+                        .blockInteraction(griefing && mayAlter ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP)
                         .particleVelocity(Vec3.ZERO)
+                        .sound(JSoundRegistry.SHA_EXPLODE.get())
+                        .noDamage()
                         .build());
+
+        final StandEntity<?, ?> masterStand = JUtils.getStand(master);
+
+        final DamageSource damageSource = masterStand != null ? JDamageSources.stand(masterStand) : level().damageSources().explosion(master, this);
+
+        final Set<LivingEntity> hurt = JUtils.generateHitbox(level(), position(), 4.0, Set.of(this, master));
+
+        for (final LivingEntity living : hurt) {
+            final Vec3 kbVec = living.getEyePosition().subtract(position()).normalize();
+            damageLogic(level(), living, kbVec, 2, 3, true, 15f,
+                    false, 4, damageSource, getMaster(), null, false);
+            living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
+        }
     }
 
     // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
+    /*private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
+    }*/
 
-    public static final RawAnimation
-            SHA_WALK = RawAnimation.begin().thenLoop("animation.sha.walk"),
-            SHA_IDLE = RawAnimation.begin().thenLoop("animation.sha.idle");
+//    public static final AzCommand SHA_WALK = AzCommand.create("base_controller", "animation.sha.walk", AzPlayBehaviors.LOOP);
+//    public static final AzCommand SHA_IDLE = AzCommand.create("base_controller", "animation.sha.idle", AzPlayBehaviors.LOOP);
 
-    private PlayState predicate(AnimationState<SheerHeartAttackEntity> state) {
+    /*private PlayState predicate(AnimationState<SheerHeartAttackEntity> state) {
         state.setAnimation(
                 state.isMoving() ? SHA_WALK : SHA_IDLE
         );
@@ -234,5 +249,5 @@ public class SheerHeartAttackEntity extends Mob implements GeoEntity, IOwnable {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
-    }
+    }*/
 }

@@ -1,0 +1,109 @@
+{
+  "anim_state": "DISC_TAKE",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "crouching_variant": {
+    "anim_state": "DISC_GIVE",
+    "class": "ULTIMATE",
+    "cooldown_type": "STAND_ULTIMATE",
+    "move": {
+      "type": "jcraft:whitesnake_give_stand_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 4,
+        "blockable_type": "NON_BLOCKABLE",
+        "hit_animation": "MID"
+      },
+      "cooldown": 400,
+      "duration": 34,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:wsstanddisc"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact2"
+          }
+        ],
+        "armor": 2147483647,
+        "description": {
+          "translate": "move.jcraft.white_snake.default.give_stand_disk.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.white_snake.default.give_stand_disk.cr.name"
+        }
+      },
+      "hitbox_size": 2.0,
+      "knockback": 0.0,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "stun": 1,
+      "windup": 22
+    }
+  },
+  "move": {
+    "type": "jcraft:whitesnake_steal_stand_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 12,
+      "blockable_type": "NON_BLOCKABLE_EFFECTS_ONLY",
+      "hit_animation": "HIGH",
+      "hit_spark": "HIT_SPARK_2",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 480,
+    "damage": 8.0,
+    "duration": 34,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:wsstanddisc"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact2"
+        },
+        {
+          "type": "jcraft:effect",
+          "effects": [
+            {
+              "amplifier": 0,
+              "duration": 160,
+              "effect": "jcraft:standless"
+            },
+            {
+              "amplifier": 0,
+              "duration": 20,
+              "effect": "jcraft:knockdown"
+            }
+          ],
+          "run": "on_strike"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.white_snake.default.take_stand_disk.description"
+      },
+      "name": {
+        "translate": "move.jcraft.white_snake.default.take_stand_disk.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 1.1,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 20,
+    "windup": 22
+  }
+}

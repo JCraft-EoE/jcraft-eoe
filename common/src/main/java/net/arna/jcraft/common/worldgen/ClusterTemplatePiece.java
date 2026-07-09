@@ -15,6 +15,9 @@ import net.minecraft.world.level.levelgen.structure.pools.SinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
+/**
+ * @see ClusterStructure
+ */
 public class ClusterTemplatePiece extends TemplateStructurePiece {
     private final ResourceLocation templateId;
     private final Rotation rotation;

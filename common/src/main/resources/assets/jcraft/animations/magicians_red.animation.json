@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.mr.summon": {
+		"summon": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 1.48,
 			"bones": {
@@ -238,7 +238,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -572,7 +572,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -878,7 +878,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1178,7 +1178,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1501,7 +1501,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -1827,7 +1827,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2098,7 +2098,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -2310,7 +2310,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"rotation": {
 						"0.2083": {
 							"vector": [0, 77.5, 0],
@@ -2835,7 +2835,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -3171,7 +3171,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -3475,7 +3475,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -3785,7 +3785,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4077,7 +4077,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0],
@@ -4419,7 +4419,7 @@
 						}
 					}
 				},
-				"redbind": {
+				"prop": {
 					"rotation": {
 						"0.375": {
 							"vector": [0, 77.5, 0],
@@ -4824,7 +4824,7 @@
 						"easing": "linear"
 					}
 				},
-				"redbind": {
+				"prop": {
 					"scale": {
 						"vector": [0, 0, 0],
 						"easing": "linear"
@@ -4875,5 +4875,10 @@
 			}
 		}
 	},
-	"azurelib_format_version": 2
+    "includes": [
+      {
+        "file_id": "jcraft:animations/base_stand.animation.json",
+        "animations": ["itemthrow", "itemthrow_charge"]
+      }
+    ]
 }

@@ -1,42 +1,76 @@
 # Changelog
 ## General
-* added a hidden advancement for the real hardcore players
-* players can no longer activate end portals in D4C's alt dimension
-### Blocks & Items
-* added Jotaro Cosplay from Part 6 (thanks Bob)
-* Diego outfit has been updated
-### NPCs & Stands
-* (re)added max reach for Mandom, BTD Ult and GER RTZ teleport, all default to 200 blocks
-* changed GER's self-heal move to work similar to Mandom
-* Training Dummy is now vulnerable if below build height (to be able to die in the void) and killable via /kill
+* Datapacks now throw errors if they configure moves wrongly during loading instead of during runtime
+### Stands & Specs
+* Disabled damage scaling for bosses and horses
+* Throwing now force-feeds potions
+* Throwing items are now transparent while being hold by Stand
+* Breaking Blocks now only triggers when nothing else was hit
+* Aerosmith
+  * now heats up blocks, i.e. makes them work temporarily like Magma Blocks
+  * BreathXRay now respects Hypoxia levels
+  * only displays landing gear when starting/landing
+  * improved the Ult mechanics
+  * added glowing to AS when it is out of sight for the user
+  * getting stunned while AS is on Autopilot influences AS now
+  * added particles to show which entity is targeted by AS
+* Made In Heaven
+  * Sprinting while Stand is out
+    * gives Speed 70
+    * creates Hunger (configurable)
+    * gives Water Walking and Dolphin's Grace
+    * gives Exhaustion
+  * improved Hit Detection for MiH Cr Sp 3
+* Added new m1 chain + skin1 for D4C
+* Whitesnake
+  * nerved stand disc attack
+  * buffed memory disc attack, now inflicts specless state
+* Added vamp cr.sp2, a feeding-oriented variant + new hitsparks for both
+* Added description for Hamon Charge in `/spec about`
+* Missing with Stands/Specs now makes miss sounds (whiff)
+* generalized a lot of moves to make it possible to be used by other stands via datapacks
+### Effects
+* Exhaustion I to IV, works against regeneration from 25% to 100%
+* Specless, which disables your Spec
+### Structures
+* made Vampire Lairs rarer
 ### Configs
-* made Roadroller paving/destruction configurable via server config
-* made Stand Arrow Spawn Rate configurable via server config
-* C-Moon's Ult range is now configurable via its moveset
-* C-Moon's Ult can exclude entities via "gravitychanger:forbidden_entities" and "gravitychanger:forbidden_entity_rendering"; this is not new, but now item frames and paintings are included by default
-* D4C's Dimensional Hop duration is now configurable via its moveset
-* D4C's Dimensional Hop can now have blacklisted blocks via the block tag "jcraft:au_replaced_with_air"
-* Mandom, BTD Ult and GER RTZ max reach is configurable via their movesets
-### Commands
-* …
+* `mih_sprint_hunger_multiplier` how much Hunger is created by MIH sprinting
+* Vampires taking extra damage by Hamon Users is now on by default
+* `show_all_cosplay` has been removed, as it doesn't serve any purpose anymore
+* Added tooltips to all server config options
+* `block_breakage_multiplier` to scale the effectiveness of Block Breaking
+* Server config is now part of the API (for add-ons)
+* String Option configs added (currently not used by us, but possible for add-ons)
+* Client config option to show MiH afterimages, off by default because it is buggy still
+### Tags
+* `jcraft:bosses` describes what constitutes bosses for JCraft purposes (for now Ender Dragon, Wither, Warden, Elder Guardian and Tonpetty) 
+* `jcraft:ignores_damage_scaling` describes which entities ignore Stand/Spec damage scaling (for now bosses and horses)
 ### Bug Fixes
-* Mobs now drop XP and player-specific loot if killed by stands
-* Cinderella Mask works in an anvil again, though you might find that the enchantment costs have slightly changed  
-* Mandom rewinds fall distance again
-* GER now uses same internal mechanism as Mandom, hence the backpack dupe is fixed
-* same for BTD Ult
-* Spec User NPCs don't try to attack creative players who attacked them any longer 
-* Cream can no longer be cheesed to give you unending invulnerability
-* Training Dummy no longer has doubled knockback
-* some cosplay nitpicks
-### Known Bugs
-* …
+* Fixed missing translation for Anubis Special 2 and Hamon Charge
+* Fixed AS bomb double damage
+* Fixed AS detecting and following Spectators
+* Fixed AS getting stuck shooting on Multiplayer
+* Fixed PH Poison damage attribution
+* Fixed bound sounds lingering when spamming
+* Fixed Spec moves holding when Stand is out
+* Fixed Stand throwing into claims
+* Fixed an Item throwing bug
+* Fixed D4C explosions not respecting claims
+* Fixed an absurd jump boost by using The Fool with Elytra
+* Fixed GE Tree not launching the user
+* Disabled Pick Block only for stands with a Toss Move
+* Fixed an NPE
+
+## Known Bugs
+* see https://github.com/JCraft-EoE/jcraft-eoe/issues?q=is%3Aissue%20state%3Aopen%20type%3ABug
+
+
+
 
 ## TODO (SOME UPDATE) :D
 * Spin
-* Throwing
 * MR barrage fire :)
 * Timestop should stop stand anims
 * CRAZY DIAMOND, Hermit Purple, Yellow Temperance
-* Stand NBT serialization
 * Actually use effect keyframes in animations

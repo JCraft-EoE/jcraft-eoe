@@ -3,11 +3,11 @@ package net.arna.jcraft.common.entity.spec;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.spec.SpecUserMob;
+import net.arna.jcraft.common.entity.TrainingDummyEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.Level;
 
 public class BrawlerSpecUser extends SpecUserMob {
@@ -20,8 +20,8 @@ public class BrawlerSpecUser extends SpecUserMob {
     protected void registerGoals() {
         super.registerGoals();
 
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal(this, TrainingDummyEntity.class, true));
         targetSelector.addGoal(3, new NearestAttackableTargetGoal(this, IronGolem.class, true));
-        targetSelector.addGoal(3, new NearestAttackableTargetGoal(this, Villager.class, true));
     }
 
     public static AttributeSupplier.Builder createUserAttributes() {

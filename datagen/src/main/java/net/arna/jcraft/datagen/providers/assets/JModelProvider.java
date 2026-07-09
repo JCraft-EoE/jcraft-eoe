@@ -1,5 +1,6 @@
 package net.arna.jcraft.datagen.providers.assets;
 
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.registry.JBlockRegistry;
@@ -25,7 +26,7 @@ public class JModelProvider extends FabricModelProvider {
     }
 
     @Override
-    public void generateBlockStateModels(BlockModelGenerators generator) {
+    public void generateBlockStateModels(final @NonNull BlockModelGenerators generator) {
         generator.createTrivialCube(JBlockRegistry.FOOLISH_SAND_BLOCK.get());
         generator.createTrivialCube(JBlockRegistry.METEORITE_BLOCK.get());
         generator.createTrivialCube(JBlockRegistry.POLISHED_METEORITE_BLOCK.get());
@@ -37,103 +38,24 @@ public class JModelProvider extends FabricModelProvider {
     }
 
     @Override
-    public void generateItemModels(ItemModelGenerators generator) {
+    public void generateItemModels(final @NonNull ItemModelGenerators generator) {
         generator.generateFlatItem(JItemRegistry.BOXING_GLOVES.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.BULLET.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.CINDERELLA_MASK.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIO_P1_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIO_P1_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIO_P1_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIO_P1_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.STRAIZO_PONCHO.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIO_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIO_CAPE.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIO_HEADBAND.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIO_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIO_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.HEAVEN_ATTAINED_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.HEAVEN_ATTAINED_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.HEAVEN_ATTAINED_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.HEAVEN_ATTAINED_SHIRT.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.DIARY_PAGE.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.DIOS_DIARY.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.GREEN_BABY.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_CAP.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KAKYOIN_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KAKYOIN_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KAKYOIN_COAT.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KAKYOIN_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_P4_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_P4_CAP.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_P4_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_P4_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_P6_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_P6_CAP.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_P6_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOTARO_P6_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KIRA_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KIRA_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KIRA_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KIRA_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KOSAKU_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KOSAKU_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KOSAKU_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KOSAKU_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.FINAL_KIRA_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.FINAL_KIRA_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.FINAL_KIRA_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.FINAL_KIRA_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.GIORNO_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.GIORNO_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.GIORNO_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.GIORNO_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.RISOTTO_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.RISOTTO_CAP.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.RISOTTO_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.RISOTTO_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DOPPIO_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DOPPIO_SHIRT.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIAVOLO_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIAVOLO_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIAVOLO_SHIRT.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIAVOLO_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOHNNY_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOHNNY_CAP.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOHNNY_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.JOHNNY_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.GYRO_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.GYRO_HAT.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.GYRO_SHIRT.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.GYRO_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIEGO_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIEGO_SHIRT.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIEGO_HAT.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.DIEGO_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.RINGO_OUTFIT.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.RINGO_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.VALENTINE_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.VALENTINE_WIG.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.VALENTINE_JACKET.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.VALENTINE_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.PUCCI_ROBE.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.PUCCI_PANTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.PUCCI_BOOTS.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.KARS_HEADWRAP.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.KNIFE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         generator.generateFlatItem(JItemRegistry.SCALPEL.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         generator.generateFlatItem(JItemRegistry.KQ_COIN.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.LIVING_ARROW.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
-        generator.generateFlatItem(JItemRegistry.RED_HAT.get(), ModelTemplates.FLAT_ITEM);
-        generator.generateFlatItem(JItemRegistry.PUCCIS_HAT.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.REQUIEM_ARROW.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.REQUIEM_RUBY.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         generator.generateFlatItem(JItemRegistry.SINNERS_SOUL.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.STAND_ARROW.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         generator.generateFlatItem(JItemRegistry.STAND_ARROWHEAD.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.ROAD_ROLLER.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.MATCHBOX.get(), ModelTemplates.FLAT_ITEM);
 
         generator.generateFlatItem(JItemRegistry.DISC.get(), ModelTemplates.FLAT_ITEM);
         generateSpecDiscModels(generator);
@@ -141,12 +63,15 @@ public class JModelProvider extends FabricModelProvider {
 
         generator.generateFlatItem(JItemRegistry.STELLAR_IRON_INGOT.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.STONE_MASK.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.RED_HAT.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.PLANKTON_VIAL.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.PRISON_KEY.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.STEEL_BALL.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.TRAINING_DUMMY.get(), ModelTemplates.FLAT_ITEM);
 
         generator.generateFlatItem(JItemRegistry.BRAWLER_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
+        generator.generateFlatItem(JItemRegistry.HAMON_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
+        generator.generateFlatItem(JItemRegistry.TONPETTY_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
         generator.generateFlatItem(JItemRegistry.VAMPIRE_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
         generator.generateFlatItem(JItemRegistry.ANUBIS_USER_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
         generator.generateFlatItem(JItemRegistry.PETSHOP_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
@@ -155,7 +80,7 @@ public class JModelProvider extends FabricModelProvider {
         generator.generateFlatItem(JItemRegistry.DARBY_YOUNGER_SPAWN_EGG.get(), SPAWN_EGG_MODEL);
     }
 
-    private void generateSpecDiscModels(ItemModelGenerators generator) {
+    private void generateSpecDiscModels(final @NonNull ItemModelGenerators generator) {
         // Generate a model for each spec.
         for (ResourceLocation id : JRegistries.SPEC_TYPE_REGISTRY.getIds()) {
             if (id.equals(JSpecTypeRegistry.NONE.getId())) {

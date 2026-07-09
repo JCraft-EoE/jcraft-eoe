@@ -1,14 +1,8 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
@@ -34,7 +28,7 @@ import java.util.Set;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public class IceBranchProjectile extends AbstractArrow implements GeoEntity {
+public class IceBranchProjectile extends AbstractArrow {
     private static final int MAX_CHAIN_LENGTH = 10;
     private final int chainIndex;
 
@@ -242,7 +236,10 @@ public class IceBranchProjectile extends AbstractArrow implements GeoEntity {
         return ItemStack.EMPTY;
     }
 
+    public static final AzCommand SPAWN = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.ice_branch.spawn", AzPlayBehaviors.HOLD_ON_LAST_FRAME);
+
     // Animations
+    /*
     private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
@@ -257,5 +254,5 @@ public class IceBranchProjectile extends AbstractArrow implements GeoEntity {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
-    }
+    }*/
 }

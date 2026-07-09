@@ -1,0 +1,52 @@
+{
+  "anim_state": "GROUND_SHOOT",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "move": {
+    "type": "jcraft:cmoon_launch_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "hit_animation": "LOW",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 60,
+    "damage": 5.0,
+    "duration": 21,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:cmoongroundshoot"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact5"
+        },
+        {
+          "type": "jcraft:cmoon_inversion",
+          "damage": 0.5,
+          "run": "on_strike",
+          "slow": false,
+          "time": 40
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.c_moon.default.block_launch.description"
+      },
+      "name": {
+        "translate": "move.jcraft.c_moon.default.block_launch.name"
+      },
+      "ranged": true
+    },
+    "hitbox_size": 1.75,
+    "knockback": 0.9,
+    "move_distance": 0.75,
+    "offset": 0.3,
+    "stun": 19,
+    "windup": 14
+  }
+}

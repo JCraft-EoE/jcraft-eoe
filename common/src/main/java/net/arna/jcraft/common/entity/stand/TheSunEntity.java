@@ -2,17 +2,22 @@ package net.arna.jcraft.common.entity.stand;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import net.arna.jcraft.api.stand.StandData;
-import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.api.stand.StandInfo;
-import net.arna.jcraft.api.stand.SummonData;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.api.stand.StandData;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.api.stand.StandInfo;
+import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.client.renderer.entity.stands.TheSunRenderer;
 import net.arna.jcraft.common.attack.moves.shared.NoOpMove;
 import net.arna.jcraft.common.attack.moves.thesun.FireMeteorAttack;
 import net.arna.jcraft.common.attack.moves.thesun.FireSunBeamAttack;
@@ -21,9 +26,6 @@ import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -44,6 +46,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -58,18 +61,15 @@ import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Sun">The Sun</a>.
  * @see JStandTypeRegistry#THE_SUN
- * @see net.arna.jcraft.client.model.entity.stand.TheSunModel TheSunModel
- * @see net.arna.jcraft.client.renderer.entity.stands.SunRenderer SunRenderer
+ * @see TheSunRenderer SunRenderer
  */
 public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.State> {
     public static final MoveSet<TheSunEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_SUN,
-            TheSunEntity::registerMoves, State.class);
+            TheSunEntity::registerMoves, TheSunEntity.class, State.class);
 
     private static final EntityDataAccessor<Boolean> PASSIVE = SynchedEntityData.defineId(TheSunEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(TheSunEntity.class, EntityDataSerializers.FLOAT);
@@ -306,7 +306,9 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     private void togglePassive() {
         boolean newPassive = !entityData.get(PASSIVE);
         entityData.set(PASSIVE, newPassive);
-        getUserOrThrow().sendSystemMessage(Component.nullToEmpty(newPassive ? "PASSIVE" : "ACTIVE"));
+        if (getUserOrThrow() instanceof Player player)
+            player.displayClientMessage(Component.translatable("entity.jcraft.the_sun." +
+                    (newPassive ? "passive" : "active")), true);
     }
 
     public boolean isPassive() {
@@ -504,6 +506,7 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
     }
 
     public static void dryOut(ServerLevel serverWorld, BlockPos pos) {
+        if (!serverWorld.getGameRules().getBoolean(net.arna.jcraft.JCraft.STAND_GRIEFING)) return;
         BlockState blockState;
         blockState = serverWorld.getBlockState(pos);
         if (blockState.getBlock() instanceof BucketPickup fluidDrainable) {
@@ -550,39 +553,35 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
         return entityData.get(SCALE);
     }
 
+    //@Override
+    //public float getScale() {
+    //    return entityData.get(SCALE);
+    //}
+
     public float getScale(float tickDelta) {
         return Mth.lerp(tickDelta, prevScale, curScale);
     }
 
     // Animation code
     public enum State implements StandAnimationState<TheSunEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.sun.idle"))),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sun.idle", AzPlayBehaviors.LOOP)),
         ;
 
-        private final BiConsumer<TheSunEntity, AnimationState<TheSunEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<TheSunEntity>> animator) {
-            this((silverChariot, builder) -> animator.accept(builder));
-        }
-
-        State(BiConsumer<TheSunEntity, AnimationState<TheSunEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(TheSunEntity attacker, AnimationState<TheSunEntity> builder) {
-            animator.accept(attacker, builder);
+        public void playAnimation(TheSunEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @NonNull String getSummonAnimation() {
-        return "animation.sun.summon";
     }
 
     @Override

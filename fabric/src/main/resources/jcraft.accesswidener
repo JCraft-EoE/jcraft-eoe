@@ -54,10 +54,11 @@ accessible field net/minecraft/world/level/storage/LevelStorageSource$LevelStora
 
 accessible method net/minecraft/core/HolderSet$Named <init> (Lnet/minecraft/core/HolderOwner;Lnet/minecraft/tags/TagKey;)V
 
-accessible field net/minecraft/world/item/BucketItem content Lnet/minecraft/world/level/material/Fluid;
 accessible method net/minecraft/world/item/AxeItem getStripped (Lnet/minecraft/world/level/block/state/BlockState;)Ljava/util/Optional;
 accessible field net/minecraft/world/item/HoeItem TILLABLES Ljava/util/Map;
 accessible method net/minecraft/world/item/context/UseOnContext <init> (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/BlockHitResult;)V
+
+accessible method net/minecraft/world/level/Level getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
 
 accessible field net/minecraft/world/food/FoodData lastFoodLevel I
 accessible field net/minecraft/world/food/FoodData foodLevel I
@@ -65,3 +66,10 @@ accessible field net/minecraft/world/food/FoodData exhaustionLevel F
 accessible field net/minecraft/world/food/FoodData saturationLevel F
 accessible field net/minecraft/world/food/FoodData tickTimer I
 
+accessible class net/minecraft/world/item/crafting/SingleItemRecipe$Serializer$SingleItemMaker
+extendable method net/minecraft/world/entity/Entity discard ()V
+
+mutable field net/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool rawTemplates Ljava/util/List;
+
+accessible class net/minecraft/world/entity/npc/VillagerTrades$TreasureMapForEmeralds
+mutable field net/minecraft/world/entity/npc/VillagerTrades TRADES Ljava/util/Map;

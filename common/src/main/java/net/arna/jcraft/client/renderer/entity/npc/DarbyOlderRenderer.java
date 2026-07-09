@@ -1,16 +1,20 @@
 package net.arna.jcraft.client.renderer.entity.npc;
 
-import mod.azure.azurelib.renderer.GeoEntityRenderer;
-import net.arna.jcraft.client.model.entity.npc.DarbyOlderModel;
+import net.arna.jcraft.client.renderer.entity.AbstractEntityRenderer;
 import net.arna.jcraft.common.entity.npc.DarbyOlderEntity;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 /**
- * The {@link GeoEntityRenderer} for {@link DarbyOlderEntity}
- * @see DarbyOlderModel
+ * The {@link AbstractEntityRenderer} for {@link DarbyOlderEntity}
  */
-public class DarbyOlderRenderer extends GeoEntityRenderer<DarbyOlderEntity> {
-    public DarbyOlderRenderer(final EntityRendererProvider.Context renderManager) {
-        super(renderManager, new DarbyOlderModel());
+@Environment(EnvType.CLIENT)
+public class DarbyOlderRenderer extends AbstractEntityRenderer<DarbyOlderEntity> {
+
+    public static final String ID = "darby_older";
+
+    public DarbyOlderRenderer(final EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID), ID);
     }
 }

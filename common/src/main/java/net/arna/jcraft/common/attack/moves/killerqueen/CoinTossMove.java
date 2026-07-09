@@ -4,6 +4,7 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.stand.KillerQueenEntity;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.ref.WeakReference;
 import java.util.Set;
 
-public final class CoinTossMove extends AbstractMove<CoinTossMove, KillerQueenEntity> {
+public final class CoinTossMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<CoinTossMove<A>, A> {
     private WeakReference<ItemEntity> coin = new WeakReference<>(null);
 
     public CoinTossMove(final int cooldown) {
@@ -27,26 +28,26 @@ public final class CoinTossMove extends AbstractMove<CoinTossMove, KillerQueenEn
     }
 
     @Override
-    public @NotNull MoveType<CoinTossMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<CoinTossMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final KillerQueenEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         ItemEntity coin = this.coin.get();
         final Vec3 lookVec = user.getLookAngle().scale(0.75);
         if (coin != null) {
             coin.discard();
         }
-        coin = new ItemEntity(attacker.level(), user.getX(), user.getY() + user.getBbHeight() * 2 / 3, user.getZ(),
+        coin = new ItemEntity(attacker.getBaseEntity().level(), user.getX(), user.getY() + user.getBbHeight() * 2 / 3, user.getZ(),
                 new ItemStack(JItemRegistry.KQ_COIN.get(), 1), lookVec.x, lookVec.y, lookVec.z);
         coin.setNeverPickUp();
 
-        attacker.level().addFreshEntity(coin);
+        attacker.getBaseEntity().level().addFreshEntity(coin);
 
         JComponentPlatformUtils.getBombTracker(user).getMainBomb().setBomb(coin);
 
-        attacker.playSound(JSoundRegistry.COIN_TOSS.get(), 1, 1);
+        attacker.getBaseEntity().playSound(JSoundRegistry.COIN_TOSS.get(), 1, 1);
 
         this.coin = new WeakReference<>(coin);
 
@@ -54,20 +55,20 @@ public final class CoinTossMove extends AbstractMove<CoinTossMove, KillerQueenEn
     }
 
     @Override
-    protected @NonNull CoinTossMove getThis() {
+    protected @NonNull CoinTossMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull CoinTossMove copy() {
-        return copyExtras(new CoinTossMove(getCooldown()));
+    public @NonNull CoinTossMove<A> copy() {
+        return copyExtras(new CoinTossMove<>(getCooldown()));
     }
 
-    public static class Type extends AbstractMove.Type<CoinTossMove> {
+    public static class Type extends AbstractMove.Type<CoinTossMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<CoinTossMove>, CoinTossMove> buildCodec(RecordCodecBuilder.Instance<CoinTossMove> instance) {
+        protected @NotNull App<RecordCodecBuilder.Mu<CoinTossMove<?>>, CoinTossMove<?>> buildCodec(RecordCodecBuilder.Instance<CoinTossMove<?>> instance) {
             return instance.group(extras(), cooldown()).apply(instance, applyExtras(CoinTossMove::new));
         }
     }

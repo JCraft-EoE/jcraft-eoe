@@ -1,0 +1,87 @@
+{
+  "anim_state": "REKKA3",
+  "class": "SPECIAL3",
+  "cooldown_type": "SPECIAL2",
+  "followup": {
+    "anim_state": "REKKA3",
+    "class": "SPECIAL3",
+    "cooldown_type": "SPECIAL2",
+    "move": {
+      "type": "jcraft:shared_knockdown_multi_hit_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 11,
+        "hit_animation": "MID",
+        "hit_spark": "SWEEP_ATTACK"
+      },
+      "cooldown": 0,
+      "damage": 7.0,
+      "duration": 40,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.anubis.default.null.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.anubis.default.null.followup.name"
+        }
+      },
+      "hit_moments": [
+        32
+      ],
+      "hitbox_size": 2.0,
+      "knockback": 0.9,
+      "knockdown_duration": 35,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "stun": 15
+    }
+  },
+  "move": {
+    "type": "jcraft:anubis_rekka_3_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 30,
+    "damage": 4.0,
+    "duration": 40,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:anubisrekka3"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact9"
+        },
+        {
+          "type": "jcraft:anubis_blood_lust",
+          "reset_only": false,
+          "run": "on_strike"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.anubis.default.cleaving_strikes_3_hits.description"
+      },
+      "name": {
+        "translate": "move.jcraft.anubis.default.cleaving_strikes_3_hits.name"
+      }
+    },
+    "hit_moments": [
+      8,
+      20,
+      32
+    ],
+    "hitbox_size": 1.75,
+    "knockback": 0.6,
+    "move_distance": 1.0,
+    "offset": -0.1,
+    "stun": 15
+  }
+}

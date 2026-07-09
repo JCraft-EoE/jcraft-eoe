@@ -1,0 +1,50 @@
+{
+  "anim_state": "SPACE_RIPPER_CHARGE",
+  "class": "SPECIAL1",
+  "cooldown_type": "SPECIAL1",
+  "followup": {
+    "anim_state": "SPACE_RIPPERS",
+    "class": "SPECIAL1",
+    "cooldown_type": "SPECIAL1",
+    "move": {
+      "type": "jcraft:vampire_space_ripper_attack",
+      "cooldown": 300,
+      "duration": 10,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.vampire.default.space_ripper_stingy_eyes_fire.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.vampire.default.space_ripper_stingy_eyes_fire.followup.name"
+        },
+        "ranged": true
+      },
+      "move_distance": 1.0,
+      "windup": 1
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_holdable_move",
+    "cooldown": 300,
+    "duration": 32,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:vampirelaser"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.vampire.default.space_ripper_stingy_eyes.description"
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.vampire.default.space_ripper_stingy_eyes.name"
+      }
+    },
+    "minimum_charge": 14,
+    "move_distance": 1.0,
+    "windup": 0
+  }
+}

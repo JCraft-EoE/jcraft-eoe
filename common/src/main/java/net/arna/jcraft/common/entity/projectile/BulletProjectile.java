@@ -1,10 +1,6 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.util.AzureLibUtil;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
@@ -37,7 +33,7 @@ import net.minecraft.world.phys.Vec3;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public class BulletProjectile extends AbstractArrow implements GeoEntity {
+public class BulletProjectile extends AbstractArrow {
     private int stunTicks;
     private float damage;
     private float mass; // Used for penetration calculation
@@ -282,16 +278,4 @@ public class BulletProjectile extends AbstractArrow implements GeoEntity {
         return ItemStack.EMPTY;
     }
 
-    // Animations
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }
 }

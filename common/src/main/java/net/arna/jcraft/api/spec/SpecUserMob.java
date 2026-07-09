@@ -1,22 +1,14 @@
 package net.arna.jcraft.api.spec;
 
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.constant.DefaultAnimations;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import mod.azure.azurelib.util.MoveAnalysis;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.player.CommonSpecComponent;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.food.IFoodData;
 import net.arna.jcraft.common.tickable.JEnemies;
-import net.arna.jcraft.common.util.DashData;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
@@ -37,23 +29,21 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static net.arna.jcraft.api.stand.StandTypeUtil.generateStandTypeForMob;
 
-public class SpecUserMob extends PathfinderMob implements JSpecHolder, GeoEntity, IFoodData {
+public class SpecUserMob extends PathfinderMob implements JSpecHolder, IFoodData {
     // TODO: add metallica anims to the player anims these guys use
     // TODO: healing
     // TODO: anubis-specific sheathing
 
     protected final CommonSpecComponent component;
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
 
     private static final EntityDataAccessor<Boolean> ANIMATION_RESET = SynchedEntityData.defineId(SpecUserMob.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<String> ANIMATION = SynchedEntityData.defineId(SpecUserMob.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Float> ANIMATION_SPEED = SynchedEntityData.defineId(SpecUserMob.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(SpecUserMob.class, EntityDataSerializers.INT);
+
+    public static final String MOVEMENT_CONTROLLER = "movement";
 
     protected FoodData foodData = null;
 
@@ -62,7 +52,10 @@ public class SpecUserMob extends PathfinderMob implements JSpecHolder, GeoEntity
 
         component = JComponentPlatformUtils.getSpecData(this);
 
-        if (level.isClientSide()) return;
+        setPersistenceRequired();
+        if (level.isClientSide()) {
+            return;
+        }
         JEnemies.add(this);
     }
 
@@ -72,7 +65,10 @@ public class SpecUserMob extends PathfinderMob implements JSpecHolder, GeoEntity
 
         super.tick();
 
-        if (level().isClientSide()) return;
+        if (level().isClientSide()) {
+            moveAnalysis.update();
+            return;
+        }
 
         entityData.set(ANIMATION_RESET, false);
 
@@ -91,8 +87,7 @@ public class SpecUserMob extends PathfinderMob implements JSpecHolder, GeoEntity
 
             spec.tickSpec();
 
-            // TODO: make animations run once without needing to be reset like this (like player animator)
-            if (spec.getMoveStun() <= 0 && !DashData.isDashing(this)) setAnimation("", 1.0f);
+            // if (spec.getMoveStun() <= 0 && !DashData.isDashing(this)) setAnimation("", 1.0f);
         } else {
             setAnimation("", 1.0f);
         }
@@ -116,7 +111,7 @@ public class SpecUserMob extends PathfinderMob implements JSpecHolder, GeoEntity
         goalSelector.addGoal(10, new OpenDoorGoal(this, true));
 
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal(this, Player.class, true));
+        //targetSelector.addGoal(2, new NearestAttackableTargetGoal(this, Player.class, true));
     }
 
     @Override
@@ -140,7 +135,7 @@ public class SpecUserMob extends PathfinderMob implements JSpecHolder, GeoEntity
             return;
         }
 
-        standComponent.setType(generateStandTypeForMob(this, level().getGameRules()));
+        standComponent.setType(generateStandTypeForMob(level().getGameRules()));
 
         if (random.nextFloat() > 0.9f) {
             standComponent.setSkin(random.nextInt(3));
@@ -208,8 +203,52 @@ public class SpecUserMob extends PathfinderMob implements JSpecHolder, GeoEntity
 
         entityData.set(ANIMATION, animationID);
         entityData.set(ANIMATION_SPEED, animationSpeed);
+
+        if (animationID.isEmpty()) {
+            return;
+        }
+
+        AzCommand.create(
+                JCraft.BASE_CONTROLLER,
+                animationID,
+                AzPlayBehaviors.PLAY_ONCE,
+                0f,
+                animationSpeed,
+                0f,
+                0f,
+                0f,
+                false
+        ).sendForEntity(this);
     }
 
+    private final MoveAnalysis moveAnalysis = new MoveAnalysis(this);
+
+    private static final AzCommand IDLE = AzCommand.create(MOVEMENT_CONTROLLER, "misc.idle", AzPlayBehaviors.LOOP);
+    private static final AzCommand WALK = AzCommand.create(MOVEMENT_CONTROLLER, "move.walk", AzPlayBehaviors.LOOP);
+    private static final AzCommand RUN = AzCommand.create(MOVEMENT_CONTROLLER, "move.run", AzPlayBehaviors.LOOP);
+
+    public void updateAnimations() {
+        boolean isMovingOnGround = moveAnalysis.isMovingHorizontally() && onGround();
+
+        if (this.isDeadOrDying()) {
+            return;
+        }
+
+        if (isMovingOnGround) {
+            if (this.isAggressive() && !this.swinging) {
+                RUN.sendForEntity(this);
+            } else {
+                WALK.sendForEntity(this);
+            }
+            return;
+        }
+
+        if (!this.isAggressive()) {
+            IDLE.sendForEntity(this);
+        }
+    }
+
+    /*
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(DefaultAnimations.genericWalkIdleController(this));
@@ -236,5 +275,5 @@ public class SpecUserMob extends PathfinderMob implements JSpecHolder, GeoEntity
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
-    }
+    }*/
 }

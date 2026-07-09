@@ -1,0 +1,58 @@
+{
+  "anim_state": "LAUNCH",
+  "class": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
+  "move": {
+    "type": "jcraft:thefool_launch_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 4,
+      "extra_hit_boxes": [
+        {
+          "size": 1.5
+        }
+      ],
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_3"
+    },
+    "cooldown": 20,
+    "damage": 8.0,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:foollaunch"
+        },
+        {
+          "type": "jcraft:effect",
+          "effects": [
+            {
+              "ambient": true,
+              "amplifier": 19,
+              "duration": 5,
+              "effect": "minecraft:levitation",
+              "show_icon": false,
+              "visible": false
+            }
+          ],
+          "run": "on_strike"
+        }
+      ],
+      "armor": 2147483647,
+      "description": {
+        "translate": "move.jcraft.the_fool.default.launch.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_fool.default.launch.name"
+      }
+    },
+    "hitbox_size": 2.0,
+    "knockback": 0.5,
+    "move_distance": 1.25,
+    "offset": -0.3,
+    "stun": 25,
+    "windup": 16
+  }
+}

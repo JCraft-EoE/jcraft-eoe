@@ -1,0 +1,104 @@
+{
+  "anim_state": "SAWBLADE",
+  "class": "BARRAGE",
+  "cooldown_type": "STAND_BARRAGE",
+  "crouching_variant": {
+    "anim_state": "CHARGE",
+    "class": "BARRAGE",
+    "cooldown_type": "STAND_BARRAGE",
+    "move": {
+      "type": "jcraft:aerosmith_charge_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 5,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1",
+        "static_height": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 100,
+      "damage": 1.0,
+      "duration": 50,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:asmaneuver"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:asbarragehit"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.aerosmith.default.dive_charge.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.aerosmith.default.dive_charge.cr.name"
+        }
+      },
+      "hit_moments": [
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50
+      ],
+      "hitbox_size": 1.66,
+      "knockback": 0.1,
+      "move_distance": 0.0,
+      "offset": 0.0,
+      "stun": 15
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_main_barrage_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 3,
+      "hit_animation": "MID",
+      "shockwaves": true,
+      "stun_type": "WINDED"
+    },
+    "cooldown": 280,
+    "damage": 1.0,
+    "duration": 24,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:asname"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:asbarragehit"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.aerosmith.default.propeller_strike.description"
+      },
+      "is_holdable": true,
+      "name": {
+        "translate": "move.jcraft.aerosmith.default.propeller_strike.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "interval": 3,
+    "knockback": 0.1,
+    "mineable_hardness": 0.2,
+    "move_distance": 0.9,
+    "offset": 0.0,
+    "stun": 13,
+    "windup": 0
+  }
+}

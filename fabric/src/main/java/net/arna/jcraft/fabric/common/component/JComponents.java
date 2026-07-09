@@ -13,12 +13,13 @@ import net.arna.jcraft.fabric.common.component.entity.GrabComponent;
 import net.arna.jcraft.fabric.common.component.entity.GravityComponent;
 import net.arna.jcraft.fabric.common.component.entity.TimeStopComponent;
 import net.arna.jcraft.fabric.common.component.impl.GravityShiftComponentImpl;
-import net.arna.jcraft.fabric.common.component.impl.VampireComponentImpl;
+import net.arna.jcraft.fabric.common.component.impl.living.VampireComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.entity.GrabComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.entity.GravityComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.entity.TimeStopComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.living.BombTrackerComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.living.CooldownsComponentImpl;
+import net.arna.jcraft.fabric.common.component.impl.living.HamonComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.living.HitPropertyComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.living.MiscComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.living.StandComponentImpl;
@@ -29,6 +30,7 @@ import net.arna.jcraft.fabric.common.component.impl.world.TexasHoldEmComponentIm
 import net.arna.jcraft.fabric.common.component.living.BombTrackerComponent;
 import net.arna.jcraft.fabric.common.component.living.CooldownsComponent;
 import net.arna.jcraft.fabric.common.component.living.GravityShiftComponent;
+import net.arna.jcraft.fabric.common.component.living.HamonComponent;
 import net.arna.jcraft.fabric.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.fabric.common.component.living.MiscComponent;
 import net.arna.jcraft.fabric.common.component.living.StandComponent;
@@ -68,6 +70,8 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
             ComponentRegistry.getOrCreate(JCraft.id("shockwave_handler"), ShockwaveHandlerComponent.class);
     public static final ComponentKey<TexasHoldEmComponent> TEXAS_HOLD_EM =
             ComponentRegistry.getOrCreate(JCraft.id("texas_hold_em"), TexasHoldEmComponent.class);
+    public static final ComponentKey<HamonComponent> HAMON =
+            ComponentRegistry.getOrCreate(JCraft.id("hamon"), HamonComponent.class);
     public static final ComponentKey<VampireComponent> VAMPIRE =
             ComponentRegistry.getOrCreate(JCraft.id("vampire"), VampireComponent.class);
 
@@ -114,6 +118,10 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
                 .respawnStrategy(RespawnCopyStrategy.CHARACTER)
                 .impl(VampireComponentImpl.class)
                 .end(VampireComponentImpl::new);
+        registry.beginRegistration(LivingEntity.class, HAMON)
+                .respawnStrategy(RespawnCopyStrategy.CHARACTER)
+                .impl(HamonComponentImpl.class)
+                .end(HamonComponentImpl::new);
     }
 
     @Override

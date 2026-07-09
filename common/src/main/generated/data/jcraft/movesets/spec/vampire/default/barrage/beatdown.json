@@ -1,0 +1,45 @@
+{
+  "anim_state": "COMBO",
+  "class": "BARRAGE",
+  "cooldown_type": "BARRAGE",
+  "move": {
+    "type": "jcraft:shared_simple_multi_hit_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 5,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 240,
+    "damage": 2.5,
+    "duration": 23,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.vampire.default.beatdown.description"
+      },
+      "name": {
+        "translate": "move.jcraft.vampire.default.beatdown.name"
+      }
+    },
+    "hit_moments": [
+      5,
+      8,
+      12,
+      16,
+      20
+    ],
+    "hitbox_size": 1.5,
+    "knockback": 0.2,
+    "move_distance": 1.0,
+    "offset": -0.1,
+    "stun": 12
+  }
+}

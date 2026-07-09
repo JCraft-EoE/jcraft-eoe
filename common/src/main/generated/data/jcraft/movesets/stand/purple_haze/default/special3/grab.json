@@ -1,0 +1,173 @@
+{
+  "anim_state": "GRAB",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "crouching_variant": {
+    "anim_state": "GROUND_SLAM",
+    "class": "SPECIAL3",
+    "cooldown_type": "STAND_SP3",
+    "move": {
+      "type": "jcraft:purplehaze_ground_slam_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 10,
+        "hit_animation": "LOW",
+        "hit_spark": "HIT_SPARK_2"
+      },
+      "cooldown": 120,
+      "damage": 6.0,
+      "duration": 18,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:phgroundslam"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.purple_haze.default.ground_slam.cr.description"
+        },
+        "may_hit_user": true,
+        "name": {
+          "translate": "move.jcraft.purple_haze.default.ground_slam.cr.name"
+        }
+      },
+      "hitbox_size": 1.75,
+      "knockback": 0.3,
+      "move_distance": 0.75,
+      "offset": 0.3,
+      "stun": 10,
+      "windup": 10
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_grab_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 4,
+      "blockable_type": "NON_BLOCKABLE",
+      "hit_spark": "HIT_SPARK_1",
+      "override_stun": true,
+      "stun_type": "UNBURSTABLE"
+    },
+    "cooldown": 280,
+    "damage": 0.0,
+    "duration": 24,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:d4cthrow"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:phgrabhit"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.purple_haze.default.grab.description"
+      },
+      "may_hit_user": true,
+      "name": {
+        "translate": "move.jcraft.purple_haze.default.grab.name"
+      }
+    },
+    "grab_duration": 25,
+    "hit_move": {
+      "type": "jcraft:shared_simple_multi_hit_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 5,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1",
+        "stun_type": "UNBURSTABLE"
+      },
+      "cooldown": 0,
+      "damage": 1.0,
+      "duration": 34,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "finisher": {
+          "move": {
+            "type": "jcraft:shared_simple_attack",
+            "attack_extras": {
+              "backstab": true,
+              "block_stun": 8,
+              "hit_animation": "LAUNCH",
+              "hit_spark": "HIT_SPARK_2",
+              "override_stun": true,
+              "shockwaves": true,
+              "stun_type": "LAUNCH"
+            },
+            "cooldown": 0,
+            "damage": 4.0,
+            "duration": 34,
+            "extras": {
+              "actions": [
+                {
+                  "type": "jcraft:play_sound",
+                  "bind": false,
+                  "run": "on_hit",
+                  "sound": "jcraft:impact1"
+                }
+              ],
+              "may_hit_user": true,
+              "name": {
+                "text": "Grab (Final Hit)"
+              }
+            },
+            "hitbox_size": 2.0,
+            "knockback": 1.25,
+            "move_distance": 0.75,
+            "offset": 0.0,
+            "stun": 8,
+            "windup": 27
+          },
+          "tick": 19
+        },
+        "may_hit_user": true,
+        "name": {
+          "text": "Grab (Final Hit)"
+        }
+      },
+      "hit_moments": [
+        6,
+        8,
+        10,
+        12,
+        14,
+        16,
+        18
+      ],
+      "hitbox_size": 2.0,
+      "knockback": 0.0,
+      "move_distance": 0.75,
+      "offset": 0.0,
+      "stun": 10
+    },
+    "hit_state": "GRAB_HIT",
+    "hitbox_size": 1.5,
+    "knockback": 0.0,
+    "move_distance": 0.75,
+    "offset": 0.0,
+    "stun": 45,
+    "windup": 12
+  }
+}

@@ -1,12 +1,10 @@
 package net.arna.jcraft.client.model;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.model.GeoModel;
 import net.arna.jcraft.JCraft;
 import net.minecraft.resources.ResourceLocation;
 
-public class JProjectileModel<T extends GeoAnimatable> extends GeoModel<T> {
+public class JProjectileModel<T> {
     private final ResourceLocation model, texture, animation;
 
     public JProjectileModel(@NonNull String name) {
@@ -17,7 +15,8 @@ public class JProjectileModel<T extends GeoAnimatable> extends GeoModel<T> {
         texture = JCraft.id("textures/entity/projectiles/" + name + ".png");
         animation = hasAnimation ? JCraft.id("animations/" + name + ".animation.json") : JCraft.id("animations/knife.animation.json");
     }
-    @Override
+
+    /*@Override
     public @NonNull ResourceLocation getModelResource(T animatable) {
         return model;
     }
@@ -30,5 +29,5 @@ public class JProjectileModel<T extends GeoAnimatable> extends GeoModel<T> {
     @Override
     public @NonNull ResourceLocation getAnimationResource(T animatable) {
         return animation;
-    }
+    }*/
 }

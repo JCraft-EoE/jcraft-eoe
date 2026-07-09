@@ -1,6 +1,6 @@
 {
   "type": "jcraft:cluster",
-  "biomes": "minecraft:cherry_grove",
+  "biomes": "#jcraft:has_structure/cinderella",
   "step": "surface_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "beard_thin",

@@ -1,0 +1,46 @@
+{
+  "anim_state": "SWEEP",
+  "class": "SPECIAL3",
+  "cooldown_type": "SPECIAL3",
+  "move": {
+    "type": "jcraft:shared_simple_uppercut_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 10,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1",
+      "static_height": true
+    },
+    "cooldown": 10,
+    "damage": 6.0,
+    "duration": 17,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact3"
+        },
+        {
+          "type": "jcraft:anubis_blood_lust",
+          "reset_only": true,
+          "run": "on_strike"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.anubis.default.low_kick.description"
+      },
+      "name": {
+        "translate": "move.jcraft.anubis.default.low_kick.name"
+      }
+    },
+    "hitbox_size": 1.33,
+    "knockback": 0.3,
+    "move_distance": 1.5,
+    "offset": 0.0,
+    "strength": 0.3,
+    "stun": 15,
+    "windup": 10
+  }
+}

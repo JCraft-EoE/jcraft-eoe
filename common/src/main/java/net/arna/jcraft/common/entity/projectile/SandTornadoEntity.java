@@ -1,16 +1,9 @@
 package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
-import net.arna.jcraft.api.Attacks;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.common.util.IOwnable;
@@ -39,44 +32,30 @@ import java.util.Set;
 
 import static net.arna.jcraft.api.Attacks.*;
 
-public class SandTornadoEntity extends JAttackEntity implements GeoEntity, IOwnable {
-    private static final EntityDataAccessor<Boolean> DISAPPEARED;
+public class SandTornadoEntity extends JAttackEntity implements IOwnable {
     private int hitsLeft = 5;
-
-    static {
-        DISAPPEARED = SynchedEntityData.defineId(SandTornadoEntity.class, EntityDataSerializers.BOOLEAN);
-    }
+    public static final int LIFETIME = 500;
 
     public SandTornadoEntity(Level world) {
         super(JEntityTypeRegistry.SAND_TORNADO.get(), world);
     }
 
-    public boolean hasDisappeared() {
-        return this.entityData.get(DISAPPEARED);
-    }
-
-    @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        entityData.define(DISAPPEARED, false);
-    }
-
     private void disappear() {
-        entityData.set(DISAPPEARED, true);
+        DISAPPEAR.sendForEntity(this);
         kill();
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (hasDisappeared()) {
-            if (deathTime > 26 || tickCount > 526) discard();
-            return;
-        }
+
+        if (hitsLeft <= 0) return;
 
         final Vec3 circulation = new Vec3(Mth.sin(tickCount * 0.25f) * 0.3f, 0.0, Mth.cos(tickCount * 0.25f) * 0.3f);
 
         if (level().isClientSide) {
+            if (tickCount < LIFETIME) IDLE.sendForEntity(this);
+
             for (int i = 0; i < 3; i++) {
                 level().addParticle(
                         new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SAND.defaultBlockState()),
@@ -86,35 +65,42 @@ public class SandTornadoEntity extends JAttackEntity implements GeoEntity, IOwna
                         circulation.x, 0, circulation.z
                 );
             }
-        } else if (tickCount % 5 == 0) {
-            if (master == null) {
-                if (isAlive()) {
-                    discard();
-                }
+        } else {
+            if (deathTime > 26 || tickCount > (LIFETIME + 26)) {
+                discard();
                 return;
             }
 
-            final Set<LivingEntity> toHurt = JUtils.generateHitbox(level(), getEyePosition(), 1.8, Set.of(this, master));
-
-            if (toHurt.isEmpty()) {
-                setDeltaMovement(getDeltaMovement().add(getLookAngle().scale(0.5)).scale(0.4));
-            } else {
-                setDeltaMovement(getDeltaMovement().scale(0.25));
-                for (LivingEntity living : toHurt) {
-                    final LivingEntity target = JUtils.getUserIfStand(living);
-                    if (target.isPassengerOfSameVehicle(master)) {
-                        return;
+            if (tickCount % 5 == 0) {
+                if (master == null) {
+                    if (isAlive()) {
+                        discard();
                     }
-                    damageLogic(level(), target, circulation, 10, 1, false, 2f, true, 6,
-                            level().damageSources().mobAttack(master), master, CommonHitPropertyComponent.HitAnimation.MID, false);
+                    return;
                 }
-                hitsLeft--;
-            }
 
-            hurtMarked = true;
+                final Set<LivingEntity> toHurt = JUtils.generateHitbox(level(), getEyePosition(), 1.8, Set.of(this, master));
 
-            if (hitsLeft < 1 || getHealth() <= 0 || tickCount >= 500) {
-                disappear();
+                if (toHurt.isEmpty()) {
+                    setDeltaMovement(getDeltaMovement().add(getLookAngle().scale(0.5)).scale(0.4));
+                } else {
+                    setDeltaMovement(getDeltaMovement().scale(0.25));
+                    for (LivingEntity living : toHurt) {
+                        final LivingEntity target = JUtils.getUserIfStand(living);
+                        if (target.isPassengerOfSameVehicle(master)) {
+                            return;
+                        }
+                        damageLogic(level(), target, circulation, 10, 1, false, 2f, true, 6,
+                                level().damageSources().mobAttack(master), master, CommonHitPropertyComponent.HitAnimation.MID, false);
+                    }
+                    hitsLeft--;
+                }
+
+                hurtMarked = true;
+
+                if (hitsLeft < 1 || getHealth() <= 0 || tickCount >= 500) {
+                    disappear();
+                }
             }
         }
     }
@@ -186,7 +172,11 @@ public class SandTornadoEntity extends JAttackEntity implements GeoEntity, IOwna
         readMasterNbt(tag);
     }
 
+    private static final AzCommand IDLE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandtornado.idle", AzPlayBehaviors.LOOP);
+    private static final AzCommand DISAPPEAR = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandtornado.disappear", AzPlayBehaviors.HOLD_ON_LAST_FRAME);
+
     // Animations
+    /*
     private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
 
     @Override
@@ -204,4 +194,5 @@ public class SandTornadoEntity extends JAttackEntity implements GeoEntity, IOwna
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
     }
+    */
 }

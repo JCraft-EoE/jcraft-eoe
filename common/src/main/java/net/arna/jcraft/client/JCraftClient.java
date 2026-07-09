@@ -11,26 +11,32 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import lombok.Getter;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
+import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
+import mod.azure.azurelib.render.item.AzItemRendererRegistry;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.pose.PoseModifiers;
-import net.arna.jcraft.client.rendering.DamageIndicatorManager;
-import net.arna.jcraft.client.particle.DamageNumberParticle;
-import net.arna.jcraft.client.rendering.StandUserPoseLoader;
+import net.arna.jcraft.api.registry.JItemRegistry;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
-import net.arna.jcraft.client.registry.*;
+import net.arna.jcraft.client.registry.JClientEventsRegistry;
+import net.arna.jcraft.client.registry.JRenderLayerRegistry;
+import net.arna.jcraft.client.renderer.armor.ArmorRenderer;
 import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
+import net.arna.jcraft.client.renderer.item.GasCanItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
+import net.arna.jcraft.client.rendering.StandUserPoseLoader;
 import net.arna.jcraft.client.rendering.handler.*;
+import net.arna.jcraft.client.sound.BoundSoundClient;
+import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
 import net.arna.jcraft.client.util.TrackedKeyBinding;
-import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.MovementInputType;
-import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.KeyMapping;
@@ -75,6 +81,7 @@ public class JCraftClient {
             .put(special3Key, MoveInputType.SPECIAL3)
             .put(ultKey, MoveInputType.ULTIMATE)
             .put(utility, MoveInputType.UTILITY)
+            .put(TrackedKeyBinding.wrap(Minecraft.getInstance().options.keyPickItem), MoveInputType.TOSS)
             .build();
     @Getter(lazy = true)
     private static final Map<TrackedKeyBinding, MovementInputType> movementBindings = createMovementBindingsMap();
@@ -96,6 +103,9 @@ public class JCraftClient {
 
         GravityChannelClient.init();
 
+        BlockBreakerClient.init();
+        BoundSoundClient.init();
+
         // Rendering
         JRenderLayerRegistry.init();
         RenderHandler.init();
@@ -103,20 +113,25 @@ public class JCraftClient {
         JCraftAbilityHud.init();
         PoseModifiers.register();
 
-        InversionShaderHandler.INSTANCE.init();
+        AzArmorRendererRegistry.register(ArmorRenderer.simple("stone_mask"), JItemRegistry.STONE_MASK.get());
+        AzArmorRendererRegistry.register(ArmorRenderer.simple("red_hat"), JItemRegistry.RED_HAT.get());
+
+        AzItemRendererRegistry.register(JItemRegistry.GAS_CAN.get(), GasCanItemRenderer::new);
+
+        SpecialParticleShaderHandler.INSTANCE.init();
         ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
         EpitaphVignetteShaderHandler.INSTANCE.init();
+        MandomRewindShaderHandler.INSTANCE.init();
 
         // Renderer registration
-        // JArmorRendererRegistry.registerArmorRenderers();
 
         ClientPacketHandler.init();
 
         AttackHitboxEffectRenderer.init();
         TimeErasePredictionEffectRenderer.init();
     }
-
+    
     public static void registerKeyBindings(@Nullable Consumer<KeyMapping> register) {
         if (register == null) register = KeyMappingRegistry::register;
 
@@ -177,6 +192,7 @@ public class JCraftClient {
                 .put(TrackedKeyBinding.wrap(options.keyJump), MovementInputType.JUMP)
                 .put(TrackedKeyBinding.wrap(options.keyShift), MovementInputType.CROUCH)
                 .put(dash, MovementInputType.DASH)
+                .put(TrackedKeyBinding.wrap(options.keyPickItem), MovementInputType.THROW)
                 .build();
     }
 
@@ -230,11 +246,15 @@ public class JCraftClient {
     }
 
     public static void registerParticleSpriteSets() {
+        // TODO: merge Forge version handling with this somehow. until then _KEEP THEM IN SYNC_
+        // See JCraftForgeClient#onParticleFactoryRegistration(RegisterParticleProvidersEvent)
+
         ParticleProviderRegistry.register(JParticleTypeRegistry.COMBO_BREAK, ComboBreakerParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.COOLDOWN_CANCEL, CooldownCancelParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.HITSPARK_1, provider -> new HitsparkParticle.Factory(provider, 0.4f, 5));
         ParticleProviderRegistry.register(JParticleTypeRegistry.HITSPARK_2, provider -> new HitsparkParticle.Factory(provider, 0.66f, 6));
         ParticleProviderRegistry.register(JParticleTypeRegistry.HITSPARK_3, provider -> new HitsparkParticle.Factory(provider, 1f, 8));
+        ParticleProviderRegistry.register(JParticleTypeRegistry.BLOOD_HITSPARK_2, provider -> new HitsparkParticle.Factory(provider, 0.66f, 6));
         ParticleProviderRegistry.register(JParticleTypeRegistry.INVERTED_HITSPARK_3, provider -> new InvertedHitsparkParticle.Factory(provider, 1f, 8));
         ParticleProviderRegistry.register(JParticleTypeRegistry.STUN_SLASH, provider -> new HitsparkParticle.Factory(provider, 0.6f, 6));
         ParticleProviderRegistry.register(JParticleTypeRegistry.STUN_PIERCE, provider -> new HitsparkParticle.Factory(provider, 0.6f, 6));
@@ -246,14 +266,19 @@ public class JCraftClient {
         ParticleProviderRegistry.register(JParticleTypeRegistry.PIXEL, PixelParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.BLOCKSPARK, provider -> new BlocksparkParticle.Factory(provider, 0.15f));
         ParticleProviderRegistry.register(JParticleTypeRegistry.GO, GoParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.DO, GoParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.AURA_ARC, AuraArcParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.AURA_BLOB, AuraBlobParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.INVERSION, InversionParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.BREATH, BreathParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.SUN_LOCK_ON, BackstabParticle.Factory::new); // 9 frames, reusing
+        ParticleProviderRegistry.register(JParticleTypeRegistry.LOCK_ON, LockOnParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.PURPLE_HAZE_CLOUD, PurpleHazeCloudParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.PURPLE_HAZE_PARTICLE, PurpleHazeErraticParticle.Factory::new);
         ParticleProviderRegistry.register(JParticleTypeRegistry.DAMAGE_NUMBER, DamageNumberParticle.Factory::new);
-        DamageIndicatorManager.setDamageNumberParticle(JParticleTypeRegistry.DAMAGE_NUMBER.get());
+        ParticleProviderRegistry.register(JParticleTypeRegistry.HAMON_SPARK, provider -> new HitsparkParticle.Factory(provider, 0.2f, 6));
+        ParticleProviderRegistry.register(JParticleTypeRegistry.LEMON, LemonParticle.Factory::new);
+        ParticleProviderRegistry.register(JParticleTypeRegistry.METALLICA_MOSH, MoshParticle.Factory::new);
     }
 
     @Getter

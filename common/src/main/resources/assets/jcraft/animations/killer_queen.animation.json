@@ -945,7 +945,7 @@
 				}
 			}
 		},
-		"animation.killerqueen.summon": {
+		"summon": {
 			"animation_length": 1.3,
 			"bones": {
 				"torso": {
@@ -4934,5 +4934,14 @@
 			}
 		}
 	},
+    "includes": [
+      {
+        "file_id": "jcraft:animations/base_stand.animation.json",
+        "animations": [
+          "itemthrow",
+          "itemthrow_charge"
+        ]
+      }
+    ],
 	"azurelib_format_version": 2
 }

@@ -4,8 +4,10 @@ import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
@@ -46,10 +48,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -65,7 +65,7 @@ import java.util.function.Supplier;
  */
 public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimsonEntity.State> {
     public static final MoveSet<KingCrimsonEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.KING_CRIMSON,
-            KingCrimsonEntity::registerMoves, State.class);
+            KingCrimsonEntity::registerMoves, KingCrimsonEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleDistance(1f)
             .idleRotation(-65f)
@@ -170,7 +170,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Vertical Chop"),
                     Component.literal("medium windup combo starter, has a true followup in the form of a slow, armored knockdown")
             );
-    public static final BloodThrowAttack BLOOD_THROW = new BloodThrowAttack(200, 10, 15, 1f)
+    public static final BloodThrowAttack<KingCrimsonEntity> BLOOD_THROW = new BloodThrowAttack<KingCrimsonEntity>(200, 10, 15, 1f)
             .withInfo(
                     Component.literal("Blood Throw"),
                     Component.literal("throws a stunning, blinding blood projectile, crouch while it comes out for higher speed")
@@ -189,7 +189,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Eye Chop"),
                     Component.literal("blindness on hit, combo starter, low blockstun")
             );
-    public static final KCDonutAttack DONUT = new KCDonutAttack(48, 30, 48, 1f,
+    public static final KCDonutAttack<KingCrimsonEntity> DONUT = new KCDonutAttack<KingCrimsonEntity>(48, 30, 48, 1f,
             14f, 10, 1.75f, 1.5f, 0.1f)
             .withSound(JSoundRegistry.KC_DONUT)
             .withImpactSound(JSoundRegistry.IMPACT_7)
@@ -205,7 +205,7 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Epitaph"),
                     Component.literal("0.2s windup, 1.5s counter, combo starter. Cannot be buffered.")
             );
-    public static final PredictionMove PREDICTION = new PredictionMove(480, 4, 104, -1f)
+    public static final PredictionMove<KingCrimsonEntity> PREDICTION = new PredictionMove<KingCrimsonEntity>(160, 4, 104, -1f)
             .withCrouchingVariant(EPITAPH)
             .withSound(JSoundRegistry.KC_EPITAPH)
             .withInfo(
@@ -221,13 +221,19 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
                     Component.literal("Time Erase"),
                     Component.literal("6 seconds duration, cancellable by doing anything with King Crimson")
             );
-    public static final TimeSkipMove<KingCrimsonEntity> TIME_SKIP = new TimeSkipMove<KingCrimsonEntity>(300, 16)
+    public static final TimeSkipMove<KingCrimsonEntity> TIME_SKIP = new TimeSkipMove<KingCrimsonEntity>(300, 16, 2, 2, 1)
             .withSound(JSoundRegistry.TE_TP)
             .withParticles()
             .withInfo(
                     Component.literal("Timeskip"),
                     Component.literal("16m range")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final KingCrimsonTossMove TOSS = new KingCrimsonTossMove(0, 1, 1, 0.75f,0.13f)
+            .withAnim(KingCrimsonEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<KingCrimsonEntity> TOSS_CHARGE = new TossChargeMove<KingCrimsonEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     private static final EntityDataAccessor<Integer> TIME_ERASE_TIME;
 
@@ -265,6 +271,8 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
         moves.register(MoveClass.ULTIMATE, TIME_ERASE, State.TIME_ERASE);
 
         moves.register(MoveClass.UTILITY, TIME_SKIP, State.TIME_SKIP);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     @Override
@@ -390,42 +398,39 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
 
     // Animations
     public enum State implements StandAnimationState<KingCrimsonEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kingcrimson.idle"))),
-        DUAL_CHOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.dual_chop"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kingcrimson.block"))),
-        OVERHEAD(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.overhead"))),
-        DONUT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.donut"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kingcrimson.barrage"))),
-        EYE_CHOP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.eye_chop"))),
-        TIME_ERASE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.time_erase"))),
-        EPITAPH(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.epitaph"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.heavy"))),
-        BLOOD_THROW(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.bloodthrow"))),
-        PREDICT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.predict"))),
-        COUNTER_MISS(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.counter_miss"))),
-        SWEEP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.kingcrimson.sweep"))),
-        TIME_SKIP(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.kingcrimson.idle")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.kingcrimson.idle", AzPlayBehaviors.LOOP)),
+        DUAL_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.dual_chop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.kingcrimson.block", AzPlayBehaviors.LOOP)),
+        OVERHEAD(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.overhead", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DONUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.donut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.barrage", AzPlayBehaviors.LOOP)),
+        EYE_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.eye_chop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TIME_ERASE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.time_erase", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        EPITAPH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.epitaph", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOOD_THROW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.bloodthrow", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        PREDICT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.predict", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        COUNTER_MISS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.counter_miss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SWEEP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.sweep", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TIME_SKIP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.idle", AzPlayBehaviors.LOOP)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
-        private final Consumer<AnimationState<KingCrimsonEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<KingCrimsonEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(KingCrimsonEntity attacker, AnimationState<KingCrimsonEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(KingCrimsonEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "animation.kingcrimson.summon";
     }
 
     @Override

@@ -2,14 +2,8 @@ package net.arna.jcraft.common.entity;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
-import mod.azure.azurelib.util.AzureLibUtil;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.MoveUsage;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent.HitAnimation;
@@ -18,8 +12,9 @@ import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.common.entity.spec.BrawlerSpecUser;
 import net.arna.jcraft.common.network.s2c.DamageNumberPacket;
-import net.arna.jcraft.common.util.ICustomDamageHandler;
+import net.arna.jcraft.api.itfs.ICustomDamageHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -50,8 +45,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class TrainingDummyEntity extends Mob implements GeoEntity, ICustomDamageHandler {
-    public static final int HIT_ANIMATION_LENGTH = 20; // Length of hit animation in ticks
+public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
+    public static final int HIT_ANIMATION_LENGTH = (int) 6.7; // Length of hit animation in ticks (0.3333 seconds)
 
     // Data watchers
     private static final EntityDataAccessor<Boolean> HAS_KNOCKDOWN = SynchedEntityData.defineId(TrainingDummyEntity.class, EntityDataSerializers.BOOLEAN);
@@ -59,6 +54,14 @@ public class TrainingDummyEntity extends Mob implements GeoEntity, ICustomDamage
     private static final EntityDataAccessor<Long> HIT_START_TIME = SynchedEntityData.defineId(TrainingDummyEntity.class, EntityDataSerializers.LONG);
 
     private boolean invisible;
+
+    private static final AzCommand DUMMY_HIT = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandbag.hit", AzPlayBehaviors.PLAY_ONCE);
+    private static final AzCommand DUMMY_IDLE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandbag.idle", AzPlayBehaviors.LOOP);
+    private static final AzCommand DUMMY_KNOCKDOWN = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandbag.knockdown", AzPlayBehaviors.HOLD_ON_LAST_FRAME);
+    private static final AzCommand DUMMY_KNOCKDOWN_IDLE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sandbag.knockdownidle", AzPlayBehaviors.LOOP);
+
+    private int lastHitCounter = -1;
+    private boolean lastKnockdownState = false;
 
     public TrainingDummyEntity(EntityType<? extends TrainingDummyEntity> entityType, Level level) {
         super(entityType, level);
@@ -141,6 +144,19 @@ public class TrainingDummyEntity extends Mob implements GeoEntity, ICustomDamage
             if (!player.level().isClientSide()) {
                 ItemStack dummyItem = new ItemStack(JItemRegistry.TRAINING_DUMMY.get());
                 player.getInventory().add(dummyItem);
+                if (isLeashed()) {
+                    dropLeash(false, true);
+                }
+                final List<BrawlerSpecUser> brawlers = player.level().getEntitiesOfClass(BrawlerSpecUser.class, AABB.ofSize(position(), 100, 10, 100), Entity::isAlive);
+                for (Mob brawler : brawlers) {
+                    if (brawler.getTarget() == this) {
+                        brawler.setTarget(null);
+                    }
+                    // aggro brawlers
+                    if (!player.isCreative()) {
+                        brawler.setTarget(player);
+                    }
+                }
                 this.discard();
             }
             return InteractionResult.SUCCESS;
@@ -259,12 +275,44 @@ public class TrainingDummyEntity extends Mob implements GeoEntity, ICustomDamage
     @Override
     public void tick() {
         super.tick();
+
         // Update knockdown sync on server side
         if (!level().isClientSide()) {
             boolean hasKnockdown = hasEffect(JStatusRegistry.KNOCKDOWN.get());
             boolean currentSyncValue = entityData.get(HAS_KNOCKDOWN);
             if (currentSyncValue != hasKnockdown) {
                 entityData.set(HAS_KNOCKDOWN, hasKnockdown);
+            }
+        } else {
+            // Client-side animation handling
+            boolean hasKnockdown = entityData.get(HAS_KNOCKDOWN);
+
+            // Knockdown takes priority
+            if (hasKnockdown) {
+                if (!lastKnockdownState) {
+                    lastKnockdownState = true;
+                    DUMMY_KNOCKDOWN.sendForEntity(this);
+                } else {
+                    DUMMY_KNOCKDOWN_IDLE.sendForEntity(this);
+                }
+            } else {
+                lastKnockdownState = false;
+
+                int currentHitCounter = entityData.get(HIT_COUNTER);
+                long hitStartTime = entityData.get(HIT_START_TIME);
+                long currentTime = level().getGameTime();
+
+                // Check if this is a new hit
+                if (currentHitCounter != lastHitCounter && currentHitCounter > 0) {
+                    lastHitCounter = currentHitCounter;
+                    DUMMY_HIT.sendForEntity(this);
+                }
+
+                // Send idle when not in hit animation (default state)
+                boolean stillInHitAnimation = (currentTime - hitStartTime) < HIT_ANIMATION_LENGTH && hitStartTime > 0;
+                if (!stillInHitAnimation) {
+                    DUMMY_IDLE.sendForEntity(this);
+                }
             }
         }
 
@@ -507,6 +555,7 @@ public class TrainingDummyEntity extends Mob implements GeoEntity, ICustomDamage
     }
 
     // Animation System
+    /*
     private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
     private int lastHitCounter = -1;
 
@@ -566,5 +615,5 @@ public class TrainingDummyEntity extends Mob implements GeoEntity, ICustomDamage
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
-    }
+    }*/
 }

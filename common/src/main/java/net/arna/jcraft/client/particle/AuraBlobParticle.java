@@ -20,7 +20,6 @@ public class AuraBlobParticle extends RisingParticle {
         this.quadSize = 0.5f;
         this.lifetime = 6 + random.nextInt(6);
         this.parent = parent;
-        tryMatchParent();
         setSpriteFromAge(spriteProvider);
     }
 
@@ -32,8 +31,8 @@ public class AuraBlobParticle extends RisingParticle {
     }
 
     public void tick() {
-        super.tick();
         tryMatchParent();
+        super.tick();
         if (age % 3 == 0) {
             setSprite(spriteProvider.get(random));
         }
@@ -53,7 +52,9 @@ public class AuraBlobParticle extends RisingParticle {
         }
 
         public Particle createParticle(final SimpleParticleType defaultParticleType, final ClientLevel clientWorld, final double d, final double e, final double f, final double g, final double h, final double i) {
-            return new AuraBlobParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider, color, parent);
+            var out = new AuraBlobParticle(clientWorld, d, e, f, g, h, i, this.spriteProvider, color, parent);
+            out.tryMatchParent();
+            return out;
         }
     }
 }

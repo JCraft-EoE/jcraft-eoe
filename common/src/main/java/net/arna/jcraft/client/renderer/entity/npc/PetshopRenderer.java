@@ -1,23 +1,17 @@
 package net.arna.jcraft.client.renderer.entity.npc;
 
-import mod.azure.azurelib.renderer.GeoEntityRenderer;
-import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.model.entity.npc.PetshopModel;
+import net.arna.jcraft.client.renderer.entity.AbstractEntityRenderer;
 import net.arna.jcraft.common.entity.npc.PetshopEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
 
 /**
- * The {@link GeoEntityRenderer} for {@link PetshopEntity}
- * @see PetshopModel
+ * The {@link AbstractEntityRenderer} for {@link PetshopEntity}
  */
-public class PetshopRenderer extends GeoEntityRenderer<PetshopEntity> {
-    public PetshopRenderer(final EntityRendererProvider.Context renderManager) {
-        super(renderManager, new PetshopModel());
-    }
+public class PetshopRenderer extends AbstractEntityRenderer<PetshopEntity> {
 
-    @Override
-    public ResourceLocation getTextureLocation(final PetshopEntity animatable) {
-        return JCraft.id("textures/entity/petshop.png");
+    public static String ID = "petshop";
+
+    public PetshopRenderer(final EntityRendererProvider.Context renderManager) {
+        super(renderManager, () -> new EntityAnimator<>(ID), ID);
     }
 }

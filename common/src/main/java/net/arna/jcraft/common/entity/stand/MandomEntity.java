@@ -1,41 +1,40 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.core.animation.AnimationController;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
-import mod.azure.azurelib.core.object.PlayState;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JMarkerExtractorRegistry;
 import net.arna.jcraft.api.registry.JMarkerInjectorRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.api.stand.*;
+import net.arna.jcraft.api.stand.StandData;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.api.stand.StandInfo;
+import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.moves.mandom.CountdownMove;
 import net.arna.jcraft.common.attack.moves.mandom.RewindMove;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-
-import java.util.function.Consumer;
 
 import static net.arna.jcraft.JCraft.QUEUE_MOVESTUN_LIMIT;
 import static net.arna.jcraft.JCraft.SPEC_QUEUE_MOVESTUN_LIMIT;
 
 public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> {
     public static final MoveSet<MandomEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.MANDOM,
-            MandomEntity::registerMoves, State.class);
+            MandomEntity::registerMoves, MandomEntity.class, State.class);
 
     public static final StandData DATA = StandData.builder()
             .idleDistance(0f)
@@ -60,13 +59,13 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
                     .build())
             .build();
 
-    public static final CountdownMove COUNTDOWN = new CountdownMove(6, 10, 120, 0f, 64, 600, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
+    public static final CountdownMove<MandomEntity> COUNTDOWN = new CountdownMove<MandomEntity>(6, 10, 120, 0f, 64, 600, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
             .withSound(JSoundRegistry.MANDOM_COUNTDOWN)
             .withInfo(
                     Component.literal("Countdown"),
                     Component.literal("Saves position data of all entities in a 64 block radius for 30 seconds. Must be active to use Rewind."));
 
-    public static final RewindMove REWIND = new RewindMove(6, 5, 10, 0f, 200)
+    public static final RewindMove<MandomEntity> REWIND = new RewindMove<MandomEntity>(6, 5, 10, 0f, 200)
             .withSound(JSoundRegistry.MANDOM_REWIND)
             .withInfo(
                     Component.literal("Rewind"),
@@ -89,24 +88,6 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(getThis(), "controller", 0, this::predicate));
-    }
-
-    private PlayState predicate(AnimationState<MandomEntity> state) {
-        AnimationController<MandomEntity> controller = state.getController();
-
-        if (isSameState()) {
-            controller.forceAnimationReset();
-        }
-
-        State superState = getState();
-        superState.playAnimation(getThis(), state);
-
-        return PlayState.CONTINUE;
-    }
-
-    @Override
     public boolean canAttack() {
         if (wantToBlock) {
             wantToBlock = false;
@@ -123,7 +104,7 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
     public void onUserMoveInput(AbstractMove<?, ? super MandomEntity> currentMove, MoveInputType type, boolean pressed, boolean moveInitiated) {
         if (!pressed) return;
 
-        MoveClass moveClass = type.getMoveClass(standby);
+        MoveClass moveClass = type.getMoveClass();
         if (moveClass == null) return;
 
         // Special check for ULTIMATE (Rewind) - only allow if countdown is active
@@ -189,20 +170,20 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
     }
 
     public enum State implements StandAnimationState<MandomEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("summon"))),
-        COUNTDOWN(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("timer"))),
-        REWIND(builder -> builder.setAnimation(RawAnimation.begin().thenPlay("rewind"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("idle")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "summon", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        COUNTDOWN(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "timer", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        REWIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "rewind", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "idle", AzPlayBehaviors.LOOP));
 
-        private final Consumer<AnimationState<MandomEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<MandomEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(MandomEntity attacker, AnimationState<MandomEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(MandomEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
@@ -216,9 +197,4 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
         return State.IDLE;
     }
 
-    // just return the animation name
-    @Override
-    protected @Nullable String getSummonAnimation() {
-        return "summon";
-    }
 }

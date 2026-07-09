@@ -10,14 +10,8 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import mod.azure.azurelib.animatable.GeoEntity;
-import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
-import mod.azure.azurelib.core.animation.AnimatableManager;
-import mod.azure.azurelib.util.AzureLibUtil;
 
-public class DarbyOlderEntity extends PathfinderMob implements GeoEntity {
-
-    private final AnimatableInstanceCache geoCache = AzureLibUtil.createInstanceCache(this);
+public class DarbyOlderEntity extends PathfinderMob {
 
     public DarbyOlderEntity(Level world) {
         super(JEntityTypeRegistry.DARBY_OLDER.get(), world);
@@ -27,16 +21,6 @@ public class DarbyOlderEntity extends PathfinderMob implements GeoEntity {
 
         if (world.isClientSide()) return;
         JEnemies.add(this);
-    }
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        // TODO Arna
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return geoCache;
     }
 
     public static AttributeSupplier.Builder createDarbyOlderAttributes() {

@@ -1,32 +1,28 @@
 package net.arna.jcraft.client.renderer.entity;
 
 import lombok.NonNull;
-import mod.azure.azurelib.renderer.GeoEntityRenderer;
-import net.arna.jcraft.client.model.entity.SandTornadoModel;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.common.entity.projectile.SandTornadoEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 /**
- * The {@link GeoEntityRenderer} for {@link SandTornadoEntity}.
- * @see SandTornadoModel
+ * The {@link AbstractEntityRenderer} for {@link SandTornadoEntity}.
  */
-public class SandTornadoRenderer extends GeoEntityRenderer<SandTornadoEntity> {
-    @Override
-    public RenderType getRenderType(final SandTornadoEntity animatable, final ResourceLocation texture, final @Nullable MultiBufferSource bufferSource, final float partialTick) {
-        return RenderType.entityTranslucent(getGeoModel().getTextureResource(animatable));
+@Environment(EnvType.CLIENT)
+public class SandTornadoRenderer extends AbstractEntityRenderer<SandTornadoEntity> {
+
+    public static final String ID = "sandtornado";
+    private static final RenderType RENDER_TYPE = RenderType.entityTranslucent(JCraft.id(TEXTURE_STR_TEMPLATE.formatted(ID)));
+
+    public SandTornadoRenderer(final @NonNull EntityRendererProvider.Context context) {
+        super(context, () -> new EntityAnimator<>(ID), b -> b.setShadowRadius(1.1f).setRenderType(RENDER_TYPE), ID);
     }
 
     @Override
     public boolean shouldShowName(final @NonNull SandTornadoEntity animatable) {
         return false;
-    }
-
-    public SandTornadoRenderer(final EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, new SandTornadoModel());
-        this.shadowRadius = 1.1f;
     }
 }

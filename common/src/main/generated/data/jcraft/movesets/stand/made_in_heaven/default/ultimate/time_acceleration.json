@@ -1,0 +1,28 @@
+{
+  "anim_state": "TIME_ACCELERATION",
+  "class": "ULTIMATE",
+  "cooldown_type": "STAND_ULTIMATE",
+  "move": {
+    "type": "jcraft:madeinheaven_time_acceleration_move",
+    "acceleration_duration": "jcraft:mih_time_acceleration_duration",
+    "cooldown": 1400,
+    "duration": 40,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mihtaccel"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.made_in_heaven.default.time_acceleration.description"
+      },
+      "name": {
+        "translate": "move.jcraft.made_in_heaven.default.time_acceleration.name"
+      }
+    },
+    "move_distance": 1.0,
+    "windup": 20
+  }
+}

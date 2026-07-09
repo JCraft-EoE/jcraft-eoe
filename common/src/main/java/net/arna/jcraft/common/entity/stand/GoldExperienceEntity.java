@@ -1,8 +1,10 @@
 package net.arna.jcraft.common.entity.stand;
 
 import lombok.NonNull;
-import mod.azure.azurelib.core.animation.AnimationState;
-import mod.azure.azurelib.core.animation.RawAnimation;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.MoveSelectionResult;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
@@ -31,15 +33,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-
-import java.util.function.Consumer;
 
 /**
  * The {@link StandEntity} for <a href="https://jojowiki.com/Gold_Experience">Gold Experience</a>.
  * @see JStandTypeRegistry#GOLD_EXPERIENCE
- * @see net.arna.jcraft.client.model.entity.stand.GoldenExperienceModel GoldenExperienceModel
  * @see net.arna.jcraft.client.renderer.entity.stands.GoldExperienceRenderer GoldExperienceRenderer
  * @see BerryBushAttack
  * @see LifeGiverAttack
@@ -48,7 +46,7 @@ import java.util.function.Consumer;
  */
 public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, GoldExperienceEntity.State> {
     public static final MoveSet<GoldExperienceEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.GOLD_EXPERIENCE,
-            GoldExperienceEntity::registerMoves, State.class);
+            GoldExperienceEntity::registerMoves, GoldExperienceEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-30f)
             .info(StandInfo.builder()
@@ -70,7 +68,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .build();
 
     // JCraft.lightCooldown -> 0 | 0.5f -> 0.35f
-    public static final BerryBushAttack BERRY_BUSH = new BerryBushAttack(40,
+    public static final BerryBushAttack<GoldExperienceEntity> BERRY_BUSH = new BerryBushAttack<GoldExperienceEntity>(40,
             16, 20, 1.25f, 4f, 5, 1.5f, 0.75f, 0.2f)
             .withAnim(State.LIFE_GIVER)
             .withImpactSound(JSoundRegistry.IMPACT_4)
@@ -134,7 +132,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     Component.literal("Healing Hand"),
                     Component.literal("standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs")
             );
-    public static final TreeAttack TREE = new TreeAttack(280, 10, 24, 1f, 5f,
+    public static final TreeAttack<GoldExperienceEntity> TREE = new TreeAttack<GoldExperienceEntity>(280, 10, 24, 1f, 5f,
             15, 1.75f, 0.2f, -0.1f)
             .withImpactSound(JSoundRegistry.IMPACT_8)
             .withSound(JSoundRegistry.GE_TREE)
@@ -142,7 +140,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     Component.literal("Tree Summon"),
                     Component.literal("two-hitting launch")
             );
-    public static final LifeGiverAttack LIFE_GIVER = new LifeGiverAttack(300, 16, 25, 1f)
+    public static final LifeGiverAttack<GoldExperienceEntity> LIFE_GIVER = new LifeGiverAttack<GoldExperienceEntity>(300, 16, 25, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(
                     Component.literal("Life Giver"),
@@ -151,7 +149,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                             CROUCHING: turns any stackable item into a frog, lasts for 15s and reflects damage, follows user
                             AERIAL: turns any item into a butterfly, lasts forever""")
             );
-    public static final OverclockAttack OVERCLOCK = new OverclockAttack(920, 22, 31, 1f,
+    public static final OverclockAttack<GoldExperienceEntity> OVERCLOCK = new OverclockAttack<GoldExperienceEntity>(920, 22, 31, 1f,
             9f, 60, 2f, 0.9f, 0f)
 //            .withSound(JSoundRegistry.GE_ULT)
             .withImpactSound(JSoundRegistry.IMPACT_10)
@@ -194,6 +192,12 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     Component.literal("Rekka Series"),
                     Component.literal("a set of three attacks, which cancel into each other during recovery")
             );
+    // TODO add move info x2
+    // TODO balance x2
+    public static final TossMove<GoldExperienceEntity> TOSS = new TossMove<GoldExperienceEntity>(0, 1, 1, 0.75f,0.13f)
+            .withAnim(GoldExperienceEntity.State.ITEM_TOSS);
+    public static final TossChargeMove<GoldExperienceEntity> TOSS_CHARGE = new TossChargeMove<GoldExperienceEntity>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
+            .withFollowup(TOSS);
 
     public GoldExperienceEntity(Level worldIn) {
         super(JStandTypeRegistry.GOLD_EXPERIENCE.get(), worldIn);
@@ -218,6 +222,8 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         moves.register(MoveClass.ULTIMATE, OVERCLOCK, State.OVERCLOCK);
 
         moves.register(MoveClass.UTILITY, TREE, State.TREE);
+
+        moves.register(MoveClass.TOSS, TOSS_CHARGE, State.ITEM_TOSS_CHARGE).withFollowup(State.ITEM_TOSS);
     }
 
     // Moveset
@@ -308,42 +314,38 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
 
     // Animation code
     public enum State implements StandAnimationState<GoldExperienceEntity> {
-        IDLE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ge.idle"))),
-        LIGHT(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.light"))),
-        BLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ge.block"))),
-        HEAVY(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.heavy"))),
-        BARRAGE(builder -> builder.setAnimation(RawAnimation.begin().thenLoop("animation.ge.barrage"))),
-        HEAL_SELF(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.healself"))),
-        HEAL(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.heal"))),
-        TREE(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.tree"))),
-        LIFE_GIVER(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.lifegiver"))),
-        REKKA1(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.rekka1"))),
-        REKKA2(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.rekka2"))),
-        REKKA3(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.rekka3"))),
-        OVERCLOCK(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.overclock"))),
-        LIGHT_FOLLOWUP(builder -> builder.setAnimation(RawAnimation.begin().thenPlayAndHold("animation.ge.light_followup")));
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.ge.idle", AzPlayBehaviors.LOOP)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.ge.block", AzPlayBehaviors.LOOP)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.barrage", AzPlayBehaviors.LOOP)),
+        HEAL_SELF(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.healself", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.heal", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TREE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.tree", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIFE_GIVER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.lifegiver", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        REKKA1(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.rekka1", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        REKKA2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.rekka2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        REKKA3(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.rekka3", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        OVERCLOCK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.overclock", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
-        private final Consumer<AnimationState<GoldExperienceEntity>> animator;
+        private final AzCommand animator;
 
-        State(Consumer<AnimationState<GoldExperienceEntity>> animator) {
+        State(AzCommand animator) {
             this.animator = animator;
         }
 
         @Override
-        public void playAnimation(GoldExperienceEntity attacker, AnimationState<GoldExperienceEntity> builder) {
-            animator.accept(builder);
+        public void playAnimation(GoldExperienceEntity attacker) {
+            animator.sendForEntity(attacker);
         }
     }
 
     @Override
     protected State[] getStateValues() {
         return State.values();
-    }
-
-    @Nullable
-    @Override
-    protected String getSummonAnimation() {
-        return "animation.ge.summon";
     }
 
     @Override

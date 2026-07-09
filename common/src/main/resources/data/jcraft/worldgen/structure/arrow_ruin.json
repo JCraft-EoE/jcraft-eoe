@@ -1,6 +1,6 @@
 {
   "type": "jcraft:cluster",
-  "biomes": ["minecraft:badlands", "minecraft:eroded_badlands"],
+  "biomes": "#jcraft:has_structure/arrow_ruin",
   "step": "underground_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "none",

@@ -66,6 +66,7 @@ public final class JCraftForge {
             HitPropertyCapability.getCapability(living).tick();
             MiscCapability.getCapability(living).tick();
 
+            HamonCapability.getCapability(living).tick();
             VampireCapability.getCapability(living).tick();
         }
     }

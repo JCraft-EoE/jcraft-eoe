@@ -13,11 +13,16 @@ public interface JStatusRegistry {
 
     RegistrySupplier<MobEffect> WSPOISON = EFFECTS.register("ws_poison", WSPoisonEffect::new);
     RegistrySupplier<MobEffect> STANDLESS = EFFECTS.register("standless", StandlessEffect::new);
+    RegistrySupplier<MobEffect> SPECLESS = EFFECTS.register("specless", SpeclessEffect::new);
+
     RegistrySupplier<MobEffect> OUTOFBODY = EFFECTS.register("outofbody", OutOfBodyEffect::new);
     RegistrySupplier<MobEffect> WEIGHTLESS = EFFECTS.register("weightless", WeightlessStatusEffect::new);
     RegistrySupplier<MobEffect> BLEEDING = EFFECTS.register("jbleeding", BleedingEffect::new);
     RegistrySupplier<MobEffect> PHPOISON = EFFECTS.register("phpoison", PurpleInfectionEffect::new);
     RegistrySupplier<MobEffect> HYPOXIA = EFFECTS.register("hypoxia", HypoxiaEffect::new);
+    RegistrySupplier<WaterWalkingEffect> WATER_WALKING = EFFECTS.register("water_walking", WaterWalkingEffect::new);
+    RegistrySupplier<MobEffect> FLAMMABLE = EFFECTS.register("flammable", FlammableEffect::new);
+    RegistrySupplier<MobEffect> EXHAUSTION = EFFECTS.register("exhaustion", ExhaustionEffect::new);
 
     static void init() {
         // intentionally left empty

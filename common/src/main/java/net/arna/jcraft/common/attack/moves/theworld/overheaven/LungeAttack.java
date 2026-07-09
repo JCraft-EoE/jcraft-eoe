@@ -11,7 +11,7 @@ import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.api.stand.StandEntity;
 
-public final class LungeAttack extends AbstractSimpleAttack<LungeAttack, StandEntity<?,?>> {
+public final class LungeAttack<A extends StandEntity<? extends A, ?>> extends AbstractSimpleAttack<LungeAttack<A>, A> {
     private final float originalMoveDistance;
     @Getter
     private final int beginMoveStun, endMoveStun;
@@ -27,12 +27,12 @@ public final class LungeAttack extends AbstractSimpleAttack<LungeAttack, StandEn
     }
 
     @Override
-    public @NonNull MoveType<LungeAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<LungeAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void onInitiate(final StandEntity<?,?> attacker) {
+    public void onInitiate(final A attacker) {
         super.onInitiate(attacker);
 
         // Reset move distance
@@ -40,34 +40,29 @@ public final class LungeAttack extends AbstractSimpleAttack<LungeAttack, StandEn
     }
 
     @Override
-    public void activeTick(final StandEntity<?,?> attacker, final int moveStun) {
+    public void activeTick(final A attacker, final int moveStun) {
         super.activeTick(attacker, moveStun);
         if (moveStun > endMoveStun && moveStun <= beginMoveStun) {
             withMoveDistance(getMoveDistance() + 0.15f);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public LungeAttack withCrouchingVariant(final KnockdownAttack<? extends StandEntity<?,?>> crouchingVariant) {
-        return super.withCrouchingVariant((AbstractMove<?, ? super StandEntity<?, ?>>)crouchingVariant);
-    }
-
     @Override
-    protected @NonNull LungeAttack getThis() {
+    protected @NonNull LungeAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull LungeAttack copy() {
-        return copyExtras(new LungeAttack(getCooldown(), getWindup(), getDuration(), originalMoveDistance, getDamage(),
+    public @NonNull LungeAttack<A> copy() {
+        return copyExtras(new LungeAttack<>(getCooldown(), getWindup(), getDuration(), originalMoveDistance, getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset(), beginMoveStun, endMoveStun));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<LungeAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<LungeAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<LungeAttack>, LungeAttack> buildCodec(RecordCodecBuilder.Instance<LungeAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<LungeAttack<?>>, LungeAttack<?>> buildCodec(RecordCodecBuilder.Instance<LungeAttack<?>> instance) {
             return instance.group(extras(), attackExtras(), cooldown(), windup(), duration(), moveDistance(), damage(),
                     stun(), hitboxSize(), knockback(), offset(),
                     Codec.INT.fieldOf("begin_move_stun").forGetter(LungeAttack::getBeginMoveStun),

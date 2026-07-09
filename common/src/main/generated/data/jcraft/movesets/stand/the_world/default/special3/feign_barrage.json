@@ -1,0 +1,76 @@
+{
+  "anim_state": "BARRAGE",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:theworld_feign_barrage_counter_attack",
+    "cooldown": 400,
+    "duration": 50,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:twbarrage"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.the_world.default.feign_barrage.description"
+      },
+      "name": {
+        "translate": "move.jcraft.the_world.default.feign_barrage.name"
+      }
+    },
+    "hit_move": {
+      "type": "jcraft:shared_knockdown_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 13,
+        "extra_hit_boxes": [
+          {
+            "size": 1.25
+          }
+        ],
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_1",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 0,
+      "damage": 9.0,
+      "duration": 9,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:twcounter"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact4"
+          }
+        ],
+        "armor": 2147483647,
+        "description": {
+          "text": "quick, armored knockdown"
+        },
+        "name": {
+          "text": "Counter (Hit)"
+        }
+      },
+      "hitbox_size": 1.75,
+      "knockback": 0.7,
+      "knockdown_duration": 35,
+      "move_distance": 0.75,
+      "offset": 0.1,
+      "stun": 16,
+      "windup": 5
+    },
+    "move_distance": 0.75,
+    "windup": 5
+  }
+}

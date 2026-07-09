@@ -1,0 +1,53 @@
+{
+  "anim_state": "GROUND_SLAM",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:cmoon_ground_slam_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 11,
+      "blockable_type": "NON_BLOCKABLE_EFFECTS_ONLY",
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_2",
+      "static_height": true
+    },
+    "cooldown": 18,
+    "damage": 7.0,
+    "duration": 18,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:cmoongroundslam"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact10"
+        },
+        {
+          "type": "jcraft:cmoon_inversion",
+          "damage": 0.5,
+          "run": "on_strike",
+          "slow": false,
+          "time": 40
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.c_moon.default.ground_slam.description"
+      },
+      "name": {
+        "translate": "move.jcraft.c_moon.default.ground_slam.name"
+      }
+    },
+    "hitbox_size": 3.0,
+    "knockback": 0.2,
+    "move_distance": 1.0,
+    "offset": 1.4,
+    "stun": 17,
+    "windup": 10
+  }
+}

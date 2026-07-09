@@ -1,5 +1,6 @@
 package net.arna.jcraft.api.attack;
 
+import dev.architectury.platform.Platform;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.MoveSelectionResult;
@@ -11,6 +12,7 @@ import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
+import net.arna.jcraft.api.misc.BoundSoundPlayer;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
 import net.arna.jcraft.common.ai.CombatEntityContext;
@@ -22,9 +24,11 @@ import net.arna.jcraft.common.util.IJCraftComboTracker;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -32,7 +36,10 @@ import net.minecraft.world.entity.ai.control.JumpControl;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Set;
+
+import static net.arna.jcraft.JCraft.comboBreak;
 
 /**
  * Anything that can use moves must implement this interface.
@@ -109,8 +116,21 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
 
     void setState(final S state);
 
-    default void playAttackerSound(final SoundEvent sound, final float volume, final float pitch) {
-        getBaseEntity().playSound(sound, volume, pitch);
+    default @Nullable BoundSoundPlayer.EntitySoundHandle playAttackerSound(final SoundEvent sound, final float volume,
+                                                                           final float pitch, final boolean bind,
+                                                                           final boolean linger) {
+        LivingEntity e = getBaseEntity();
+        if (e.isSilent()) return null;
+
+        if (bind) {
+            BoundSoundPlayer.EntitySoundHandle handle = BoundSoundPlayer.playSoundFrom(e, sound, e.getSoundSource(), volume, pitch);
+            if (!linger && getCurrentMove() != null)
+                getCurrentMove().submitBoundSound(getThis(), handle);
+            return handle;
+        }
+
+        e.level().playSound(null, e.getX(), e.getY(), e.getZ(), sound, e.getSoundSource(), volume, pitch);
+        return null;
     }
 
     /**
@@ -152,6 +172,10 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
                         AttackerBrainInfo.State.DISENGAGE);
                 // Otherwise, we stay on defense.
             else return;
+        }
+
+        if (getMoveStun() <= 0) { // Uncrouch when not doing anything to prevent persisting crouching
+            getUser().setShiftKeyDown(false);
         }
 
         final double distance = combatCtx.getDistanceBetween();
@@ -197,7 +221,8 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
 
         MoveMap.Entry<A, S> heavyEntry = getFirstValidEntry(MoveClass.HEAVY);
         if (heavyEntry == null) {
-            JCraft.LOGGER.warn("Couldn't find light or heavy attack entry while running selectAttack on attacker: {}", this);
+            if (Platform.isDevelopmentEnvironment())
+                JCraft.LOGGER.warn("Couldn't find light or heavy attack entry while running selectAttack on attacker: {}", this);
             return null;
         } else {
             return heavyEntry.getMove();
@@ -213,7 +238,16 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
     }
 
     /**
-     * Selects and uses a move
+     * A preprocessor for move execution, right after selection and before any move initiation was done. Used to handle special cases in move execution.
+     * @return Whether to stop further attempts at move execution.
+     */
+    default MoveSelectionResult overrideMoveExecution(AbstractMove<?, ? super A> selectedAttack, AttackerBrainInfo info, Mob mob, LivingEntity target, JumpControl mobJumpControl,
+                                          StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack, double distance, int enemyMoveStun, int stunTicks) {
+        return MoveSelectionResult.PASS;
+    }
+
+    /**
+     * Selects and uses a move. Also handles queueing.
      */
     default @Nullable AbstractMove<?, ? super A> doMoveSelection(AttackerBrainInfo info, Mob mob, LivingEntity target, JumpControl mobJumpControl,
                                  StandEntity<?, ?> enemyStand, AbstractMove<?, ?> enemyAttack, double distance, int enemyMoveStun, int stunTicks) {
@@ -225,6 +259,10 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
                 mob, target, stunTicks, enemyMoveStun, distance, enemyStand, enemyAttack);
 
         if (selectedAttack == null) return null;
+
+        final MoveSelectionResult result = overrideMoveExecution(selectedAttack, info, mob, target, mobJumpControl, enemyStand, enemyAttack, distance, enemyMoveStun, stunTicks);
+        if (result == MoveSelectionResult.STOP) return null;
+        else if (result == MoveSelectionResult.USE) return selectedAttack;
 
         boolean shouldPerformMove = this.getMoveStun() < 1;
 
@@ -256,6 +294,10 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
         }
 
         return selectedAttack;
+    }
+
+    default List<AbstractMove<?, ? super A>> allAttacks() {
+        return getMoveMap().asMovesList();
     }
 
      /**
@@ -299,13 +341,14 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
 
          final int aiLevel = info.getAiLevel();
 
-         for (AbstractMove<?, ? super A> attack : getMoveMap().asMovesList()) {
+         for (AbstractMove<?, ? super A> attack : allAttacks()) {
              int windupPoint = attack.getWindupPoint();
+             final MoveClass moveClass = attack.getMoveClass(); // is null mostly in invalid cases
 
              if (attack.isFollowup()) {
                  // Discount any followup attacks when there is no move to follow up from
                  if (getCurrentMove() == null || getCurrentMove().getFollowup() == null) continue;
-             } else if (cooldowns.getCooldown(attack.getMoveClass().getDefaultCooldownType()) > 0 && attack.getCooldown() != 0) {
+             } else if (moveClass != null && cooldowns.getCooldown(moveClass.getDefaultCooldownType()) > 0 && attack.getCooldown() != 0) {
                  // Discount any on-cooldown non-followup attacks
                  movesOnCooldown++;
                  continue;
@@ -456,5 +499,40 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
          }
 
          return selectedAttack;
+     }
+
+    /**
+     * @return Whether it was decided to Combo Break.
+     */
+     default boolean decideComboBreak(final int aiLevel, final CombatInstantContext combatCtx) {
+         if (aiLevel <= IJAttackerBrain.BEGINNER_LEVEL) return false;
+
+         final MobEffectInstance stun = combatCtx.getAttackerCtx().stun();
+         if (stun == null) return false;
+
+         final LivingEntity user = getUser();
+         final RandomSource random = user.getRandom();
+
+         final CombatEntityContext targetCtx = combatCtx.getTargetCtx();
+         final boolean lowHP = user.getHealth() < user.getMaxHealth() / 2.0f || user.getHealth() < 5f;
+         final boolean enemyIsActing = targetCtx.standAttack() != null || targetCtx.specAttack() != null;
+
+         boolean burstCondition;
+         if (aiLevel >= IJAttackerBrain.COMPETITIVE_LEVEL) {
+             burstCondition = (combatCtx.getDistanceBetween() <= 2.0 && lowHP && enemyIsActing) || random.nextFloat() < 0.02f;
+         }
+         else if (aiLevel >= IJAttackerBrain.INTERMEDIATE_LEVEL) {
+             burstCondition = lowHP || enemyIsActing || random.nextFloat() < 0.05f;
+         }
+         else {
+             burstCondition = random.nextFloat() < 0.1f;
+         }
+
+         if (burstCondition) {
+             comboBreak((ServerLevel) user.level(), user, stun);
+             return true;
+         }
+
+         return false;
      }
 }

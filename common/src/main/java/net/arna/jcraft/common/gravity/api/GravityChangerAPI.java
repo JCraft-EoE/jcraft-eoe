@@ -2,6 +2,7 @@ package net.arna.jcraft.common.gravity.api;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.entity.CommonGravityComponent;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.gravity.RotationAnimation;
 import net.arna.jcraft.common.gravity.util.*;
 import net.arna.jcraft.common.gravity.util.packet.DefaultGravityPacket;
@@ -11,6 +12,7 @@ import net.arna.jcraft.common.gravity.util.packet.UpdateGravityPacket;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -22,13 +24,13 @@ import java.util.Optional;
 public abstract class GravityChangerAPI {
 
     /**
-     * Returns the applied gravity direction for the given player
+     * Returns the applied gravity direction for the given entity
      * This is the direction that directly affects everything this mod changes
      * If the player is riding a vehicle this will be the applied gravity direction of the vehicle
      * Otherwise it will be the main gravity direction of the player itself
      */
     public static Direction getGravityDirection(Entity entity) {
-        if (EntityTags.canChangeGravity(entity)) {
+        if (EntityTags.canChangeGravity(entity) && (entity instanceof Player || !JServerConfig.GRAVITY_ONLY_AFFECTS_PLAYERS.getValue())) {
             return JComponentPlatformUtils.getGravity(entity).map(CommonGravityComponent::getGravityDirection).orElse(Direction.DOWN);
         }
         return Direction.DOWN;

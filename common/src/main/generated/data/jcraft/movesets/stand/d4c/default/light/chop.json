@@ -1,0 +1,99 @@
+{
+  "anim_state": "LIGHT",
+  "class": "LIGHT",
+  "cooldown_type": "STAND_LIGHT",
+  "crouching_variant": {
+    "anim_state": "ITEM_PLACE",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:dirtydeedsdonedirtcheap_item_place_move",
+      "cooldown": 20,
+      "duration": 12,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.d4c.default.item_place.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.d4c.default.item_place.cr.name"
+        }
+      },
+      "move_distance": 0.75,
+      "windup": 8
+    }
+  },
+  "followup": {
+    "anim_state": "LIGHT_FOLLOWUP",
+    "class": "LIGHT",
+    "cooldown_type": "STAND_LIGHT",
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "MID",
+        "hit_spark": "HIT_SPARK_1"
+      },
+      "cooldown": 0,
+      "damage": 5.0,
+      "duration": 12,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.d4c.default.elbow_strike.followup.description"
+        },
+        "name": {
+          "translate": "move.jcraft.d4c.default.elbow_strike.followup.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 1.0,
+      "move_distance": 0.75,
+      "offset": 0.0,
+      "stun": 7,
+      "windup": 7
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "HIGH",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 20,
+    "damage": 4.5,
+    "duration": 12,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact9"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.d4c.default.chop.description"
+      },
+      "loop_prevention": false,
+      "name": {
+        "translate": "move.jcraft.d4c.default.chop.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.25,
+    "move_distance": 0.75,
+    "offset": -0.1,
+    "stun": 14,
+    "windup": 7
+  }
+}

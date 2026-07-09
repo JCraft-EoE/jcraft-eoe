@@ -1,11 +1,13 @@
 package net.arna.jcraft.common.saveddata;
 
 import com.google.common.base.MoreObjects;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.mixin.LevelStorageAccessAccessor;
 import net.arna.jcraft.mixin.MinecraftServerAccessor;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.minecraft.ReportedException;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -96,7 +98,10 @@ public class ExclusiveStandsData extends SavedData {
             CompoundTag fileData = NbtIo.read(file);
             if (fileData != null)
                 compoundTag = (CompoundTag) fileData.get("data");
-        } catch (final NullPointerException | ClassCastException | IOException ignored) {}
+        }
+        catch (final NullPointerException | ClassCastException | IOException | ReportedException ex) {
+            JCraft.LOGGER.warn(ex);
+        }
 
         return new ExclusiveStandsData(MoreObjects.firstNonNull(compoundTag, NO_STANDS));
     }

@@ -10,6 +10,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.UseAnim;
 import java.util.Collections;
 import java.util.Set;
@@ -56,7 +57,7 @@ public class StandBlockPacket {
     }
 
     private static boolean allowBlockingWith(ItemStack itemStack) {
-        if (itemStack.is(JItemRegistry.ANUBIS.get()) || itemStack.is(JItemRegistry.ANUBIS_SHEATHED.get())) {
+        if (itemStack.is(JItemRegistry.ANUBIS.get()) || itemStack.is(JItemRegistry.ANUBIS_SHEATHED.get()) || itemStack.getItem() instanceof ShieldItem) {
             return true;
         }
         return itemStack.getUseAnimation() == UseAnim.NONE;

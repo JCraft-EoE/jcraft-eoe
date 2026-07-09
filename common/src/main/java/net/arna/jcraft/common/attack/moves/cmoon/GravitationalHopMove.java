@@ -4,9 +4,9 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.common.entity.stand.CMoonEntity;
 import net.arna.jcraft.api.attack.enums.MobilityType;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.util.ExtraCodecs;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 @Getter
-public final class GravitationalHopMove extends AbstractMove<GravitationalHopMove, CMoonEntity> {
+public final class GravitationalHopMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<GravitationalHopMove<A>, A> {
     private final int weightlessDuration, slowFallingDuration;
 
     public GravitationalHopMove(final int cooldown, final int weightlessDuration, final int slowFallingDuration) {
@@ -29,12 +29,12 @@ public final class GravitationalHopMove extends AbstractMove<GravitationalHopMov
     }
 
     @Override
-    public @NotNull MoveType<GravitationalHopMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<GravitationalHopMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final CMoonEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         if (user.onGround()) {
             if (user.hasEffect(JStatusRegistry.WEIGHTLESS.get())) {
                 user.removeEffect(JStatusRegistry.WEIGHTLESS.get());
@@ -50,20 +50,20 @@ public final class GravitationalHopMove extends AbstractMove<GravitationalHopMov
     }
 
     @Override
-    protected @NonNull GravitationalHopMove getThis() {
+    protected @NonNull GravitationalHopMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull GravitationalHopMove copy() {
-        return copyExtras(new GravitationalHopMove(getCooldown(), getWeightlessDuration(), getSlowFallingDuration()));
+    public @NonNull GravitationalHopMove<A> copy() {
+        return copyExtras(new GravitationalHopMove<>(getCooldown(), getWeightlessDuration(), getSlowFallingDuration()));
     }
 
-    public static class Type extends AbstractMove.Type<GravitationalHopMove> {
+    public static class Type extends AbstractMove.Type<GravitationalHopMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<GravitationalHopMove>, GravitationalHopMove> buildCodec(RecordCodecBuilder.Instance<GravitationalHopMove> instance) {
+        protected @NotNull App<RecordCodecBuilder.Mu<GravitationalHopMove<?>>, GravitationalHopMove<?>> buildCodec(RecordCodecBuilder.Instance<GravitationalHopMove<?>> instance) {
             return instance.group(extras(), cooldown(),
                             ExtraCodecs.NON_NEGATIVE_INT.fieldOf("weightless_duration").forGetter(GravitationalHopMove::getWeightlessDuration),
                             ExtraCodecs.NON_NEGATIVE_INT.fieldOf("slow_falling_duration").forGetter(GravitationalHopMove::getSlowFallingDuration))

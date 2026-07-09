@@ -1,0 +1,39 @@
+{
+  "parent": "jcraft:obtain_any_spec",
+  "criteria": {
+    "has_mask": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jcraft:stone_mask"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.jcraft.find_stone_mask.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:stone_mask",
+      "nbt": "{Damage:0,az_id:[I;-994543774,-1112067257,-1115476039,-1738903803]}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.find_stone_mask.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_mask"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

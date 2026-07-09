@@ -1,14 +1,13 @@
 package net.arna.jcraft.common.item;
 
+import net.arna.jcraft.api.registry.JItemRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.projectile.BulletProjectile;
 import net.arna.jcraft.common.tickable.PeacemakerReload;
-import net.arna.jcraft.common.tickable.RevolverFire;
 import net.arna.jcraft.common.util.DimensionData;
-import net.arna.jcraft.api.registry.JItemRegistry;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -167,7 +166,7 @@ public class Peacemaker extends Item {
         if (!world.isClientSide) {
             // Set immediate cooldown to prevent multiple inputs
             player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), 10); // 10 tick cooldown
-            RevolverFire.enqueue(new DimensionData(player, world.dimension(), 3));
+            Peacemaker.fireStatic(peacemakerStack, world, player);
         }
 
         return true; // Successfully handled the input

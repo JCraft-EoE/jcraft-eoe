@@ -1,0 +1,44 @@
+{
+  "anim_state": "TIME_STRIKE",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "move": {
+    "type": "jcraft:starplatinum_theworld_time_strike_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 9,
+      "extra_hit_boxes": [
+        {
+          "size": 1.0
+        }
+      ],
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 300,
+    "damage": 5.0,
+    "duration": 11,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.star_platinum_the_world.default.time_strike.description"
+      },
+      "name": {
+        "translate": "jcraft.sptw.sp1"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.6,
+    "move_distance": 0.75,
+    "offset": -0.25,
+    "stun": 12,
+    "windup": 7
+  }
+}

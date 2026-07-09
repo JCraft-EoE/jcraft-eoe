@@ -1,0 +1,28 @@
+{
+  "anim_state": "FLAG",
+  "class": "UTILITY",
+  "cooldown_type": "UTILITY",
+  "move": {
+    "type": "jcraft:dirtydeedsdonedirtcheap_flag_move",
+    "cooldown": 200,
+    "duration": 60,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:d4cutility"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.d4c.default.dimensional_phase.description"
+      },
+      "mobility_type": "HIGHJUMP",
+      "name": {
+        "translate": "move.jcraft.d4c.default.dimensional_phase.name"
+      }
+    },
+    "move_distance": 0.0,
+    "windup": 10
+  }
+}

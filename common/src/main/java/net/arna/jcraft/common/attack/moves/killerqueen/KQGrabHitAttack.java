@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
@@ -28,7 +29,7 @@ import java.util.Set;
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
 @Getter
-public final class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQueenEntity> {
+public final class KQGrabHitAttack<A extends StandEntity<? extends A, ?>> extends AbstractMove<KQGrabHitAttack<A>, A> {
     private final int stun;
 
     public KQGrabHitAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final int stun) {
@@ -37,12 +38,12 @@ public final class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQ
     }
 
     @Override
-    public @NotNull MoveType<KQGrabHitAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<KQGrabHitAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final KillerQueenEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         attacker.playSound(JSoundRegistry.KQ_DETONATE.get(), 1, 1);
 
         final CommonBombTrackerComponent.BombData bombData = JComponentPlatformUtils.getBombTracker(user).getMainBomb();
@@ -52,7 +53,7 @@ public final class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQ
 
             final Vec3 pos = livingEntity.position();
             JCraft.createParticle(world, pos.x, pos.y, pos.z, JParticleType.BOOM);
-            JUtils.serverPlaySound(JSoundRegistry.KQ_EXPLODE.get(), world, pos, 96);
+            JUtils.serverPlaySound(JSoundRegistry.KQ_NUKE.get(), world, pos, 96);
 
             final DamageSource damageSource = JDamageSources.stand(attacker);
 
@@ -67,20 +68,20 @@ public final class KQGrabHitAttack extends AbstractMove<KQGrabHitAttack, KillerQ
     }
 
     @Override
-    protected @NonNull KQGrabHitAttack getThis() {
+    protected @NonNull KQGrabHitAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull KQGrabHitAttack copy() {
-        return copyExtras(new KQGrabHitAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun()));
+    public @NonNull KQGrabHitAttack<A> copy() {
+        return copyExtras(new KQGrabHitAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun()));
     }
 
-    public static class Type extends AbstractMove.Type<KQGrabHitAttack> {
+    public static class Type extends AbstractMove.Type<KQGrabHitAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<KQGrabHitAttack>, KQGrabHitAttack> buildCodec(RecordCodecBuilder.Instance<KQGrabHitAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<KQGrabHitAttack<?>>, KQGrabHitAttack<?>> buildCodec(RecordCodecBuilder.Instance<KQGrabHitAttack<?>> instance) {
             return baseDefault(instance).and(Codec.INT.fieldOf("stun").forGetter(KQGrabHitAttack::getStun))
                     .apply(instance, applyExtras(KQGrabHitAttack::new));
         }

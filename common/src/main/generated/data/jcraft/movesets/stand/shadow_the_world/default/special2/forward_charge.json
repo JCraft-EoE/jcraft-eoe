@@ -1,0 +1,49 @@
+{
+  "anim_state": "CHARGE",
+  "class": "SPECIAL2",
+  "cooldown_type": "STAND_SP2",
+  "move": {
+    "type": "jcraft:shadowtheworld_charge_attack",
+    "attack_extras": {
+      "block_stun": 11,
+      "hit_animation": "CRUSH",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 100,
+    "damage": 5.0,
+    "duration": 19,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:twcharge"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:stwwarble"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:twchargehit"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.shadow_the_world.default.forward_charge.description"
+      },
+      "name": {
+        "translate": "move.jcraft.shadow_the_world.default.forward_charge.name"
+      },
+      "ranged": true
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.25,
+    "move_distance": 5.0,
+    "offset": 0.0,
+    "stun": 20,
+    "windup": 5
+  }
+}

@@ -1,8 +1,8 @@
 package net.arna.jcraft.client.rendering;
 
 import lombok.experimental.UtilityClass;
+import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.common.entity.TrainingDummyEntity;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
@@ -12,17 +12,12 @@ import java.util.WeakHashMap;
 @UtilityClass
 public class DamageIndicatorManager {
     private static final Map<TrainingDummyEntity, Integer> dummyPositionCounter = new WeakHashMap<>();
-    private static SimpleParticleType DAMAGE_NUMBER_PARTICLE;
-
-    public static void setDamageNumberParticle(SimpleParticleType particle) {
-        DAMAGE_NUMBER_PARTICLE = particle;
-    }
 
     /**
      * Spawns a damage number particle at the entity's location
      */
     public static void spawnDamageNumber(Entity entity, float damageAmount) {
-        if (DAMAGE_NUMBER_PARTICLE == null || !entity.level().isClientSide) {
+        if (!entity.level().isClientSide) {
             return;
         }
 
@@ -41,7 +36,7 @@ public class DamageIndicatorManager {
 
         // Pass the animation position as the Z speed parameter
         // The particle will use this to determine its horizontal offset
-        level.addParticle(DAMAGE_NUMBER_PARTICLE,
+        level.addParticle(JParticleTypeRegistry.DAMAGE_NUMBER.get(),
                 x, y, z,
                 damageAmount, 0, animationPos);
     }

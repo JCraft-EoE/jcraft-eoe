@@ -1,0 +1,19 @@
+{
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:breath_xray_move",
+    "cooldown": 0,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.aerosmith.default.breath_detection.description"
+      },
+      "name": {
+        "translate": "move.jcraft.aerosmith.default.breath_detection.name"
+      }
+    },
+    "move_distance": 0.0,
+    "range": 128.0,
+    "requireRemote": true
+  }
+}

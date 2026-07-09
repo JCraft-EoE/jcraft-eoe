@@ -1,0 +1,131 @@
+{
+  "anim_state": "STAR_FINGER",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "crouching_variant": {
+    "anim_state": "GRAB",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:shared_grab_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 6,
+        "hit_spark": "HIT_SPARK_1",
+        "override_stun": true,
+        "stun_type": "UNBURSTABLE"
+      },
+      "cooldown": 0,
+      "damage": 2.0,
+      "duration": 20,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:sptwgrab"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:sptwgrabhit"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.star_platinum.default.takedown.cr.description"
+        },
+        "name": {
+          "translate": "jcraft.starplatinum.crsp1"
+        }
+      },
+      "grab_duration": 11,
+      "grab_offset": 0.8,
+      "hit_move": {
+        "type": "jcraft:shared_knockdown_attack",
+        "attack_extras": {
+          "backstab": true,
+          "block_stun": 10,
+          "hit_animation": "MID",
+          "hit_spark": "HIT_SPARK_2"
+        },
+        "cooldown": 0,
+        "damage": 6.0,
+        "duration": 20,
+        "extras": {
+          "actions": [
+            {
+              "type": "jcraft:play_sound",
+              "run": "at_init",
+              "sound": "jcraft:sptwuppercut"
+            },
+            {
+              "type": "jcraft:play_sound",
+              "bind": false,
+              "run": "on_hit",
+              "sound": "jcraft:impact6"
+            }
+          ],
+          "armor": 2147483647,
+          "name": {
+            "translate": "jcraft.starplatinum.crsp1hit"
+          }
+        },
+        "hitbox_size": 1.75,
+        "knockback": 0.4,
+        "knockdown_duration": 35,
+        "move_distance": 1.0,
+        "offset": 0.0,
+        "stun": 15,
+        "windup": 10
+      },
+      "hit_state": "GRAB_HIT",
+      "hitbox_size": 1.5,
+      "knockback": 0.1,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "stun": 20,
+      "windup": 8
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 5,
+      "extra_hit_boxes": [
+        {
+          "forward_offset": 2.0,
+          "size": 1.0,
+          "vertical_offset": 0.1
+        }
+      ],
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 0,
+    "damage": 5.0,
+    "duration": 20,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:starfinger"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.star_platinum.default.star_finger.description"
+      },
+      "name": {
+        "translate": "jcraft.starplatinum.sp1"
+      }
+    },
+    "hitbox_size": 1.75,
+    "knockback": -0.4,
+    "move_distance": 0.75,
+    "offset": -0.25,
+    "stun": 30,
+    "windup": 12
+  }
+}

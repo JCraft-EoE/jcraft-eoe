@@ -1,0 +1,101 @@
+{
+  "anim_state": "LOW_KICK",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "crouching_variant": {
+    "anim_state": "LEG_CRUSHER",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:shared_knockdown_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 11,
+        "extra_hit_boxes": [
+          {
+            "size": 1.0,
+            "vertical_offset": -0.5
+          }
+        ],
+        "hit_animation": "LOW",
+        "hit_spark": "HIT_SPARK_2"
+      },
+      "cooldown": 19,
+      "damage": 7.0,
+      "duration": 19,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:mihlegcrusher"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:twkickhit"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.made_in_heaven.default.leg_crusher.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.made_in_heaven.default.leg_crusher.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 0.35,
+      "knockdown_duration": 45,
+      "move_distance": 0.85,
+      "offset": 0.2,
+      "stun": 22,
+      "windup": 9
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 10,
+      "extra_hit_boxes": [
+        {
+          "size": 1.0,
+          "vertical_offset": -0.5
+        }
+      ],
+      "hit_animation": "LOW",
+      "hit_spark": "HIT_SPARK_2"
+    },
+    "cooldown": 17,
+    "damage": 6.0,
+    "duration": 17,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:mihlegcrusher"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact1"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.made_in_heaven.default.low_kick.description"
+      },
+      "name": {
+        "translate": "move.jcraft.made_in_heaven.default.low_kick.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 0.25,
+    "move_distance": 0.85,
+    "offset": 0.2,
+    "stun": 26,
+    "windup": 8
+  }
+}

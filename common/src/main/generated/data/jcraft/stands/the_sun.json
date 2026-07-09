@@ -1,0 +1,30 @@
+{
+  "idle_rotation": 0.0,
+  "info": {
+    "con_count": 2,
+    "free_space": {
+      "translate": "entity.jcraft.the_sun.info.freeSpace"
+    },
+    "name": {
+      "translate": "entity.jcraft.the_sun"
+    },
+    "pro_count": 2,
+    "skin_names": [
+      {
+        "translate": "entity.jcraft.the_sun.info.skin1"
+      },
+      {
+        "translate": "entity.jcraft.the_sun.info.skin2"
+      },
+      {
+        "translate": "entity.jcraft.the_sun.info.skin3"
+      }
+    ]
+  },
+  "summon_data": {
+    "anim_duration": 40,
+    "sound": {
+      "sound_id": "jcraft:sunsummon"
+    }
+  }
+}

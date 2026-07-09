@@ -1,0 +1,49 @@
+{
+  "anim_state": "POMMEL",
+  "class": "HEAVY",
+  "cooldown_type": "HEAVY",
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 20,
+    "damage": 4.0,
+    "duration": 8,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:anubispommel"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact3"
+        },
+        {
+          "type": "jcraft:anubis_blood_lust",
+          "reset_only": false,
+          "run": "on_strike"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.anubis.default.pommel_strike.description"
+      },
+      "name": {
+        "translate": "move.jcraft.anubis.default.pommel_strike.name"
+      }
+    },
+    "hitbox_size": 1.25,
+    "knockback": 0.2,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 7,
+    "windup": 5
+  }
+}

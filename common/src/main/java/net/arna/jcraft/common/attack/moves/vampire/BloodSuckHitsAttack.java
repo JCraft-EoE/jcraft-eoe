@@ -1,15 +1,17 @@
 package net.arna.jcraft.common.attack.moves.vampire;
 
 import com.mojang.datafixers.kinds.App;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.ints.IntCollection;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMultiHitAttack;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -20,9 +22,13 @@ public class BloodSuckHitsAttack extends AbstractMultiHitAttack<BloodSuckHitsAtt
     @Setter
     private WeakReference<LivingEntity> target;
 
+    @Getter
+    private final float bloodGainMult;
+
     public BloodSuckHitsAttack(int cooldown, int duration, float moveDistance, float damage, int stun, float hitboxSize,
-                               float knockback, float offset, @NonNull IntCollection hitMoments) {
+                               float knockback, float offset, @NonNull IntCollection hitMoments, float bloodGainMult) {
         super(cooldown, duration, moveDistance, damage, stun, hitboxSize, knockback, offset, hitMoments);
+        this.bloodGainMult = bloodGainMult;
     }
 
     @Override
@@ -33,11 +39,11 @@ public class BloodSuckHitsAttack extends AbstractMultiHitAttack<BloodSuckHitsAtt
     @Override
     public @NonNull Set<LivingEntity> perform(VampireSpec attacker, LivingEntity user) {
         Set<LivingEntity> targets = super.perform(attacker, user);
-        user.heal(1);
         LivingEntity target = this.target.get();
         float bloodMult = target == null ? 0 : JUtils.getBloodMult(target);
         if (bloodMult <= 0) return targets;
 
+        user.heal(1);
         attacker.getVampireComponent().setBlood(attacker.getVampireComponent().getBlood() + 2 * bloodMult);
         JUtils.serverPlaySound(JSoundRegistry.VAMPIRE_SUCK.get(), (ServerLevel) user.level(), user.position(), 32);
         return targets;
@@ -51,7 +57,7 @@ public class BloodSuckHitsAttack extends AbstractMultiHitAttack<BloodSuckHitsAtt
     @Override
     public @NonNull BloodSuckHitsAttack copy() {
         return copyExtras(new BloodSuckHitsAttack(getCooldown(), getDuration(), getMoveDistance(), getDamage(), getStun(),
-                getHitboxSize(), getKnockback(), getOffset(), getHitMoments()));
+                getHitboxSize(), getKnockback(), getOffset(), getHitMoments(), getBloodGainMult()));
     }
 
     public static class Type extends AbstractMultiHitAttack.Type<BloodSuckHitsAttack> {
@@ -60,7 +66,10 @@ public class BloodSuckHitsAttack extends AbstractMultiHitAttack<BloodSuckHitsAtt
         @Override
         protected @NonNull App<RecordCodecBuilder.Mu<BloodSuckHitsAttack>, BloodSuckHitsAttack>
         buildCodec(RecordCodecBuilder.Instance<BloodSuckHitsAttack> instance) {
-            return multiHitDefault(instance, BloodSuckHitsAttack::new);
+            return instance.group(extras(), attackExtras(), cooldown(), duration(), moveDistance(), damage(),
+                            stun(), hitboxSize(), knockback(), offset(), hitMoments(),
+                            Codec.FLOAT.fieldOf("blood_gain_mult").forGetter(BloodSuckHitsAttack::getBloodGainMult))
+                    .apply(instance, applyAttackExtras(BloodSuckHitsAttack::new));
         }
     }
 }

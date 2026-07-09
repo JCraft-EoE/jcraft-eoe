@@ -11,16 +11,17 @@ import java.util.Map;
 @Getter
 public enum MoveInputType {
     LIGHT(MoveClass.LIGHT, true),
-    HEAVY(MoveClass.HEAVY, false, MoveClass.TOSS, true),
+    HEAVY(MoveClass.HEAVY, false),
     BARRAGE(MoveClass.BARRAGE),
     SPECIAL1(MoveClass.SPECIAL1),
     SPECIAL2(MoveClass.SPECIAL2),
     SPECIAL3(MoveClass.SPECIAL3),
     ULTIMATE(MoveClass.ULTIMATE),
-    UTILITY(MoveClass.UTILITY, MoveClass.STANDBY_OFF),
-    STAND_SUMMON(null);
+    UTILITY(MoveClass.UTILITY),
+    STAND_SUMMON(null),
+    TOSS(MoveClass.TOSS);
 
-    public static final int types = 9;
+    public static final int types = 10;
     @Getter(value = AccessLevel.PRIVATE, lazy = true)
     private static final Map<MoveClass, MoveInputType> fromMoveType = Arrays.stream(values())
             .filter(v -> v.getMoveClass() != null)
@@ -29,41 +30,14 @@ public enum MoveInputType {
     @Nullable
     private final MoveClass moveClass;
     private final boolean holdable;
-    @Nullable
-    private final MoveClass moveClassStandby;
-    private final boolean holdableStandby;
 
     MoveInputType(final @Nullable MoveClass moveClass) {
         this(moveClass, false);
     }
 
     MoveInputType(final @Nullable MoveClass moveClass, final boolean holdable) {
-        this(moveClass, holdable, null, false);
-    }
-
-    MoveInputType(final @Nullable MoveClass moveClass, final @Nullable MoveClass moveClassStandby) {
-        this(moveClass, false, moveClassStandby, false);
-    }
-
-    MoveInputType(final @Nullable MoveClass moveClass, final boolean holdable, final @Nullable MoveClass moveClassStandby, final boolean holdableStandby) {
         this.moveClass = moveClass;
         this.holdable = holdable;
-        this.moveClassStandby = moveClassStandby;
-        this.holdableStandby = holdable;
-    }
-
-    public MoveClass getMoveClass(boolean standby) {
-        if (standby) {
-            return moveClassStandby;
-        }
-        return moveClass;
-    }
-
-    public boolean isHoldable(boolean standby) {
-        if (standby) {
-            return holdableStandby;
-        }
-        return holdable;
     }
 
     public static @Nullable MoveInputType fromMoveClass(final MoveClass moveClass) {

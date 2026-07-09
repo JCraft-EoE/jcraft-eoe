@@ -4,15 +4,15 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
-import net.arna.jcraft.common.entity.stand.CMoonEntity;
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.core.Direction;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public final class GravPunchAttack extends AbstractSimpleAttack<GravPunchAttack, CMoonEntity> {
+public final class GravPunchAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<GravPunchAttack<A>, A> {
     public static final String GRAVITY_SOURCE = JCraft.MOD_ID + "$" + GravPunchAttack.class.getSimpleName();
 
     public GravPunchAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun,
@@ -33,7 +33,7 @@ public final class GravPunchAttack extends AbstractSimpleAttack<GravPunchAttack,
     }
 
     @Override
-    protected void processTarget(final CMoonEntity attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
+    protected void processTarget(final A attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
         super.processTarget(attacker, target, kbVec, damageSource);
 
         final Direction oppositeGravity = GravityChangerAPI.getGravityDirection(target).getOpposite();
@@ -44,38 +44,41 @@ public final class GravPunchAttack extends AbstractSimpleAttack<GravPunchAttack,
     }
 
     @Override
-    public void performHook(final CMoonEntity attacker, final Set<LivingEntity> targets, final Set<AABB> boxes,
+    public void performHook(final A attacker, final Set<LivingEntity> targets, final Set<AABB> boxes,
                             final DamageSource damageSource, final Vec3 forwardPos, final Vec3 rotationVector) {
         if (targets.isEmpty()) {
             JCraft.stun(attacker.getUserOrThrow(), 15, 0);
             return;
         }
+
+        LivingEntity baseEntity = attacker.getBaseEntity();
         JComponentPlatformUtils
-                .getShockwaveHandler(attacker.level())
-                .addShockwave(forwardPos, new Vec3(GravityChangerAPI.getGravityDirection(attacker).step()), 3.0f);
+                .getShockwaveHandler(baseEntity.level())
+                .addShockwave(forwardPos, new Vec3(GravityChangerAPI.getGravityDirection(baseEntity).step()), 3.0f);
     }
 
     @Override
-    public @NotNull MoveType<GravPunchAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<GravPunchAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    protected @NonNull GravPunchAttack getThis() {
+    protected @NonNull GravPunchAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull GravPunchAttack copy() {
-        return copyExtras(new GravPunchAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull GravPunchAttack<A> copy() {
+        return copyExtras(new GravPunchAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<GravPunchAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<GravPunchAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<GravPunchAttack>, GravPunchAttack> buildCodec(RecordCodecBuilder.Instance<GravPunchAttack> instance) {
+        protected @NotNull App<RecordCodecBuilder.Mu<GravPunchAttack<?>>, GravPunchAttack<?>> buildCodec(
+                final RecordCodecBuilder.Instance<GravPunchAttack<?>> instance) {
             return attackDefault(instance, GravPunchAttack::new);
         }
     }

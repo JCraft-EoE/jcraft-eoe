@@ -17,7 +17,7 @@ loom {
             name "Data Generation"
             vmArg "-Dfabric-api.datagen"
             vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file("src/main/generated")}"
-            vmArg "-Dfabric-api.datagen.modid=jcraft"
+            vmArg "-Dfabric-api.datagen.modid=jcraft_datagen"
             vmArg "-Djcraft.datagen.resources-source=${project(":common").file("src/main/resources")}"
 
             runDir "build/datagen"
@@ -54,6 +54,33 @@ configurations {
     }
 }
 
+tasks.register("copyAccessWidener", Copy) {
+    from(project(":common").file("src/main/resources/jcraft.accesswidener"))
+    into(sourceSets.named("main").get().resources.srcDirs.first())
+}
+
+processResources {
+    dependsOn("copyAccessWidener")
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+sourcesJar {
+    dependsOn "copyAccessWidener"
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE // Ignore duplicate jcraft.accesswidener files
+
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+
+    def fabricSources = project(":fabric").sourcesJar
+    dependsOn fabricSources
+    from fabricSources.archiveFile.map { zipTree(it) }
+}
+
 // Ensure fabric project is evaluated before this project
 evaluationDependsOn(':fabric')
 
@@ -62,6 +89,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-data-generation-api-v1:12.3.4+1802ada577"
     modImplementation "net.fabricmc.fabric-api:fabric-convention-tags-v1:1.5.5+1802ada577"
     modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
+
+    // jjbacosplay
+    modImplementation "com.jcraft-eoe.jjbacosplay:jjbacosplay-datagen:${rootProject.jjbacosplay_version}"
 
     // Copy all mod dependencies from fabric project.
     // Doing this manually gives us more control over what transitive dependencies are included.
