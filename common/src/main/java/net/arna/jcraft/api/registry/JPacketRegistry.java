@@ -29,6 +29,7 @@ public interface JPacketRegistry {
     ResourceLocation S2C_DAMAGE_NUMBER = JCraft.id("dmg_no");
     ResourceLocation S2C_BLOCK_BREAKAGE = JCraft.id("bb");
     ResourceLocation S2C_BOUND_SOUND = JCraft.id("bs");
+    ResourceLocation S2C_MENU_CALL = JCraft.id("menu");
 
     ResourceLocation C2S_STAND_BLOCK = JCraft.id("stnd_blk");
     ResourceLocation C2S_COOLDOWN_CANCEL = JCraft.id("cdc");
@@ -36,7 +37,6 @@ public interface JPacketRegistry {
     ResourceLocation C2S_PLAYER_INPUT_HOLD = JCraft.id("plr_input_h");
     ResourceLocation C2S_REMOTE_STAND_INTERACT = JCraft.id("rmt_stnd_act");
     ResourceLocation C2S_PREDICTION_TRIGGER = JCraft.id("prdct_trig");
-    ResourceLocation C2S_MENU_CALL = JCraft.id("menu");
 
     ResourceLocation S2C_SYNC = JCraft.id("s2c_sync");
     ResourceLocation C2S_SYNC = JCraft.id("c2s_sync");

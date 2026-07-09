@@ -2,9 +2,12 @@ package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import net.arna.jcraft.platform.JPlatformUtils;
+import dev.architectury.networking.NetworkManager;
+import io.netty.buffer.Unpooled;
+import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
 public class JCraftMenuCommand {
@@ -21,7 +24,8 @@ public class JCraftMenuCommand {
         if (player == null) {
             return 0;
         }
-        JPlatformUtils.callMainMenu(player);
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        NetworkManager.sendToPlayer(player, JPacketRegistry.S2C_MENU_CALL, buf);
         return 1;
     }
 }
