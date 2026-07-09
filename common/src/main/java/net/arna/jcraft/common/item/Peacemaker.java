@@ -139,7 +139,7 @@ public class Peacemaker extends Item {
             return true; // We handled it (by doing nothing), don't let other systems try
         }
 
-        // Check if player has an active stand with moveStun > 0
+/*        // Check if player has an active stand with moveStun > 0
         StandEntity<?, ?> stand = JUtils.getStand(player);
         if (stand != null && stand.getMoveStun() > 0) {
             return true; // We handled it (by doing nothing) - stand is busy
@@ -149,7 +149,7 @@ public class Peacemaker extends Item {
         JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec != null && spec.getMoveStun() > 0) {
             return true; // We handled it (by doing nothing) - spec is busy
-        }
+        }*/
 
         CompoundTag data = peacemakerStack.getOrCreateTag();
         int shots = data.getInt(SHOTS_ID);
@@ -205,7 +205,7 @@ public class Peacemaker extends Item {
 
         if (user instanceof Player player) {
             // Set refire cooldown - longer than the initial input cooldown
-            player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), 20); // 20 tick refire time
+            player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), 5); // 20 tick refire time
             player.awardStat(Stats.ITEM_USED.get(JItemRegistry.PEACEMAKER.get()));
         }
     }
