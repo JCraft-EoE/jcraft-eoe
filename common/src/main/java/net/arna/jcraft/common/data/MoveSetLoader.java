@@ -30,7 +30,7 @@ public class MoveSetLoader {
     public static void attemptLoad(final MoveSet<?, ?> moveSet) {
         // This method is called when a MoveSet is created.
         // It will load the move set data if it exists.
-        final ResourceLocation typeLoc = moveSet.getType().getId();
+        final ResourceLocation typeLoc = moveSet.getTypeId();
         final String moveSetName = moveSet.getName();
 
         Map<String, Collection<Pair<ResourceLocation, JsonObject>>> typeMoveSets = PENDING_MOVE_SET_DATA

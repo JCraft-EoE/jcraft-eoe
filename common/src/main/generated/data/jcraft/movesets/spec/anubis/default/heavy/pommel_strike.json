@@ -3,14 +3,13 @@
   "class": "HEAVY",
   "cooldown_type": "HEAVY",
   "move": {
-    "type": "jcraft:anubis_simple_anubis_attack",
+    "type": "jcraft:shared_simple_attack",
     "attack_extras": {
       "backstab": true,
       "block_stun": 8,
       "hit_animation": "MID",
       "hit_spark": "HIT_SPARK_1"
     },
-    "check_holding_anubis": false,
     "cooldown": 20,
     "damage": 4.0,
     "duration": 8,
@@ -26,6 +25,11 @@
           "bind": false,
           "run": "on_hit",
           "sound": "jcraft:impact3"
+        },
+        {
+          "type": "jcraft:anubis_blood_lust",
+          "reset_only": false,
+          "run": "on_strike"
         }
       ],
       "description": {
@@ -36,7 +40,6 @@
       }
     },
     "hitbox_size": 1.25,
-    "increment_bloodlust": true,
     "knockback": 0.2,
     "move_distance": 1.0,
     "offset": 0.0,

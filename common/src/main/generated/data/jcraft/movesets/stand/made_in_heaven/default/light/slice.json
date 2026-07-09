@@ -10,11 +10,11 @@
       "type": "jcraft:shared_simple_attack",
       "attack_extras": {
         "backstab": true,
-        "block_stun": 7,
+        "block_stun": 3,
         "hit_animation": "HIGH",
         "hit_spark": "HIT_SPARK_1"
       },
-      "cooldown": 0,
+      "cooldown": 15,
       "damage": 3.0,
       "duration": 11,
       "extras": {

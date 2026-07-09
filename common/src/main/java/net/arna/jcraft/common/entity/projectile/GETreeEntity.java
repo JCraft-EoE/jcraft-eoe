@@ -64,19 +64,21 @@ public class GETreeEntity extends AbstractArrow {
 
         if (tickCount == 4) {
             final DamageSource ds = level().damageSources().mobAttack(livingOwner);
-            final Set<LivingEntity> hurt = JUtils.generateHitbox(level(), position().add(launchVec.normalize()), 2.5, Set.of(this, livingOwner));
+            final Set<LivingEntity> hurt = JUtils.generateHitbox(level(), position().add(launchVec.normalize()), 2.5, Set.of(this));
 
             for (LivingEntity living : hurt) {
-                if (!JUtils.canDamage(ds, living)) {
-                    continue;
-                }
-
                 final LivingEntity target = JUtils.getUserIfStand(living);
-                if (livingOwner != target) {
-                    damageLogic(level(), target, Vec3.ZERO, 25, 3,
-                            false, 7f, false, 11, ds, livingOwner, CommonHitPropertyComponent.HitAnimation.MID, false);
-                }
+
                 JUtils.addVelocity(target, launchVec.x, launchVec.y, launchVec.z);
+
+                if (!JUtils.canDamage(ds, target))
+                    continue;
+
+                if (livingOwner == target)
+                    continue;
+
+                damageLogic(level(), target, Vec3.ZERO, 25, 3,
+                        false, 7f, false, 11, ds, livingOwner, CommonHitPropertyComponent.HitAnimation.MID, false);
             }
         }
     }

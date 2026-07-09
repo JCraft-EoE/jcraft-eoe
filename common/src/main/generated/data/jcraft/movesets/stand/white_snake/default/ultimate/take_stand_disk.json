@@ -53,7 +53,10 @@
       "block_stun": 12,
       "blockable_type": "NON_BLOCKABLE_EFFECTS_ONLY",
       "hit_animation": "HIGH",
-      "hit_spark": "HIT_SPARK_2"
+      "hit_spark": "HIT_SPARK_2",
+      "override_stun": true,
+      "shockwaves": true,
+      "stun_type": "LAUNCH"
     },
     "cooldown": 480,
     "damage": 8.0,
@@ -78,6 +81,11 @@
               "amplifier": 0,
               "duration": 160,
               "effect": "jcraft:standless"
+            },
+            {
+              "amplifier": 0,
+              "duration": 20,
+              "effect": "jcraft:knockdown"
             }
           ],
           "run": "on_strike"
@@ -92,7 +100,7 @@
       }
     },
     "hitbox_size": 2.0,
-    "knockback": 0.5,
+    "knockback": 1.1,
     "move_distance": 1.0,
     "offset": 0.0,
     "stun": 20,

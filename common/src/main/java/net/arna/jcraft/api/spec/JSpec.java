@@ -216,7 +216,10 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     public boolean canAttack() {
-        return moveStun <= 0 && !JUtils.isAffectedByTimeStop(user) && !user.hasEffect(JStatusRegistry.DAZED.get());
+        return moveStun <= 0
+                && !JUtils.isAffectedByTimeStop(user)
+                && !user.hasEffect(JStatusRegistry.DAZED.get())
+                && !user.hasEffect(JStatusRegistry.SPECLESS.get());
     }
 
     public boolean handleMove(MoveClass moveClass) {
