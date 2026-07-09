@@ -12,7 +12,6 @@ import net.arna.jcraft.common.spec.RangerSpec;
 import net.arna.jcraft.common.util.InputStateManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -26,7 +25,7 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
     private static final int SLIDE_START_TICKS = 12;
 
     private final Map<RangerSpec, Set<LivingEntity>> carriedTargets = new WeakHashMap<>();
-    private final Map<RangerSpec, Vec3> slideVectors = new WeakHashMap<>();
+    private Vec3 slideVector = Vec3.ZERO;
 
     public RangerSlideMove(final int cooldown, final int windup, final int duration, final float moveDistance,
                            final float damage, final int stun, final float hitboxSize, final float knockback, final float offset) {
@@ -40,9 +39,8 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
         super.onInitiate(attacker);
         carriedTargets.remove(attacker);
         final LivingEntity user = attacker.getUser();
-        if (user != null) {
-            slideVectors.put(attacker, createSlideVector(user));
-        }
+
+        slideVector = createSlideVector(user);
     }
 
     @Override
@@ -57,9 +55,8 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
             return;
         }
 
-        user.setPose(Pose.SWIMMING);
+        // user.setPose(Pose.SWIMMING);
 
-        final Vec3 slideVector = slideVectors.getOrDefault(attacker, Vec3.directionFromRotation(0, user.getYRot()).scale(SLIDE_SPEED));
         final Vec3 delta = user.getDeltaMovement();
         final Vec3 next = delta.add(slideVector).scale(0.5);
         user.setDeltaMovement(next.x, delta.y, next.z);
@@ -75,6 +72,7 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
     private Vec3 createSlideVector(final LivingEntity user) {
         int forward = 1;
         int side = 0;
+
         if (user instanceof ServerPlayer player) {
             final InputStateManager input = PlayerInputPacket.getInputStateManager(player);
             forward = input.calcForward();
@@ -83,13 +81,17 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
                 forward = 1;
             }
         }
+
         double speed = SLIDE_SPEED;
+
         if (side != 0) {
             speed *= 0.75;
         }
+
         if (forward == -1) {
             speed *= 0.75;
         }
+
         final float angle = (float) Math.atan2(side, forward);
         return Vec3.directionFromRotation(0, user.getYRot()).yRot(angle).scale(speed);
     }
@@ -102,7 +104,6 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
     @Override
     protected Set<AABB> calculateBoxes(final RangerSpec attacker, final LivingEntity user, final Vec3 rotVec,
                                        final Vec3 upVec, final Vec3 hPos, final Vec3 fPos) {
-        final Vec3 slideVector = slideVectors.getOrDefault(attacker, Vec3.ZERO);
         return Set.of(createBox(user.getBoundingBox().getCenter(), getHitboxSize()).expandTowards(slideVector));
     }
 

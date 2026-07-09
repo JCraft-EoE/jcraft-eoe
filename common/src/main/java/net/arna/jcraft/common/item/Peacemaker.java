@@ -3,12 +3,9 @@ package net.arna.jcraft.common.item;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
-import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.projectile.BulletProjectile;
 import net.arna.jcraft.common.tickable.PeacemakerReload;
 import net.arna.jcraft.common.util.DimensionData;
-import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -190,7 +187,7 @@ public class Peacemaker extends Item {
 
         world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegistry.REVOLVER_FIRE.get(), SoundSource.PLAYERS, 1f, 1f);
 
-        BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 5);
+        BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 7f);
         bullet.shootFromRotation(user, user.getXRot(), user.getYRot(), 0f, 10, 0f);
         final Vec3 forward = Vec3.directionFromRotation(0f, user.getYRot());
         final boolean offhand = user.getOffhandItem() == itemStack;

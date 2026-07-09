@@ -1,50 +1,11 @@
 {
-  "aerial_variant": {
-    "anim_state": "BUTTSTROKE",
-    "class": "HEAVY",
-    "cooldown_type": "HEAVY",
-    "move": {
-      "type": "jcraft:shared_simple_attack",
-      "attack_extras": {
-        "backstab": true,
-        "block_stun": 10,
-        "hit_animation": "CRUSH",
-        "hit_spark": "HIT_SPARK_2"
-      },
-      "cooldown": 80,
-      "damage": 6.0,
-      "duration": 13,
-      "extras": {
-        "actions": [
-          {
-            "type": "jcraft:play_sound",
-            "bind": false,
-            "run": "on_hit",
-            "sound": "jcraft:impact3"
-          }
-        ],
-        "description": {
-          "translate": "move.jcraft.ranger.default.buttstroke.air.description"
-        },
-        "name": {
-          "translate": "move.jcraft.ranger.default.buttstroke.air.name"
-        }
-      },
-      "hitbox_size": 1.5,
-      "knockback": 0.3,
-      "move_distance": 1.0,
-      "offset": 0.5,
-      "stun": 18,
-      "windup": 8
-    }
-  },
   "anim_state": "WHIP",
   "class": "HEAVY",
-  "cooldown_type": "HEAVY",
+  "cooldown_type": "STAND_HEAVY",
   "crouching_variant": {
     "anim_state": "BASH",
     "class": "HEAVY",
-    "cooldown_type": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
     "move": {
       "type": "jcraft:shared_simple_attack",
       "attack_extras": {
@@ -93,7 +54,7 @@
       "hit_animation": "MID",
       "hit_spark": "HIT_SPARK_1"
     },
-    "cooldown": 15,
+    "cooldown": 0,
     "damage": 4.0,
     "duration": 8,
     "extras": {

@@ -15,12 +15,7 @@ import net.arna.jcraft.common.attack.moves.ranger.RangerHolsterMove;
 import net.arna.jcraft.common.attack.moves.ranger.RangerRollMove;
 import net.arna.jcraft.common.attack.moves.ranger.RangerSlideMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleUppercutAttack;
-import net.arna.jcraft.common.util.CooldownType;
-import net.arna.jcraft.common.util.IJInputStateManagerHolder;
-import net.arna.jcraft.common.util.InputStateManager;
-import net.arna.jcraft.common.util.JParticleType;
-import net.arna.jcraft.common.util.SpecAnimationState;
+import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -63,9 +58,8 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Component.literal("Shoulder Bash"),
                     Component.literal("Springs up from a squat, launching enemies. 1 point of armor.")
             );
-    public static final SimpleAttack<RangerSpec> WHIP = new SimpleAttack<RangerSpec>(15, 5, 8,
+    public static final SimpleAttack<RangerSpec> WHIP = new SimpleAttack<RangerSpec>(0, 5, 8,
             1f, 4f, 7, 1.25f, 0.2f, 0f)
-            .withAerialVariant(BUTTSTROKE)
             .withCrouchingVariant(SHOULDER_BASH)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withInfo(
@@ -89,13 +83,13 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Component.literal("Held. Fast crawl that carries hit enemies, launching them up for juggles.")
             );
 
-    public static final RangerHolsterMove HOLSTER = new RangerHolsterMove(10, 0, 0, 0f)
+    public static final RangerHolsterMove HOLSTER = new RangerHolsterMove(5, 0, 0, 0f)
             .withInfo(
                     Component.literal("Holster"),
                     Component.literal("Stows the held non-stackable item, or draws the stowed one. Swaps if holding another.")
             );
 
-    public static final RangerFocusMove FOCUS = new RangerFocusMove(10)
+    public static final RangerFocusMove FOCUS = new RangerFocusMove(0)
             .withSound(JSoundRegistry.RANGER_FOCUS)
             .withSound(JSoundRegistry.RANGER_FOCUS_START)
             .withInfo(
@@ -108,15 +102,15 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
     }
 
     private static void registerMoves(MoveMap<RangerSpec, State> moves) {
-        MoveMap.Entry<RangerSpec, State> hvy = moves.register(MoveClass.HEAVY, WHIP, CooldownType.HEAVY, State.WHIP);
+        var hvy = moves.register(MoveClass.HEAVY, WHIP, CooldownType.HEAVY, State.WHIP);
         hvy.withCrouchingVariant(State.BASH);
-        hvy.withAerialVariant(State.BUTTSTROKE);
 
         moves.register(MoveClass.BARRAGE, SLIDE, CooldownType.BARRAGE, State.SLIDE_START)
                 .withCrouchingVariant(State.ROLL);
 
-        moves.register(MoveClass.SPECIAL1, FOCUS, CooldownType.SPECIAL1, null);
-        moves.register(MoveClass.SPECIAL2, HOLSTER, CooldownType.SPECIAL2, null);
+        moves.register(MoveClass.SPECIAL1, BUTTSTROKE,  CooldownType.SPECIAL1, State.BUTTSTROKE);
+        moves.register(MoveClass.SPECIAL2, FOCUS, CooldownType.SPECIAL2, null);
+        moves.register(MoveClass.SPECIAL3, HOLSTER, CooldownType.SPECIAL3, null);
     }
 
     @Override
@@ -143,8 +137,8 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
     }
 
     private float getFocusRegen() {
-        if (user instanceof ServerPlayer player) {
-            final InputStateManager input = ((IJInputStateManagerHolder) player).jcraft$getJInputStateManager();
+        if (user instanceof ServerPlayer serverPlayer) {
+            final InputStateManager input = ((IJInputStateManagerHolder) serverPlayer).jcraft$getJInputStateManager();
             final boolean moving = input.calcForward() != 0 || input.calcSide() != 0;
             if (!moving) {
                 return FOCUS_REGEN;

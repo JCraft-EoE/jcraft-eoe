@@ -10,7 +10,6 @@ import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.spec.RangerSpec;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Map;
@@ -50,7 +49,7 @@ public final class RangerRollMove extends AbstractMove<RangerRollMove, RangerSpe
         user.fallDistance = 0;
 
         if (moveStun > RECOVERY_TICKS) {
-            user.setPose(Pose.SWIMMING); // Pose recalculation is suppressed in PlayerMixin
+            // user.setPose(Pose.SWIMMING); // Pose recalculation is suppressed in PlayerMixin
 
             final Vec3 rollVector = rollVectors.get(attacker);
             if (rollVector != null) {

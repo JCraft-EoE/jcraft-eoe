@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 
 public final class RangerFocusMove extends AbstractMove<RangerFocusMove, RangerSpec> {
-    public static final double TARGET_RANGE = 32.0;
+    public static final double TARGET_RANGE = 512.0;
     // cos(30 degrees), the horizontal half-angle around the crosshair. Pitch is ignored so lobbed shots still lock on
     private static final double MIN_TARGET_DOT = 0.866;
     private static final float MAX_TURN_DEGREES = 6.0f;

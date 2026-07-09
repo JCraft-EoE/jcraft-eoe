@@ -58,17 +58,16 @@ public abstract class ProjectileMixin {
     }
 
     @Inject(method = "tick()V", at = @At("TAIL"))
-    protected void jcraft$focusSteering(final CallbackInfo ci) {
+    protected void jcraft$applyFocusAim(final CallbackInfo ci) {
         final Projectile projectile = (Projectile)(Object)this;
-        if (projectile.level().isClientSide() || !(projectile.getOwner() instanceof LivingEntity ownerOrStand)) {
+        if (projectile.level().isClientSide() || !(projectile.getOwner() instanceof LivingEntity owner)) {
             return;
         }
-        // A stand's projectiles are owned by the stand, so trace back to its user
-        final LivingEntity owner = JUtils.getUserIfStand(ownerOrStand);
-        if (JUtils.getSpec(owner) instanceof RangerSpec &&
-                JComponentPlatformUtils.getGunslinger(owner).isFocusActive()
-        ) {
-            jcraft$focusYawUpdated |= RangerFocusMove.steerProjectile(projectile, owner, jcraft$focusYawUpdated);
+
+        if (JUtils.getSpec(owner) instanceof RangerSpec) {
+            if (JComponentPlatformUtils.getGunslinger(owner).isFocusActive()) {
+                jcraft$focusYawUpdated |= RangerFocusMove.steerProjectile(projectile, owner, jcraft$focusYawUpdated);
+            }
         }
     }
 

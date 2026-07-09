@@ -1304,7 +1304,7 @@
 			}
 		},
 		"roll": {
-			"loop": "once",
+			"loop": "hold_on_last_frame",
 			"animation_length": 0.9167,
 			"bones": {
 				"head": {

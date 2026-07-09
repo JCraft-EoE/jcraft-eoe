@@ -1,9 +1,9 @@
 {
-  "class": "SPECIAL2",
-  "cooldown_type": "SPECIAL2",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
   "move": {
     "type": "jcraft:ranger_holster_move",
-    "cooldown": 10,
+    "cooldown": 5,
     "duration": 0,
     "extras": {
       "description": {

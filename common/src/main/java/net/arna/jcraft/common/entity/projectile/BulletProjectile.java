@@ -2,13 +2,16 @@ package net.arna.jcraft.common.entity.projectile;
 
 import lombok.NonNull;
 import net.arna.jcraft.api.AttackData;
+import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.events.JServerEvents;
+import net.arna.jcraft.common.spec.RangerSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
@@ -30,12 +33,15 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
 public class BulletProjectile extends AbstractArrow {
-    private int stunTicks;
-    private float damage;
+    public int stunTicks = 0;
+    public StunType stunType = StunType.BURSTABLE;
+    public float damage = 0.0f;
+    public boolean doStunLaunch = true;
     private float mass; // Used for penetration calculation
     private boolean cancelMoves = false;
 
@@ -173,19 +179,17 @@ public class BulletProjectile extends AbstractArrow {
             if (!level().isClientSide()) {
                 final Entity owner = getOwner();
                 final LivingEntity target = JUtils.getUserIfStand(living);
-                DamageSource thrown = level().damageSources().thrown(this, owner);
+                final DamageSource thrown = level().damageSources().thrown(this, owner);
 
-                AttackData attackData = new AttackData( getDeltaMovement().normalize(),
-                        stunTicks, 1, false, damage, true, (int) (4 + damage),
+                AttackData attackData = new AttackData( getDeltaMovement().normalize().scale(0.2),
+                        stunTicks, stunType.ordinal(), false, damage, true, (int) (4 + damage),
                         thrown, owner, CommonHitPropertyComponent.HitAnimation.MID,
                         null, false, false, cancelMoves
                 );
 
                 damageLogic(level(), target, attackData);
 
-                if (entity instanceof LivingEntity livingEntity) {
-                    JServerEvents.maybeLaunch(livingEntity, thrown, (ServerLevel) level(), livingEntity.getEffect(JStatusRegistry.DAZED.get()), owner );
-                }
+                if (doStunLaunch) JServerEvents.maybeLaunch(living, thrown, (ServerLevel) level(), living.getEffect(JStatusRegistry.DAZED.get()), owner );
                 JUtils.serverPlaySound(JSoundRegistry.BULLET_PENETRATE.get(), (ServerLevel) level(), position(), 32);
 
                 // Add entity hit particle effect
@@ -203,6 +207,22 @@ public class BulletProjectile extends AbstractArrow {
             }
         } else {
             super.onHitEntity(entityHitResult);
+        }
+    }
+
+    @Override
+    public void gameEvent(GameEvent event, @Nullable Entity entity) {
+        super.gameEvent(event, entity);
+
+        if (event != GameEvent.PROJECTILE_SHOOT) return;
+
+        if (entity instanceof LivingEntity living) {
+            if (JUtils.getSpec(living) instanceof RangerSpec) {
+                if (JComponentPlatformUtils.getGunslinger(living).isFocusActive()) {
+                    stunTicks = 5 + (int) (damage / 2.0f);
+                    doStunLaunch = false;
+                }
+            }
         }
     }
 
