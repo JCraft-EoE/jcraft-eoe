@@ -1,10 +1,12 @@
 package net.arna.jcraft.client.gui.screen;
 
+import lombok.NonNull;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -18,8 +20,17 @@ public class MainMenuScreen extends Screen {
         stand = JUtils.getStand(Minecraft.getInstance().player);
     }
 
+    // add components in this method
     @Override
     protected void init() {
+    }
+
+    // draw text in this method
+    @Override
+    public void render(final @NonNull GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.drawString(font, "test", 0, 0, 4210752);
     }
 
     //    @Override
