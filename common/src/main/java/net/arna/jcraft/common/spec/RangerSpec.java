@@ -52,12 +52,13 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Component.literal("Buttstroke"),
                     Component.literal("Heavy downwards blow with high stun. Slower, longer cooldown.")
             );
-    public static final SimpleUppercutAttack<RangerSpec> SHOULDER_BASH = new SimpleUppercutAttack<RangerSpec>(30, 7, 14,
-            1f, 5f, 14, 1.5f, 0.2f, 0f, 0.4f)
+    public static final SimpleAttack<RangerSpec> SHOULDER_BASH = new SimpleAttack<RangerSpec>(30, 7, 14,
+            1f, 5f, 14, 1.5f, 1.5f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withArmor(1)
             .withStaticY()
+            .withLaunch()
             .withInfo(
                     Component.literal("Shoulder Bash"),
                     Component.literal("Springs up from a squat, launching enemies. 1 point of armor.")
