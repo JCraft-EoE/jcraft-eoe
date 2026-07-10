@@ -20,7 +20,7 @@ public abstract class EntityMixin {
         final LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && JUtils.getSpec(player) instanceof RangerSpec &&
                 JComponentPlatformUtils.getGunslinger(player).isFocusActive() &&
-                RangerFocusMove.isFocusTarget(player, (Entity) (Object) this)) {
+                RangerFocusMove.selectOutlineTarget(player) == (Entity) (Object) this) {
             return RangerFocusMove.GLOW_COLOR;
         }
         return original;

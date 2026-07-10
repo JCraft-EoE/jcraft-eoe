@@ -105,7 +105,7 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
         var hvy = moves.register(MoveClass.HEAVY, WHIP, CooldownType.HEAVY, State.WHIP);
         hvy.withCrouchingVariant(State.BASH);
 
-        moves.register(MoveClass.BARRAGE, SLIDE, CooldownType.BARRAGE, State.SLIDE_START)
+        moves.register(MoveClass.BARRAGE, SLIDE, CooldownType.BARRAGE, State.SLIDE)
                 .withCrouchingVariant(State.ROLL);
 
         moves.register(MoveClass.SPECIAL1, BUTTSTROKE,  CooldownType.SPECIAL1, State.BUTTSTROKE);
@@ -151,12 +151,11 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
     }
 
     public enum State implements SpecAnimationState<RangerSpec> {
-        WHIP("whip"),
-        BUTTSTROKE("buttstroke"),
-        BASH("bash"),
-        ROLL("roll"),
-        SLIDE_START("slide_start"),
-        SLIDE_LOOP("slide_loop"),
+        WHIP("rgr.whip"),
+        BUTTSTROKE("rgr.buts"),
+        BASH("rgr.bash"),
+        ROLL("rgr.roll"),
+        SLIDE("rgr.slide"),
         ;
 
         private final String key;

@@ -1,5 +1,5 @@
 {
-  "anim_state": "SLIDE_START",
+  "anim_state": "SLIDE",
   "class": "BARRAGE",
   "cooldown_type": "BARRAGE",
   "crouching_variant": {

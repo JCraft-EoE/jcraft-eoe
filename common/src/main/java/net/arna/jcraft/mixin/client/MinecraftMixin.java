@@ -77,6 +77,6 @@ public class MinecraftMixin {
         if (original || player == null) return original;
         return JUtils.getSpec(player) instanceof RangerSpec &&
                 JComponentPlatformUtils.getGunslinger(player).isFocusActive() &&
-                RangerFocusMove.isFocusTarget(player, entity);
+                RangerFocusMove.selectOutlineTarget(player) == entity;
     }
 }

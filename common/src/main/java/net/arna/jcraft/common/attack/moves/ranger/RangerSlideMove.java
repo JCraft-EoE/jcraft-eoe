@@ -22,7 +22,6 @@ import java.util.Set;
 
 public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove, RangerSpec> {
     private static final double SLIDE_SPEED = 0.75;
-    private static final int SLIDE_START_TICKS = 12;
     private static final double END_HITBOX_SIZE = 0.75;
 
     private Vec3 lockedDirection; // null while steering with the camera
@@ -67,10 +66,6 @@ public final class RangerSlideMove extends AbstractSimpleAttack<RangerSlideMove,
             final Vec3 next = delta.add(slideDirection(user)).scale(0.5);
             user.setDeltaMovement(next.x, delta.y, next.z);
             user.hurtMarked = true;
-        }
-
-        if (getDuration() - moveStun == SLIDE_START_TICKS) {
-            attacker.setState(RangerSpec.State.SLIDE_LOOP);
         }
 
         super.activeTick(attacker, moveStun);

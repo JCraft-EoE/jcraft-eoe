@@ -85,6 +85,44 @@ public final class RangerFocusMove extends AbstractMove<RangerFocusMove, RangerS
         return best;
     }
 
+    @Nullable
+    public static Entity selectOutlineTarget(final LivingEntity user) {
+        final AABB box = user.getBoundingBox().inflate(TARGET_RANGE);
+        Entity best = null;
+        double bestDot = MIN_TARGET_DOT;
+        for (final Entity candidate : user.level().getEntities(user, box, e -> isFocusTarget(user, e) && wouldFocusedShotHit(user, e))) {
+            final double dot = horizontalAlignment(user, candidate);
+            if (dot > bestDot) {
+                bestDot = dot;
+                best = candidate;
+            }
+        }
+        return best;
+    }
+
+    private static boolean wouldFocusedShotHit(final LivingEntity user, final Entity target) {
+        final Vec3 look = user.getLookAngle();
+        final double horizontalSpeed = look.horizontalDistance();
+        if (horizontalSpeed < 1.0E-3) {
+            return false;
+        }
+
+        final Vec3 targetCenter = target.getBoundingBox().getCenter();
+        final Vec3 toTarget = targetCenter.subtract(user.getEyePosition());
+        final Vec3 flatToTarget = new Vec3(toTarget.x, 0.0, toTarget.z);
+        if (flatToTarget.lengthSqr() < 1.0E-4) {
+            return false;
+        }
+
+        final float currentYaw = (float) (Mth.atan2(look.z, look.x) * Mth.RAD_TO_DEG);
+        final float targetYaw = (float) (Mth.atan2(toTarget.z, toTarget.x) * Mth.RAD_TO_DEG);
+        final float newYaw = (currentYaw + Mth.clamp(Mth.wrapDegrees(targetYaw - currentYaw), -MAX_TURN_DEGREES, MAX_TURN_DEGREES)) * Mth.DEG_TO_RAD;
+        final Vec3 focusedDirection = new Vec3(Mth.cos(newYaw) * horizontalSpeed, look.y, Mth.sin(newYaw) * horizontalSpeed).normalize();
+        final Vec3 start = user.getEyePosition();
+        final Vec3 end = start.add(focusedDirection.scale(Math.min(TARGET_RANGE, user.distanceTo(target) + 2.0)));
+        return target.getBoundingBox().inflate(0.3).clip(start, end).isPresent();
+    }
+
     private static double horizontalAlignment(final LivingEntity user, final Entity target) {
         final Vec3 look = user.getLookAngle();
         final Vec3 toTarget = target.getBoundingBox().getCenter().subtract(user.getEyePosition());
