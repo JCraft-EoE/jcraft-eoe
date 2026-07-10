@@ -1,11 +1,17 @@
 package net.arna.jcraft.client.gui.screen;
 
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -30,7 +36,45 @@ public class MainMenuScreen extends Screen {
     public void render(final @NonNull GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
         renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawString(font, "test", 0, 0, 4210752);
+        // TODO make the strings translatables
+        guiGraphics.drawString(font, "normals", 10, height/7 + 10, 0xFFFFFF);
+        guiGraphics.drawString(font, "specials", width/4 + 10, height/7 + 10, 0xFFFFFF);
+        final MoveMap<?,?> moveMap = MoveSetManager.get(JStandTypeRegistry.STAR_PLATINUM.get()).get("default").getMoveMap();
+        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.LIGHT)) {
+            drawMoveString(guiGraphics, font, entry, false, 10, 2*height/7 + 10, 0xFFFFFF);
+        }
+        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.HEAVY)) {
+            drawMoveString(guiGraphics, font, entry, false, 10, 3*height/7 + 10, 0xFFFFFF);
+        }
+        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.BARRAGE)) {
+            drawMoveString(guiGraphics, font, entry, false, 10, 4*height/7 + 10, 0xFFFFFF);
+        }
+        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.UTILITY)) {
+            drawMoveString(guiGraphics, font, entry, false, 10, 5*height/7 + 10, 0xFFFFFF);
+        }
+        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL1)) {
+            drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 2*height/7 + 10, 0xFFFFFF);
+        }
+        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL2)) {
+            drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 3*height/7 + 10, 0xFFFFFF);
+        }
+        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL3)) {
+            drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 4*height/7 + 10, 0xFFFFFF);
+        }
+        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.ULTIMATE)) {
+            drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 5*height/7 + 10, 0xFFFFFF);
+        }
+    }
+
+    protected static void drawMoveString(final @NonNull GuiGraphics guiGraphics, final @NonNull Font font, final @NonNull MoveMap.Entry<?,?> move, final boolean isVariant, final int x, final int y, final int color) {
+        guiGraphics.drawString(font, move.getMove().getName().copy().withStyle(ChatFormatting.DARK_PURPLE), x, y, color);
+        final Component text = Component.empty()
+                .append(move.getMoveClass().getFriendlyName())
+                .append(Component.empty()
+                        .append(Component.literal(" ("))
+                        .append(move.getMoveClass().getKey().copy().withStyle(ChatFormatting.AQUA))
+                        .append(Component.literal(")")));
+        guiGraphics.drawString(font, text, x, y + 10, color);
     }
 
     //    @Override
