@@ -477,7 +477,7 @@
   "entity.jcraft.whitesnake.info.con2": "遅い牽制",
   "entity.jcraft.whitesnake.info.con3": "平均以下のダメージ",
   "entity.jcraft.whitesnake.info.desc": "全距離の行動妨害型",
-  "entity.jcraft.whitesnake.info.freeSpace": "基本コンボ:\n    -役立たず\n    弱攻撃>ガットパンチ>毒吐き\n\n    エル・マヨ(DISC技による最適なダメージ)\n    記憶DISC>弱攻撃>ラッシュ>脚砕き>スタンドDISC~弱攻撃\n\n    -ガゼボ(DISC技なしの最適なダメージ)\n    弱攻撃>ラッシュ>脚砕き>ガットパンチ>弱攻撃~弱攻撃\n\n    -プロテインシェイク(セットプレイの択攻め)\n    弱攻撃>ラッシュ>脚砕き>チャージ吐き",
+  "entity.jcraft.whitesnake.info.freeSpace": "基本コンボ:\n    -役立たず\n    弱攻撃>ガットパンチ>毒吐き\n\n    -エル・マヨ(DISC技による最適なダメージ)\n    記憶DISC>弱攻撃>ラッシュ>脚砕き>スタンドDISC~弱攻撃\n\n    -ガゼボ(DISC技なしの最適なダメージ)\n    弱攻撃>ラッシュ>脚砕き>ガットパンチ>弱攻撃~弱攻撃\n\n    -プロテインシェイク(セットプレイの択攻め)\n    弱攻撃>ラッシュ>脚砕き>チャージ吐き",
   "entity.jcraft.whitesnake.info.pro1": "全距離対応",
   "entity.jcraft.whitesnake.info.pro2": "高い汎用性",
   "entity.jcraft.whitesnake.info.pro3": "狙いやすい勝利条件",
