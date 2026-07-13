@@ -1,12 +1,17 @@
 package net.arna.jcraft.common.effects;
 
+import net.arna.jcraft.api.AttackData;
+import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.WeakHashMap;
@@ -36,12 +41,30 @@ public class PurpleInfectionEffect extends MobEffect {
 
     @Override
     public void applyEffectTick(final LivingEntity entity, final int amplifier) {
-        StandType standType = JComponentPlatformUtils.getStandComponent(entity).getType();
+        final StandType standType = JComponentPlatformUtils.getStandComponent(entity).getType();
+
         float damage = 0.6666f; // 1/3rd of a heart
+
         if (standType == JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get()) {
             damage /= 3.0f;
         }
-        LivingEntity infector = INFECTORS.get(entity);
-        entity.hurt(infector != null ? JDamageSources.phpoison(entity.level(), infector) : JDamageSources.phpoison(entity.level()), damage);
+
+        final LivingEntity infector = INFECTORS.get(entity);
+
+        final DamageSource source = JDamageSources.phpoison(entity.level(), infector);
+
+        if (entity.invulnerableTime > 10.0F) {
+            return;
+        }
+
+        Attacks.damageLogic(
+                entity.level(),
+                entity,
+                new AttackData(
+                        Vec3.ZERO, 0, 0, false, damage, false, 0,
+                        source, infector, CommonHitPropertyComponent.HitAnimation.MID, null,
+                        false, false, false
+                )
+        );
     }
 }
