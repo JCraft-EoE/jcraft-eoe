@@ -120,7 +120,8 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withLaunch()
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
-            .withHyperArmor()
+            .withArmor(1)
+            .withBlockStun(8)
             .withInfo(
                     Component.literal("Sendoff"),
                     Component.literal("uninterruptible launcher")

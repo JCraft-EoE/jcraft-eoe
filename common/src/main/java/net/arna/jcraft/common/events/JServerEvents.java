@@ -56,13 +56,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ArmorMaterials;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Explosion;
@@ -594,9 +588,11 @@ public class JServerEvents {
     public static EventResult hurt(LivingEntity entity, DamageSource source, float damage) {
         // No snowball shenanigans
         if (damage < 0.01f) return EventResult.pass();
+
         if (entity.level() instanceof ServerLevel serverWorld) {
             maybeLaunch(entity, source, serverWorld, entity.getEffect(JStatusRegistry.DAZED.get()), source.getEntity());
         }
+
         return EventResult.pass();
     }
 
