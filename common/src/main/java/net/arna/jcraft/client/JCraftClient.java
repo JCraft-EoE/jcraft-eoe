@@ -29,6 +29,7 @@ import net.arna.jcraft.client.renderer.armor.ArmorRenderer;
 import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.renderer.item.GasCanItemRenderer;
+import net.arna.jcraft.client.renderer.item.PeacemakerItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.StandUserPoseLoader;
 import net.arna.jcraft.client.rendering.handler.*;
@@ -117,6 +118,7 @@ public class JCraftClient {
         AzArmorRendererRegistry.register(ArmorRenderer.simple("red_hat"), JItemRegistry.RED_HAT.get());
 
         AzItemRendererRegistry.register(JItemRegistry.GAS_CAN.get(), GasCanItemRenderer::new);
+        AzItemRendererRegistry.register(JItemRegistry.PEACEMAKER.get(), PeacemakerItemRenderer::new);
 
         SpecialParticleShaderHandler.INSTANCE.init();
         ZaWarudoShaderHandler.INSTANCE.init();

@@ -1407,5 +1407,35 @@
     "sounds": [
       "jcraft:projectiles/matchbox/use"
     ]
+  },
+  "peacemaker_fire": {
+    "sounds": [
+      "jcraft:gun/peacemaker_fire"
+    ]
+  },
+  "gun_cock": {
+    "sounds": [
+      "jcraft:gun/cock"
+    ]
+  },
+  "gun_gate": {
+    "sounds": [
+      "jcraft:gun/gate"
+    ]
+  },
+  "gun_eject": {
+    "sounds": [
+      "jcraft:gun/eject"
+    ]
+  },
+  "gun_load": {
+    "sounds": [
+      "jcraft:gun/load"
+    ]
+  },
+  "gun_cycle": {
+    "sounds": [
+      "jcraft:gun/cycle"
+    ]
   }
 }

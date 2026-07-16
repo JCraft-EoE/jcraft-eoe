@@ -356,6 +356,14 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> GAS_CAN_CRASH = register("gas_can_crash");
     RegistrySupplier<SoundEvent> MATCHBOX_USE = register("matchbox_use");
 
+    // GUNS
+    RegistrySupplier<SoundEvent> PEACEMAKER_FIRE = register("peacemaker_fire");
+    RegistrySupplier<SoundEvent> GUN_COCK = register("gun_cock");
+    RegistrySupplier<SoundEvent> GUN_GATE = register("gun_gate");
+    RegistrySupplier<SoundEvent> GUN_EJECT = register("gun_eject");
+    RegistrySupplier<SoundEvent> GUN_LOAD = register("gun_load");
+    RegistrySupplier<SoundEvent> GUN_CYCLE = register("gun_cycle");
+
     // ROAD ROLLER
     RegistrySupplier<SoundEvent> ROAD_ROLLER_HIT = register("rrhit");
     RegistrySupplier<SoundEvent> ROAD_ROLLER_SLAM = register("rrslam");

@@ -274,12 +274,18 @@ public final class JCraft {
         AzIdentityRegistry.register(JItemRegistry.RED_HAT.get());
     }
 
+    // Held guns animate per stack, so each one needs its own identity rather than sharing the item's.
+    private static void registerAzItems() {
+        AzIdentityRegistry.register(JItemRegistry.PEACEMAKER.get());
+    }
+
     public static void postInit() {
         initBlockPostLoad();
         EvolutionItemHandler.init();
         initDispenserBehaviors();
         JStatRegistry.initFormatters();
         registerAzArmor();
+        registerAzItems();
         initMoveSets();
     }
 
