@@ -25,16 +25,7 @@ public class ItemInHandRendererMixin {
     private float oMainHandHeight;
 
     @Shadow
-    private float offHandHeight;
-
-    @Shadow
-    private float oOffHandHeight;
-
-    @Shadow
     private ItemStack mainHandItem;
-
-    @Shadow
-    private ItemStack offHandItem;
 
     /**
      * Firing and reloading rewrite the gun's NBT, and vanilla compares the held stack by value, so
@@ -60,15 +51,6 @@ public class ItemInHandRendererMixin {
             }
             mainHandItem = mainHand;
         }
-
-        final ItemStack offHand = player.getOffhandItem();
-        if (offHand.getItem() instanceof Peacemaker) {
-            if (!ItemStack.isSameItem(offHandItem, offHand)) {
-                oOffHandHeight = 0.0f;
-                offHandHeight = 0.0f;
-            }
-            offHandItem = offHand;
-        }
     }
 
     /**
@@ -85,10 +67,6 @@ public class ItemInHandRendererMixin {
 
         if (player.getMainHandItem().getItem() instanceof Peacemaker) {
             mainHandHeight += Mth.clamp(1.0f - mainHandHeight, -JCRAFT$GUN_RAISE_SPEED, JCRAFT$GUN_RAISE_SPEED);
-        }
-
-        if (player.getOffhandItem().getItem() instanceof Peacemaker) {
-            offHandHeight += Mth.clamp(1.0f - offHandHeight, -JCRAFT$GUN_RAISE_SPEED, JCRAFT$GUN_RAISE_SPEED);
         }
     }
 }

@@ -49,6 +49,28 @@ public class PeacemakerReload {
         return holds(reloads, stack) || holds(toAdd, stack);
     }
 
+    /**
+     * Drops out of the loading loop and shuts the gate now, keeping whatever is already chambered.
+     * Used when the shooter would rather have the gun back than a full cylinder.
+     */
+    public void finishEarly(ItemStack stack, Level world) {
+        for (Reload reload : reloads) {
+            if (reload.stack == stack && reload.stage != Stage.END) {
+                reload.enter(Stage.END, world);
+            }
+        }
+        for (Reload reload : toAdd) {
+            if (reload.stack == stack && reload.stage != Stage.END) {
+                reload.enter(Stage.END, world);
+            }
+        }
+    }
+
+    /** How long shutting the gate takes, in ticks. */
+    public int endTicks() {
+        return Stage.END.ticks;
+    }
+
     private boolean holds(List<Reload> list, ItemStack stack) {
         for (Reload reload : list) {
             if (reload.stack == stack) {
@@ -166,7 +188,7 @@ public class PeacemakerReload {
             return true;
         }
 
-        private void enter(Stage next, ServerLevel world) {
+        private void enter(Stage next, Level world) {
             stage = next;
             timer = next.ticks;
             Peacemaker.markAnimation(stack, next.animation);

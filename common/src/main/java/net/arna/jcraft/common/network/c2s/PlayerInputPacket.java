@@ -237,6 +237,15 @@ public class PlayerInputPacket {
                     // If not handled by Peacemaker, proceed with normal stand logic
                     future.complete(initStandOrSpecMove(player, MoveInputType.LIGHT));
                 }
+                case TOSS -> {
+                    // A held gun takes the pick block key for reloading; without one it still tosses.
+                    if (Peacemaker.handleReloadInput(player)) {
+                        future.complete(true);
+                        return;
+                    }
+
+                    future.complete(initStandOrSpecMove(player, MoveInputType.TOSS));
+                }
                 case UTILITY -> {
                     boolean s;
                     StandEntity<?, ?> stand = JUtils.getStand(player);

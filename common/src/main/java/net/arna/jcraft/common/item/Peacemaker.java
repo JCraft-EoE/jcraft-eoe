@@ -34,10 +34,11 @@ public class Peacemaker extends Item {
     public static final String ANIMATION_SEQUENCE_ID = "AnimationSequence";
     public static final String COCKED_ID = "Cocked";
     public static final int MAX_ROUNDS = 6;
-    // Animation lengths out of peacemaker.animation.json at 20 ticks per second: cock 0.5s,
-    // fire 0.375s. Each click is locked out for as long as the step it started takes.
-    private static final int COCK_TICKS = 10;
+    // Animation length of fire out of peacemaker.animation.json at 20 ticks per second.
     private static final int FIRE_TICKS = 8;
+    // Cocking deliberately does not lock out for its animation's length; the hammer can be dropped
+    // as soon as it is back, and the animation is cut off by the shot.
+    private static final int COCK_INPUT_LOCKOUT = 2;
 
     public Peacemaker(Properties settings) {
         super(settings);
@@ -86,43 +87,13 @@ public class Peacemaker extends Item {
         return false; // Don't actually hurt the entity
     }
 
-    // Handle right-click - reload only
+    /**
+     * Right click is left free for aiming. Reloading is on the pick block key, routed through
+     * jcraft's own input rather than item use, which vanilla gates behind the item's cooldown.
+     */
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
-        ItemStack itemStack = user.getItemInHand(hand);
-
-        if (user.hasEffect(JStatusRegistry.DAZED.get()) || user.isSpectator()) {
-            return InteractionResultHolder.fail(itemStack);
-        }
-
-        // Creative mode players don't need to reload
-        // But they are allowed to!
-//        if (user.isCreative()) {
-//            return InteractionResultHolder.fail(itemStack);
-//        }
-
-        CompoundTag data = itemStack.getOrCreateTag();
-
-        // Check if already at max capacity
-        if (data.getInt(SHOTS_ID) >= MAX_ROUNDS) {
-            return InteractionResultHolder.fail(itemStack);
-        }
-
-        // Check if already reloading
-        if (data.getBoolean(RELOADING_ID)) {
-            return InteractionResultHolder.fail(itemStack);
-        }
-
-        // Check if player has bullets
-        if (!canLoadMore(itemStack, user)) {
-            return InteractionResultHolder.fail(itemStack);
-        }
-
-        if (!world.isClientSide) {
-            startReload(itemStack, world, user, hand);
-        }
-
-        return InteractionResultHolder.success(itemStack);
+        return InteractionResultHolder.fail(user.getItemInHand(hand));
     }
 
     /**
@@ -214,18 +185,9 @@ public class Peacemaker extends Item {
 
     // method to handle left-click firing via PlayerInputPacket
     public static boolean handleLeftClick(Player player) {
-        final ItemStack mainHand = player.getMainHandItem();
-        final ItemStack offHand = player.getOffhandItem();
-
-        // Check if player is holding a peacemaker in either hand
-        ItemStack peacemakerStack = null;
-        if (mainHand.getItem() instanceof Peacemaker) {
-            peacemakerStack = mainHand;
-        } else if (offHand.getItem() instanceof Peacemaker) {
-            peacemakerStack = offHand;
-        }
-
-        if (peacemakerStack == null) {
+        // Guns are main hand only, so the offhand is left to whatever else wants the input.
+        final ItemStack peacemakerStack = player.getMainHandItem();
+        if (!(peacemakerStack.getItem() instanceof Peacemaker)) {
             return false; // Not holding a peacemaker, let other systems handle it
         }
 
@@ -253,15 +215,19 @@ public class Peacemaker extends Item {
         }*/
 
         CompoundTag data = peacemakerStack.getOrCreateTag();
-        int shots = data.getInt(SHOTS_ID);
 
-        // Check if reloading
+        // Working the trigger during a reload gives up on filling the cylinder and shuts the gate
+        // now, keeping whatever is already chambered.
         if (data.getBoolean(RELOADING_ID)) {
-            return true; // We handled it (by doing nothing)
+            if (!world.isClientSide) {
+                PeacemakerReload.finishEarly(peacemakerStack, world);
+                player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), PeacemakerReload.endTicks());
+            }
+            return true; // We handled it
         }
 
         // Creative mode has infinite bullets
-        if (shots < 1 && !player.isCreative()) {
+        if (data.getInt(SHOTS_ID) < 1 && !player.isCreative()) {
             return true; // We handled it (by doing nothing)
         }
 
@@ -276,13 +242,40 @@ public class Peacemaker extends Item {
                 shoot(peacemakerStack, world, player);
             } else {
                 data.putBoolean(COCKED_ID, true);
-                player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), COCK_TICKS);
+                // Only long enough to keep one click from reading as two. The hammer can be dropped
+                // before the cock animation has played out, which is what keeps the gun quick.
+                player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), COCK_INPUT_LOCKOUT);
                 markAnimation(peacemakerStack, "cock");
                 world.playSound(null, player.getX(), player.getY(), player.getZ(), JSoundRegistry.GUN_COCK.get(), SoundSource.PLAYERS, 1f, 1f);
             }
         }
 
         return true; // Successfully handled the input
+    }
+
+    /** Handles the reload input (pick block) routed through PlayerInputPacket. */
+    public static boolean handleReloadInput(Player player) {
+        final ItemStack peacemakerStack = player.getMainHandItem();
+        if (!(peacemakerStack.getItem() instanceof Peacemaker)) {
+            return false; // Not holding a peacemaker, let the toss move have the input
+        }
+
+        final Level world = player.level();
+
+        if (player.hasEffect(JStatusRegistry.DAZED.get()) || player.isSpectator()) {
+            return true;
+        }
+
+        final CompoundTag data = peacemakerStack.getOrCreateTag();
+        if (data.getInt(SHOTS_ID) >= MAX_ROUNDS || data.getBoolean(RELOADING_ID) || !canLoadMore(peacemakerStack, player)) {
+            return true; // We handled it (by doing nothing)
+        }
+
+        if (!world.isClientSide) {
+            startReload(peacemakerStack, world, player, InteractionHand.MAIN_HAND);
+        }
+
+        return true;
     }
 
     public static boolean isReloading(ItemStack itemStack) {
