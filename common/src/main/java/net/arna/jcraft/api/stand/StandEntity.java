@@ -491,7 +491,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         setFree(true);
 
         Vec3 fPos = user.position().add(user.getLookAngle());
-        remoteSpeed = user.getDeltaMovement().scale(2); // Inertia
+        remoteSpeed = user.getDeltaMovement().scale(1.5); // Inertia
+        setDeltaMovement(remoteSpeed);
 
         setAlphaOverride(0.1f);
 
