@@ -258,9 +258,13 @@ public interface Attacks {
                 // Counter check
                 if (!tsHit && standAttack.isCounter() && stand.getMoveStun() < standAttack.getWindupPoint()) {
                     //noinspection unchecked
-                    ((AbstractCounterAttack<?, StandEntity<?, ?>>) standAttack).counter(stand, attacker, source);
-                    victim.removeEffect(JStatusRegistry.DAZED.get());
-                    return;
+                    var counter = ((AbstractCounterAttack<?, StandEntity<?, ?>>) standAttack);
+
+                    if (counter.canCounter(source, damage)) {
+                        counter.counter(stand, attacker, source);
+                        victim.removeEffect(JStatusRegistry.DAZED.get());
+                        return;
+                    }
                 }
 
                 if (--stand.armorPoints < 0) {
