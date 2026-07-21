@@ -585,6 +585,7 @@
   "jcraft.diosdiary.desc": "§e§l오래 전 죽은 이§r§9의 사념이 담겨있다.",
   "jcraft.diosdiary.evodesc": "§9(§a§lC-MOON §r§e& §l더 월드 §r§9진화 아이템)",
   "jcraft.disc.combat": "전투 중에는 디스크를 사용할 수 없습니다!",
+  "jcraft.disc.fragile_has_stand": "스탠드를 보유한 상태에서는 취약한 디스크를 사용할 수 없다!",
   "jcraft.disc.same_spec": "당신은 이미 이 종족입니다!",
   "jcraft.disc.same_stand": "당신은 이미 이 스탠드를 가지고 있습니다!",
   "jcraft.disc.stand_in_use": "이미 다른 플레이어가 이 스탠드를 사용하고 있습니다!",
