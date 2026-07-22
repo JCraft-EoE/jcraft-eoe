@@ -155,6 +155,9 @@ public final class JCraft {
      */
     public static final String BASE_CONTROLLER = "base_controller";
 
+    // General-purpose gun controllers
+    public static final String FIRE_CONTROLLER = "fire_controller";
+
     // Dimensional travel bullshit
     /**
      * Used to lock the AU chunks from being unloaded automatically by JServerTickEvents

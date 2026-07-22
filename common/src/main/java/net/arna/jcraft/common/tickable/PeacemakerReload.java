@@ -25,6 +25,7 @@ import java.util.List;
  * cylinder, and the gate closes once the cylinder is full or the shooter is out of bullets.
  */
 @UtilityClass
+@Deprecated(forRemoval = false) // This should've been an item component
 public class PeacemakerReload {
     private final List<Reload> reloads = new ArrayList<>();
     private final List<Reload> toAdd = new ArrayList<>();

@@ -15,6 +15,7 @@ import net.arna.jcraft.common.attack.moves.ranger.RangerHolsterMove;
 import net.arna.jcraft.common.attack.moves.ranger.RangerRollMove;
 import net.arna.jcraft.common.attack.moves.ranger.RangerSlideMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.SimpleUppercutAttack;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.chat.Component;
@@ -38,14 +39,14 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
                     Slide carries hit enemies, launching them up for juggles."""))
             .build();
 
-    public static final SimpleAttack<RangerSpec> BUTTSTROKE = new SimpleAttack<RangerSpec>(80, 8, 13,
-            1f, 6f, 18, 1.5f, 0.3f, 0.5f)
+    public static final SimpleUppercutAttack<RangerSpec> BUTTSTROKE = new SimpleUppercutAttack<RangerSpec>(80, 8, 13,
+            1f, 6f, 18, 1.5f, 0.3f, 0.5f, 0.5f)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(
                     Component.literal("Buttstroke"),
-                    Component.literal("Heavy downwards blow with high stun. Slower, longer cooldown.")
+                    Component.literal("Heavy blow with high stun. Launches upwards. Slower, longer cooldown.")
             );
     public static final SimpleAttack<RangerSpec> SHOULDER_BASH = new SimpleAttack<RangerSpec>(30, 7, 14,
             1f, 5f, 14, 1.5f, 1.5f, 0f)
@@ -56,7 +57,7 @@ public class RangerSpec extends JSpec<RangerSpec, RangerSpec.State> {
             .withLaunch()
             .withInfo(
                     Component.literal("Shoulder Bash"),
-                    Component.literal("Springs up from a squat, launching enemies. 1 point of armor.")
+                    Component.literal("Springs up from a squat, launching enemies away. 1 point of armor.")
             );
     public static final SimpleAttack<RangerSpec> WHIP = new SimpleAttack<RangerSpec>(0, 5, 8,
             1f, 4f, 7, 1.25f, 0.2f, 0f)

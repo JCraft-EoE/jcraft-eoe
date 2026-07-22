@@ -1,5 +1,9 @@
 package net.arna.jcraft.common.item;
 
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
@@ -33,12 +37,18 @@ public class Peacemaker extends Item {
     public static final String ANIMATION_ID = "Animation";
     public static final String ANIMATION_SEQUENCE_ID = "AnimationSequence";
     public static final String COCKED_ID = "Cocked";
+
     public static final int MAX_ROUNDS = 6;
+
     // Animation length of fire out of peacemaker.animation.json at 20 ticks per second.
     private static final int FIRE_TICKS = 8;
+
     // Cocking deliberately does not lock out for its animation's length; the hammer can be dropped
     // as soon as it is back, and the animation is cut off by the shot.
     private static final int COCK_INPUT_LOCKOUT = 2;
+
+    public static final AzCommand FIRE = Attacks.createAnimationCommand(JCraft.FIRE_CONTROLLER, "fire", AzPlayBehaviors.PLAY_ONCE);
+    public static final AzCommand COCK = Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "cock", AzPlayBehaviors.PLAY_ONCE);
 
     public Peacemaker(Properties settings) {
         super(settings);
@@ -237,7 +247,9 @@ public class Peacemaker extends Item {
             if (data.getBoolean(COCKED_ID)) {
                 data.putBoolean(COCKED_ID, false);
                 player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), FIRE_TICKS);
-                markAnimation(peacemakerStack, "fire");
+
+                FIRE.sendForItem(player, peacemakerStack);
+
                 world.playSound(null, player.getX(), player.getY(), player.getZ(), JSoundRegistry.PEACEMAKER_FIRE.get(), SoundSource.PLAYERS, 1f, 1f);
                 shoot(peacemakerStack, world, player);
             } else {
@@ -245,7 +257,9 @@ public class Peacemaker extends Item {
                 // Only long enough to keep one click from reading as two. The hammer can be dropped
                 // before the cock animation has played out, which is what keeps the gun quick.
                 player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), COCK_INPUT_LOCKOUT);
-                markAnimation(peacemakerStack, "cock");
+
+                COCK.sendForItem(player, peacemakerStack);
+
                 world.playSound(null, player.getX(), player.getY(), player.getZ(), JSoundRegistry.GUN_COCK.get(), SoundSource.PLAYERS, 1f, 1f);
             }
         }

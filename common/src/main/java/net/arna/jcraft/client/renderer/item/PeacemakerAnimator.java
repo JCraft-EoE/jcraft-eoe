@@ -17,20 +17,19 @@ import java.util.UUID;
 
 public class PeacemakerAnimator extends AzItemAnimator {
     private static final ResourceLocation ANIMATION = JCraft.id("animations/peacemaker.animation.json");
-    // Long enough to cover the flash keyframes in the fire animation, which scale it away again by
-    // 0.16667s of the shot on their own.
-    private static final long FIRE_EFFECT_NANOS = 375_000_000L;
 
-    private AzAnimationController<ItemStack> controller;
+    private AzAnimationController<ItemStack> baseController, fireController;
     private UUID lastStackId;
     private long lastSequence;
     private boolean sequenceInitialized;
-    private long fireEffectEndsAt;
 
     @Override
     public void registerControllers(AzAnimationControllerContainer<ItemStack> container) {
-        controller = AzAnimationController.builder(this, JCraft.BASE_CONTROLLER).build();
-        container.add(controller);
+        baseController = AzAnimationController.builder(this, JCraft.BASE_CONTROLLER).build();
+        container.add(baseController);
+
+        fireController = AzAnimationController.builder(this, JCraft.FIRE_CONTROLLER).build();
+        container.add(fireController);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class PeacemakerAnimator extends AzItemAnimator {
 
     @Override
     public void setCustomAnimations(ItemStack stack, float partialTicks) {
-        if (controller == null) {
+        if (baseController == null) {
             return;
         }
 
@@ -65,6 +64,7 @@ public class PeacemakerAnimator extends AzItemAnimator {
         if (sequence == lastSequence) {
             return;
         }
+
         lastSequence = sequence;
 
         final String animation = data.getString(Peacemaker.ANIMATION_ID);
@@ -72,34 +72,19 @@ public class PeacemakerAnimator extends AzItemAnimator {
             return;
         }
 
-        // Working the trigger again has to restart the cycle rather than queue behind the last one.
-        if ("cock".equals(animation)) {
-            resetController();
-        }
-
-        // The flash only exists for the length of the shot; the rest of the time it stays hidden.
-        fireEffectEndsAt = "fire".equals(animation) ? System.nanoTime() + FIRE_EFFECT_NANOS : 0L;
-
-        // Every animation holds its last frame, matching how they are authored: without an explicit
-        // behavior AzureLib ignores that and loops them instead. Holding also covers the gap until
-        // the server marks the next stage, so nothing snaps back to the rest pose between them.
         dispatch(AzCommand.create(JCraft.BASE_CONTROLLER, animation, AzPlayBehaviors.HOLD_ON_LAST_FRAME));
-    }
-
-    public boolean isFireEffectVisible() {
-        return System.nanoTime() < fireEffectEndsAt;
     }
 
     private void dispatch(AzCommand command) {
         command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, this));
     }
 
-    private void resetController() {
-        controller.animationQueue().clear();
-        controller.controllerTimer().reset();
-        controller.keyframeManager().keyframeCallbackHandler().reset();
-        controller.setCurrentAnimation(null);
-        controller.stateMachine().stop();
+    public boolean isFireEffectVisible() {
+        final var queuedAnim = fireController.currentAnimation();
+        if (queuedAnim == null) return false;
+        final var anim = queuedAnim.animation();
+        if (!fireController.stateMachine().isPlaying()) return false;
+        return "fire".equals(anim.name());
     }
 
     private static UUID stackId(CompoundTag data) {
