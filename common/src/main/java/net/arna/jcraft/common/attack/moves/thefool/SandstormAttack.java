@@ -55,15 +55,22 @@ public final class SandstormAttack<A extends IAttacker<? extends A, ?>> extends 
         final LivingEntity superTarget = JUtils.getUserIfStand(targets.stream().findFirst().orElseThrow());
         this.superTarget = new WeakReference<>(superTarget);
 
+        final var level = attacker.getEntityWorld();
+        final var pos = superTarget.position();
+        final var blockState = JBlockRegistry.FOOLISH_SAND_BLOCK.get().defaultBlockState();
+
         for (int i = 0; i < 8; i++) {
-            final FallingBlockEntity sand = FallingBlockEntity.fall(attacker.getEntityWorld(), superTarget.blockPosition(),
-                    JBlockRegistry.FOOLISH_SAND_BLOCK.get().defaultBlockState());
+            final var sand = new FallingBlockEntity(level, pos.x() + 0.5, pos.y(), pos.z() + 0.5, blockState);
+
             sand.time = -160;
             sand.noPhysics = true;
             sand.dropItem = false;
             sand.setBoundingBox(new AABB(0, 0, 0, 0, 0, 0));
             sand.setNoGravity(true);
+
             sandEntities.add(new WeakReference<>(sand));
+
+            level.addFreshEntity(sand);
         }
 
         return targets;

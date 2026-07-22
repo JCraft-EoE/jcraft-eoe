@@ -4,18 +4,19 @@ import lombok.NonNull;
 import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.spec.RangerSpec;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.api.registry.JEntityTypeRegistry;
-import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -94,6 +95,8 @@ public class BulletProjectile extends AbstractArrow {
             if (blockState.isAir()) {
                 return;
             }
+
+            setPos(hitResult.getLocation());
 
             // Calculate penetrative value and decide if it should land
             final Vec3i intNormal = blockHitResult.getDirection().getNormal();
@@ -181,7 +184,9 @@ public class BulletProjectile extends AbstractArrow {
                 final LivingEntity target = JUtils.getUserIfStand(living);
                 final DamageSource thrown = level().damageSources().thrown(this, owner);
 
-                AttackData attackData = new AttackData( getDeltaMovement().normalize().scale(0.2),
+                final var impactScale = target.onGround() ? 0.2 : 0.1;
+
+                final var attackData = new AttackData( getDeltaMovement().normalize().scale(impactScale),
                         stunTicks, stunType.ordinal(), false, damage, true, (int) (4 + damage),
                         thrown, owner, CommonHitPropertyComponent.HitAnimation.MID,
                         null, false, false, cancelMoves
@@ -219,7 +224,7 @@ public class BulletProjectile extends AbstractArrow {
         if (entity instanceof LivingEntity living) {
             if (JUtils.getSpec(living) instanceof RangerSpec) {
                 if (JComponentPlatformUtils.getGunslinger(living).isFocusActive()) {
-                    stunTicks = 5 + (int) (damage / 2.0f);
+                    stunTicks = 5 + (int) (2.0f * Mth.sqrt(damage));
                     doStunLaunch = false;
                 }
             }
@@ -230,33 +235,21 @@ public class BulletProjectile extends AbstractArrow {
     public void tick() {
         super.tick();
 
-        // Only create particle trail if bullet is moving and not stuck in ground
-        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel && !this.inGround) {
-            // Get current velocity
-            Vec3 velocity = this.getDeltaMovement();
+        if (level() instanceof ServerLevel serverLevel && !inGround) {
+
+            Vec3 velocity = getDeltaMovement();
             double speed = velocity.length();
 
-            // Only spawn particles if bullet is moving fast enough
             if (speed > 0.1) {
-                // Get current position
-                double currentX = this.getX();
-                double currentY = this.getY();
-                double currentZ = this.getZ();
+                double currentX = getX();
+                double currentY = getY();
+                double currentZ = getZ();
 
-                // Calculate previous position based on velocity
-                double prevX = currentX - velocity.x;
-                double prevY = currentY - velocity.y;
-                double prevZ = currentZ - velocity.z;
+                double prevX = xOld;
+                double prevY = yOld;
+                double prevZ = zOld;
 
-                // Calculate distance for particle density
-                double distance = Math.sqrt(
-                        Math.pow(currentX - prevX, 2) +
-                                Math.pow(currentY - prevY, 2) +
-                                Math.pow(currentZ - prevZ, 2)
-                );
-
-                // Spawn particles along the path
-                int particleCount = Math.max(1, (int)(distance * 4)); // 4 particles per block for denser trail
+                int particleCount = Math.max(1, (int)(speed * 4)); // 4 particles per block
 
                 for (int i = 0; i < particleCount; i++) {
                     double t = (double) i / particleCount;
@@ -264,14 +257,17 @@ public class BulletProjectile extends AbstractArrow {
                     double y = prevY + (currentY - prevY) * t;
                     double z = prevZ + (currentZ - prevZ) * t;
 
-                    // Use end rod particles for the trail
-                    serverLevel.sendParticles(
+                    var packet = new ClientboundLevelParticlesPacket(
                             ParticleTypes.END_ROD,
+                            true,
                             x, y, z,
-                            1, // particle count
-                            0.02, 0.02, 0.02, // tiny spread for slight variation
-                            0.0 // no extra velocity
+                            0.02f, 0.02f, 0.02f,
+                            0,
+                            1
                     );
+
+                    for (var player : serverLevel.players())
+                        serverLevel.sendParticles(player, true, x, y, z, packet);
                 }
             }
         }
