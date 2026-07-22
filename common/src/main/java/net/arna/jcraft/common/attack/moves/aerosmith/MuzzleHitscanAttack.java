@@ -42,7 +42,7 @@ public class MuzzleHitscanAttack extends AbstractHitscanAttack<MuzzleHitscanAtta
 
     @Override
     public @NonNull Set<LivingEntity> perform(final AerosmithEntity attacker, final LivingEntity user) {
-        attacker.addOverheat(0.225f);
+        attacker.addOverheat(0.45f);
         spread = Mth.clamp(originalSpread + attacker.getOverheat() / 100, 0f, HALF_PI);
 
         Vec3 hitPos = attacker.isRemote() ?

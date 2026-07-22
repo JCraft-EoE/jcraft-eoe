@@ -512,7 +512,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         if (user instanceof Mob mob) {
             final var target = mob.getTarget();
 
-            if (target != null)
+            if (target != null && !forcedReturn)
                 attackOrderMove.setCurrentTarget(target);
         }
 

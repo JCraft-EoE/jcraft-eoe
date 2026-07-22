@@ -27,7 +27,7 @@ import java.util.Set;
 
 @Getter
 public class BombDropAttack extends AbstractMove<BombDropAttack, AerosmithEntity> {
-    public static final float BASE_DROP_RANGE = 1.5f;
+    public static final float BASE_DROP_RANGE = 1.75f;
     public static final float DROP_RANGE_INCREASE = 0.01f;
 
     private float range;
@@ -102,7 +102,7 @@ public class BombDropAttack extends AbstractMove<BombDropAttack, AerosmithEntity
         bomb.setYRot(attacker.getYRot());
         bomb.yRotO = attacker.yRotO;
 
-        bomb.setDeltaMovement(attacker.getDeltaMovement().scale(1.0 / 16.0));
+        bomb.setDeltaMovement(attacker.getDeltaMovement().scale(0.25));
         attacker.level().addFreshEntity(bomb);
     }
 
