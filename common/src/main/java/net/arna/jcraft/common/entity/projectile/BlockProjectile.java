@@ -10,7 +10,6 @@ import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -47,7 +46,7 @@ import static net.arna.jcraft.api.Attacks.damageLogic;
 public class BlockProjectile extends JAttackEntity {
     private static final int MAX_TIME_TO_LAUNCH = 15;
 
-    private int timeToLaunch = MAX_TIME_TO_LAUNCH;
+    public int timeToLaunch = MAX_TIME_TO_LAUNCH;
     private int timeLaunched = 0;
     private boolean toRefresh = false;
     private boolean launched = false;
@@ -64,6 +63,11 @@ public class BlockProjectile extends JAttackEntity {
     public BlockProjectile(final Level world) {
         super(JEntityTypeRegistry.BLOCK_PROJECTILE.get(), world);
         setNoGravity(true);
+    }
+
+    public BlockProjectile(final LivingEntity master) {
+        this(master.level());
+        setMaster(master);
     }
 
     @Override
@@ -102,32 +106,42 @@ public class BlockProjectile extends JAttackEntity {
     @Override
     public void tick() {
         super.tick();
+
         if (level().isClientSide) {
             IDLE.sendForEntity(this);
 
-            final Vec3 vel = getDeltaMovement();
+            final var vel = JUtils.deltaPos(this);
             final int effect = entityData.get(EFFECT);
+            final var level = level();
+
+            double x = getX();
+            double y = getY();
+            double z = getZ();
 
             if (effect != 0) {
-                for (int i = 0; i < 32; i++) {
-                    ParticleOptions particle = (effect == 1) ?
-                            new BlockParticleOption(ParticleTypes.BLOCK, Block.byItem(entityData.get(BLOCKSTACK).getItem()).defaultBlockState()) :
-                            ParticleTypes.REVERSE_PORTAL;
-                    level().addParticle(
+                boolean breaking = effect == 1;
+
+                final var particle = breaking ?
+                        new BlockParticleOption(ParticleTypes.BLOCK, Block.byItem(entityData.get(BLOCKSTACK).getItem()).defaultBlockState()) :
+                        ParticleTypes.REVERSE_PORTAL;
+
+                for (int i = 0; i < 48; i++) {
+                    level.addParticle(
                             particle,
-                            getX() + vel.x + random.nextDouble() - 0.5,
-                            getY() + vel.y + random.nextDouble() - 0.5,
-                            getZ() + vel.z + random.nextDouble() - 0.5,
+                            x + vel.x * random.nextDouble() + random.nextDouble() - 0.5,
+                            y + vel.y * random.nextDouble() + random.nextDouble() - 0.5,
+                            z + vel.z * random.nextDouble() + random.nextDouble() - 0.5,
                             vel.x + random.nextDouble() * 2 - 1,
                             vel.y + random.nextDouble() * 2 - 1,
                             vel.z + random.nextDouble() * 2 - 1
                     );
                 }
             }
-            level().addParticle(ParticleTypes.REVERSE_PORTAL,
-                    getX() + random.nextDouble() - 0.5,
-                    getY() + random.nextDouble() - 0.5,
-                    getZ() + random.nextDouble() - 0.5,
+
+            level.addParticle(ParticleTypes.REVERSE_PORTAL,
+                    x + random.nextDouble() - 0.5,
+                    y + random.nextDouble() - 0.5,
+                    z + random.nextDouble() - 0.5,
                     vel.x / 2,
                     vel.y / 2,
                     vel.z / 2

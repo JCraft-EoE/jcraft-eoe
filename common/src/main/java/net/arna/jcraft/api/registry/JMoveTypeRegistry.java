@@ -73,6 +73,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> CMOON_GROUND_SLAM_ATTACK = register("cmoon_ground_slam_attack", CGroundSlamAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CMOON_LAUNCH_ATTACK = register("cmoon_launch_attack", LaunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CMOON_TOSS_MOVE = register("cmoon_toss_move", CMoonTossMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> CMOON_DIVEKICK_ATTACK = register("cmoon_divekick_attack", CDivekickAttack.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> CREAM_BALL_CHARGE_ATTACK = register("cream_ball_charge_attack", BallChargeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CREAM_BALL_MODE_ENTER_MOVE = register("cream_ball_mode_enter_move", BallModeEnterMove.Type.INSTANCE);

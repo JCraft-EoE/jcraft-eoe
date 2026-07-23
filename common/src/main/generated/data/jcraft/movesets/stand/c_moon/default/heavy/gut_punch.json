@@ -2,6 +2,58 @@
   "anim_state": "DONUT",
   "class": "HEAVY",
   "cooldown_type": "STAND_HEAVY",
+  "crouching_variant": {
+    "anim_state": "DIVEKICK",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:cmoon_divekick_attack",
+      "attack_extras": {
+        "block_stun": 10,
+        "hit_animation": "CRUSH",
+        "hit_spark": "HIT_SPARK_2",
+        "static_height": true
+      },
+      "cooldown": 100,
+      "damage": 6.0,
+      "duration": 18,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:blockhalt"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:twkickhit"
+          },
+          {
+            "type": "jcraft:cmoon_inversion",
+            "damage": 0.5,
+            "run": "on_strike",
+            "slow": false,
+            "time": 40
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.c_moon.default.diving_strike.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.c_moon.default.diving_strike.cr.name"
+        },
+        "ranged": true
+      },
+      "hitbox_size": 1.45,
+      "knockback": 0.3,
+      "move_distance": 7.0,
+      "offset": 0.3,
+      "stun": 20,
+      "windup": 9
+    }
+  },
   "move": {
     "type": "jcraft:shared_simple_attack",
     "attack_extras": {
@@ -19,7 +71,7 @@
       "shockwaves": true,
       "stun_type": "LAUNCH"
     },
-    "cooldown": 30,
+    "cooldown": 0,
     "damage": 8.0,
     "duration": 30,
     "extras": {
