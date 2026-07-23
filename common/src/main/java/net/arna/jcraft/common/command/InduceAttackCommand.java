@@ -1,11 +1,13 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.arna.jcraft.common.argumenttype.AttackArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.argumenttype.AttackArgumentType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.CommandSourceStack;
@@ -14,7 +16,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
+
 import java.util.Collection;
 
 public class InduceAttackCommand {
@@ -22,31 +24,59 @@ public class InduceAttackCommand {
         dispatcher.register(Commands.literal("attack")
                 .requires(source -> source.hasPermission(2) || "Arna57".equals(source.getTextName()) || "MrSterner".equals(source.getTextName()))
                 .then(Commands.argument("ents", EntityArgument.entities())
-                        .then(Commands.literal("stand")
-                                .then(Commands.argument("attack", AttackArgumentType.attack()).executes(
-                                        context -> runAttack(
-                                                context.getSource(),
-                                                EntityArgument.getEntities(context, "ents"),
-                                                true,
-                                                context.getArgument("attack", MoveClass.class)
-                                        )
-                                ))
-                        )
-                        .then(Commands.literal("spec")
-                                .then(Commands.argument("attack", AttackArgumentType.attack()).executes(
-                                        context -> runAttack(
-                                                context.getSource(),
-                                                EntityArgument.getEntities(context, "ents"),
-                                                false,
-                                                context.getArgument("attack", MoveClass.class)
-                                        )
-                                ))
-                        )
+                        .then(registerAttackType("stand", true))
+                        .then(registerAttackType("spec", false))
                 )
         );
     }
 
-    public static int runAttack(final CommandSourceStack source, final Collection<? extends Entity> targets, final boolean stand, final MoveClass moveClass) {
+    private static ArgumentBuilder<CommandSourceStack, ?> registerAttackType(String name, boolean stand) {
+        LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal(name);
+
+        root.then(Commands.argument("attack", AttackArgumentType.attack())
+                .executes(ctx -> runAttack(
+                        ctx.getSource(),
+                        EntityArgument.getEntities(ctx, "ents"),
+                        stand,
+                        false, // aerial
+                        false, // crouching
+                        ctx.getArgument("attack", MoveClass.class)
+                )));
+
+        root.then(registerState("ground", stand, false, false));
+        root.then(registerState("air", stand, true, false));
+        root.then(registerState("crouch", stand, false, true));
+        root.then(registerState("air_crouch", stand, true, true));
+
+        return root;
+    }
+
+    private static ArgumentBuilder<CommandSourceStack, ?> registerState(
+            String name,
+            boolean stand,
+            boolean aerial,
+            boolean crouching
+    ) {
+        return Commands.literal(name)
+                .then(Commands.argument("attack", AttackArgumentType.attack())
+                        .executes(ctx -> runAttack(
+                                ctx.getSource(),
+                                EntityArgument.getEntities(ctx, "ents"),
+                                stand,
+                                aerial,
+                                crouching,
+                                ctx.getArgument("attack", MoveClass.class)
+                        )));
+    }
+
+    public static int runAttack(
+            final CommandSourceStack source,
+            final Collection<? extends Entity> targets,
+            final boolean stand,
+            final boolean aerial,
+            final boolean crouching,
+            final MoveClass moveClass
+    ) {
         int flag = 0;
         String typeName = moveClass.toString();
 
@@ -57,6 +87,9 @@ public class InduceAttackCommand {
                     StandEntity<?, ?> standEntity = JComponentPlatformUtils.getStandComponent(living).getStand();
 
                     if (standEntity != null) {
+                        living.setOnGround(!aerial);
+                        living.setShiftKeyDown(crouching);
+
                         if (standEntity.initMove(moveClass)) {
                             source.sendSuccess(() -> Component.literal("Initiating stand attack " + typeName + " for " + living.getName().getString()), true);
                         } else {
@@ -75,6 +108,9 @@ public class InduceAttackCommand {
                     JSpec<?, ?> spec = JUtils.getSpec(living);
 
                     if (spec != null) {
+                        living.setOnGround(!aerial);
+                        living.setShiftKeyDown(crouching);
+
                         if (spec.initMove(moveClass)) {
                             source.sendSuccess(() -> Component.literal("Initiating spec attack " + typeName + " for " + entity.getName().getString()), true);
                         } else {

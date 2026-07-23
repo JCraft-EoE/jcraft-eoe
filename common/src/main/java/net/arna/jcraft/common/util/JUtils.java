@@ -422,7 +422,6 @@ public final class JUtils {
         return CombatRules.getDamageAfterAbsorb(damage, totalArmor, toughnessAttribute);
     }
 
-    //To check method ms usage, use spark[something]
     public static boolean isBlocking(LivingEntity entity) {
         if (entity instanceof StandEntity<?, ?> stand) {
             return stand.blocking;

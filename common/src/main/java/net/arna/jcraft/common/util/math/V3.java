@@ -7,7 +7,6 @@ import net.minecraft.world.phys.Vec3;
  * Use instead of the mutating calls of {@link Vec3} because those create new instances and add unnecessary GC pressure.
  */
 public final class V3 {
-    public static V3 ZERO = new V3();
     public double x, y, z;
 
     /** Creates a null-vector. */
@@ -37,8 +36,18 @@ public final class V3 {
         return this;
     }
 
+    public V3 set(Vec3 src, double scalar) {
+        this.x = src.x * scalar;
+        this.y = src.y * scalar;
+        this.z = src.z * scalar;
+        return this;
+    }
+
     public double lengthSqr() {
         return x * x + y * y + z * z;
+    }
+    public boolean isZero() {
+        return x == 0 && y == 0 && z == 0;
     }
 
     public Vec3 toImmutable() {

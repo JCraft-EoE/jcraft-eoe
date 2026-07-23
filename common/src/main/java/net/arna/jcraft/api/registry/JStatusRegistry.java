@@ -8,14 +8,14 @@ import static net.arna.jcraft.JCraft.EFFECTS;
 
 public interface JStatusRegistry {
 
-    RegistrySupplier<MobEffect> DAZED = EFFECTS.register("dazed_effect", DazedStatusEffect::new);
+    RegistrySupplier<MobEffect> DAZED = EFFECTS.register("dazed", DazedStatusEffect::new);
     RegistrySupplier<MobEffect> KNOCKDOWN = EFFECTS.register("knockdown", KnockdownStatusEffect::new);
 
     RegistrySupplier<MobEffect> WSPOISON = EFFECTS.register("ws_poison", WSPoisonEffect::new);
     RegistrySupplier<MobEffect> STANDLESS = EFFECTS.register("standless", StandlessEffect::new);
     RegistrySupplier<MobEffect> SPECLESS = EFFECTS.register("specless", SpeclessEffect::new);
 
-    RegistrySupplier<MobEffect> OUTOFBODY = EFFECTS.register("outofbody", OutOfBodyEffect::new);
+    RegistrySupplier<MobEffect> OUT_OF_BODY = EFFECTS.register("out_of_body", OutOfBodyEffect::new);
     RegistrySupplier<MobEffect> WEIGHTLESS = EFFECTS.register("weightless", WeightlessStatusEffect::new);
     RegistrySupplier<MobEffect> BLEEDING = EFFECTS.register("jbleeding", BleedingEffect::new);
     RegistrySupplier<MobEffect> PHPOISON = EFFECTS.register("phpoison", PurpleInfectionEffect::new);

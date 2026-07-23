@@ -4,9 +4,11 @@ import lombok.NonNull;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,16 +22,17 @@ import java.util.Set;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public class GETreeEntity extends AbstractArrow {
+public class GEVinesEntity extends AbstractArrow {
     private final Vec3 launchVec;
     private final LivingEntity livingOwner;
+    int hitCount = 0;
 
-    public GETreeEntity(Level world) {
+    public GEVinesEntity(Level world) {
         this(world, null, Vec3.ZERO);
     }
 
-    public GETreeEntity(Level world, LivingEntity owner, Vec3 launchVec) {
-        super(JEntityTypeRegistry.GE_TREE.get(), world);
+    public GEVinesEntity(Level world, LivingEntity owner, Vec3 launchVec) {
+        super(JEntityTypeRegistry.GE_VINES.get(), world);
         this.setOwner(owner);
         this.setInvulnerable(true);
         this.setSilent(true);
@@ -39,6 +42,7 @@ public class GETreeEntity extends AbstractArrow {
     }
 
     private boolean lockRotation = false;
+
     @Override
     public void setXRot(float xRot) {
         if (lockRotation) return;
@@ -55,7 +59,8 @@ public class GETreeEntity extends AbstractArrow {
         lockRotation = true;
         super.tick();
         lockRotation = false;
-        if (tickCount > 120) {
+
+        if (tickCount > 72) {
             discard();
         }
 
@@ -63,14 +68,15 @@ public class GETreeEntity extends AbstractArrow {
             return;
         }
 
-        if (tickCount == 4) {
+        if (tickCount == 16 || tickCount == 36 || tickCount == 42 || tickCount == 49) {
             final DamageSource ds = level().damageSources().mobAttack(livingOwner);
-            final Set<LivingEntity> hurt = JUtils.generateHitbox(level(), position().add(launchVec.normalize()), 2.5, Set.of(this));
+            final var kbVec = launchVec.scale( hitCount * 0.15 - 1.0);
+            final Set<LivingEntity> hurt = JUtils.generateHitbox(level(), position().add(launchVec.normalize()), 2.5 - hitCount * 0.25, Set.of(this));
+
+            boolean anyHit = false;
 
             for (LivingEntity living : hurt) {
                 final LivingEntity target = JUtils.getUserIfStand(living);
-
-                JUtils.addVelocity(target, launchVec.x, launchVec.y, launchVec.z);
 
                 if (!JUtils.canDamage(ds, target))
                     continue;
@@ -78,9 +84,16 @@ public class GETreeEntity extends AbstractArrow {
                 if (livingOwner == target)
                     continue;
 
-                damageLogic(level(), target, Vec3.ZERO, 25, 3,
-                        false, 7f, false, 11, ds, livingOwner, CommonHitPropertyComponent.HitAnimation.MID, false);
+                damageLogic(level(), target, kbVec, 22 - hitCount * 2, StunType.BURSTABLE.ordinal(),
+                        false, 5f, true, 11, ds, livingOwner, CommonHitPropertyComponent.HitAnimation.MID, false);
+
+                anyHit = true;
             }
+
+            if (anyHit)
+                level().playSound(null, getX(), getY(), getZ(), SoundEvents.PLAYER_HURT_SWEET_BERRY_BUSH, getSoundSource(), 1, 1);
+
+            hitCount++;
         }
     }
 
@@ -101,17 +114,11 @@ public class GETreeEntity extends AbstractArrow {
 
     public static final AzCommand ANIMATION = AzCommand.controllerBuilder().
             playSequence(
-                JCraft.BASE_CONTROLLER,
-                sequenceBuilder -> sequenceBuilder.queue(
-                        "animation.getree.spawn",
-                    props -> props.withPlayBehavior(AzPlayBehaviors.PLAY_ONCE)
-                ).queue(
-                        "animation.getree.idle",
-                        props -> props.withPlayBehavior(AzPlayBehaviors.PLAY_ONCE)
-                ).queue(
-                        "animation.getree.return",
-                        props -> props.withPlayBehavior(AzPlayBehaviors.PLAY_ONCE)
-                )
+                    JCraft.BASE_CONTROLLER,
+                    sequenceBuilder -> sequenceBuilder.queue(
+                            "animation.gevine.attack",
+                            props -> props.withPlayBehavior(AzPlayBehaviors.HOLD_ON_LAST_FRAME)
+                    )
             )
             .setFreezeTickOffset(JCraft.BASE_CONTROLLER, 0)
             .setStartTickOffset(JCraft.BASE_CONTROLLER, 0)

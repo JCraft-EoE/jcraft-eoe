@@ -14,7 +14,7 @@
         "hit_animation": "MID",
         "hit_spark": "HIT_SPARK_1"
       },
-      "cooldown": 520,
+      "cooldown": 500,
       "duration": 16,
       "extras": {
         "actions": [
@@ -48,7 +48,7 @@
       "hit_animation": "MID",
       "hit_spark": "HIT_SPARK_1"
     },
-    "cooldown": 520,
+    "cooldown": 500,
     "duration": 14,
     "extras": {
       "actions": [
