@@ -9,6 +9,7 @@ import net.arna.jcraft.client.particle.AuraArcParticle;
 import net.arna.jcraft.client.particle.AuraBlobParticle;
 import net.arna.jcraft.client.particle.MoshParticle;
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
+import net.arna.jcraft.common.entity.projectile.BlockProjectile;
 import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.entity.vehicle.AbstractGroundVehicleEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
@@ -19,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.network.chat.Component;
@@ -27,6 +29,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -381,6 +384,55 @@ public class ClientEntityHandlerImpl implements IClientEntityHandler {
                     sneak = options.keyShift.isDown();
 
             vehicle.movementTick(w, a, s, d, jump, sneak);
+        }
+    }
+
+    @Override
+    public void blockProjectileTick(final BlockProjectile proj) {
+        if (proj.level() instanceof ClientLevel clientLevel) {
+            BlockProjectile.IDLE.sendForEntity(proj);
+
+            final var random = proj.getRandom();
+            final var vel = JUtils.deltaPos(proj);
+            final int effect = proj.getEffect();
+
+            double x = proj.getX();
+            double y = proj.getY();
+            double z = proj.getZ();
+
+            if (effect != 0) {
+                boolean breaking = effect == 1;
+
+                final var block = Block.byItem(proj.getBlockStack().getItem());
+                final var blockState = block.defaultBlockState();
+
+                clientLevel.playLocalSound(x, y, z, block.getSoundType(blockState).getBreakSound(), proj.getSoundSource(), 1.0f, 1.0f, true);
+
+                final var particle = breaking ?
+                        new BlockParticleOption(ParticleTypes.BLOCK, blockState) :
+                        ParticleTypes.REVERSE_PORTAL;
+
+                for (int i = 0; i < 48; i++) {
+                    clientLevel.addParticle(
+                            particle,
+                            x + vel.x * random.nextDouble() + random.nextDouble() - 0.5,
+                            y + vel.y * random.nextDouble() + random.nextDouble() - 0.5,
+                            z + vel.z * random.nextDouble() + random.nextDouble() - 0.5,
+                            vel.x + random.nextDouble() * 2 - 1,
+                            vel.y + random.nextDouble() * 2 - 1,
+                            vel.z + random.nextDouble() * 2 - 1
+                    );
+                }
+            }
+
+            clientLevel.addParticle(ParticleTypes.REVERSE_PORTAL,
+                    x + random.nextDouble() - 0.5,
+                    y + random.nextDouble() - 0.5,
+                    z + random.nextDouble() - 0.5,
+                    vel.x / 2,
+                    vel.y / 2,
+                    vel.z / 2
+            );
         }
     }
 }

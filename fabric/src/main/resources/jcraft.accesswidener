@@ -62,6 +62,8 @@ accessible method net/minecraft/world/item/context/UseOnContext <init> (Lnet/min
 
 accessible method net/minecraft/world/level/Level getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
 
+accessible method net/minecraft/server/level/ServerLevel sendParticles (Lnet/minecraft/server/level/ServerPlayer;ZDDDLnet/minecraft/network/protocol/Packet;)Z
+
 accessible field net/minecraft/world/food/FoodData lastFoodLevel I
 accessible field net/minecraft/world/food/FoodData foodLevel I
 accessible field net/minecraft/world/food/FoodData exhaustionLevel F
