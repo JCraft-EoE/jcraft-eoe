@@ -9,6 +9,7 @@ import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -107,7 +108,9 @@ public class BlockProjectile extends JAttackEntity {
     public void tick() {
         super.tick();
 
-        if (level().isClientSide) {
+        resetFallDistance();
+
+        if (level() instanceof ClientLevel clientLevel) {
             IDLE.sendForEntity(this);
 
             final var vel = JUtils.deltaPos(this);
@@ -121,8 +124,13 @@ public class BlockProjectile extends JAttackEntity {
             if (effect != 0) {
                 boolean breaking = effect == 1;
 
+                final var block = Block.byItem(entityData.get(BLOCKSTACK).getItem());
+                final var blockState = block.defaultBlockState();
+
+                clientLevel.playLocalSound(x, y, z, block.getSoundType(blockState).getBreakSound(), getSoundSource(), 1.0f, 1.0f, true);
+
                 final var particle = breaking ?
-                        new BlockParticleOption(ParticleTypes.BLOCK, Block.byItem(entityData.get(BLOCKSTACK).getItem()).defaultBlockState()) :
+                        new BlockParticleOption(ParticleTypes.BLOCK, blockState) :
                         ParticleTypes.REVERSE_PORTAL;
 
                 for (int i = 0; i < 48; i++) {
@@ -239,7 +247,7 @@ public class BlockProjectile extends JAttackEntity {
     @Nullable
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.STONE_BREAK;
+        return null;
     }
 
     @Override

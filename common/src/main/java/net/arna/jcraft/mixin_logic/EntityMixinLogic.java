@@ -46,15 +46,20 @@ public class EntityMixinLogic {
             y *= Mth.DEG_TO_RAD;
 
             final Direction gravity = GravityChangerAPI.getGravityDirection(thisEntity);
+            final var axis = gravity.getAxis();
 
             // When the stand should track the user's look pitch (i.e. during attacks), position it along the
             // full look direction at `dist` so it follows where the user is looking, instead of staying at a
             // fixed horizontal distance with only a small vertical nudge.
             float pitch = stand.shouldOffsetHeight() ? thisEntity.getXRot() * Mth.DEG_TO_RAD : 0f;
 
-            if (gravity.getAxis() != Direction.Axis.Y) {
+            if (axis != Direction.Axis.Y) {
                 y *= -1.0f;
                 pitch += Math.PI;
+
+                if (axis == Direction.Axis.Z) {
+                    y += Math.PI;
+                }
             }
 
             final double horizontalDist = dist * Mth.cos(pitch);
