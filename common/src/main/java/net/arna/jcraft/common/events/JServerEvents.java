@@ -747,4 +747,11 @@ public class JServerEvents {
         return EventResult.pass();
     }
 
+    public static void playerRespawn(final ServerPlayer serverPlayer, boolean conqueredEnd) {
+        final var vamp = JComponentPlatformUtils.getVampirism(serverPlayer);
+
+        if (vamp == null) return;
+
+        vamp.resetBlood();
+    }
 }

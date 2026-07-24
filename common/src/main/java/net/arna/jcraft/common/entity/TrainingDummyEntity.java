@@ -100,7 +100,7 @@ public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
         this.setInvisible(compound.getBoolean("Invisible"));
     }
 
-    private boolean isOnKnockbackBlockingBlock() {
+    private boolean isOnKnockbackDisablingBlock() {
         // Check a small area around the entity's feet for cut red sandstone slabs
         BlockPos center = this.blockPosition();
 
@@ -117,12 +117,12 @@ public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
 
     @Override
     public boolean isPushable() {
-        return !isOnKnockbackBlockingBlock();
+        return !isOnKnockbackDisablingBlock();
     }
 
     @Override
     protected void doPush(@NotNull Entity entity) {
-        if (!isOnKnockbackBlockingBlock()) {
+        if (!isOnKnockbackDisablingBlock()) {
             super.doPush(entity);
         }
     }
@@ -202,7 +202,7 @@ public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
         level().broadcastEntityEvent(this, (byte)2);
 
         // Apply knockback ONLY if the move specifies it and not on red sandstone slab
-        if (!isOnKnockbackBlockingBlock() && kbVec != null && (kbVec.x != 0 || kbVec.y != 0 || kbVec.z != 0)) {
+        if (!isOnKnockbackDisablingBlock() && kbVec != null) {
             push(kbVec.x, kbVec.y, kbVec.z);
             hasImpulse = true;
         }
@@ -212,7 +212,7 @@ public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
             JCraft.stun(this, stunTicks, stunLevel);
         }
 
-        return false; // Prevent actual damage
+        return true; // Do actual damage
     }
 
     @Override
@@ -275,6 +275,9 @@ public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
     @Override
     public void tick() {
         super.tick();
+
+        if (!isDeadOrDying())
+            setHealth(getMaxHealth());
 
         // Update knockdown sync on server side
         if (!level().isClientSide()) {
