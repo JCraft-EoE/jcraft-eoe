@@ -42,7 +42,7 @@
         }
       },
       "hitbox_size": 1.5,
-      "knockback": 1.25,
+      "knockback": 1.1,
       "move_distance": 1.5,
       "offset": 0.0,
       "stun": 10,

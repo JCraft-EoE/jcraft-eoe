@@ -83,7 +83,7 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             .withLaunch()
             .withInfo(Component.literal("Feeding Blood Suck (Finisher)"), Component.empty());
     public static final BloodSuckHitsAttack FEEDING_BLOODSUCK_HITS = new BloodSuckHitsAttack(0, 46, 0.8f,
-            2.5f, 19, 1.75f, 0.6f, -0.1f, IntSet.of(8, 16, 24), 3.0f)
+            2.5f, 19, 1.75f, 0.6f, -0.1f, IntSet.of(8, 16, 24), 2.0f)
             .withStunType(StunType.UNBURSTABLE)
             .withFinisher(24, FEEDING_BLOODSUCK_LAUNCH)
             .withInfo(Component.literal("Feeding Blood Suck (Hit)"), Component.empty());

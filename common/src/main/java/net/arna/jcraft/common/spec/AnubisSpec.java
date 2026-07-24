@@ -50,6 +50,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
 
     public static final SimpleAttack<AnubisSpec> AERIAL_CLEAVE = new SimpleAttack<AnubisSpec>(0, 9, 15, 1f, 5f,
             15, 1.75f, 0.4f, 0.3f)
+            .withIpsId(1)
             .withSound(JSoundRegistry.ANUBIS_SLASH)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
             .withHitSpark(JParticleType.SWEEP_ATTACK)
@@ -61,6 +62,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             );
     public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(20, 9, 20, 1f, 6f,
             15, 1.75f, 0.9f, 0f)
+            .withIpsId(2)
             .withAerialVariant(AERIAL_CLEAVE)
             .withSound(JSoundRegistry.ANUBIS_SLASH)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
@@ -73,6 +75,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             );
     public static final SimpleAttack<AnubisSpec> POMMEL = new SimpleAttack<AnubisSpec>(20, 5, 8,
             1f, 4f, 7, 1.25f, 0.2f, 0f)
+            .withIpsId(3)
             .withSound(JSoundRegistry.ANUBIS_POMMEL)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withAction(AnubisBloodLustMoveAction.incrementBloodlust())
@@ -82,6 +85,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             );
     public static final SimpleAnubisMultiHitAttack REKKA2 = new SimpleAnubisMultiHitAttack(30,
             26, 1f, 4f, 15, 1.75f, 0.2f, -0.1f, IntSet.of(8, 20), false)
+            .withIpsId(4)
             .withSound(JSoundRegistry.ANUBIS_REKKA2)
             .withImpactSound(JSoundRegistry.IMPACT_9)
             .withInfo(
@@ -91,9 +95,11 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     public static final KnockdownMultiHitAttack<AnubisSpec> REKKA_FINISHER = new KnockdownMultiHitAttack<AnubisSpec>(
             0, 40, 1f, 7f, 15, 2f, 0.9f, 0f,
             IntSet.of(32), 35)
+            .withIpsId(5)
             .withHitSpark(JParticleType.SWEEP_ATTACK);
     public static final Rekka3Attack REKKA3 = new Rekka3Attack(30, 40, 1f, 4f,
             15, 1.75f, 0.6f, -0.1f, IntSet.of(8, 20, 32))
+            .withIpsId(6)
             .withFollowup(REKKA_FINISHER)
             .withSound(JSoundRegistry.ANUBIS_REKKA3)
             .withImpactSound(JSoundRegistry.IMPACT_9)
@@ -104,6 +110,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             );
     public static final SimpleUppercutAttack<AnubisSpec> LOW_KICK = new SimpleUppercutAttack<AnubisSpec>(10, 10, 17,
             1.5f, 6f, 15, 1.33f, 0.3f, 0f, 0.3f)
+            .withIpsId(7)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withStaticY()
             .withAction(AnubisBloodLustMoveAction.resetLastHitTicks())
@@ -113,6 +120,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             );
     public static final SimpleAnubisMultiHitAttack UNSHEATHING_SWEEP = new SimpleAnubisMultiHitAttack(5, 16, 1f,
             3f, 10, 1.25f, 0.3f, 0.3f, IntSet.of(6, 10), true)
+            .withIpsId(8)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withArmor(1)
             .withInfo(
@@ -121,6 +129,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
             );
     public static final UnsheathingAttack UNSHEATHING_ATTACK = new UnsheathingAttack(5, 6, 12, 1f, 5f,
             13, 1.75f, 0.5f, 0f)
+            .withIpsId(9)
             .withCrouchingVariant(UNSHEATHING_SWEEP)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
             .withHitSpark(JParticleType.SWEEP_ATTACK)

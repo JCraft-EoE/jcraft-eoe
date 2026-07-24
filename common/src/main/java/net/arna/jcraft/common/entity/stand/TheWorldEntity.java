@@ -99,7 +99,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.LOW)
             .withInfo(
                     Component.literal("Low Kick"),
-                    Component.literal("slower, higher stun, low hitbox")
+                    Component.literal("Slower, higher stun, low hitbox.")
             );
     public static final SimpleAttack<TheWorldEntity> LIGHT_FOLLOWUP = new SimpleAttack<TheWorldEntity>(
             0, 7, 11, 0.75f, 6f, 8, 1.5f, 1f, 0)
@@ -111,7 +111,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withExtraHitBox(0, 0, 1)
             .withInfo(
                     Component.literal("Punch"),
-                    Component.literal("quick combo finisher")
+                    Component.literal("Quick combo finisher.")
             );
     public static final SimpleAttack<TheWorldEntity> LIGHT = SimpleAttack.<TheWorldEntity>lightAttack(
                     5, 7, 0.75f, 5, 10, 0.1f, -0.1f)
@@ -120,14 +120,14 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withCrouchingVariant(LOW_KICK)
             .withInfo(
                     Component.literal("Punch"),
-                    Component.literal("quick combo starter")
+                    Component.literal("Quick combo starter.")
             );
     public static final MainBarrageAttack<TheWorldEntity> BARRAGE = new MainBarrageAttack<TheWorldEntity>(280,
             0, 40, 0.75f, 1f, 30, 2, 0.25f, 0, 3, Blocks.OBSIDIAN.defaultDestroyTime())
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(
                     Component.literal("Barrage"),
-                    Component.literal("fast reliable combo starter/extender, high stun")
+                    Component.literal("Fast reliable combo starter/extender, high stun.")
             );
     public static final SimpleAttack<TheWorldEntity> SWEEP = new SimpleAttack<TheWorldEntity>(16,
             6, 16, 0.75f, 5f, 16, 1.85f, 0.5f, 0.4f)
@@ -137,7 +137,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(
                     Component.literal("Sweep"),
-                    Component.literal("fast, decent stun")
+                    Component.literal("Fast, decent stun.")
             );
     public static final SimpleUppercutAttack<TheWorldEntity> ROUNDHOUSE = new SimpleUppercutAttack<TheWorldEntity>(13,
             7, 13, 0.75f, 5f, 10, 1.75f, 0.5f, -0.2f, 0.4f)
@@ -148,7 +148,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(
                     Component.literal("Roundhouse"),
-                    Component.literal("low stun")
+                    Component.literal("Low stun. Great speed.")
             );
     public static final KnockdownAttack<TheWorldEntity> COUNTER_FOLLOWUP = new KnockdownAttack<TheWorldEntity>(0,
             5, 9, 0.75f, 9f, 16, 1.75f, 0.7f, 0.1f, 35)
@@ -159,25 +159,25 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withHyperArmor()
             .withInfo(
                     Component.literal("Counter (Hit)"),
-                    Component.literal("quick, armored knockdown")
+                    Component.literal("Quick, armored knockdown.")
             );
     public static final FeignBarrageCounterAttack FEIGN_BARRAGE = new FeignBarrageCounterAttack(400,
             5,50, 0.75f, COUNTER_FOLLOWUP)
             .withSound(JSoundRegistry.TW_BARRAGE)
             .withInfo(
                     Component.literal("Feign Barrage"),
-                    Component.literal("counter, 0.25s windup, 2.25s duration, teleports and knocks down on hit")
+                    Component.literal("Counter, 0.25s windup, 2.25s duration, teleports and knocks down on hit.")
             );
     public static final TWDonutAttack<TheWorldEntity> DONUT = new TWDonutAttack<TheWorldEntity>(42,
             20, 42, 1f,9f, 52, 2f, 1f, 0f)
             .withSound(JSoundRegistry.TW_DONUT)
             .withImpactSound(JSoundRegistry.TW_DONUT_HIT)
             .withExtraHitBox(1.5)
-            .withHyperArmor()
+            .withArmor(3)
             .withLaunch()
             .withInfo(
                     Component.literal("Donut"),
-                    Component.literal("slow, uninterruptible combo starter/extender, 1.5s stun on whiff")
+                    Component.literal("Slow, uninterruptible combo starter/extender, 1.5s stun on whiff. 3 points of armor.")
             );
     public static final TimeSkipMove<TheWorldEntity> TIME_SKIP = new TimeSkipMove<TheWorldEntity>(300, 14, 2, 2, 1)
             .withSound(JSoundRegistry.TIME_SKIP)
@@ -195,7 +195,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withLaunch()
             .withInfo(
                     Component.literal("Lunge"),
-                    Component.literal("user & stand charge forward, launches")
+                    Component.literal("User & stand charge forward, launches.")
             );
     public static final TWChargeAttack CHARGE = new TWChargeAttack(100,
             7, 19, 7.5f, 5f, 20, 1.5f, 0.25f, 0)
@@ -207,7 +207,7 @@ public final class TheWorldEntity extends AbstractTheWorldEntity<TheWorldEntity,
             .withBlockStun(8)
             .withInfo(
                     Component.literal("Forward Charge"),
-                    Component.literal("The World detaches from the user and lunges forward, combo starter")
+                    Component.literal("The World detaches from the user and lunges forward, combo starter.")
             );
     public static final TimeStopMove<TheWorldEntity> TIME_STOP = new TimeStopMove<TheWorldEntity>(1400,
             45, 52, Either.right(JServerConfig.TW_TIME_STOP_DURATION))
