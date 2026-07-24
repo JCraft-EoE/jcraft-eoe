@@ -484,6 +484,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     if (distanceSqr <= 6.25) {
                         setRemote(false);
                         setFlyState(FlyState.NONE);
+                        cancelMove();
                         playSound(JSoundRegistry.AS_LANDING.get());
                     }
                 }
@@ -659,11 +660,6 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public void setRemote(final boolean r) {
         super.setRemote(r);
         setAlphaOverride(r ? 1f : -1f);
-
-        if (!r) {
-            setDistanceOffset(DATA.getIdleDistance());
-            setRotationOffset(DATA.getIdleRotation());
-        }
     }
 
     @Override
