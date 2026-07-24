@@ -39,7 +39,7 @@ public class VineAttack<A extends IAttacker<? extends A, ?>> extends AbstractSim
         if (user.onGround() || !baseEntity.getFeetBlockState().isAir()) {
             final Vec3 direction = user.getLookAngle();
 
-            final var vines = new GEVinesEntity(baseEntity.level(), user, direction.scale(0.67));
+            final var vines = new GEVinesEntity(baseEntity.level(), user, direction.scale(0.35));
 
             final Direction gravity = GravityChangerAPI.getGravityDirection(baseEntity);
             GravityChangerAPI.setDefaultGravityDirection(vines, gravity);
@@ -51,7 +51,7 @@ public class VineAttack<A extends IAttacker<? extends A, ?>> extends AbstractSim
                     (float) (Mth.atan2(e, g) * 57.2957763671875),
                     (float) (Mth.atan2(f, l) * 57.2957763671875)
             );
-            vines.setDeltaMovement(direction.scale(0.33));
+            vines.setDeltaMovement(direction.scale(0.5));
 
             baseEntity.level().addFreshEntity(vines);
 

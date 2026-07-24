@@ -98,7 +98,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
                     Component.literal("Quick combo starter, low stun.")
             );
     public static final VineAttack<GoldExperienceEntity> UNDERHAND = new VineAttack<GoldExperienceEntity>(100,
-            13, 22, 1.5f, 7f, 10, 1.5f, 1.25f, 0f)
+            13, 22, 1.5f, 7f, 10, 0.75f, 1.25f, 0f)
             .withAnim(State.UNDERHAND)
             .withSound(JSoundRegistry.GE_TREE)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -172,7 +172,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withInfo(
                     Component.literal("Overclock"),
-                    Component.literal("Slow, unblockable, devastating stun.")
+                    Component.literal("Slow, unblockable, devastating stun. Launches the opponent's soul out of their body.")
             );
 
     public static final OverclockAttack<GoldExperienceEntity> SOUL_PUNCH = new OverclockAttack<GoldExperienceEntity>(100,

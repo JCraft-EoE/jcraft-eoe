@@ -1,5 +1,7 @@
 package net.arna.jcraft.common.entity.projectile;
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.NonNull;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
@@ -67,19 +69,25 @@ public class GETreeEntity extends AbstractArrow {
             final DamageSource ds = level().damageSources().mobAttack(livingOwner);
             final Set<LivingEntity> hurt = JUtils.generateHitbox(level(), position().add(launchVec.normalize()), 2.5, Set.of(this));
 
+            final IntSet processed = new IntOpenHashSet(4);
+
             for (LivingEntity living : hurt) {
                 final LivingEntity target = JUtils.getUserIfStand(living);
+                final int id = target.getId();
 
-                JUtils.addVelocity(target, launchVec.x, launchVec.y, launchVec.z);
+                if (processed.contains(id)) continue;
 
                 if (!JUtils.canDamage(ds, target))
                     continue;
 
-                if (livingOwner == target)
-                    continue;
+                if (livingOwner == target) {
+                    JUtils.addVelocity(target, launchVec.x, launchVec.y, launchVec.z);
+                } else {
+                    damageLogic(level(), target, launchVec, 25, 3,
+                            false, 7f, false, 11, ds, livingOwner, CommonHitPropertyComponent.HitAnimation.MID, false);
+                }
 
-                damageLogic(level(), target, Vec3.ZERO, 25, 3,
-                        false, 7f, false, 11, ds, livingOwner, CommonHitPropertyComponent.HitAnimation.MID, false);
+                processed.add(id);
             }
         }
     }
