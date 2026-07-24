@@ -659,6 +659,11 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public void setRemote(final boolean r) {
         super.setRemote(r);
         setAlphaOverride(r ? 1f : -1f);
+
+        if (!r) {
+            setDistanceOffset(DATA.getIdleDistance());
+            setRotationOffset(DATA.getIdleRotation());
+        }
     }
 
     @Override

@@ -1690,7 +1690,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     @Override
     public boolean handleDamage(Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift,
                                 int blockstun, DamageSource source, Entity attacker, CommonHitPropertyComponent.HitAnimation hitAnimation,
-                                MoveUsage moveUsage, boolean canBackstab, boolean unblockable) {
+                                MoveUsage moveUsage, boolean canBackstab, boolean unblockable, boolean cancelAttacks) {
         if (!hasUser()) return false;
         boolean hit = true;
 
@@ -1728,8 +1728,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         if (hit) {
-            AttackData attackData = new AttackData(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun,
-                    source, attacker, hitAnimation, moveUsage, canBackstab, unblockable);
+            AttackData attackData = new AttackData(
+                    kbVec, stunTicks, stunLevel, overrideStun, damage, lift,
+                    blockstun, source, attacker, hitAnimation, moveUsage,
+                    canBackstab, unblockable, cancelAttacks);
+
             onJCraftDamageReceived(attackData);
             damageLogic(level(), user, attackData);
         }

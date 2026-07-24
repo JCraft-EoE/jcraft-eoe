@@ -221,12 +221,13 @@ public interface Attacks {
      */
     static void baseDamageLogic(LivingEntity victim, Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun,
                                 float damage, boolean lift, int blockstun, DamageSource source, @Nullable Entity attacker,
-                                HitAnimation hitAnimation, @Nullable MoveUsage moveUsage, boolean canBackstab, boolean unblockable,
-                                boolean cancelAttack) {
+                                HitAnimation hitAnimation, @Nullable MoveUsage moveUsage,
+                                boolean canBackstab, boolean unblockable, boolean cancelAttack) {
         if (victim instanceof ICustomDamageHandler customDamageHandler) {
             if (!customDamageHandler.handleDamage(
                     kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun,
-                    source, attacker, hitAnimation, moveUsage, canBackstab, unblockable)
+                    source, attacker, hitAnimation, moveUsage,
+                    canBackstab, unblockable, cancelAttack)
             ) {
                 return;
             }

@@ -173,8 +173,8 @@ public class TrainingDummyEntity extends Mob implements ICustomDamageHandler {
     @Override
     public boolean handleDamage(Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage,
                                 boolean lift, int blockstun, DamageSource source, Entity attacker,
-                                HitAnimation hitAnimation,
-                                MoveUsage moveUsage, boolean canBackstab, boolean unblockable) {
+                                HitAnimation hitAnimation, MoveUsage moveUsage,
+                                boolean canBackstab, boolean unblockable, boolean cancelAttacks) {
         if (level().isClientSide() || isRemoved()) {
             return false;
         }

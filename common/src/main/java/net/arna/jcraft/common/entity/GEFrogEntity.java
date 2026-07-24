@@ -78,12 +78,12 @@ public class GEFrogEntity extends Frog implements IOwnable, ICustomDamageHandler
     @Override
     public boolean handleDamage(Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage,
                                 boolean lift, int blockstun, DamageSource source, Entity attacker, CommonHitPropertyComponent.HitAnimation hitAnimation,
-                                MoveUsage moveUsage, boolean canBackstab, boolean unblockable) {
+                                MoveUsage moveUsage, boolean canBackstab, boolean unblockable, boolean cancelAttacks) {
         if (attacker instanceof LivingEntity living) {
             damageLogic(
                     attacker.level(),
                     living,
-                    new AttackData(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, moveUsage, canBackstab, unblockable)
+                    new AttackData(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun, source, attacker, hitAnimation, moveUsage, canBackstab, unblockable, cancelAttacks)
             );
         }
         return false;
