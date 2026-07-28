@@ -37,6 +37,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.*;
@@ -185,6 +186,7 @@ public class ItemTossProjectile extends AbstractArrow {
         if (level().isClientSide()) {
             return;
         }
+
         // this part has been heavily inspired by AbstractArrow
         Entity entity = result.getEntity();
         Entity entity2 = JUtils.getUserIfStand(this.getOwner());
@@ -285,14 +287,24 @@ public class ItemTossProjectile extends AbstractArrow {
         // force feed
         if (entity instanceof LivingEntity livingEntity && getItem().isEdible()) {
             if (!JComponentPlatformUtils.getVampirism(livingEntity).isVampire()) {
-                livingEntity.eat(level(), getItem());
-                if (getItem().getItem() instanceof BowlFoodItem) {
-                    setItem(Items.BOWL.getDefaultInstance());
-                    dropItem(result.getLocation()); // FIXME doesn't work?
+                boolean canEat = true;
+
+                if (livingEntity instanceof Player player)
+                    canEat = player.getFoodData().needsFood();
+
+                if (canEat) {
+                    livingEntity.eat(level(), getItem());
+
+                    if (getItem().getItem() instanceof BowlFoodItem) {
+                        setItem(Items.BOWL.getDefaultInstance());
+                        dropItem(result.getLocation()); // FIXME doesn't work?
+                    }
+
+                    effectActivated = true;
                 }
-                effectActivated = true;
             }
         }
+
         // force drink potions
         if (entity instanceof LivingEntity living && getItem().getItem() instanceof PotionItem) {
             for (MobEffectInstance mobEffectInstance : PotionUtils.getMobEffects(getItem())) {

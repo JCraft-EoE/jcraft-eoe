@@ -320,7 +320,14 @@ public interface Attacks {
             comboTracker.jcraft$increaseHitCount();
 
             boolean allowFurtherStun = true;
-            if (livingAttacker != null && moveUsage != null) allowFurtherStun = !comboTracker.jcraft$addMoveToCombo(livingAttacker, moveUsage);
+
+            // check for IPS
+            if (livingAttacker != null && moveUsage != null)
+                allowFurtherStun = !comboTracker.jcraft$addMoveToCombo(livingAttacker, moveUsage);
+
+            // timestop overrides IPS
+            if (tsHit)
+                allowFurtherStun = true;
 
             MobEffectInstance stun = victim.getEffect(JStatusRegistry.DAZED.get());
             if (stun != null) {
