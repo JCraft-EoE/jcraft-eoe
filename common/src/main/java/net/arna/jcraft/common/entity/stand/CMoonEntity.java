@@ -121,7 +121,7 @@ public class CMoonEntity extends StandEntity<CMoonEntity, CMoonEntity.State> {
             );
 
     public static final CDivekickAttack DIVEKICK = new CDivekickAttack(100,
-            9, 18, 7.0f, 6f, 20, 1.45f, 0.3f, 0.3f)
+            9, 18, 7.0f, 8f, 20, 2.0f, 0.3f, 0.3f)
             .withSound(JSoundRegistry.CMOON_BLOCKHALT)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withAction(CMoonInversionAction.addInversion(40, 0.5f, false))

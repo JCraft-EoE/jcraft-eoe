@@ -83,7 +83,7 @@
                   "text": "Feeding Blood Suck (Finisher)"
                 }
               },
-              "hitbox_size": 1.75,
+              "hitbox_size": 2.0,
               "knockback": 1.5,
               "move_distance": 1.0,
               "offset": 0.0,
@@ -101,7 +101,7 @@
           16,
           24
         ],
-        "hitbox_size": 1.75,
+        "hitbox_size": 2.0,
         "knockback": 0.6,
         "move_distance": 0.8,
         "offset": -0.1,
@@ -174,7 +174,7 @@
         16,
         24
       ],
-      "hitbox_size": 1.75,
+      "hitbox_size": 2.0,
       "knockback": 0.6,
       "move_distance": 0.8,
       "offset": -0.1,

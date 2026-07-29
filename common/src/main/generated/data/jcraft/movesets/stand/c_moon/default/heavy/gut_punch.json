@@ -9,13 +9,13 @@
     "move": {
       "type": "jcraft:cmoon_divekick_attack",
       "attack_extras": {
-        "block_stun": 10,
+        "block_stun": 12,
         "hit_animation": "CRUSH",
         "hit_spark": "HIT_SPARK_2",
         "static_height": true
       },
       "cooldown": 100,
-      "damage": 6.0,
+      "damage": 8.0,
       "duration": 18,
       "extras": {
         "actions": [
@@ -46,7 +46,7 @@
         },
         "ranged": true
       },
-      "hitbox_size": 1.45,
+      "hitbox_size": 2.0,
       "knockback": 0.3,
       "move_distance": 7.0,
       "offset": 0.3,

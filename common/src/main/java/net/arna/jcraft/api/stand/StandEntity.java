@@ -171,6 +171,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         standType = type;
         noCulling = true;
 
+        setStandGauge(getMaxStandGauge() * 0.6f);
+
         assert getThis() == this;
     }
 
@@ -664,7 +666,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         entityData.define(ALPHA_OVERRIDE, -1f);
 
-        entityData.define(STANDGAUGE, 45f);
+        entityData.define(STANDGAUGE, 0.0f); // called in the Entity() constructor so maxStandGauge is uninitialized
 
         entityData.define(FREE, false);
         entityData.define(REMOTE, false);

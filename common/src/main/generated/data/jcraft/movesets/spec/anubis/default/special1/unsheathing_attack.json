@@ -12,7 +12,8 @@
         "backstab": true,
         "block_stun": 7,
         "hit_animation": "MID",
-        "hit_spark": "HIT_SPARK_1"
+        "hit_spark": "HIT_SPARK_1",
+        "ipsId": 8
       },
       "cooldown": 5,
       "damage": 3.0,
@@ -52,7 +53,8 @@
       "backstab": true,
       "block_stun": 9,
       "hit_animation": "MID",
-      "hit_spark": "SWEEP_ATTACK"
+      "hit_spark": "SWEEP_ATTACK",
+      "ipsId": 9
     },
     "cooldown": 5,
     "damage": 5.0,

@@ -59,18 +59,15 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
     }
 
     @Override
-    public void jcraft$increaseHitCount() {
+    public void jcraft$increaseHitCount(boolean tsHit) {
         hitCount++;
         var minimum = JServerConfig.DAMAGE_SCALING_MINIMUM.getValue();
         var penalty = JServerConfig.SCALING_PENALTY_PER_HIT.getValue();
 
-        /*
-        final var tsData = JComponentPlatformUtils.getTimeStopData((LivingEntity)(Object)this);
-        if (tsData.isPresent() && tsData.get().getTicks() > 0) {
+        if (tsHit) {
             minimum /= 2.0f;
             penalty *= 2.0f;
         }
-        */
 
         damageScaling = Math.max(
                 minimum,

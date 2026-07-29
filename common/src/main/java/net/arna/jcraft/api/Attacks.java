@@ -317,7 +317,7 @@ public interface Attacks {
         if (attacker instanceof LivingEntity l) livingAttacker = l;
 
         if (hit) {
-            comboTracker.jcraft$increaseHitCount();
+            comboTracker.jcraft$increaseHitCount(tsHit);
 
             boolean allowFurtherStun = true;
 
