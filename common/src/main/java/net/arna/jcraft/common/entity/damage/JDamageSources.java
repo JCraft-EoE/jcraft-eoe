@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Contract;
 
@@ -18,6 +19,7 @@ public class JDamageSources {
         return ResourceKey.create(Registries.DAMAGE_TYPE, JCraft.id(name));
     }
 
+    public static final ResourceKey<DamageType> SPEC = createDamageType("spec");
     public static final ResourceKey<DamageType> STAND = createDamageType("stand");
     public static final ResourceKey<DamageType> WHITE_SNAKE_POISON = createDamageType("wspoison");
     public static final ResourceKey<DamageType> BLEEDING = createDamageType("jbleeding");
@@ -33,6 +35,10 @@ public class JDamageSources {
 
     public static DamageSource create(final Level world, final ResourceKey<DamageType> key) {
         return new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key));
+    }
+
+    public static @NonNull DamageSource spec(final LivingEntity attacker) {
+        return create(attacker.level(), SPEC, attacker);
     }
 
     public static @NonNull DamageSource stand(final StandEntity<?, ?> stand) {
