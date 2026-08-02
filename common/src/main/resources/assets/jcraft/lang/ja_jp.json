@@ -282,7 +282,7 @@
   "entity.jcraft.metallica.info.con2": "メーター管理が必要",
   "entity.jcraft.metallica.info.con3": "平凡な接近戦",
   "entity.jcraft.metallica.info.desc": "戦略特化の遠距離キャラ",
-  "entity.jcraft.metallica.info.freeSpace": "最大80個の鉄分を含有。\n攻撃に使用するアイテムの作成には鉄分が必要。",
+  "entity.jcraft.metallica.info.freeSpace": "最大80個の鉄分を含有。\n攻撃に使用するアイテムの生成には鉄分が必要。",
   "entity.jcraft.metallica.info.pro1": "予測不能な攻め",
   "entity.jcraft.metallica.info.pro2": "強力な遠距離性能",
   "entity.jcraft.metallica.info.pro3": "透明化",
