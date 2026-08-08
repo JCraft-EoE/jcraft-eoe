@@ -30,7 +30,7 @@ public class FrameDataRequests {
         public final long initialTick;
         public Queue<Tick> ticks = new LinkedList<>();
         public int finalAdvantage;
-        public AbstractMove<?, ? super IAttacker<?, ?>> lastMove = null;
+        public AbstractMove<?, ? super IAttacker<?, ?>> lastMove = null, lastValidMove = null;
         @Getter
         private final FrameDataType type;
 
@@ -80,34 +80,37 @@ public class FrameDataRequests {
                 }
             }
 
-            // todo: find out why Anubis + Silver Chariot's God of Death only registers every second move here
+            // Once set, lastValidMove is never cleared during a sequence
+            if (move != null) {
+                frameData.lastValidMove = move;
+            }
+
+            // Stand desummoned mid-sequence (e.g. STW after move completes)
             if (attacker == null) {
-                if (frameData.lastMove != null) {
-                    sendFrameData(player, frameData.lastMove, frameData.ticks);
-                    iter.remove();
+                if (frameData.lastValidMove != null) {
+                    sendFrameData(player, frameData.lastValidMove, frameData.ticks);
                 }
+                iter.remove();
                 return;
             }
+
             if (move != null) wasActive = move.shouldPerform(attacker, attacker.getMoveStun());
-            if (frameData.lastMove != null || move != null) frameData.ticks.add(new Tick(wasActive));
+
+            // Only accumulate ticks once a move has been seen
+            if (frameData.lastValidMove != null) frameData.ticks.add(new Tick(wasActive));
 
             final int moveStun = attacker.getMoveStun();
-            if (moveStun > 0) { // If acting
-                if (frameData.lastMove != move) {
-                    if (move != null) {
-                        player.displayClientMessage(
-                                Component.literal("New move in sequence: " + move.getName().getString()), false
-                        );
-                    }
-                } else if (move == null) {
-                    if (frameData.lastMove != null) {
-                        // Move finished but moveStun lingers, keep accumulating inactive ticks
-                        frameData.ticks.add(new Tick(false));
-                    }
-                    //iter.remove();
+            if (moveStun > 0) {
+                // New move started in a combo sequence
+                if (move != null && frameData.lastMove != move) {
+                    player.displayClientMessage(
+                            Component.literal("New move in sequence: " + move.getName().getString()), false
+                    );
                 }
-            } else if (frameData.lastMove != null) {
-                sendFrameData(player, frameData.lastMove, frameData.ticks);
+                // If move is null but stun > 0: detach/charge case, just keep accumulating via the tick add above
+            } else if (frameData.lastValidMove != null) {
+                // Stun expired and we have a sequence to report
+                sendFrameData(player, frameData.lastValidMove, frameData.ticks);
                 iter.remove();
             }
 

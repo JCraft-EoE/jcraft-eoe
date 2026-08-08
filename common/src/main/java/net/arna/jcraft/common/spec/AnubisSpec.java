@@ -60,7 +60,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
                     Component.literal("Aerial Cleave"),
                     Component.literal("Interruptible, faster recovery.")
             );
-    public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(20, 9, 20, 1f, 6f,
+    public static final SimpleAttack<AnubisSpec> SLASH = new SimpleAttack<AnubisSpec>(20, 9, 20, 1f, 5f,
             15, 1.75f, 0.9f, 0f)
             .withIpsId(2)
             .withAerialVariant(AERIAL_CLEAVE)
@@ -74,7 +74,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
                     Component.literal("Uninterruptible get-off-me tool. Great stun.")
             );
     public static final SimpleAttack<AnubisSpec> POMMEL = new SimpleAttack<AnubisSpec>(20, 5, 8,
-            1f, 4f, 7, 1.25f, 0.2f, 0f)
+            1f, 3f, 7, 1.25f, 0.2f, 0f)
             .withIpsId(3)
             .withSound(JSoundRegistry.ANUBIS_POMMEL)
             .withImpactSound(JSoundRegistry.IMPACT_3)
@@ -93,7 +93,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
                     Component.literal("Two-strike attack")
             );
     public static final KnockdownMultiHitAttack<AnubisSpec> REKKA_FINISHER = new KnockdownMultiHitAttack<AnubisSpec>(
-            0, 40, 1f, 7f, 15, 2f, 0.9f, 0f,
+            0, 40, 1f, 6f, 15, 2f, 0.9f, 0f,
             IntSet.of(32), 35)
             .withIpsId(5)
             .withHitSpark(JParticleType.SWEEP_ATTACK);
@@ -109,7 +109,7 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
                     Component.literal("Last hit knocks down if on 0 Bloodlust.")
             );
     public static final SimpleUppercutAttack<AnubisSpec> LOW_KICK = new SimpleUppercutAttack<AnubisSpec>(10, 10, 17,
-            1.5f, 6f, 15, 1.33f, 0.3f, 0f, 0.3f)
+            1.5f, 4f, 15, 1.33f, 0.3f, 0f, 0.3f)
             .withIpsId(7)
             .withImpactSound(JSoundRegistry.IMPACT_3)
             .withStaticY()
