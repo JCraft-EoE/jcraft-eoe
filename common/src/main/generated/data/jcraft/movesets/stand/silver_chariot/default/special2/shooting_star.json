@@ -5,12 +5,12 @@
   "move": {
     "type": "jcraft:silverchariot_sc_charge_attack",
     "attack_extras": {
-      "block_stun": 9,
+      "block_stun": 10,
       "hit_animation": "MID",
       "hit_spark": "HIT_SPARK_1"
     },
     "cooldown": 280,
-    "damage": 5.0,
+    "damage": 6.0,
     "duration": 19,
     "extras": {
       "actions": [
@@ -32,7 +32,7 @@
     "knockback": 0.25,
     "move_distance": 8.0,
     "offset": 0.0,
-    "stun": 17,
+    "stun": 18,
     "windup": 5
   }
 }

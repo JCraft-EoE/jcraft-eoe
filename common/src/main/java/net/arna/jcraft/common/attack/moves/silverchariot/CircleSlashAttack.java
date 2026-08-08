@@ -37,8 +37,7 @@ public final class CircleSlashAttack<A extends IAttacker<? extends A, ?>> extend
     public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Set<LivingEntity> targets = super.perform(attacker, user);
 
-        //noinspection IntegerDivisionInFloatingPointContext // intended
-        withDamage(originalDamage + (getChargeTime() / 10) * 0.75f);
+        withDamage(originalDamage + (getChargeTime() / 10.0f) * 0.75f);
         double launchMultiplier = getDamage() / 5; // damage [6.5 to 11]
 
         for (LivingEntity living : targets) {

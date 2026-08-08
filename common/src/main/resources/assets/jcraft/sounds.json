@@ -885,6 +885,11 @@
       "jcraft:stands/silverchariot/poke"
     ]
   },
+  "scthrust": {
+    "sounds": [
+      "jcraft:stands/silverchariot/thrust"
+    ]
+  },
   "hgsummon": {
     "sounds": [
       "jcraft:stands/hierophantgreen/summon"

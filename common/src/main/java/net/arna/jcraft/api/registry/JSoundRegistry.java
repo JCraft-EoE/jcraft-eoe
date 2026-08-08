@@ -156,6 +156,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> SC_CLEAVE = register("sccleave");
     RegistrySupplier<SoundEvent> SC_ARMOROFF = register("scarmoroff");
     RegistrySupplier<SoundEvent> SC_POKE = register("scpoke");
+    RegistrySupplier<SoundEvent> SC_THRUST = register("scthrust");
 
     //Golden Experience
     RegistrySupplier<SoundEvent> GE_SUMMON = register("gesummon");
