@@ -195,6 +195,10 @@ public class Peacemaker extends Item {
 
     // method to handle left-click firing via PlayerInputPacket
     public static boolean handleLeftClick(Player player) {
+        return handleLeftClick(player, null);
+    }
+
+    public static boolean handleLeftClick(Player player, @Nullable Vec3 muzzle) {
         // Guns are main hand only, so the offhand is left to whatever else wants the input.
         final ItemStack peacemakerStack = player.getMainHandItem();
         if (!(peacemakerStack.getItem() instanceof Peacemaker)) {
@@ -251,7 +255,7 @@ public class Peacemaker extends Item {
                 FIRE.sendForItem(player, peacemakerStack);
 
                 world.playSound(null, player.getX(), player.getY(), player.getZ(), JSoundRegistry.PEACEMAKER_FIRE.get(), SoundSource.PLAYERS, 1f, 1f);
-                shoot(peacemakerStack, world, player);
+                shoot(peacemakerStack, world, player, muzzle);
             } else {
                 data.putBoolean(COCKED_ID, true);
                 // Only long enough to keep one click from reading as two. The hammer can be dropped
@@ -302,6 +306,10 @@ public class Peacemaker extends Item {
      * with the fire animation rather than with the trigger input; the stage owns the sound.
      */
     public static void shoot(ItemStack itemStack, Level world, LivingEntity user) {
+        shoot(itemStack, world, user, null);
+    }
+
+    public static void shoot(ItemStack itemStack, Level world, LivingEntity user, @Nullable Vec3 muzzle) {
         CompoundTag data = itemStack.getOrCreateTag();
         int shots = data.getInt(SHOTS_ID);
 
@@ -319,10 +327,19 @@ public class Peacemaker extends Item {
         final boolean offhand = user.getOffhandItem() == itemStack;
         final boolean rightArm = user.getMainArm() == HumanoidArm.RIGHT;
         final double side = rightArm != offhand ? 0.35 : -0.35;
-        final Vec3 armPosition = user.getEyePosition().add(forward.scale(0.25))
-                .add(forward.cross(new Vec3(0, 1, 0)).scale(side))
-                .add(0, -0.35, 0);
-        bullet.setPos(armPosition);
+        final Vec3 eye = user.getEyePosition();
+        Vec3 spawn;
+        if (muzzle != null && muzzle.distanceToSqr(eye) < 6.25) {
+            spawn = muzzle;
+        } else {
+            spawn = eye.add(forward.scale(0.25))
+                    .add(forward.cross(new Vec3(0, 1, 0)).scale(side))
+                    .add(0, -0.35, 0);
+        }
+        bullet.setPos(spawn);
+        bullet.xo = spawn.x;
+        bullet.yo = spawn.y;
+        bullet.zo = spawn.z;
 
         world.addFreshEntity(bullet);
 

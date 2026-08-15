@@ -19,6 +19,7 @@ import net.arna.jcraft.api.pose.PoseModifiers;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.client.aim.GunAimHandler;
 import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.net.ClientPacketHandler;
@@ -106,6 +107,7 @@ public class JCraftClient {
 
         BlockBreakerClient.init();
         BoundSoundClient.init();
+        GunAimHandler.init();
 
         // Rendering
         JRenderLayerRegistry.init();

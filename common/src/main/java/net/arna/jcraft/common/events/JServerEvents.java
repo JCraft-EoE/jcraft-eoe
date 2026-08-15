@@ -28,6 +28,7 @@ import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
 import net.arna.jcraft.common.spec.VampireSpec;
+import net.arna.jcraft.common.system.GunAiming;
 import net.arna.jcraft.common.tickable.*;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin_logic.EntityAddon;
@@ -748,6 +749,8 @@ public class JServerEvents {
     }
 
     public static void playerRespawn(final ServerPlayer serverPlayer, boolean conqueredEnd) {
+        GunAiming.set(serverPlayer, false);
+
         final var vamp = JComponentPlatformUtils.getVampirism(serverPlayer);
 
         if (vamp == null) return;

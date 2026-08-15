@@ -37,6 +37,7 @@ public interface JPacketRegistry {
     ResourceLocation C2S_REMOTE_STAND_INTERACT = JCraft.id("rmt_stnd_act");
     ResourceLocation C2S_PREDICTION_TRIGGER = JCraft.id("prdct_trig");
     ResourceLocation C2S_MENU_CALL = JCraft.id("menu");
+    ResourceLocation C2S_GUN_AIM = JCraft.id("gun_aim");
 
     ResourceLocation S2C_SYNC = JCraft.id("s2c_sync");
     ResourceLocation C2S_SYNC = JCraft.id("c2s_sync");
