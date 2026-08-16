@@ -6,25 +6,24 @@ import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.vehicle.AbstractGroundVehicleEntity;
 import net.arna.jcraft.common.events.JServerPlayerInputEvent;
 import net.arna.jcraft.common.item.Peacemaker;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -46,14 +45,9 @@ public class PlayerInputPacket {
     }
 
     public static FriendlyByteBuf write(Object2BooleanMap<MovementInputType> movementInput, Object2BooleanMap<MoveInputType> moveInput) {
-        return write(movementInput, moveInput, null);
-    }
-
-    public static FriendlyByteBuf write(Object2BooleanMap<MovementInputType> movementInput, Object2BooleanMap<MoveInputType> moveInput, @Nullable Vec3 muzzle) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         writeInput(buf, movementInput);
         writeInput(buf, moveInput);
-        writeMuzzle(buf, muzzle);
         return buf;
     }
 
@@ -67,26 +61,6 @@ public class PlayerInputPacket {
             buf.writeEnum(entry.getKey());
             buf.writeBoolean(entry.getBooleanValue());
         }
-    }
-
-    private static void writeMuzzle(FriendlyByteBuf buf, @Nullable Vec3 muzzle) {
-        buf.writeBoolean(muzzle != null);
-        if (muzzle != null) {
-            buf.writeDouble(muzzle.x);
-            buf.writeDouble(muzzle.y);
-            buf.writeDouble(muzzle.z);
-        }
-    }
-
-    @Nullable
-    private static Vec3 readMuzzle(FriendlyByteBuf buf) {
-        if (!buf.isReadable()) {
-            return null;
-        }
-        if (!buf.readBoolean()) {
-            return null;
-        }
-        return new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
     }
 
     public static void handle(FriendlyByteBuf buf, NetworkManager.PacketContext context) {
@@ -182,13 +156,12 @@ public class PlayerInputPacket {
             }
         }
 
-        Vec3 muzzle = readMuzzle(buf);
         for (int i = 0; i < count; i++) {
             MoveInputType type = types[i];
             boolean pressed = pressedStates[i];
 
             if (pressed) {
-                handleMoveInput(server, player, type, muzzle).thenAccept(b -> {
+                handleMoveInput(server, player, type).thenAccept(b -> {
                     successMap.computeIfAbsent(player, p -> new Object2BooleanOpenHashMap<>()).put(type, b.booleanValue());
 
                     server.execute(() -> {
@@ -235,7 +208,7 @@ public class PlayerInputPacket {
      * @param player that sent the input
      * @return
      */
-    private static CompletableFuture<Boolean> handleMoveInput(MinecraftServer server, ServerPlayer player, MoveInputType type, @Nullable Vec3 muzzle) {
+    private static CompletableFuture<Boolean> handleMoveInput(MinecraftServer server, ServerPlayer player, MoveInputType type) {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         ServerLevel world = (ServerLevel) player.level();
         server.execute(() -> {
@@ -264,7 +237,7 @@ public class PlayerInputPacket {
                 }
                 case LIGHT -> {
                     // First check if player is holding a Peacemaker
-                    boolean peacemakerHandled = Peacemaker.handleLeftClick(player, muzzle);
+                    boolean peacemakerHandled = Peacemaker.handleLeftClick(player, null);
                     if (peacemakerHandled) {
                         future.complete(true);
                         return;
@@ -303,10 +276,6 @@ public class PlayerInputPacket {
         });
 
         return future;
-    }
-
-    private static CompletableFuture<Boolean> handleMoveInput(MinecraftServer server, ServerPlayer player, MoveInputType type) {
-        return handleMoveInput(server, player, type, null);
     }
 
     private static boolean initStandOrSpecMove(ServerPlayer player, MoveInputType type) {

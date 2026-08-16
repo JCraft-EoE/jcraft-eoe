@@ -253,7 +253,7 @@ public class JClientEvents {
             final Object2BooleanMap<MoveInputType> moveInput = getChangedInputs(getBindings());
 
             if (!movementInput.isEmpty() || !moveInput.isEmpty()) {
-                NetworkManager.sendToServer(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket.write(movementInput, moveInput, getMainHandMuzzle(client, moveInput)));
+                NetworkManager.sendToServer(JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket.write(movementInput, moveInput));
             }
 
             final Object2BooleanMap<MoveInputType> heldMoves = new Object2BooleanOpenHashMap<>();

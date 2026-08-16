@@ -8,6 +8,7 @@ import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.entity.projectile.BulletProjectile;
+import net.arna.jcraft.common.system.GunAiming;
 import net.arna.jcraft.common.tickable.PeacemakerReload;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -321,12 +322,19 @@ public class Peacemaker extends Item {
             data.putInt(SHOTS_ID, shots - 1);
         }
 
+        final boolean aiming = GunAiming.isAiming(user);
+        var inaccuracy = 0.1f;
+        if (aiming) inaccuracy *= GunAiming.SPREAD_MULTIPLIER;
+
         BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 7f);
-        bullet.shootFromRotation(user, user.getXRot(), user.getYRot(), 0f, 10, 0f);
+        bullet.shootFromRotation(user, user.getXRot(), user.getYRot(), 0f, 10, inaccuracy);
+
         final Vec3 forward = Vec3.directionFromRotation(0f, user.getYRot());
         final boolean offhand = user.getOffhandItem() == itemStack;
         final boolean rightArm = user.getMainArm() == HumanoidArm.RIGHT;
-        final double side = rightArm != offhand ? 0.35 : -0.35;
+        double side = rightArm != offhand ? 0.35 : -0.35;
+        if (aiming) side = 0.0;
+
         final Vec3 eye = user.getEyePosition();
         Vec3 spawn;
         if (muzzle != null && muzzle.distanceToSqr(eye) < 6.25) {
