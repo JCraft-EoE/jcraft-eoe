@@ -23,7 +23,7 @@ public class ItemInHandRendererMixin {
     @Unique
     private static final float JCRAFT$GUN_RAISE_SPEED = 0.4f;
     @Unique
-    private static final float JCRAFT$AIM_RAISE = 0.15f;
+    private static final float JCRAFT$AIM_RAISE = 0.3f;
 
     @Shadow
     private float mainHandHeight;
