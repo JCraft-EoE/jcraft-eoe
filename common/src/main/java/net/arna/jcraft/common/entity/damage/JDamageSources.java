@@ -24,6 +24,7 @@ public class JDamageSources {
     public static final ResourceKey<DamageType> WHITE_SNAKE_POISON = createDamageType("wspoison");
     public static final ResourceKey<DamageType> BLEEDING = createDamageType("jbleeding");
     public static final ResourceKey<DamageType> PHPOISON = createDamageType("phpoison");
+    public static final ResourceKey<DamageType> AP_BULLET = createDamageType("armor_piercing_bullet");
 
     public static DamageSource create(final Level world, final ResourceKey<DamageType> key, final @Nullable Entity source, final @Nullable Entity attacker) {
         return new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key), source, attacker);
@@ -56,6 +57,10 @@ public class JDamageSources {
 
     public static @NonNull DamageSource phpoison(Level world) {
         return create(world, PHPOISON);
+    }
+
+    public static @NonNull DamageSource apBullet(Level world, Entity attacker) {
+        return create(world, AP_BULLET, attacker);
     }
 
     public static @NonNull DamageSource phpoison(Level world, Entity attacker) {

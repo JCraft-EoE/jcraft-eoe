@@ -8,6 +8,7 @@ import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.spec.RangerSpec;
 import net.arna.jcraft.common.util.JUtils;
@@ -182,7 +183,7 @@ public class BulletProjectile extends AbstractArrow {
             if (!level().isClientSide()) {
                 final Entity owner = getOwner();
                 final LivingEntity target = JUtils.getUserIfStand(living);
-                final DamageSource thrown = level().damageSources().thrown(this, owner);
+                final DamageSource thrown = JDamageSources.apBullet(level(), owner);
 
                 final var impactScale = target.onGround() ? 0.2 : 0.1;
 
