@@ -323,7 +323,7 @@ public class Peacemaker extends Item {
         }
 
         final boolean aiming = GunAiming.isAiming(user);
-        var inaccuracy = 0.1f;
+        var inaccuracy = 2.5f;
         if (aiming) inaccuracy *= GunAiming.SPREAD_MULTIPLIER;
 
         BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 7f);
