@@ -35,7 +35,8 @@ public class MainMenuScreen extends Screen {
             final int skin = standData.getSkin();
             stand.setSkin(skin);
             stand.setVirtual(true);
-            // stand.setRawState(stand.getIdleState().ordinal()); // TODO doesn't work either
+            stand.tickCount = stand.getStandData().getSummonData().getAnimDuration() + 1;
+            stand.setRawState(stand.getIdleState().ordinal());
         }
     }
 
