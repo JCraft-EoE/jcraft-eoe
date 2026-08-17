@@ -4,9 +4,12 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -15,6 +18,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
 @Environment(EnvType.CLIENT)
@@ -23,8 +28,17 @@ public class MainMenuScreen extends Screen {
     protected StandEntity<?,?> stand;
 
     public MainMenuScreen() {
-        super(Component.literal("hey"));
-        stand = JUtils.getStand(Minecraft.getInstance().player);
+        super(Component.literal("hey")); // TODO change this
+        final LocalPlayer player = Minecraft.getInstance().player;
+        final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(player);
+        final StandType type = standData.getType();
+        if (!StandTypeUtil.isNone(type)) {
+            stand = type.createEntity(player.level());
+            final int skin = standData.getSkin();
+            stand.setSkin(skin);
+            // stand.setAlphaOverride(1f); // TODO doesn't work
+            // stand.setRawState(stand.getIdleState().ordinal()); // TODO doesn't work either
+        }
     }
 
     // add components in this method
@@ -39,7 +53,7 @@ public class MainMenuScreen extends Screen {
     @Override
     public void render(final @NonNull GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
         renderBackground(guiGraphics);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        super.render(guiGraphics, mouseX, mouseY, partialTick); // takes care of the scroll widget and such
         // TODO make the strings translatables
         guiGraphics.drawString(font, "normals", 10, height/7 + 10, 0xFFFFFF);
         guiGraphics.drawString(font, "specials", width/4 + 10, height/7 + 10, 0xFFFFFF);
@@ -67,6 +81,9 @@ public class MainMenuScreen extends Screen {
         }
         for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.ULTIMATE)) {
             drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 5*height/7 + 10, 0xFFFFFF);
+        }
+        if (stand != null) {
+            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, 7*width/8, 8*height/14 + 10, 45, 7f*width/8 - mouseX, 8f*height/14 + 10 - mouseY, stand);
         }
     }
 
