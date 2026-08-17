@@ -48,6 +48,14 @@ public class MainMenuScreen extends Screen {
         addRenderableWidget(bnbList);
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+        if (stand != null) {
+            stand.tick();
+        }
+    }
+
     // draw text in this method
     @Override
     public void render(final @NonNull GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
