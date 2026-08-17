@@ -34,7 +34,7 @@ public class MainMenuScreen extends Screen {
             stand = type.createEntity(player.level());
             final int skin = standData.getSkin();
             stand.setSkin(skin);
-            // stand.setAlphaOverride(1f); // TODO doesn't work
+            stand.setVirtual(true);
             // stand.setRawState(stand.getIdleState().ordinal()); // TODO doesn't work either
         }
     }

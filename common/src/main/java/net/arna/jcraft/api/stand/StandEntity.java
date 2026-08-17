@@ -112,6 +112,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     protected int tsTime = 0;
     @Getter
     private float prevAlpha = 1f;
+    @Getter
+    @Setter
+    private boolean virtual = false; // for display in menus and such
 
     @Getter
     @Setter

@@ -16,6 +16,7 @@ import net.arna.jcraft.common.util.JUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -134,7 +135,7 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
             final var animatable = pc.animatable();
             final var partialTick = pc.partialTick();
 
-            if (animatable.tickCount == 0) {
+            if (animatable.tickCount == 0 && !animatable.isVirtual()) {
                 pc.setAlpha(0.2f * partialTick);
                 pc.poseStack().scale(partialTick, 1, partialTick);
                 return pc;
@@ -199,7 +200,8 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
 
     public static boolean shouldApplyAlpha(final StandEntity<?, ?> stand) {
         final Minecraft mcClient = Minecraft.getInstance();
-        return mcClient.player != null && mcClient.options.getCameraType().isFirstPerson() && JUtils.getStand(mcClient.player) == stand;
+        final LocalPlayer player = mcClient.player;
+        return player != null && !stand.isVirtual() && mcClient.options.getCameraType().isFirstPerson() && JUtils.getStand(player) == stand;
     }
 
     public static float getAlpha(final StandEntity<?, ?> stand, final float tickDelta) {
