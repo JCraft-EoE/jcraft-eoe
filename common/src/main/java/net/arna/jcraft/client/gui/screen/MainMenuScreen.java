@@ -13,6 +13,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -29,6 +30,9 @@ public class MainMenuScreen extends Screen {
     // add components in this method
     @Override
     protected void init() {
+        final BnbList bnbList = new BnbList(Minecraft.getInstance(), width / 4, height / 2, height / 2, height, 9*2);
+        bnbList.setLeftPos(width/2);
+        addRenderableWidget(bnbList);
     }
 
     // draw text in this method
@@ -120,4 +124,57 @@ public class MainMenuScreen extends Screen {
 //    protected void drawText(final GuiGraphics guiGraphics, final Component text, final int row, final int col, final int color) {
 //        guiGraphics.drawString(this.font, text, this.titleLabelX+10*col, this.titleLabelY+10*row, color, false);
 //    }
+
+    @Environment(EnvType.CLIENT)
+    class BnbList extends ObjectSelectionList<BnbList.BnbListEntry> {
+
+        public BnbList(final Minecraft minecraft, final int width, final int height, final int y0, final int y1, final int itemHeight) {
+            super(minecraft, width, height, y0, y1, itemHeight);
+            setRenderBackground(false);
+            setRenderTopAndBottom(false);
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+            addEntry(new BnbListEntry());
+        }
+
+        @Override
+        public int getRowWidth() {
+            return MainMenuScreen.this.width/4;
+        }
+
+        @Override
+        protected int getScrollbarPosition() {
+            return 3*MainMenuScreen.this.width/4 - 6; // -6 to ensure it completely stays in the 3rd quarter
+        }
+
+        @Environment(EnvType.CLIENT)
+        class BnbListEntry extends ObjectSelectionList.Entry<BnbListEntry> {
+
+            @NonNull
+            @Override
+            public Component getNarration() {
+                return Component.empty();
+            }
+
+            @Override
+            public void render(final GuiGraphics guiGraphics, final int index, final int top, final int left, final int width, final int height, final int mouseX, final int mouseY, final boolean hovering, final float partialTick) {
+                guiGraphics.drawString(font, Component.literal("this is a test " + index + ", baka!"), left+2, top+1, 16777215);
+            }
+        }
+
+    }
 }
