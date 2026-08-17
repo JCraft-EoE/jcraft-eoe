@@ -2,10 +2,8 @@ package net.arna.jcraft.client.gui.screen;
 
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -54,35 +52,35 @@ public class MainMenuScreen extends Screen {
     public void render(final @NonNull GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
         renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, partialTick); // takes care of the scroll widget and such
-        // TODO make the strings translatables
-        guiGraphics.drawString(font, "normals", 10, height/7 + 10, 0xFFFFFF);
-        guiGraphics.drawString(font, "specials", width/4 + 10, height/7 + 10, 0xFFFFFF);
-        final MoveMap<?,?> moveMap = MoveSetManager.get(JStandTypeRegistry.STAR_PLATINUM.get()).get("default").getMoveMap();
-        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.LIGHT)) {
-            drawMoveString(guiGraphics, font, entry, false, 10, 2*height/7 + 10, 0xFFFFFF);
-        }
-        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.HEAVY)) {
-            drawMoveString(guiGraphics, font, entry, false, 10, 3*height/7 + 10, 0xFFFFFF);
-        }
-        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.BARRAGE)) {
-            drawMoveString(guiGraphics, font, entry, false, 10, 4*height/7 + 10, 0xFFFFFF);
-        }
-        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.UTILITY)) {
-            drawMoveString(guiGraphics, font, entry, false, 10, 5*height/7 + 10, 0xFFFFFF);
-        }
-        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL1)) {
-            drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 2*height/7 + 10, 0xFFFFFF);
-        }
-        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL2)) {
-            drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 3*height/7 + 10, 0xFFFFFF);
-        }
-        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL3)) {
-            drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 4*height/7 + 10, 0xFFFFFF);
-        }
-        for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.ULTIMATE)) {
-            drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 5*height/7 + 10, 0xFFFFFF);
-        }
         if (stand != null) {
+            // TODO make the strings translatables
+            guiGraphics.drawString(font, "normals", 10, height/7 + 10, 0xFFFFFF);
+            guiGraphics.drawString(font, "specials", width/4 + 10, height/7 + 10, 0xFFFFFF);
+            final MoveMap<?,?> moveMap = stand.getMoveMap();
+            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.LIGHT)) {
+                drawMoveString(guiGraphics, font, entry, false, 10, 2*height/7 + 10, 0xFFFFFF);
+            }
+            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.HEAVY)) {
+                drawMoveString(guiGraphics, font, entry, false, 10, 3*height/7 + 10, 0xFFFFFF);
+            }
+            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.BARRAGE)) {
+                drawMoveString(guiGraphics, font, entry, false, 10, 4*height/7 + 10, 0xFFFFFF);
+            }
+            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.UTILITY)) {
+                drawMoveString(guiGraphics, font, entry, false, 10, 5*height/7 + 10, 0xFFFFFF);
+            }
+            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL1)) {
+                drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 2*height/7 + 10, 0xFFFFFF);
+            }
+            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL2)) {
+                drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 3*height/7 + 10, 0xFFFFFF);
+            }
+            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL3)) {
+                drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 4*height/7 + 10, 0xFFFFFF);
+            }
+            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.ULTIMATE)) {
+                drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 5*height/7 + 10, 0xFFFFFF);
+            }
             InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, 7*width/8, 8*height/14 + 10, 45, 7f*width/8 - mouseX, 8f*height/14 + 10 - mouseY, stand);
         }
     }
