@@ -19,6 +19,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 
 @Environment(EnvType.CLIENT)
 public class MainMenuScreen extends Screen {
@@ -108,6 +110,19 @@ public class MainMenuScreen extends Screen {
                         .append(move.getMoveClass().getKey().copy().withStyle(ChatFormatting.AQUA))
                         .append(Component.literal(")")));
         guiGraphics.drawString(font, text, x, y + 10, color);
+    }
+
+    @Override
+    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
+        if (stand != null && mouseX >= 3f*width/4 && mouseY >= height/7f + 10 && mouseY <= 6f*height/7 + 10) {
+            final SoundEvent summonSound = stand.getStandData().getSummonData().getSound();
+            final LocalPlayer player = Minecraft.getInstance().player;
+            if (player != null && summonSound != null) {
+                player.playSound(summonSound);
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     //    @Override
