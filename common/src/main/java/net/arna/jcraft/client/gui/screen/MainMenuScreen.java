@@ -14,13 +14,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 
 @Environment(EnvType.CLIENT)
 public class MainMenuScreen extends Screen {
@@ -48,6 +48,18 @@ public class MainMenuScreen extends Screen {
         final BnbList bnbList = new BnbList(Minecraft.getInstance(), width / 4, height / 2, height / 2, height, 9*2);
         bnbList.setLeftPos(width/2);
         addRenderableWidget(bnbList);
+        final Button prevSkinBtn = Button.builder(Component.literal("<"), button -> {})
+                .bounds(3*width/4, 6*height/7 + 10, Math.max(2, width/12), Math.max(2, height/7 - 10))
+                .build();
+        addRenderableWidget(prevSkinBtn);
+        final Button equipSkinBtn = Button.builder(Component.literal("apply"), button -> {})
+                .bounds(10*width/12, 6*height/7 + 10, Math.max(2, width/12), Math.max(2, height/7 - 10))
+                .build();
+        addRenderableWidget(equipSkinBtn);
+        final Button nextSkinBtn = Button.builder(Component.literal(">"), button -> {})
+                .bounds(11*width/12, 6*height/7 + 10, Math.max(2, width/12), Math.max(2, height/7 - 10))
+                .build();
+        addRenderableWidget(nextSkinBtn);
     }
 
     @Override
@@ -114,7 +126,7 @@ public class MainMenuScreen extends Screen {
 
     @Override
     public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-        if (stand != null && mouseX >= 3f*width/4 && mouseY >= height/7f + 10 && mouseY <= 6f*height/7 + 10) {
+        if (stand != null && mouseX >= 3f*width/4 && mouseY >= height/7f + 10 && mouseY < 6f*height/7 + 10) {
             final SoundEvent summonSound = stand.getStandData().getSummonData().getSound();
             final LocalPlayer player = Minecraft.getInstance().player;
             if (player != null && summonSound != null) {
