@@ -7,6 +7,7 @@ import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.fabricmc.api.EnvType;
@@ -22,6 +23,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
 
@@ -74,7 +76,7 @@ public class MainMenuScreen extends Screen {
         addRenderableWidget(nextSkinBtn);
     }
 
-    void setDisplayedSkin(int skin) {
+    protected void setDisplayedSkin(int skin) {
         final int skinCount = stand.getStandData().getInfo().getSkinCount();
         final int actualSkin = (skin + skinCount) % skinCount;
         stand.setSkin(actualSkin);
@@ -83,7 +85,7 @@ public class MainMenuScreen extends Screen {
         }
     }
 
-    void applySkin() {
+    protected void applySkin() {
         final int skin = stand.getSkin();
         final LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
@@ -98,6 +100,14 @@ public class MainMenuScreen extends Screen {
                 standEntity.setSkin(skin);
             }
         }
+    }
+
+    protected Component getSkinName() {
+        final int skin = stand.getSkin();
+        if (skin == 0) {
+            return StandDiscItem.DEFAULT_SKIN;
+        }
+        return stand.getStandData().getInfo().getSkinNames().get(skin - 1);
     }
 
     @Override
@@ -147,6 +157,15 @@ public class MainMenuScreen extends Screen {
             for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.ULTIMATE)) {
                 drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 5*height/7 + 10, 0xFFFFFF);
             }
+            // description
+            List<FormattedCharSequence> descLines = font.split(Component.translatable(stand.getStandData().getInfo().getNameKey() + ".info.desc"), width/4);
+            int lineCount = 0;
+            for (final var descLine : descLines) {
+                guiGraphics.drawString(font, descLine, width/2 + 10, height/7 + 10 + 9*lineCount++, 0xFFFFFF);
+            }
+            // skin name
+            guiGraphics.drawCenteredString(font, getSkinName(), 7*width/8, 6*height/7, StandDiscItem.SKIN_LEVEL_COLORS[stand.getSkin()].getValue());
+            // stand render
             InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, 7*width/8, 8*height/14 + 10, 45, 7f*width/8 - mouseX, 8f*height/14 + 10 - mouseY, stand);
         }
     }

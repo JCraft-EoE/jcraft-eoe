@@ -28,13 +28,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class StandDiscItem extends Item {
-    private static final TextColor[] SKIN_LEVEL_COLORS = {
+    public static final TextColor[] SKIN_LEVEL_COLORS = {
             TextColor.fromLegacyFormat(ChatFormatting.GRAY),
             TextColor.fromLegacyFormat(ChatFormatting.RED),
             TextColor.fromLegacyFormat(ChatFormatting.BLUE),
             TextColor.fromLegacyFormat(ChatFormatting.LIGHT_PURPLE)
     };
-    private static final Component DEFAULT_SKIN = Component.literal("Default");
+    public static final Component DEFAULT_SKIN = Component.translatable("entity.jcraft.info.skin0");
 
     public StandDiscItem(Properties settings) {
         super(settings);
