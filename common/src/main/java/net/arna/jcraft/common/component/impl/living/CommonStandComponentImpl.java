@@ -3,6 +3,7 @@ package net.arna.jcraft.common.component.impl.living;
 import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
@@ -11,11 +12,18 @@ import net.arna.jcraft.api.registry.JAdvancementTriggerRegistry;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class CommonStandComponentImpl implements CommonStandComponent {
     private final Entity entity;
@@ -25,6 +33,7 @@ public class CommonStandComponentImpl implements CommonStandComponent {
     private int skin;
     @Getter
     private boolean tagged;
+    private final Map<StandType, List<Integer>> skinsMap = new HashMap<>();
 
     public CommonStandComponentImpl(final Entity entity) {
         this.entity = entity;
@@ -46,6 +55,7 @@ public class CommonStandComponentImpl implements CommonStandComponent {
         }
         this.type = type;
         this.skin = skin;
+        addSkinFor(this.type, this.skin); // TODO add advancement trigger here
         sync(entity);
     }
 
@@ -56,6 +66,7 @@ public class CommonStandComponentImpl implements CommonStandComponent {
         }
 
         this.skin = Mth.clamp(skin, 0, type.getData().getInfo().getSkinCount() - 1);
+        addSkinFor(type, this.skin); // TODO add advancement trigger here
         sync(entity);
     }
 
@@ -64,6 +75,20 @@ public class CommonStandComponentImpl implements CommonStandComponent {
         // if (this.stand != null) this.stand.setUser(null);
         this.stand = stand;
         sync(entity);
+    }
+
+    @Override
+    public @NonNull List<Integer> getSkinsFor(final StandType type) {
+        if (!skinsMap.containsKey(type)) {
+            return List.of();
+        }
+        return Collections.unmodifiableList(skinsMap.get(type));
+    }
+
+    @Override
+    public boolean addSkinFor(final StandType type, final int skin) {
+        skinsMap.putIfAbsent(type, new LinkedList<>());
+        return skinsMap.get(type).add(skin);
     }
 
     @Nullable
@@ -103,12 +128,37 @@ public class CommonStandComponentImpl implements CommonStandComponent {
         type = StandTypeUtil.readFromNBT(tag, "Type");
         skin = tag.getInt("Skin");
         tagged = tag.getBoolean("Tagged");
+        final CompoundTag skinsMapTag = tag.getCompound("SkinsMap");
+        skinsMap.clear();
+        for (final String typeKeyStr : skinsMapTag.getAllKeys()) {
+            final StandType typeKey = JRegistries.STAND_TYPE_REGISTRY.get(new ResourceLocation(typeKeyStr));
+            if (typeKey == null) {
+                JCraft.LOGGER.warn("Skin for unknown stand {} found, will be ignored!", typeKeyStr);
+                continue;
+            }
+            List<Integer> skinList = skinsMap.computeIfAbsent(typeKey, key -> new LinkedList<>());
+            final int[] skins = skinsMapTag.getIntArray(typeKeyStr);
+            for (final int skin : skins) {
+                if (!skinList.contains(skin)) {
+                    skinList.add(skin);
+                }
+            }
+        }
+        // always ensure the current skin of the current stand
+        if (!StandTypeUtil.isNone(type)) {
+            addSkinFor(type, skin);
+        }
     }
 
     public void writeToNbt(final @NonNull CompoundTag tag) {
         tag.putString("Type", type == null ? "" : type.getId().toString());
         tag.putInt("Skin", skin);
         tag.putBoolean("Tagged", tagged);
+        final CompoundTag skinsMapTag = new CompoundTag();
+        for (final var entry : skinsMap.entrySet()) {
+            skinsMapTag.putIntArray(entry.getKey().getId().toString(), entry.getValue());
+        }
+        tag.put("SkinsMap", skinsMapTag);
     }
 
     /**

@@ -7,6 +7,7 @@ import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -22,14 +23,23 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 
+import java.util.List;
+
 @Environment(EnvType.CLIENT)
 public class MainMenuScreen extends Screen {
 
     protected StandEntity<?,?> stand;
+    protected List<Integer> skins;
+
+    protected Button equipSkinBtn;
 
     public MainMenuScreen() {
         super(Component.literal("hey")); // TODO change this
         final LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) {
+            skins = List.of();
+            return;
+        }
         final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(player);
         final StandType type = standData.getType();
         if (!StandTypeUtil.isNone(type)) {
@@ -40,6 +50,7 @@ public class MainMenuScreen extends Screen {
             stand.tickCount = stand.getStandData().getSummonData().getAnimDuration() + 1;
             stand.setRawState(stand.getIdleState().ordinal());
         }
+        skins = standData.getSkinsFor(type);
     }
 
     // add components in this method
@@ -48,18 +59,45 @@ public class MainMenuScreen extends Screen {
         final BnbList bnbList = new BnbList(Minecraft.getInstance(), width / 4, height / 2, height / 2, height, 9*2);
         bnbList.setLeftPos(width/2);
         addRenderableWidget(bnbList);
-        final Button prevSkinBtn = Button.builder(Component.literal("<"), button -> {})
+        final Button prevSkinBtn = Button.builder(Component.literal("<"), button -> setDisplayedSkin(stand.getSkin()-1))
                 .bounds(3*width/4, 6*height/7 + 10, Math.max(2, width/12), Math.max(2, height/7 - 10))
                 .build();
         addRenderableWidget(prevSkinBtn);
-        final Button equipSkinBtn = Button.builder(Component.literal("apply"), button -> {})
+        // TODO make this string translatable
+        equipSkinBtn = Button.builder(Component.literal("apply"), button -> applySkin())
                 .bounds(10*width/12, 6*height/7 + 10, Math.max(2, width/12), Math.max(2, height/7 - 10))
                 .build();
         addRenderableWidget(equipSkinBtn);
-        final Button nextSkinBtn = Button.builder(Component.literal(">"), button -> {})
+        final Button nextSkinBtn = Button.builder(Component.literal(">"), button -> setDisplayedSkin(stand.getSkin()+1))
                 .bounds(11*width/12, 6*height/7 + 10, Math.max(2, width/12), Math.max(2, height/7 - 10))
                 .build();
         addRenderableWidget(nextSkinBtn);
+    }
+
+    void setDisplayedSkin(int skin) {
+        final int skinCount = stand.getStandData().getInfo().getSkinCount();
+        final int actualSkin = (skin + skinCount) % skinCount;
+        stand.setSkin(actualSkin);
+        if (equipSkinBtn != null) {
+            equipSkinBtn.active = skins.contains(actualSkin);
+        }
+    }
+
+    void applySkin() {
+        final int skin = stand.getSkin();
+        final LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) {
+            return;
+        }
+        final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(player);
+        final StandType type = standData.getType();
+        if (!StandTypeUtil.isNone(type)) {
+            standData.setSkin(skin);
+            StandEntity<?,?> standEntity = JUtils.getStand(player);
+            if (standEntity != null) {
+                standEntity.setSkin(skin);
+            }
+        }
     }
 
     @Override
