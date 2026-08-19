@@ -653,6 +653,8 @@
   "jcraft.serverconfig.option.kc_time_erasure_duration": "King Crimson Time Erasure Duration",
   "jcraft.serverconfig.option.kill_vampirism": "Heal On Kill",
   "jcraft.serverconfig.option.kill_vampirism.tooltip": "When enabled, scoring a kill fully restores the\nkiller's hunger and heals them if they are a\nvampire.",
+  "jcraft.serverconfig.option.locked_skins": "Locked Skins",
+  "jcraft.serverconfig.option.locked_skins.tooltip": "When disabled, players can freely choose their Stand skins.",
   "jcraft.serverconfig.option.mandom_affects_blocks": "Mandom affects Blocks",
   "jcraft.serverconfig.option.mandom_affects_blocks.tooltip": "When enabled, Mandom's time rewind also reverts\nblock changes, not just entities.",
   "jcraft.serverconfig.option.meteor_spawn_rate": "Meteor Spawn Rate (%)",

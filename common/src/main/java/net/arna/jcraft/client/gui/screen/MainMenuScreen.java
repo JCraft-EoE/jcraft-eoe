@@ -7,6 +7,7 @@ import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -86,7 +87,8 @@ public class MainMenuScreen extends Screen {
         stand.setSkin(actualSkin);
         if (applySkinBtn != null) {
             final LocalPlayer player = Minecraft.getInstance().player;
-            applySkinBtn.active = (player != null && player.isCreative()) || skins.contains(actualSkin);
+            boolean lockedSkins = JServerConfig.LOCKED_SKINS.getValue();
+            applySkinBtn.active = (player != null && player.isCreative()) || !lockedSkins || skins.contains(actualSkin);
         }
     }
 
