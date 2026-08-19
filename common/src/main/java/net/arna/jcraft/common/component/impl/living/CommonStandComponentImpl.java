@@ -156,7 +156,9 @@ public class CommonStandComponentImpl implements CommonStandComponent {
         tag.putBoolean("Tagged", tagged);
         final CompoundTag skinsMapTag = new CompoundTag();
         for (final var entry : skinsMap.entrySet()) {
-            skinsMapTag.putIntArray(entry.getKey().getId().toString(), entry.getValue());
+            if (entry.getKey() != null) {
+                skinsMapTag.putIntArray(entry.getKey().getId().toString(), entry.getValue());
+            }
         }
         tag.put("SkinsMap", skinsMapTag);
     }
