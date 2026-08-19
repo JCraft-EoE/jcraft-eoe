@@ -30,13 +30,16 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public class MainMenuScreen extends Screen {
 
+    public static final Component NORMAL_MOVES = Component.translatable("jcraft.gui.normal_moves");
+    public static final Component SPECIAL_MOVES = Component.translatable("jcraft.gui.special_moves");
+
     protected StandEntity<?,?> stand;
     protected List<Integer> skins;
 
     protected Button equipSkinBtn;
 
     public MainMenuScreen() {
-        super(Component.literal("hey")); // TODO change this
+        super(Component.literal("JCraft Menu"));
         final LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
             skins = List.of();
@@ -67,8 +70,7 @@ public class MainMenuScreen extends Screen {
                 .bounds(3*width/4, skinBtnY, Math.max(2, 5*width/6-3*width/4), Math.max(2, skinBtnHeight))
                 .build();
         addRenderableWidget(prevSkinBtn);
-        // TODO make this string translatable
-        equipSkinBtn = Button.builder(Component.literal("apply"), button -> applySkin())
+        equipSkinBtn = Button.builder(Component.translatable("jcraft.gui.apply_skin"), button -> applySkin())
                 .bounds(5*width/6, skinBtnY, Math.max(2, 11*width/12-5*width/6), Math.max(2, skinBtnHeight))
                 .build();
         addRenderableWidget(equipSkinBtn);
@@ -131,9 +133,8 @@ public class MainMenuScreen extends Screen {
         renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, partialTick); // takes care of the scroll widget and such
         if (stand != null) {
-            // TODO make the strings translatables
-            guiGraphics.drawString(font, "normals", 10, height/7 + 10, 0xFFFFFF);
-            guiGraphics.drawString(font, "specials", width/4 + 10, height/7 + 10, 0xFFFFFF);
+            guiGraphics.drawString(font, NORMAL_MOVES, 10, height/7 + 10, 0xFFFFFF);
+            guiGraphics.drawString(font, SPECIAL_MOVES, width/4 + 10, height/7 + 10, 0xFFFFFF);
             final MoveMap<?,?> moveMap = stand.getMoveMap();
             for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.LIGHT)) {
                 drawMoveString(guiGraphics, font, entry, false, 10, 2*height/7 + 10, 0xFFFFFF);

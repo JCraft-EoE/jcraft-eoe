@@ -34,7 +34,7 @@ public class StandDiscItem extends Item {
             TextColor.fromLegacyFormat(ChatFormatting.BLUE),
             TextColor.fromLegacyFormat(ChatFormatting.LIGHT_PURPLE)
     };
-    public static final Component DEFAULT_SKIN = Component.translatable("entity.jcraft.info.skin0");
+    public static final Component DEFAULT_SKIN = Component.translatable("jcraft.generic.skin0");
 
     public StandDiscItem(Properties settings) {
         super(settings);
