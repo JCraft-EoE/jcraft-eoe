@@ -61,17 +61,19 @@ public class MainMenuScreen extends Screen {
         final BnbList bnbList = new BnbList(Minecraft.getInstance(), width / 4, height / 2, height / 2, height, 9*2);
         bnbList.setLeftPos(width/2);
         addRenderableWidget(bnbList);
+        final int skinBtnY = 6*height/7 + 10;
+        final int skinBtnHeight = height - skinBtnY;
         final Button prevSkinBtn = Button.builder(Component.literal("<"), button -> setDisplayedSkin(stand.getSkin()-1))
-                .bounds(3*width/4, 6*height/7 + 10, Math.max(2, width/12), Math.max(2, height/7 - 10))
+                .bounds(3*width/4, skinBtnY, Math.max(2, 5*width/6-3*width/4), Math.max(2, skinBtnHeight))
                 .build();
         addRenderableWidget(prevSkinBtn);
         // TODO make this string translatable
         equipSkinBtn = Button.builder(Component.literal("apply"), button -> applySkin())
-                .bounds(10*width/12, 6*height/7 + 10, Math.max(2, width/12), Math.max(2, height/7 - 10))
+                .bounds(5*width/6, skinBtnY, Math.max(2, 11*width/12-5*width/6), Math.max(2, skinBtnHeight))
                 .build();
         addRenderableWidget(equipSkinBtn);
         final Button nextSkinBtn = Button.builder(Component.literal(">"), button -> setDisplayedSkin(stand.getSkin()+1))
-                .bounds(11*width/12, 6*height/7 + 10, Math.max(2, width/12), Math.max(2, height/7 - 10))
+                .bounds(11*width/12, skinBtnY, Math.max(2, width - 11*width/12), Math.max(2, skinBtnHeight))
                 .build();
         addRenderableWidget(nextSkinBtn);
     }
