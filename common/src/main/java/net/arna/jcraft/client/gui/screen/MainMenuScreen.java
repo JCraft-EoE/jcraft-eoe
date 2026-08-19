@@ -36,7 +36,7 @@ public class MainMenuScreen extends Screen {
     protected StandEntity<?,?> stand;
     protected List<Integer> skins;
 
-    protected Button equipSkinBtn;
+    protected Button applySkinBtn;
 
     public MainMenuScreen() {
         super(Component.literal("JCraft Menu"));
@@ -70,10 +70,10 @@ public class MainMenuScreen extends Screen {
                 .bounds(3*width/4, skinBtnY, Math.max(2, 5*width/6-3*width/4), Math.max(2, skinBtnHeight))
                 .build();
         addRenderableWidget(prevSkinBtn);
-        equipSkinBtn = Button.builder(Component.translatable("jcraft.gui.apply_skin"), button -> applySkin())
+        applySkinBtn = Button.builder(Component.translatable("jcraft.gui.apply_skin"), button -> applySkin())
                 .bounds(5*width/6, skinBtnY, Math.max(2, 11*width/12-5*width/6), Math.max(2, skinBtnHeight))
                 .build();
-        addRenderableWidget(equipSkinBtn);
+        addRenderableWidget(applySkinBtn);
         final Button nextSkinBtn = Button.builder(Component.literal(">"), button -> setDisplayedSkin(stand.getSkin()+1))
                 .bounds(11*width/12, skinBtnY, Math.max(2, width - 11*width/12), Math.max(2, skinBtnHeight))
                 .build();
@@ -84,8 +84,9 @@ public class MainMenuScreen extends Screen {
         final int skinCount = stand.getStandData().getInfo().getSkinCount();
         final int actualSkin = (skin + skinCount) % skinCount;
         stand.setSkin(actualSkin);
-        if (equipSkinBtn != null) {
-            equipSkinBtn.active = skins.contains(actualSkin);
+        if (applySkinBtn != null) {
+            final LocalPlayer player = Minecraft.getInstance().player;
+            applySkinBtn.active = (player != null && player.isCreative()) || skins.contains(actualSkin);
         }
     }
 
