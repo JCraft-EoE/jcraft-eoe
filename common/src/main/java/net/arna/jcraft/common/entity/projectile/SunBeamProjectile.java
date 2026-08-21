@@ -71,6 +71,15 @@ public class SunBeamProjectile extends AbstractArrow {
     @Override
     public void setOwner(@Nullable Entity owner) {
         super.setOwner(owner);
+
+        if (owner instanceof LivingEntity living) {
+            var stand = JUtils.getStand(living);
+            if (stand != null) {
+                damageSource = JDamageSources.stand(stand);
+                return;
+            }
+        }
+
         damageSource = JDamageSources.create(level(), DamageTypes.MOB_ATTACK, owner);
     }
 
