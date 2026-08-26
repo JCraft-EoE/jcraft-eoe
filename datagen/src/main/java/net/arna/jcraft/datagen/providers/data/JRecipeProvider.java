@@ -300,6 +300,16 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .define('S', Items.STRING)
                 .unlockedBy("has_leather", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER))
                 .save(exporter);
+        // holster
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.HOLSTER.get())
+                .pattern("LNL")
+                .pattern("DS")
+                .define('D', Items.LEAD)
+                .define('L', Items.LEATHER)
+                .define('N', Items.IRON_NUGGET)
+                .define('S', Items.STRING)
+                .unlockedBy("has_lead", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEAD))
+                .save(exporter);
         // coin to nuggets
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.GOLD_NUGGET, 2)
                 .requires(JItemRegistry.KQ_COIN.get())
