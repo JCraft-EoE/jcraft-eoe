@@ -94,8 +94,8 @@ dependencies {
     //modRuntimeOnly("curse.maven:citadel-331936:6702068")
     //modRuntimeOnly("curse.maven:ice-and-fire-dragons-264231:5633453")
     // for Weather, Storms and Tornadoes
-    modRuntimeOnly("curse.maven:coroutil-237749:5096038")
-    modRuntimeOnly("curse.maven:weather-storms-tornadoes-237746:5244118")
+//    modRuntimeOnly("curse.maven:coroutil-237749:5096038")
+//    modRuntimeOnly("curse.maven:weather-storms-tornadoes-237746:5244118")
     //modRuntimeOnly("curse.maven:weather2-additions-1091174:6666847")
     //modRuntimeOnly("curse.maven:wuffys-weather2-additions-1115203:5807550")
     // for Particle Core

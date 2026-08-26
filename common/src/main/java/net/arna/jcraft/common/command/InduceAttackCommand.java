@@ -1,7 +1,9 @@
 package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.common.argumenttype.AttackArgumentType;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -20,9 +22,10 @@ import java.util.Collection;
 public class InduceAttackCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("attack")
-                .requires(source -> source.hasPermission(2) || "Arna57".equals(source.getTextName()) || "MrSterner".equals(source.getTextName()))
+                .requires(JPerms.any(JPerms.ATTACK_STAND, JPerms.ATTACK_SPEC))
                 .then(Commands.argument("ents", EntityArgument.entities())
                         .then(Commands.literal("stand")
+                                .requires(JPerms.ATTACK_STAND.require())
                                 .then(Commands.argument("attack", AttackArgumentType.attack()).executes(
                                         context -> runAttack(
                                                 context.getSource(),
@@ -33,6 +36,7 @@ public class InduceAttackCommand {
                                 ))
                         )
                         .then(Commands.literal("spec")
+                                .requires(JPerms.ATTACK_SPEC.require())
                                 .then(Commands.argument("attack", AttackArgumentType.attack()).executes(
                                         context -> runAttack(
                                                 context.getSource(),
@@ -46,7 +50,10 @@ public class InduceAttackCommand {
         );
     }
 
-    public static int runAttack(final CommandSourceStack source, final Collection<? extends Entity> targets, final boolean stand, final MoveClass moveClass) {
+    public static int runAttack(final CommandSourceStack source, final Collection<? extends Entity> targets, final boolean stand,
+                                final MoveClass moveClass) throws CommandSyntaxException {
+        JPerms.checkTargets(source, targets, JPerms.ATTACK_OTHERS);
+
         int flag = 0;
         String typeName = moveClass.toString();
 

@@ -12,6 +12,7 @@ import net.arna.jcraft.common.advancements.Hamon3Trigger;
 import net.arna.jcraft.common.advancements.Hamon4Trigger;
 import net.arna.jcraft.common.advancements.Hamon5Trigger;
 import net.arna.jcraft.common.advancements.Hamon6Trigger;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
@@ -29,7 +30,7 @@ public class ResetSpecCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("spec")
                 .then(Commands.literal("reset")
-                        .requires(source -> source.hasPermission(2))
+                        .requires(JPerms.SPEC_RESET.require())
                         .then(Commands.argument("entities", EntityArgument.entities())
                                     .executes(ResetSpecCommand::run)
                         )
@@ -38,12 +39,14 @@ public class ResetSpecCommand {
     }
 
     public static int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        try {
-            final Collection<? extends Entity> targets = EntityArgument.getEntities(context, "entities");
+        final Collection<? extends Entity> targets = EntityArgument.getEntities(context, "entities");
 
-            if (targets.isEmpty()) {
-                return 0;
-            }
+        if (targets.isEmpty()) {
+            return 0;
+        }
+        JPerms.checkTargets(context.getSource(), targets, JPerms.SPEC_RESET_OTHERS);
+
+        try {
             for (final Entity entity : targets) {
                 if (entity instanceof LivingEntity living) {
                     final SpecType specType = JComponentPlatformUtils.getSpecData(living).getType();
