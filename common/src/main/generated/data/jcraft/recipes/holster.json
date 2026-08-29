@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "D": {
+      "item": "minecraft:lead"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "N": {
+      "item": "minecraft:iron_nugget"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "pattern": [
+    "LNL",
+    "DS "
+  ],
+  "result": {
+    "item": "jcraft:holster"
+  },
+  "show_notification": true
+}

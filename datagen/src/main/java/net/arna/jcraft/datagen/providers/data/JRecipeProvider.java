@@ -303,7 +303,7 @@ public class JRecipeProvider extends FabricRecipeProvider {
         // holster
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.HOLSTER.get())
                 .pattern("LNL")
-                .pattern("DS")
+                .pattern("DS ")
                 .define('D', Items.LEAD)
                 .define('L', Items.LEATHER)
                 .define('N', Items.IRON_NUGGET)
