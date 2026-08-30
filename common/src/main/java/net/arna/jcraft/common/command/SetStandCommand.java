@@ -12,6 +12,7 @@ import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.argumenttype.StandArgumentType;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.CommandSourceStack;
@@ -40,14 +41,16 @@ public class SetStandCommand {
         final RandomSource rng = RandomSource.create();
         dispatcher.register(Commands.literal("stand")
                 .then(Commands.literal("set")
-                        .requires(source -> source.hasPermission(2))
+                        .requires(JPerms.STAND_SET.require())
                         .then(Commands.argument("targets", EntityArgument.entities())
                                 .then(Commands.argument("stand", StandArgumentType.stand())
                                         .executes(ctx -> executeSet(ctx, ctx.getArgument("stand", StandType.class), 0))
                                         .then(Commands.argument("skin", IntegerArgumentType.integer(0, 3))
+                                                .requires(JPerms.STAND_SET_SKIN.require())
                                                 .executes(ctx -> executeSet(ctx,
                                                         ctx.getArgument("stand", StandType.class), ctx.getArgument("skin", Integer.class)))))
                                 .then(Commands.literal("random")
+                                        .requires(JPerms.STAND_SET_RANDOM.require())
                                         .executes(ctx -> executeSet(ctx, 0, rng)))
                         )));
     }
@@ -65,6 +68,8 @@ public class SetStandCommand {
         if (targets.isEmpty() || (type == null && rng == null)) {
             return 0;
         }
+
+        JPerms.checkTargets(ctx.getSource(), targets, JPerms.STAND_SET_OTHERS);
 
         if (type != null && skin >= type.getData().getInfo().getSkinCount()) {
             throw INVALID_SKIN.create(type.getData().getInfo().getSkinCount());

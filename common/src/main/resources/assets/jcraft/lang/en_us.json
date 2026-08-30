@@ -585,6 +585,7 @@
   "jcraft.commands.changes.removal": "- %s",
   "jcraft.commands.changes.too_long": "Change is too long to display",
   "jcraft.commands.changes.type": "Changes for %s:",
+  "jcraft.commands.error.no_permission": "You do not have permission to do that. (%s)",
   "jcraft.commands.error.nospec": "No spec found!",
   "jcraft.commands.error.nostand": "No stand found!",
   "jcraft.diarypage.evodesc": "§9(§eShadow The World §9evolution item)",

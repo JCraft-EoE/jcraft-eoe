@@ -19,6 +19,7 @@ import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.common.argumenttype.SpecArgumentType;
 import net.arna.jcraft.common.argumenttype.StandArgumentType;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -43,10 +44,13 @@ public class JCraftChangesCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("jcraft")
                 .then(Commands.literal("changes")
+                        .requires(JPerms.CHANGES.require())
                         .executes(ctx -> run(ctx, null))
                         .then(Commands.argument("stand", StandArgumentType.stand())
+                                .requires(JPerms.CHANGES_STAND.require())
                                 .executes(ctx -> run(ctx, ctx.getArgument("stand", StandType.class))))
                         .then(Commands.argument("spec", SpecArgumentType.spec())
+                                .requires(JPerms.CHANGES_SPEC.require())
                                 .executes(ctx -> run(ctx, ctx.getArgument("spec", SpecType.class))))));
     }
 

@@ -3,6 +3,10 @@ package net.arna.jcraft.common.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.arna.jcraft.common.argumenttype.AttackArgumentType;
+import net.arna.jcraft.common.command.permissions.JPerm;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.spec.JSpec;
@@ -22,18 +26,19 @@ import java.util.Collection;
 public class InduceAttackCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("attack")
-                .requires(source -> source.hasPermission(2) || "Arna57".equals(source.getTextName()) || "MrSterner".equals(source.getTextName()))
+                .requires(JPerms.any(JPerms.ATTACK_STAND, JPerms.ATTACK_SPEC))
                 .then(Commands.argument("ents", EntityArgument.entities())
-                        .then(registerAttackType("stand", true))
-                        .then(registerAttackType("spec", false))
+                        .then(registerAttackType("stand", true, JPerms.ATTACK_STAND))
+                        .then(registerAttackType("spec", false, JPerms.ATTACK_SPEC))
                 )
         );
     }
 
-    private static ArgumentBuilder<CommandSourceStack, ?> registerAttackType(String name, boolean stand) {
+    private static ArgumentBuilder<CommandSourceStack, ?> registerAttackType(String name, boolean stand, JPerm perm) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal(name);
 
-        root.then(Commands.argument("attack", AttackArgumentType.attack())
+        root.requires(perm.require())
+            .then(Commands.argument("attack", AttackArgumentType.attack())
                 .executes(ctx -> runAttack(
                         ctx.getSource(),
                         EntityArgument.getEntities(ctx, "ents"),
