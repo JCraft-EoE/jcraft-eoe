@@ -259,14 +259,15 @@ public final class JCraft {
         VillagerTradesModifier.init();
         ConditionalFlightHandler.init();
 
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_REMOTE_STAND_INTERACT, RemoteStandInteractPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PREDICTION_TRIGGER, PredictionTriggerPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_REMOTE_STAND_INTERACT, RemoteStandInteractPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_PREDICTION_TRIGGER, PredictionTriggerPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_VARIANT, VariantInputPacket::handle);
     }
 
     private static void registerAzArmor() {
