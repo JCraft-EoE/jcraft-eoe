@@ -1,49 +1,41 @@
-package net.arna.jcraft.client.util;
+package net.arna.jcraft.client.input;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import lombok.Getter;
 import net.minecraft.client.KeyMapping;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * A KeyBinding that can tell you whether it was pressed this tick.
  */
 @Getter
-public class TrackedKeyBinding {
+public class TrackedKeyBinding implements IJKeyBinding {
     private static final Map<KeyMapping, TrackedKeyBinding> bindings = new HashMap<>();
     private static boolean resetForScreen = false;
     private final KeyMapping parent;
     private boolean changedThisTick, pressedThisTick, releasedThisTick;
 
     public static void resetValues(final boolean clientScreenAssigned) {
-            bindings.values().forEach(TrackedKeyBinding::reset);
-            if (clientScreenAssigned) {
-                bindings.values().stream()
-                        .filter(TrackedKeyBinding::isDown)
-                        .forEach(TrackedKeyBinding::markReleased);
-                resetForScreen = true;
-            } else {
-                resetForScreen = false;
-            }
+        bindings.values().forEach(TrackedKeyBinding::reset);
+        if (clientScreenAssigned) {
+            bindings.values().stream()
+                    .filter(TrackedKeyBinding::isDown)
+                    .forEach(TrackedKeyBinding::markReleased);
+            resetForScreen = true;
+        } else {
+            resetForScreen = false;
+        }
     }
 
     private TrackedKeyBinding(final KeyMapping parent) {
         this.parent = parent;
     }
 
-    public static TrackedKeyBinding createAndRegister(final String translationKey, final InputConstants.Type type, final int code, final String category) {
-        return createAndRegister(translationKey, type, code, category, KeyMappingRegistry::register);
-    }
-
-    public static TrackedKeyBinding createAndRegister(final String translationKey, final InputConstants.Type type, final int code, final String category,
-                                                      final Consumer<KeyMapping> register) {
-        final KeyMapping keyBinding = new KeyMapping(translationKey, type, code, category);
-        register.accept(keyBinding);
-
-        return wrap(keyBinding);
+    public static TrackedKeyBinding create(final String translationKey, final InputConstants.Type type, final int code,
+                                           final String category) {
+        return wrap(new KeyMapping(translationKey, type, code, category));
     }
 
     public static TrackedKeyBinding wrap(final KeyMapping binding) {

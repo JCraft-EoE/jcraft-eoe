@@ -1,5 +1,6 @@
 package net.arna.jcraft.client;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -22,6 +23,10 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.aim.GunAimHandler;
 import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
+import net.arna.jcraft.client.input.AerialKeyBinding;
+import net.arna.jcraft.client.input.CrouchKeyBinding;
+import net.arna.jcraft.client.input.IJKeyBinding;
+import net.arna.jcraft.client.input.TrackedKeyBinding;
 import net.arna.jcraft.client.net.ClientPacketHandler;
 import net.arna.jcraft.client.particle.*;
 import net.arna.jcraft.client.registry.JClientEventsRegistry;
@@ -37,7 +42,6 @@ import net.arna.jcraft.client.rendering.handler.*;
 import net.arna.jcraft.client.sound.BoundSoundClient;
 import net.arna.jcraft.client.util.BlockBreakerClient;
 import net.arna.jcraft.client.util.ClientEntityHandlerImpl;
-import net.arna.jcraft.client.util.TrackedKeyBinding;
 import net.arna.jcraft.common.util.MovementInputType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -69,24 +73,45 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class JCraftClient {
     // Keybinds
-    public static TrackedKeyBinding standSummon, heavyKey, barrageKey, ultKey, special1Key, special2Key, special3Key,
-            comboBreaker, cooldownCancel, utility, dash;
-    @SuppressWarnings({"ConstantValue", "DataFlowIssue"}) // Not the case here cuz of the lazy getter.
+    public static final String JCRAFT_KEY_CAT = "key.category.jcraft";
+    public static final TrackedKeyBinding STAND_SUMMON_KEY = TrackedKeyBinding.create("key.jcraft.standsummon",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_N, JCRAFT_KEY_CAT);
+    public static final TrackedKeyBinding HEAVY_KEY = TrackedKeyBinding.create("key.jcraft.heavy",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, JCRAFT_KEY_CAT);
+    public static final TrackedKeyBinding BARRAGE_KEY = TrackedKeyBinding.create("key.jcraft.barrage",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, JCRAFT_KEY_CAT);
+    public static final TrackedKeyBinding ULT_KEY = TrackedKeyBinding.create("key.jcraft.ultimate",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, JCRAFT_KEY_CAT);
+    public static final TrackedKeyBinding SPECIAL1_KEY = TrackedKeyBinding.create("key.jcraft.special1",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, JCRAFT_KEY_CAT);
+    public static final TrackedKeyBinding SPECIAL2_KEY = TrackedKeyBinding.create("key.jcraft.special2",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, JCRAFT_KEY_CAT);
+    public static final TrackedKeyBinding SPECIAL3_KEY = TrackedKeyBinding.create("key.jcraft.special3",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_M, JCRAFT_KEY_CAT);
+    public static final TrackedKeyBinding COOLDOWN_CANCEL_KEY = TrackedKeyBinding.create("key.jcraft.cooldowncancel",
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_ALT, JCRAFT_KEY_CAT);
+    public static final TrackedKeyBinding UTILITY_KEY = TrackedKeyBinding.create("key.jcraft.utility",
+            InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_5, JCRAFT_KEY_CAT);
+    public static final TrackedKeyBinding DASH_KEY = TrackedKeyBinding.create("key.jcraft.dash",
+            InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_4, JCRAFT_KEY_CAT);
+    public static final IJKeyBinding AERIAL_VARIANT_KEY = AerialKeyBinding.INSTANCE;
+    public static final IJKeyBinding CROUCH_VARIANT_KEY = CrouchKeyBinding.INSTANCE;
+
     @Getter(lazy = true)
-    private static final Map<TrackedKeyBinding, MoveInputType> bindings = ImmutableMap.<TrackedKeyBinding, MoveInputType>builder()
-            .put(standSummon, MoveInputType.STAND_SUMMON)
+    private static final Map<IJKeyBinding, MoveInputType> bindings = ImmutableMap.<IJKeyBinding, MoveInputType>builder()
+            .put(STAND_SUMMON_KEY, MoveInputType.STAND_SUMMON)
             .put(TrackedKeyBinding.wrap(Minecraft.getInstance().options.keyAttack), MoveInputType.LIGHT)
-            .put(heavyKey, MoveInputType.HEAVY)
-            .put(barrageKey, MoveInputType.BARRAGE)
-            .put(special1Key, MoveInputType.SPECIAL1)
-            .put(special2Key, MoveInputType.SPECIAL2)
-            .put(special3Key, MoveInputType.SPECIAL3)
-            .put(ultKey, MoveInputType.ULTIMATE)
-            .put(utility, MoveInputType.UTILITY)
+            .put(HEAVY_KEY, MoveInputType.HEAVY)
+            .put(BARRAGE_KEY, MoveInputType.BARRAGE)
+            .put(SPECIAL1_KEY, MoveInputType.SPECIAL1)
+            .put(SPECIAL2_KEY, MoveInputType.SPECIAL2)
+            .put(SPECIAL3_KEY, MoveInputType.SPECIAL3)
+            .put(ULT_KEY, MoveInputType.ULTIMATE)
+            .put(UTILITY_KEY, MoveInputType.UTILITY)
             .put(TrackedKeyBinding.wrap(Minecraft.getInstance().options.keyPickItem), MoveInputType.TOSS)
             .build();
     @Getter(lazy = true)
-    private static final Map<TrackedKeyBinding, MovementInputType> movementBindings = createMovementBindingsMap();
+    private static final Map<IJKeyBinding, MovementInputType> movementBindings = createMovementBindingsMap();
     @Getter(lazy = true)
     private static final TrackedKeyBinding trackedUseKey = TrackedKeyBinding.wrap(Minecraft.getInstance().options.keyUse);
     public static Supplier<DecimalFormat> decimalFormat = Suppliers.memoize(JCraftClient::createDecimalFormat);
@@ -138,34 +163,11 @@ public class JCraftClient {
     }
     
     public static void registerKeyBindings(@Nullable Consumer<KeyMapping> register) {
-        if (register == null) register = KeyMappingRegistry::register;
+        Consumer<KeyMapping> consumer = MoreObjects.firstNonNull(register, KeyMappingRegistry::register);
 
-        // Keybinding registration
-        standSummon = TrackedKeyBinding.createAndRegister("key.jcraft.standsummon", InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_N, "key.category.jcraft", register);
-        heavyKey = TrackedKeyBinding.createAndRegister("key.jcraft.heavy", InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_R, "key.category.jcraft", register);
-        barrageKey = TrackedKeyBinding.createAndRegister("key.jcraft.barrage", InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_B, "key.category.jcraft", register);
-        ultKey = TrackedKeyBinding.createAndRegister("key.jcraft.ultimate", InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_H, "key.category.jcraft", register);
-        special1Key = TrackedKeyBinding.createAndRegister("key.jcraft.special1", InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_V, "key.category.jcraft", register);
-        special2Key = TrackedKeyBinding.createAndRegister("key.jcraft.special2", InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_G, "key.category.jcraft", register);
-        special3Key = TrackedKeyBinding.createAndRegister("key.jcraft.special3", InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_M, "key.category.jcraft", register);
-        //comboBreaker = TrackingKeyBinding.createAndRegister("key.jcraft.combobreaker", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.category.jcraft");
-        cooldownCancel = TrackedKeyBinding.createAndRegister("key.jcraft.cooldowncancel", InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_RIGHT_ALT, "key.category.jcraft", register);
-        utility = TrackedKeyBinding.createAndRegister("key.jcraft.utility", InputConstants.Type.MOUSE,
-                GLFW.GLFW_MOUSE_BUTTON_5, "key.category.jcraft", register);
-        dash = TrackedKeyBinding.createAndRegister("key.jcraft.dash", InputConstants.Type.MOUSE,
-                GLFW.GLFW_MOUSE_BUTTON_4, "key.category.jcraft", register);
-
-        // todo: actually finish jcraft menu
-        // menuKey = new KeyMapping("key.jcraft.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_KP_DIVIDE, "key.category.jcraft");
-        // register.accept(menuKey);
+        List<TrackedKeyBinding> bindings = List.of(STAND_SUMMON_KEY, HEAVY_KEY, BARRAGE_KEY, ULT_KEY, SPECIAL1_KEY, SPECIAL2_KEY,
+                SPECIAL3_KEY, COOLDOWN_CANCEL_KEY, UTILITY_KEY, DASH_KEY);
+        bindings.forEach(kb -> consumer.accept(kb.getParent()));
     }
 
     /// TEXT HUD
@@ -187,16 +189,16 @@ public class JCraftClient {
         framesSinceComboStarted = 0;
     }
 
-    private static Map<TrackedKeyBinding, MovementInputType> createMovementBindingsMap() {
+    private static Map<IJKeyBinding, MovementInputType> createMovementBindingsMap() {
         final Options options = Minecraft.getInstance().options;
-        return ImmutableMap.<TrackedKeyBinding, MovementInputType>builder()
+        return ImmutableMap.<IJKeyBinding, MovementInputType>builder()
                 .put(TrackedKeyBinding.wrap(options.keyUp), MovementInputType.FORWARD)
                 .put(TrackedKeyBinding.wrap(options.keyDown), MovementInputType.BACKWARD)
                 .put(TrackedKeyBinding.wrap(options.keyLeft), MovementInputType.LEFT)
                 .put(TrackedKeyBinding.wrap(options.keyRight), MovementInputType.RIGHT)
                 .put(TrackedKeyBinding.wrap(options.keyJump), MovementInputType.JUMP)
                 .put(TrackedKeyBinding.wrap(options.keyShift), MovementInputType.CROUCH)
-                .put(dash, MovementInputType.DASH)
+                .put(DASH_KEY, MovementInputType.DASH)
                 .put(TrackedKeyBinding.wrap(options.keyPickItem), MovementInputType.THROW)
                 .build();
     }
@@ -216,17 +218,18 @@ public class JCraftClient {
         }
 
         if (makeShort) {
-            if (secondLast.length() > 0) secondLast = secondLast.substring(0, 1);
-            if (last.length() > 0) last = last.substring(0, 1);
+            if (!secondLast.isEmpty()) secondLast = secondLast.substring(0, 1);
+            if (!last.isEmpty()) last = last.substring(0, 1);
         }
 
         return StringUtils.capitalize(secondLast) + StringUtils.capitalize(last);
     }
 
-    public static <E extends Enum<E>> Object2BooleanMap<E> getChangedInputs(final Map<TrackedKeyBinding, E> bindings) {
+    public static <E extends Enum<E>> Object2BooleanMap<E> getChangedInputs(final Map<? extends IJKeyBinding, E> bindings) {
         return bindings.entrySet().stream()
                 .filter(entry -> entry.getKey().isChangedThisTick())
-                .collect(Object2BooleanOpenHashMap::new, (map, entry) -> map.put(entry.getValue(), entry.getKey().isPressedThisTick()),
+                .collect(Object2BooleanOpenHashMap::new, (map, entry) ->
+                                map.put(entry.getValue(), entry.getKey().isPressedThisTick()),
                         Object2BooleanMap::putAll);
     }
 

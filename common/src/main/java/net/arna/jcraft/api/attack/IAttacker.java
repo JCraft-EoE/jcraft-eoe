@@ -20,11 +20,13 @@ import net.arna.jcraft.common.ai.CombatInstantContext;
 import net.arna.jcraft.common.ai.IJAttackerBrain;
 import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.network.c2s.VariantInputPacket;
 import net.arna.jcraft.common.util.IJCraftComboTracker;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -205,8 +207,8 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
 
     default @Nullable MoveMap.Entry<A, S> getFirstValidEntry(final MoveClass moveClass) {
         boolean hasUser = hasUser();
-        boolean crouching = hasUser && getUserOrThrow().isShiftKeyDown();
-        boolean aerial = hasUser && !getUserOrThrow().onGround();
+        boolean crouching = hasUser && isSelectingCrouch();
+        boolean aerial = hasUser && isSelectingAerial();
         return getMoveMap().getFirstValidEntry(moveClass, getThis(), crouching, aerial);
     }
 
@@ -535,4 +537,24 @@ public interface IAttacker<A extends IAttacker<? extends A, S>, S extends Enum<?
 
          return false;
      }
+
+     default boolean isSelectingAerial() {
+         if (!hasUser()) return false;
+
+         LivingEntity user = getUserOrThrow();
+         if (user instanceof ServerPlayer player)
+             return VariantInputPacket.getState(player).aerial();
+
+         return !user.onGround();
+     }
+
+    default boolean isSelectingCrouch() {
+        if (!hasUser()) return false;
+
+        LivingEntity user = getUserOrThrow();
+        if (user instanceof ServerPlayer player)
+            return VariantInputPacket.getState(player).crouch();
+
+        return user.isShiftKeyDown();
+    }
 }

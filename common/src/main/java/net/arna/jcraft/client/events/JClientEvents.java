@@ -22,10 +22,11 @@ import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.sound.AerosmithSoundInstance;
 import net.arna.jcraft.client.tracer.MuzzleTracker;
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.client.util.TrackedKeyBinding;
+import net.arna.jcraft.client.input.TrackedKeyBinding;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
+import net.arna.jcraft.common.network.c2s.VariantInputPacket;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -51,13 +52,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static net.arna.jcraft.client.JCraftClient.*;
 import static net.arna.jcraft.client.gui.hud.JCraftAbilityHud.cooldownTypeToKeybind;
@@ -264,10 +259,9 @@ public class JClientEvents {
             });
 
             if (!heldMoves.isEmpty()) {
-                NetworkManager.sendToServer(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket.write(null, heldMoves));
-                //ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket.write(null, heldMoves));
+                FriendlyByteBuf buf = PlayerInputPacket.write(null, heldMoves);
+                NetworkManager.sendToServer(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, buf);
             }
-
         }
 
         // Block
@@ -280,8 +274,14 @@ public class JClientEvents {
         }
 
         // Cooldown Cancel
-        if (cooldownCancel.isPressedThisTick()) {
+        if (COOLDOWN_CANCEL_KEY.isPressedThisTick()) {
             NetworkManager.sendToServer(JPacketRegistry.C2S_COOLDOWN_CANCEL, new FriendlyByteBuf(Unpooled.buffer()));
+        }
+
+        // Aerial and crouch variants
+        if (AERIAL_VARIANT_KEY.isChangedThisTick() || CROUCH_VARIANT_KEY.isChangedThisTick()) {
+            FriendlyByteBuf buf = VariantInputPacket.write(AERIAL_VARIANT_KEY.isDown(), CROUCH_VARIANT_KEY.isDown());
+            NetworkManager.sendToServer(JPacketRegistry.C2S_VARIANT, buf);
         }
 
         if (client.isPaused() && client.isLocalServer()) {
