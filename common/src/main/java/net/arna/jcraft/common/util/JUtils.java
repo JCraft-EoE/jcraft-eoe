@@ -422,7 +422,6 @@ public final class JUtils {
         return CombatRules.getDamageAfterAbsorb(damage, totalArmor, toughnessAttribute);
     }
 
-    //To check method ms usage, use spark[something]
     public static boolean isBlocking(LivingEntity entity) {
         if (entity instanceof StandEntity<?, ?> stand) {
             return stand.blocking;
@@ -564,9 +563,12 @@ public final class JUtils {
     }
 
     public static boolean isAffectedByTimeStop(Entity entity) {
-        return JComponentPlatformUtils.getTimeStopData(entity)
-                .map(data -> data.getTicks() > 0)
-                .orElse(false);
+        final var data = JComponentPlatformUtils.getTimeStopData(entity);
+
+        if (data.isEmpty())
+            return false;
+
+        return data.get().getTicks() > 0;
     }
 
     public static boolean canDamage(DamageSource damageSource, Entity ent) {

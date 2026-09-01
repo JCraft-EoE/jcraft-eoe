@@ -7,6 +7,7 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.client.renderer.entity.*;
+import net.arna.jcraft.client.renderer.entity.ge.*;
 import net.arna.jcraft.client.renderer.entity.npc.*;
 import net.arna.jcraft.client.renderer.entity.projectiles.*;
 import net.arna.jcraft.client.renderer.entity.stands.*;
@@ -63,6 +64,7 @@ public interface JEntityRendererRegister {
 
             new RendererData<>(JEntityTypeRegistry.GOLD_EXPERIENCE, GoldExperienceRenderer::new),
             new RendererData<>(JEntityTypeRegistry.GE_TREE, GETreeRenderer::new),
+            new RendererData<>(JEntityTypeRegistry.GE_VINES, GEVinesRenderer::new),
             new RendererData<>(JEntityTypeRegistry.GE_FROG, GEFrogRenderer::new),
             new RendererData<>(JEntityTypeRegistry.GE_SNAKE, GESnakeRenderer::new),
             new RendererData<>(JEntityTypeRegistry.GE_BUTTERFLY, GEButterflyRenderer::new),

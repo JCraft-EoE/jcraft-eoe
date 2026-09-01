@@ -5,18 +5,11 @@ import io.netty.buffer.Unpooled;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehavior;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.itfs.ICustomDamageHandler;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.component.living.CommonHamonComponent;
-import net.arna.jcraft.api.registry.JAdvancementTriggerRegistry;
-import net.arna.jcraft.api.registry.JPacketRegistry;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JSpecTypeRegistry;
-import net.arna.jcraft.api.registry.JStatRegistry;
-import net.arna.jcraft.api.registry.JStatusRegistry;
-import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.api.itfs.ICustomDamageHandler;
+import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -228,12 +221,13 @@ public interface Attacks {
      */
     static void baseDamageLogic(LivingEntity victim, Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun,
                                 float damage, boolean lift, int blockstun, DamageSource source, @Nullable Entity attacker,
-                                HitAnimation hitAnimation, @Nullable MoveUsage moveUsage, boolean canBackstab, boolean unblockable,
-                                boolean cancelAttack) {
+                                HitAnimation hitAnimation, @Nullable MoveUsage moveUsage,
+                                boolean canBackstab, boolean unblockable, boolean cancelAttack) {
         if (victim instanceof ICustomDamageHandler customDamageHandler) {
             if (!customDamageHandler.handleDamage(
                     kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun,
-                    source, attacker, hitAnimation, moveUsage, canBackstab, unblockable)
+                    source, attacker, hitAnimation, moveUsage,
+                    canBackstab, unblockable, cancelAttack)
             ) {
                 return;
             }
@@ -258,9 +252,13 @@ public interface Attacks {
                 // Counter check
                 if (!tsHit && standAttack.isCounter() && stand.getMoveStun() < standAttack.getWindupPoint()) {
                     //noinspection unchecked
-                    ((AbstractCounterAttack<?, StandEntity<?, ?>>) standAttack).counter(stand, attacker, source);
-                    victim.removeEffect(JStatusRegistry.DAZED.get());
-                    return;
+                    var counter = ((AbstractCounterAttack<?, StandEntity<?, ?>>) standAttack);
+
+                    if (counter.canCounter(source, damage)) {
+                        counter.counter(stand, attacker, source);
+                        victim.removeEffect(JStatusRegistry.DAZED.get());
+                        return;
+                    }
                 }
 
                 if (--stand.armorPoints < 0) {
@@ -319,10 +317,17 @@ public interface Attacks {
         if (attacker instanceof LivingEntity l) livingAttacker = l;
 
         if (hit) {
-            comboTracker.jcraft$increaseHitCount();
+            comboTracker.jcraft$increaseHitCount(tsHit);
 
             boolean allowFurtherStun = true;
-            if (livingAttacker != null && moveUsage != null) allowFurtherStun = !comboTracker.jcraft$addMoveToCombo(livingAttacker, moveUsage);
+
+            // check for IPS
+            if (livingAttacker != null && moveUsage != null)
+                allowFurtherStun = !comboTracker.jcraft$addMoveToCombo(livingAttacker, moveUsage);
+
+            // timestop overrides IPS
+            if (tsHit)
+                allowFurtherStun = true;
 
             MobEffectInstance stun = victim.getEffect(JStatusRegistry.DAZED.get());
             if (stun != null) {
@@ -614,24 +619,6 @@ public interface Attacks {
     }
 
     static boolean prototypeMatch(AbstractMove<?, ?> a, AbstractMove<?, ?> b) {
-        if (a.getClass() != b.getClass()) return false;
-        if (a.getMoveClass() != b.getMoveClass()) return false;
-        if (a.isAerialVariant() != b.isAerialVariant()) return false;
-        if (a.isCrouchingVariant() != b.isCrouchingVariant()) return false;
-        if (a.getCooldown() != b.getCooldown()) return false;
-        if (a.getDuration() != b.getDuration()) return false;
-        if (a.getWindup() != b.getWindup()) return false;
-
-        if (a instanceof AbstractSimpleAttack<?, ?> aa) {
-            if (b instanceof AbstractSimpleAttack<?, ?> ab) {
-                if (aa.getStun() != ab.getStun()) return false;
-                if (aa.getOffset() != ab.getOffset()) return false;
-                if (aa.getKnockback() != ab.getKnockback()) return false;
-            } else {
-                return false;
-            }
-        }
-
-        return true;
+        return a.prototypeMatches(b);
     }
 }

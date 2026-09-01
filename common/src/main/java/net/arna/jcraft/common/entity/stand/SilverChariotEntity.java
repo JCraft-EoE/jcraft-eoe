@@ -75,10 +75,10 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     .conCount(3)
                     .freeSpace(Component.literal("""
                         BNBs:
-                            (Armor ON) Light>Barrage>Light>Cleave>Spinning Blade>Shooting Star>Light
-                            (Armor ON) Shooting Star>Light>Barrage>Impaling Thrust
-                            (Armor OFF) Shooting Star>Light>Spinning Blade>Barrage>Light>Cleave>Impaling Thrust
-                            (Armor OFF) Light>Spinning Blade>Barrage>Shooting Star>Cleave>Light
+                            (Armor ON) Stab>Barrage>Cleave>Spinning Blade>Shooting Star>Stab
+                            (Armor ON) Shooting Star>Stab>Barrage>Impaling Thrust
+                            (Armor OFF) Shooting Star>Stab>Spinning Blade>Barrage>Stab>Cleave>Impaling Thrust
+                            (Armor OFF) Stab>Spinning Blade>Barrage>Shooting Star>Cleave>Stab
                             (Armor OFF) Impaling Thrust>dash>Barrage>...
                         """))
                     .skinName(Component.literal("Gold Chariot"))
@@ -91,16 +91,21 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public static final StandData POSSESSED_DATA = DATA.withInfo(info ->
             info.freeSpace(Component.literal("""
                     BNBs:
-                        (Light>)Charge~Barrage>Light>Spinning Blade>Light~Light
-                        (Light>)Charge~Barrage>God of Death""")));
+                        Charge>Stab>Barrage>Stab>Spinning Blade>Divine Blade>Stab~Stab
+                        Barrage>God of Death""")));
 
-    public static final LastShotAttack LAST_SHOT = new LastShotAttack(100, 12, 15, 1f)
-            .withAnim(State.LAST_SHOT)
+    public static final SimpleAttack<SilverChariotEntity> THRUST = new SimpleAttack<SilverChariotEntity>(0,
+            9, 20, 0.75f, 6f, 22, 1.5f, 1.4f, -0.1f)
+            .withAnim(State.THRUST)
+            .withSound(JSoundRegistry.SC_THRUST)
+            .withBlockStun(5)
+            .withExtraHitBox(2, 0.1, 1)
+            .withImpactSound(JSoundRegistry.IMPACT_9)
             .withInfo(
-                    Component.literal("Last Shot"),
-                    Component.literal("Silver Chariot fires his rapier, which can bounce 5 times off walls, " +
-                            "nerfs all hitboxes and damage by 25% until returned")
+                    Component.literal("Thrust"),
+                    Component.literal("Longer range combo starter. Good stun and bad blockstun.")
             );
+
     public static final SimpleAttack<SilverChariotEntity> LIGHT_FOLLOWUP = new SimpleAttack<SilverChariotEntity>(0,
             6, 14, 0.65f, 6f, 12, 1.5f, 1.2f, -0.1f)
             .withAnim(State.LIGHT_FOLLOWUP)
@@ -110,16 +115,16 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(
                     Component.literal("Slash"),
-                    Component.literal("quick combo finisher")
+                    Component.literal("Quick combo finisher.")
             );
     public static final SimpleAttack<SilverChariotEntity> LIGHT = SimpleAttack.<SilverChariotEntity>lightAttack(
             5, 9, 0.65f, 5f,11, 0.15f, -0.1f)
+            .withCrouchingVariant(THRUST)
             .withFollowup(LIGHT_FOLLOWUP)
-            .withCrouchingVariant(LAST_SHOT)
             .withSound(JSoundRegistry.SC_POKE)
             .withInfo(
                     Component.literal("Stab"),
-                    Component.literal("quick combo starter, links into Spinning Blade while armor is off")
+                    Component.literal("Quick combo starter, links into Spinning Blade while armor is off.")
             );
     public static final MainBarrageAttack<SilverChariotEntity> BARRAGE = new MainBarrageAttack<SilverChariotEntity>(240,
             0, 40, 0.65f, 0.9f, 25, 2.25f, 0.1f, 0f, 3, 1.25F)
@@ -135,9 +140,10 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
+            .withImpactSound(JSoundRegistry.IMPACT_8)
             .withInfo(
                     Component.literal("Impaling Thrust"),
-                    Component.literal("slow, uninterruptible launcher")
+                    Component.literal("Slow, uninterruptible launcher.")
             );
 
     public static final SpinBarrageAttack<SilverChariotEntity> ANUBIS_SPIN_BARRAGE = new SpinBarrageAttack<SilverChariotEntity>(0,
@@ -147,16 +153,26 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withSound(JSoundRegistry.SC_SPIN)
             .withInfo(
                     Component.literal("Divine Blade"),
-                    Component.literal("fast reliable combo starter/extender, low stun")
+                    Component.literal("Fast reliable combo starter/extender, low stun.")
+            );
+    public static final LastShotAttack LAST_SHOT = new LastShotAttack(100, 12, 15, 1f)
+            .withAnim(State.LAST_SHOT)
+            .withInfo(
+                    Component.literal("Last Shot"),
+                    Component.literal(
+                            "Silver Chariot fires his rapier, which can bounce 5 times off walls, " +
+                                    "nerfs all hitboxes and damage by 25% until returned."
+                    )
             );
     public static final BarrageAttack<SilverChariotEntity> SPIN_BARRAGE = new BarrageAttack<SilverChariotEntity>(100,
-            7, 24,0.65f, 1f, 10, 2f, 0.1f, -0.2f, 2)
+            10, 24,0.65f, 1f, 10, 2f, 0.1f, -0.2f, 2)
+            .withCrouchingVariant(LAST_SHOT)
             .withFollowup(ANUBIS_SPIN_BARRAGE)
             .withFollowupFrame(6)
             .withSound(JSoundRegistry.SC_SPIN)
             .withInfo(
                     Component.literal("Spinning Blade"),
-                    Component.literal("fast reliable combo starter/extender, low stun")
+                    Component.literal("Fast reliable combo starter/extender, low stun.")
             );
 
     public static final RayDartAttack<SilverChariotEntity> RAY_DART_LOW = new RayDartAttack<SilverChariotEntity>(100,
@@ -164,6 +180,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withSound(JSoundRegistry.SC_CHARGE)
             .withSound(SoundEvents.PLAYER_ATTACK_SWEEP)
             .withBlockStun(9)
+            .withImpactSound(JSoundRegistry.IMPACT_9)
             .withInfo(
                     Component.literal("Lacerate"),
                     Component.literal("Anubis Chariot and the user charge forward, high stun, low blockstun.")
@@ -179,32 +196,32 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
                     Component.literal("Split"),
                     Component.literal("Anubis Chariot and the user charge forward, low stun, high blockstun.")
             );
-    public static final CleaveAttack<SilverChariotEntity> CLEAVE = new CleaveAttack<SilverChariotEntity>(0, 12, 21, 0.75f, 9f,
-            20, 2.5f, 0.8f, 0f)
+    public static final CleaveAttack<SilverChariotEntity> CLEAVE = new CleaveAttack<SilverChariotEntity>(0,
+            12, 21, 0.75f, 9f, 20, 2.5f, 0.8f, 0f)
             .withSound(JSoundRegistry.SC_CLEAVE)
             .withImpactSound(SoundEvents.PLAYER_ATTACK_SWEEP)
-            .withHyperArmor()
+            .withArmor(1)
             .withInfo(
                     Component.literal("Cleave"),
-                    Component.literal("Silver Chariot detaches from the user, delivering an uninterruptible, combo-starting slice")
+                    Component.literal("Silver Chariot detaches from the user, delivering an armored, combo-starting slice.")
             );
     public static final SCChargeAttack CHARGE = new SCChargeAttack(280, 5, 19, 8f,
-            5f, 17, 1.5f, 0.25f, 0f)
+            6f, 18, 1.5f, 0.25f, 0f)
             .withSound(JSoundRegistry.SC_SUMMON)
             .withBackstab(false)
             .withInfo(
                     Component.literal("Shooting Star"),
-                    Component.literal("Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender")
+                    Component.literal("Silver Chariot detaches from the user and charges in the looked direction, combo starter/extender.")
             );
     public static final SCCounterAttack COUNTER = new SCCounterAttack(480, 4, 34, 0.5f)
             .withInfo(
                     Component.literal("Counter"),
-                    Component.literal("0.2s windup, 1.5s duration, stuns when hit")
+                    Component.literal("0.2s windup, 1.5s duration, stuns when hit.")
             );
     public static final SimpleMultiHitAttack<SilverChariotEntity> GOD_OF_DEATH_FINAL = new SimpleMultiHitAttack<SilverChariotEntity>(
             0, 59, 0.65f, 6f, 20, 2.5f, 1.25f, 0f,
             IntSet.of(54))
-            .withImpactSound(JSoundRegistry.TW_KICK_HIT)
+            .withImpactSound(JSoundRegistry.IMPACT_7)
             .withLaunch()
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withInfo(
@@ -226,7 +243,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(
                     Component.literal("God of Death"),
-                    Component.literal("high-damage beatdown, 1.5s stun on whiff, cannot be combo broken")
+                    Component.literal("High-damage beatdown, 1.5s stun on whiff, cannot be combo broken.")
             );
     public static final ArmorOffAttack ARMOR_OFF = new ArmorOffAttack(1200, 6, 15, 0.65f,
             4f, 7, 1.75f, 0.75f, 0f)
@@ -234,7 +251,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withLaunch()
             .withInfo(
                     Component.literal("Armor Off"),
-                    Component.literal("25s of faster moves")
+                    Component.literal("25s of faster moves.")
             );
     public static final CircleSlashAttack<SilverChariotEntity> CIRCLE_SLASH = new CircleSlashAttack<SilverChariotEntity>(0, 2, 20,
             0.65f, 5f, 20, 1.75f, 0f, 0f)
@@ -252,7 +269,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
             .withInfo(
                     Component.literal("Circle Slash"),
                     Component.literal("""
-                            2 armor points
+                            2 armor points.
                             Can be held, and released 0.75s in.
                             Depending on how much you hold, the damage and launch height increase."""
                     ));
@@ -349,7 +366,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         moves.register(MoveClass.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveClass.BARRAGE, BARRAGE, State.BARRAGE);
 
-        moves.register(MoveClass.SPECIAL1, SPIN_BARRAGE, State.SPIN);
+        moves.registerImmediate(MoveClass.SPECIAL1, SPIN_BARRAGE, State.SPIN);
         moves.register(MoveClass.SPECIAL2, CHARGE, State.P_CHARGE);
         moves.register(MoveClass.SPECIAL3, CLEAVE, State.CLEAVE);
 
@@ -366,7 +383,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
         moves.register(MoveClass.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveClass.BARRAGE, BARRAGE, State.BARRAGE);
 
-        moves.register(MoveClass.SPECIAL1, SPIN_BARRAGE, State.SPIN).withFollowup(State.SPIN_2);
+        moves.registerImmediate(MoveClass.SPECIAL1, SPIN_BARRAGE, State.SPIN);
         moves.register(MoveClass.SPECIAL2, RAY_DART_HIGH, State.CHARGE_HIGH).withCrouchingVariant(State.CHARGE_LOW);
         moves.register(MoveClass.SPECIAL3, COUNTER, State.COUNTER);
 
@@ -506,6 +523,7 @@ public class SilverChariotEntity extends StandEntity<SilverChariotEntity, Silver
     public enum State implements StandAnimationState<SilverChariotEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.silverchariot.idle", AzPlayBehaviors.LOOP)),
         STAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.stab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        THRUST(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.thrust", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.silverchariot.block", AzPlayBehaviors.LOOP)),
         HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.silverchariot.barrage", AzPlayBehaviors.LOOP)),

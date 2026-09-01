@@ -9,9 +9,6 @@ import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.util.JUtils;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -30,7 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -47,23 +43,25 @@ import static net.arna.jcraft.api.Attacks.damageLogic;
 public class BlockProjectile extends JAttackEntity {
     private static final int MAX_TIME_TO_LAUNCH = 15;
 
-    private int timeToLaunch = MAX_TIME_TO_LAUNCH;
+    public int timeToLaunch = MAX_TIME_TO_LAUNCH;
     private int timeLaunched = 0;
     private boolean toRefresh = false;
     private boolean launched = false;
     private boolean hit = false;
 
-    private static final EntityDataAccessor<Byte> EFFECT;
-    private static final EntityDataAccessor<ItemStack> BLOCKSTACK;
+    public static final AzCommand IDLE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.block.idle", AzPlayBehaviors.LOOP);
 
-    static {
-        EFFECT = SynchedEntityData.defineId(BlockProjectile.class, EntityDataSerializers.BYTE);
-        BLOCKSTACK = SynchedEntityData.defineId(BlockProjectile.class, EntityDataSerializers.ITEM_STACK);
-    }
+    private static final EntityDataAccessor<Byte> EFFECT = SynchedEntityData.defineId(BlockProjectile.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<ItemStack> BLOCKSTACK = SynchedEntityData.defineId(BlockProjectile.class, EntityDataSerializers.ITEM_STACK);
 
     public BlockProjectile(final Level world) {
         super(JEntityTypeRegistry.BLOCK_PROJECTILE.get(), world);
         setNoGravity(true);
+    }
+
+    public BlockProjectile(final LivingEntity master) {
+        this(master.level());
+        setMaster(master);
     }
 
     @Override
@@ -87,6 +85,9 @@ public class BlockProjectile extends JAttackEntity {
         entityData.set(EFFECT, effect);
     }
 
+    public byte getEffect() { return entityData.get(EFFECT); }
+    public ItemStack getBlockStack() { return entityData.get(BLOCKSTACK); }
+
     public void markRefresh() {
         toRefresh = true;
     }
@@ -102,36 +103,11 @@ public class BlockProjectile extends JAttackEntity {
     @Override
     public void tick() {
         super.tick();
+
+        resetFallDistance();
+
         if (level().isClientSide) {
-            IDLE.sendForEntity(this);
-
-            final Vec3 vel = getDeltaMovement();
-            final int effect = entityData.get(EFFECT);
-
-            if (effect != 0) {
-                for (int i = 0; i < 32; i++) {
-                    ParticleOptions particle = (effect == 1) ?
-                            new BlockParticleOption(ParticleTypes.BLOCK, Block.byItem(entityData.get(BLOCKSTACK).getItem()).defaultBlockState()) :
-                            ParticleTypes.REVERSE_PORTAL;
-                    level().addParticle(
-                            particle,
-                            getX() + vel.x + random.nextDouble() - 0.5,
-                            getY() + vel.y + random.nextDouble() - 0.5,
-                            getZ() + vel.z + random.nextDouble() - 0.5,
-                            vel.x + random.nextDouble() * 2 - 1,
-                            vel.y + random.nextDouble() * 2 - 1,
-                            vel.z + random.nextDouble() * 2 - 1
-                    );
-                }
-            }
-            level().addParticle(ParticleTypes.REVERSE_PORTAL,
-                    getX() + random.nextDouble() - 0.5,
-                    getY() + random.nextDouble() - 0.5,
-                    getZ() + random.nextDouble() - 0.5,
-                    vel.x / 2,
-                    vel.y / 2,
-                    vel.z / 2
-            );
+            JCraft.getClientEntityHandler().blockProjectileTick(this);
         } else {
             if (master == null || deathTime > 1) {
                 discard();
@@ -194,6 +170,7 @@ public class BlockProjectile extends JAttackEntity {
                 setNoGravity(false);
             }
         }
+
     }
 
     public static AttributeSupplier.Builder createBlockAttributes() {
@@ -225,7 +202,7 @@ public class BlockProjectile extends JAttackEntity {
     @Nullable
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.STONE_BREAK;
+        return null;
     }
 
     @Override
@@ -258,25 +235,4 @@ public class BlockProjectile extends JAttackEntity {
     public @NonNull ItemStack getItemBySlot(final @NonNull EquipmentSlot slot) {
         return item;
     }
-
-    private static final AzCommand IDLE = AzCommand.create(JCraft.BASE_CONTROLLER, "animation.block.idle", AzPlayBehaviors.LOOP);
-
-    // Animations
-    /*
-    private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
-
-    @Override
-    public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
-    }
-
-    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.block.idle");
-    private PlayState predicate(final AnimationState<GeoAnimatable> state) {
-        return state.setAndContinue(IDLE);
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
-    }*/
 }

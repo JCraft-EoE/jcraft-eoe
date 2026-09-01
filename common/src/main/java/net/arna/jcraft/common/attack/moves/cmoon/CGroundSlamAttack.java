@@ -6,13 +6,11 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.Level;
@@ -34,11 +32,10 @@ public final class CGroundSlamAttack<A extends IAttacker<? extends A, ?>> extend
         super.processTarget(attacker, target, kbVec, damageSource);
 
         final LivingEntity user = attacker.getUserOrThrow();
-        GravityChangerAPI.setWorldVelocity(target, GravityChangerAPI.getGravityDirection(user).step());
+        final var launchVel = GravityChangerAPI.getGravityDirection(user).step();
+        if (user.isShiftKeyDown()) launchVel.negate();
+        GravityChangerAPI.setWorldVelocity(target, launchVel);
         target.hurtMarked = true;
-        if (user.isShiftKeyDown()) {
-            target.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 30, 0, true, false));
-        }
     }
 
     @Override

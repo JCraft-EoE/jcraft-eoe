@@ -1,7 +1,10 @@
 {
+  "replace": false,
   "values": [
     "jcraft:stand",
+    "jcraft:spec",
     "jcraft:phpoison",
-    "jcraft:jbleeding"
+    "jcraft:jbleeding",
+    "jcraft:armor_piercing_bullet"
   ]
 }

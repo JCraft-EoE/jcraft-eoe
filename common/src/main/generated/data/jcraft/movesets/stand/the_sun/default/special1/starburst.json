@@ -5,7 +5,7 @@
     "type": "jcraft:thesun_fire_meteor_attack",
     "cooldown": 40,
     "duration": 24,
-    "explosive_if_max": false,
+    "explosive_scale_minimum": 2.0,
     "extras": {
       "description": {
         "translate": "move.jcraft.the_sun.default.starburst.description"

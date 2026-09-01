@@ -43,6 +43,7 @@ public class SetupEvents {
         event.register(StandCapability.class);
         event.register(HamonCapability.class);
         event.register(VampireCapability.class);
+        event.register(GunslingerCapability.class);
 
         //World
         event.register(ShockwaveHandlerCapability.class);

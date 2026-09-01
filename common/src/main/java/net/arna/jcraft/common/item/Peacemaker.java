@@ -1,22 +1,24 @@
 package net.arna.jcraft.common.item;
 
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
-import net.arna.jcraft.api.spec.JSpec;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.projectile.BulletProjectile;
+import net.arna.jcraft.common.system.GunAiming;
 import net.arna.jcraft.common.tickable.PeacemakerReload;
-import net.arna.jcraft.common.util.DimensionData;
-import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -24,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -32,10 +35,40 @@ public class Peacemaker extends Item {
 
     public static final String SHOTS_ID = "Shots";
     public static final String RELOADING_ID = "Reloading";
+    public static final String ANIMATION_ID = "Animation";
+    public static final String ANIMATION_SEQUENCE_ID = "AnimationSequence";
+    public static final String COCKED_ID = "Cocked";
+
     public static final int MAX_ROUNDS = 6;
+
+    // Animation length of fire out of peacemaker.animation.json at 20 ticks per second.
+    private static final int FIRE_TICKS = 8;
+
+    // Cocking deliberately does not lock out for its animation's length; the hammer can be dropped
+    // as soon as it is back, and the animation is cut off by the shot.
+    private static final int COCK_INPUT_LOCKOUT = 2;
+
+    public static final AzCommand FIRE = Attacks.createAnimationCommand(JCraft.FIRE_CONTROLLER, "fire", AzPlayBehaviors.PLAY_ONCE);
+    public static final AzCommand COCK = Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "cock", AzPlayBehaviors.PLAY_ONCE);
 
     public Peacemaker(Properties settings) {
         super(settings);
+    }
+
+    /**
+     * Names the animation the held model should play next.
+     * <p>
+     * The sequence counter is what the client actually watches; bumping it is how a repeat of
+     * the same animation still reads as a new trigger rather than being skipped.
+     */
+    public static void markAnimation(ItemStack stack, String animation) {
+        if (animation == null || animation.isEmpty()) {
+            return;
+        }
+
+        CompoundTag data = stack.getOrCreateTag();
+        data.putString(ANIMATION_ID, animation);
+        data.putLong(ANIMATION_SEQUENCE_ID, data.getLong(ANIMATION_SEQUENCE_ID) + 1);
     }
 
     @Override
@@ -65,65 +98,111 @@ public class Peacemaker extends Item {
         return false; // Don't actually hurt the entity
     }
 
-    // Handle right-click - reload only
+    /**
+     * Right click is left free for aiming. Reloading is on the pick block key, routed through
+     * jcraft's own input rather than item use, which vanilla gates behind the item's cooldown.
+     */
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
-        ItemStack itemStack = user.getItemInHand(hand);
+        return InteractionResultHolder.fail(user.getItemInHand(hand));
+    }
 
-        if (user.hasEffect(JStatusRegistry.DAZED.get()) || user.isSpectator()) {
-            return InteractionResultHolder.fail(itemStack);
+    /**
+     * Recovers a gun whose reload never finished. The reloading flag lives in NBT and saves to
+     * disk, but the reload queue does not survive a logout or a server restart, so without this
+     * the gun would come back flagged as reloading forever and never fire again.
+     */
+    @Override
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, world, entity, slot, selected);
+
+        if (world.isClientSide) {
+            return;
         }
 
-        // Creative mode players don't need to reload
-        // But they are allowed to!
-//        if (user.isCreative()) {
-//            return InteractionResultHolder.fail(itemStack);
-//        }
+        final CompoundTag data = stack.getTag();
+        if (data != null && data.getBoolean(RELOADING_ID) && !PeacemakerReload.isReloading(stack)) {
+            abortReload(stack, entity instanceof LivingEntity living ? living : null);
+        }
+    }
 
-        CompoundTag data = itemStack.getOrCreateTag();
-        int shots = data.getInt(SHOTS_ID);
+    private static void startReload(ItemStack itemStack, Level world, Player user, InteractionHand hand) {
+        final CompoundTag data = itemStack.getOrCreateTag();
+        data.putBoolean(RELOADING_ID, true);
+        // Opening the gate lowers the hammer, so a gun left cocked does not stay that way.
+        data.putBoolean(COCKED_ID, false);
+        // Shooting stays locked out for exactly as long as the rounds actually being loaded take.
+        user.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), PeacemakerReload.totalTicks(plannedRounds(itemStack, user)));
+        // The reload owns its own animations and sounds, opening gate included.
+        PeacemakerReload.start(user, world, hand, itemStack);
+    }
 
-        // Check if already at max capacity
+    /** How many rounds this reload expects to chamber, used to size the cooldown up front. */
+    private static int plannedRounds(ItemStack itemStack, Player user) {
+        final int empty = MAX_ROUNDS - itemStack.getOrCreateTag().getInt(SHOTS_ID);
+        return user.isCreative() ? empty : Math.min(empty, countBulletsInInventory(user));
+    }
+
+    /** Whether the cylinder has room for another round and the shooter has one to put in it. */
+    public static boolean canLoadMore(ItemStack itemStack, LivingEntity user) {
+        if (itemStack.getOrCreateTag().getInt(SHOTS_ID) >= MAX_ROUNDS) {
+            return false;
+        }
+        if (!(user instanceof Player player)) {
+            return false;
+        }
+        return player.isCreative() || hasBulletInInventory(player);
+    }
+
+    /** Chambers a single round. Called once per feed step of the reload, which owns the sound. */
+    public static void loadRound(ItemStack itemStack, LivingEntity user) {
+        if (!(user instanceof Player player)) {
+            return;
+        }
+
+        final CompoundTag data = itemStack.getOrCreateTag();
+        final int shots = data.getInt(SHOTS_ID);
         if (shots >= MAX_ROUNDS) {
-            return InteractionResultHolder.fail(itemStack);
+            return;
         }
 
-        // Check if already reloading
-        if (data.getBoolean(RELOADING_ID) && user.getCooldowns().isOnCooldown(JItemRegistry.PEACEMAKER.get())) {
-            return InteractionResultHolder.fail(itemStack);
+        // Creative keeps the animation and audio without eating the player's ammo.
+        if (!player.isCreative() && !consumeBulletFromInventory(player)) {
+            return;
         }
 
-        // Check if player has bullets
-        if (!user.isCreative() && !hasBulletInInventory(user)) {
-            return InteractionResultHolder.fail(itemStack);
-        }
+        data.putInt(SHOTS_ID, shots + 1);
+    }
 
-        if (!world.isClientSide) {
-            // Start reload process
-            data.putBoolean(RELOADING_ID, true);
-            // Put shooting on cooldown during reload (3 seconds = 60 ticks)
-            user.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), 60); // 3 second cooldown during reload
-            PeacemakerReload.enqueue(new DimensionData(user, world.dimension(), 10)); // 10 ticks between bullets
-            world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegistry.LOAD.get(), SoundSource.PLAYERS, 0.5f, 1.0f);
-        }
+    /** Ends a reload that ran to completion. */
+    public static void finishReload(ItemStack itemStack, LivingEntity user) {
+        clearReloadState(itemStack, user);
+    }
 
-        return InteractionResultHolder.success(itemStack);
+    /**
+     * Ends a reload that was cut short, by swapping the gun away or dying mid-load. Without this
+     * the reloading flag sticks and the gun can never fire again.
+     */
+    public static void abortReload(ItemStack itemStack, LivingEntity user) {
+        clearReloadState(itemStack, user);
+    }
+
+    private static void clearReloadState(ItemStack itemStack, LivingEntity user) {
+        itemStack.getOrCreateTag().putBoolean(RELOADING_ID, false);
+        if (user instanceof Player player) {
+            player.getCooldowns().removeCooldown(JItemRegistry.PEACEMAKER.get());
+        }
     }
 
     // method to handle left-click firing via PlayerInputPacket
     public static boolean handleLeftClick(Player player) {
-        final ItemStack mainHand = player.getMainHandItem();
-        final ItemStack offHand = player.getOffhandItem();
+        return handleLeftClick(player, null);
+    }
 
-        // Check if player is holding a peacemaker in either hand
-        ItemStack peacemakerStack = null;
-        if (mainHand.getItem() instanceof Peacemaker) {
-            peacemakerStack = mainHand;
-        } else if (offHand.getItem() instanceof Peacemaker) {
-            peacemakerStack = offHand;
-        }
-
-        if (peacemakerStack == null) {
+    public static boolean handleLeftClick(Player player, @Nullable Vec3 muzzle) {
+        // Guns are main hand only, so the offhand is left to whatever else wants the input.
+        final ItemStack peacemakerStack = player.getMainHandItem();
+        if (!(peacemakerStack.getItem() instanceof Peacemaker)) {
             return false; // Not holding a peacemaker, let other systems handle it
         }
 
@@ -138,7 +217,7 @@ public class Peacemaker extends Item {
             return true; // We handled it (by doing nothing), don't let other systems try
         }
 
-        // Check if player has an active stand with moveStun > 0
+/*        // Check if player has an active stand with moveStun > 0
         StandEntity<?, ?> stand = JUtils.getStand(player);
         if (stand != null && stand.getMoveStun() > 0) {
             return true; // We handled it (by doing nothing) - stand is busy
@@ -148,34 +227,90 @@ public class Peacemaker extends Item {
         JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec != null && spec.getMoveStun() > 0) {
             return true; // We handled it (by doing nothing) - spec is busy
-        }
+        }*/
 
         CompoundTag data = peacemakerStack.getOrCreateTag();
-        int shots = data.getInt(SHOTS_ID);
 
-        // Check if reloading
+        // Working the trigger during a reload gives up on filling the cylinder and shuts the gate
+        // now, keeping whatever is already chambered.
         if (data.getBoolean(RELOADING_ID)) {
-            return true; // We handled it (by doing nothing)
+            if (!world.isClientSide) {
+                PeacemakerReload.finishEarly(peacemakerStack, world);
+                player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), PeacemakerReload.endTicks());
+            }
+            return true; // We handled it
         }
 
         // Creative mode has infinite bullets
-        if (shots < 1 && !player.isCreative()) {
+        if (data.getInt(SHOTS_ID) < 1 && !player.isCreative()) {
             return true; // We handled it (by doing nothing)
         }
 
         if (!world.isClientSide) {
-            // Set immediate cooldown to prevent multiple inputs
-            player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), 10); // 10 tick cooldown
-            Peacemaker.fireStatic(peacemakerStack, world, player);
+            // Single action: the hammer has to be thumbed back on its own click before the next
+            // one can drop it. Each click is one step, and the gun rests cocked in between.
+            if (data.getBoolean(COCKED_ID)) {
+                data.putBoolean(COCKED_ID, false);
+                player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), FIRE_TICKS);
+
+                FIRE.sendForItem(player, peacemakerStack);
+
+                world.playSound(null, player.getX(), player.getY(), player.getZ(), JSoundRegistry.PEACEMAKER_FIRE.get(), SoundSource.PLAYERS, 1f, 1f);
+                shoot(peacemakerStack, world, player, muzzle);
+            } else {
+                data.putBoolean(COCKED_ID, true);
+                // Only long enough to keep one click from reading as two. The hammer can be dropped
+                // before the cock animation has played out, which is what keeps the gun quick.
+                player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), COCK_INPUT_LOCKOUT);
+
+                COCK.sendForItem(player, peacemakerStack);
+
+                world.playSound(null, player.getX(), player.getY(), player.getZ(), JSoundRegistry.GUN_COCK.get(), SoundSource.PLAYERS, 1f, 1f);
+            }
         }
 
         return true; // Successfully handled the input
     }
 
-    // Remove the old onEntitySwing method completely
+    /** Handles the reload input (pick block) routed through PlayerInputPacket. */
+    public static boolean handleReloadInput(Player player) {
+        final ItemStack peacemakerStack = player.getMainHandItem();
+        if (!(peacemakerStack.getItem() instanceof Peacemaker)) {
+            return false; // Not holding a peacemaker, let the toss move have the input
+        }
 
-    // Static fire method for RevolverFire to call
-    public static void fireStatic(ItemStack itemStack, Level world, LivingEntity user) {
+        final Level world = player.level();
+
+        if (player.hasEffect(JStatusRegistry.DAZED.get()) || player.isSpectator()) {
+            return true;
+        }
+
+        final CompoundTag data = peacemakerStack.getOrCreateTag();
+        if (data.getInt(SHOTS_ID) >= MAX_ROUNDS || data.getBoolean(RELOADING_ID) || !canLoadMore(peacemakerStack, player)) {
+            return true; // We handled it (by doing nothing)
+        }
+
+        if (!world.isClientSide) {
+            startReload(peacemakerStack, world, player, InteractionHand.MAIN_HAND);
+        }
+
+        return true;
+    }
+
+    public static boolean isReloading(ItemStack itemStack) {
+        final CompoundTag data = itemStack.getTag();
+        return data != null && data.getBoolean(RELOADING_ID);
+    }
+
+    /**
+     * Spends a round and puts a bullet downrange. Called as the hammer falls, so the shot lands
+     * with the fire animation rather than with the trigger input; the stage owns the sound.
+     */
+    public static void shoot(ItemStack itemStack, Level world, LivingEntity user) {
+        shoot(itemStack, world, user, null);
+    }
+
+    public static void shoot(ItemStack itemStack, Level world, LivingEntity user, @Nullable Vec3 muzzle) {
         CompoundTag data = itemStack.getOrCreateTag();
         int shots = data.getInt(SHOTS_ID);
 
@@ -187,74 +322,55 @@ public class Peacemaker extends Item {
             data.putInt(SHOTS_ID, shots - 1);
         }
 
-        world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegistry.REVOLVER_FIRE.get(), SoundSource.PLAYERS, 1f, 1f);
+        final boolean aiming = GunAiming.isAiming(user);
+        var inaccuracy = 2.5f;
+        if (aiming) inaccuracy *= GunAiming.SPREAD_MULTIPLIER;
 
-        BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 5);
-        bullet.shootFromRotation(user, user.getXRot(), user.getYRot(), 0f, 10, 0f);
+        BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 7f);
+        bullet.shootFromRotation(user, user.getXRot(), user.getYRot(), 0f, 10, inaccuracy);
 
-        // Add campfire smoke particles at bullet spawn position
-        if (world instanceof ServerLevel serverLevel) {
-            // Get the bullet's initial position (slightly in front of the player)
-            double bulletX = bullet.getX();
-            double bulletY = bullet.getY();
-            double bulletZ = bullet.getZ();
+        final Vec3 forward = Vec3.directionFromRotation(0f, user.getYRot());
+        final boolean offhand = user.getOffhandItem() == itemStack;
+        final boolean rightArm = user.getMainArm() == HumanoidArm.RIGHT;
+        double side = rightArm != offhand ? 0.35 : -0.35;
+        if (aiming) side = 0.0;
 
-            // Spawn small campfire smoke particles
-            serverLevel.sendParticles(
-                    net.minecraft.core.particles.ParticleTypes.CAMPFIRE_COSY_SMOKE,
-                    bulletX, bulletY, bulletZ,
-                    5, // particle count
-                    0.1, 0.1, 0.1, // spread
-                    0.02 // speed
-            );
+        final Vec3 eye = user.getEyePosition();
+        Vec3 spawn;
+        if (muzzle != null && muzzle.distanceToSqr(eye) < 6.25) {
+            spawn = muzzle;
+        } else {
+            spawn = eye.add(forward.scale(0.25))
+                    .add(forward.cross(new Vec3(0, 1, 0)).scale(side))
+                    .add(0, -0.35, 0);
         }
+        bullet.setPos(spawn);
+        bullet.xo = spawn.x;
+        bullet.yo = spawn.y;
+        bullet.zo = spawn.z;
 
         world.addFreshEntity(bullet);
 
+        // The refire cooldown covers the whole pull and is set when the trigger is worked, so
+        // there is deliberately none added here; doing so would cut the fire animation short.
         if (user instanceof Player player) {
-            // Set refire cooldown - longer than the initial input cooldown
-            player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), 20); // 20 tick refire time
             player.awardStat(Stats.ITEM_USED.get(JItemRegistry.PEACEMAKER.get()));
-        }
-    }
-
-    public static void finishReload(ItemStack itemStack, Level world, LivingEntity user) {
-        CompoundTag data = itemStack.getOrCreateTag();
-        int shots = data.getInt(SHOTS_ID);
-
-        if (shots >= MAX_ROUNDS) {
-            data.putBoolean(RELOADING_ID, false);
-            return;
-        }
-
-        if (user instanceof Player player) {
-            // Consume one bullet from inventory
-            if (consumeBulletFromInventory(player)) {
-                data.putInt(SHOTS_ID, shots + 1);
-                // Play reload sound from JSoundRegistry
-                world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegistry.LOAD.get(), SoundSource.PLAYERS, 0.7f, 1.0f);
-
-                // Check if we need to reload more bullets
-                if (data.getInt(SHOTS_ID) < MAX_ROUNDS && hasBulletInInventory(player)) {
-                    // Queue next bullet reload (10 ticks between each bullet)
-                    PeacemakerReload.enqueue(new DimensionData(user, world.dimension(), 10));
-                    // Keep cooldown active during reload (3 seconds total)
-                    player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), 60);
-                } else {
-                    // Finished reloading - remove cooldown
-                    data.putBoolean(RELOADING_ID, false);
-                    player.getCooldowns().removeCooldown(JItemRegistry.PEACEMAKER.get());
-                }
-            } else {
-                // No more bullets available - remove cooldown
-                data.putBoolean(RELOADING_ID, false);
-                player.getCooldowns().removeCooldown(JItemRegistry.PEACEMAKER.get());
-            }
         }
     }
 
     private static boolean hasBulletInInventory(Player player) {
         return player.getInventory().contains(new ItemStack(JItemRegistry.BULLET.get()));
+    }
+
+    private static int countBulletsInInventory(Player player) {
+        int count = 0;
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            final ItemStack stack = player.getInventory().getItem(i);
+            if (stack.getItem() == JItemRegistry.BULLET.get()) {
+                count += stack.getCount();
+            }
+        }
+        return count;
     }
 
     private static boolean consumeBulletFromInventory(Player player) {

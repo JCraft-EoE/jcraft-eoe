@@ -29,6 +29,12 @@
           "type": "jcraft:play_sound",
           "run": "at_init",
           "sound": "jcraft:scheavy"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact8"
         }
       ],
       "armor": 2147483647,

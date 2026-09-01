@@ -22,10 +22,9 @@ import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
-import net.arna.jcraft.common.attack.moves.goldexperience.BerryBushAttack;
-import net.arna.jcraft.common.attack.moves.goldexperience.LifeGiverAttack;
-import net.arna.jcraft.common.attack.moves.goldexperience.OverclockAttack;
-import net.arna.jcraft.common.attack.moves.goldexperience.TreeAttack;
+import net.arna.jcraft.common.attack.actions.HealAction;
+import net.arna.jcraft.common.attack.actions.LaunchUpAction;
+import net.arna.jcraft.common.attack.moves.goldexperience.*;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
@@ -74,7 +73,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withImpactSound(JSoundRegistry.IMPACT_4)
             .withInfo(
                     Component.literal("Place Berry Bush"),
-                    Component.literal("places an almost-ripe berry bush on the ground, this move cannot be aimed up or down")
+                    Component.literal("Places an almost-ripe berry bush on the ground.")
             );
     public static final SimpleAttack<GoldExperienceEntity> LIGHT_FOLLOWUP = new SimpleAttack<GoldExperienceEntity>(0,
             7, 12, 0.75f, 6, 7, 1.5f, 1f, -0.1f)
@@ -86,7 +85,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withInfo(
                     Component.literal("Punch"),
-                    Component.literal("quick combo finisher")
+                    Component.literal("Quick combo finisher.")
             );
     public static final SimpleAttack<GoldExperienceEntity> LIGHT = new SimpleAttack<GoldExperienceEntity>(15,
             6, 9, 0.75f, 5f, 7, 1.5f, 0.2f, -0.1f)
@@ -96,9 +95,20 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withInfo(
                     Component.literal("Punch"),
-                    Component.literal("quick combo starter, low stun")
+                    Component.literal("Quick combo starter, low stun.")
             );
-    public static final MovementSlowingSimpleAttack<GoldExperienceEntity> HEAVY = new MovementSlowingSimpleAttack<GoldExperienceEntity>(22,
+    public static final VineAttack<GoldExperienceEntity> UNDERHAND = new VineAttack<GoldExperienceEntity>(100,
+            13, 22, 1.5f, 7f, 10, 1.5f, 1.1f, 0f)
+            .withAnim(State.UNDERHAND)
+            .withSound(JSoundRegistry.GE_TREE)
+            .withImpactSound(JSoundRegistry.IMPACT_2)
+            .withHitSpark(JParticleType.HIT_SPARK_3)
+            .withLaunch()
+            .withInfo(
+                    Component.literal("Underhand Carve"),
+                    Component.literal("An underhand launching strike, which creates aggressive vines if used near the ground.")
+            );
+    public static final MovementSlowingSimpleAttack<GoldExperienceEntity> HEAVY = new MovementSlowingSimpleAttack<GoldExperienceEntity>(0,
             13, 22, 1f, 9f, 10, 1.5f, 1.5f, 0f)
             .withExtraHitBox(new HitBoxData(0, 0, 1.25))
 //            .withSound(JSoundRegistry.GE_HEAVY)
@@ -106,31 +116,32 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withHyperArmor()
             .withLaunch()
+            .withCrouchingVariant(UNDERHAND)
             .withInfo(
                     Component.literal("Shoulder Smash"),
-                    Component.literal("slow, uninterruptible combo finisher")
+                    Component.literal("Slow, uninterruptible combo finisher.")
             );
     public static final MainBarrageAttack<GoldExperienceEntity> BARRAGE = new MainBarrageAttack<GoldExperienceEntity>(
             280, 0, 30, 0.75f, 1f, 20, 2f, 0.25f, 0f, 3, Blocks.OAK_PLANKS.defaultDestroyTime())
             .withSound(JSoundRegistry.GE_BARRAGE)
             .withInfo(
                     Component.literal("Barrage"),
-                    Component.literal("fast reliable combo starter/extender, high stun")
+                    Component.literal("Fast reliable combo starter/extender, high stun.")
             );
-    public static final HealMove<GoldExperienceEntity> HEAL_OTHERS = new HealMove<GoldExperienceEntity>(520, 10,
+    public static final HealMove<GoldExperienceEntity> HEAL_OTHERS = new HealMove<GoldExperienceEntity>(500, 10,
             16, 1f, 1.25f, 0f, 4f, HealMove.HealTarget.TARGETS, false)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(
                     Component.literal("Healing Hand (others)"),
-                    Component.empty()
+                    Component.literal("Heals others for 2 hearts, pacifies angered mobs.")
             );
-    public static final HealMove<GoldExperienceEntity> HEAL_SELF = new HealMove<GoldExperienceEntity>(520, 10,
+    public static final HealMove<GoldExperienceEntity> HEAL_SELF = new HealMove<GoldExperienceEntity>(500, 10,
             14, 1f, 0, 0, 4f, HealMove.HealTarget.USER, false)
             .withCrouchingVariant(HEAL_OTHERS)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(
                     Component.literal("Healing Hand"),
-                    Component.literal("standing: heals user for 2 hearts, crouching: heals others for 2 hearts, pacifies angered mobs")
+                    Component.literal("Heals user for 2 hearts.")
             );
     public static final TreeAttack<GoldExperienceEntity> TREE = new TreeAttack<GoldExperienceEntity>(280, 10, 24, 1f, 5f,
             15, 1.75f, 0.2f, -0.1f)
@@ -138,25 +149,42 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withSound(JSoundRegistry.GE_TREE)
             .withInfo(
                     Component.literal("Tree Summon"),
-                    Component.literal("two-hitting launch")
+                    Component.literal("Ground strike, which creates a tree that launches those it hits in the direction it was summoned in.")
             );
     public static final LifeGiverAttack<GoldExperienceEntity> LIFE_GIVER = new LifeGiverAttack<GoldExperienceEntity>(300, 16, 25, 1f)
             .withSound(JSoundRegistry.GE_HEAL)
             .withInfo(
                     Component.literal("Life Giver"),
                     Component.literal("""
-                            STANDING: turns any stackable item into a snake, lasts for 25s and stuns for 0.5s on hit
-                            CROUCHING: turns any stackable item into a frog, lasts for 15s and reflects damage, follows user
-                            AERIAL: turns any item into a butterfly, lasts forever""")
+                            STANDING: Turns any stackable item into a snake, lasts for 25s and stuns for 0.5s on hit.
+                            CROUCHING: Turns any stackable item into a frog, lasts for 15s and reflects damage, follows user.
+                            AERIAL: Turns any item into a butterfly, lasts forever.""")
             );
-    public static final OverclockAttack<GoldExperienceEntity> OVERCLOCK = new OverclockAttack<GoldExperienceEntity>(920, 22, 31, 1f,
-            9f, 60, 2f, 0.9f, 0f)
+    public static final OverclockAttack<GoldExperienceEntity> OVERCLOCK = new OverclockAttack<GoldExperienceEntity>(920,
+            22, 31, 1f,9f, 60, 2f, 0.9f, 0f, 60)
 //            .withSound(JSoundRegistry.GE_ULT)
+            .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withImpactSound(JSoundRegistry.IMPACT_10)
             .withBlockableType(BlockableType.NON_BLOCKABLE)
+            .withHitAnimation(CommonHitPropertyComponent.HitAnimation.LAUNCH)
+            .withLaunch()
+            .withAction(LaunchUpAction.launchUp(0.8f))
+            .withHitSpark(JParticleType.HIT_SPARK_3)
             .withInfo(
                     Component.literal("Overclock"),
-                    Component.literal("slow, unblockable, devastating stun")
+                    Component.literal("Slow, unblockable, devastating stun. Launches the opponent's soul out of their body.")
+            );
+
+    public static final OverclockAttack<GoldExperienceEntity> SOUL_PUNCH = new OverclockAttack<GoldExperienceEntity>(100,
+            14, 26, 1f,0f, 80, 1.65f, 0.9f, 0f, 80)
+            .withImpactSound(JSoundRegistry.IMPACT_1)
+            .withImpactSound(JSoundRegistry.IMPACT_10)
+            .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
+            .withAction(HealAction.heal(6.0f))
+            .withHitSpark(JParticleType.HIT_SPARK_2)
+            .withInfo(
+                    Component.literal("Soul Punch"),
+                    Component.literal("Fills the target with life energy, healing them and knocking their soul out of their body for 3 seconds. Extreme stun.")
             );
     public static final KnockdownAttack<GoldExperienceEntity> REKKA3 = new KnockdownAttack<GoldExperienceEntity>
             (0, 12, 24, 1f, 6f, 15, 2f, 0.75f, 0f, 50)
@@ -167,7 +195,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withBlockStun(8)
             .withInfo(
                     Component.literal("Rekka (Final Hit)"),
-                    Component.literal("knockdown, low blockstun")
+                    Component.literal("Knockdown, low blockstun.")
             );
     public static final SimpleAttack<GoldExperienceEntity> REKKA2 = new SimpleAttack<GoldExperienceEntity>
             (0, 9, 18, 1f, 5f, 16, 1.75f, 0.5f, 0f)
@@ -178,10 +206,11 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
             .withInfo(
                     Component.literal("Rekka (2nd Hit)"),
-                    Component.literal("links into Light")
+                    Component.literal("Links into Light.")
             );
     public static final SimpleAttack<GoldExperienceEntity> REKKA1 = new SimpleAttack<GoldExperienceEntity>
             (0, 7, 14, 1f, 5f, 15, 1.5f, 0.5f, 0f)
+            .withCrouchingVariant(SOUL_PUNCH)
             .withAnim(State.REKKA1)
             .withSound(JSoundRegistry.GE_REKKA1)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -190,7 +219,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
             .withInfo(
                     Component.literal("Rekka Series"),
-                    Component.literal("a set of three attacks, which cancel into each other during recovery")
+                    Component.literal("A set of three attacks, which cancel into each other during recovery.")
             );
     // TODO add move info x2
     // TODO balance x2
@@ -213,11 +242,15 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
     private static void registerMoves(MoveMap<GoldExperienceEntity, State> moves) {
         moves.registerImmediate(MoveClass.LIGHT, LIGHT, State.LIGHT);
 
-        moves.register(MoveClass.HEAVY, HEAVY, State.HEAVY);
+        moves.registerImmediate(MoveClass.HEAVY, HEAVY, State.HEAVY);
         moves.register(MoveClass.BARRAGE, BARRAGE, State.BARRAGE);
 
         moves.register(MoveClass.SPECIAL1, HEAL_SELF, State.HEAL_SELF).withCrouchingVariant(State.HEAL);
-        moves.register(MoveClass.SPECIAL2, REKKA1, State.REKKA1).withFollowup(State.REKKA2).withFollowup(State.REKKA3);
+
+        final var r1 = moves.register(MoveClass.SPECIAL2, REKKA1, State.REKKA1);
+        r1.withCrouchingVariant(State.SOUL_PUNCH);
+        r1.withFollowup(State.REKKA2).withFollowup(State.REKKA3);
+
         moves.register(MoveClass.SPECIAL3, LIFE_GIVER, State.LIFE_GIVER);
         moves.register(MoveClass.ULTIMATE, OVERCLOCK, State.OVERCLOCK);
 
@@ -318,6 +351,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.ge.block", AzPlayBehaviors.LOOP)),
         HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        UNDERHAND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.underhand", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.barrage", AzPlayBehaviors.LOOP)),
         HEAL_SELF(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.healself", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         HEAL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.heal", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
@@ -326,6 +360,7 @@ public class GoldExperienceEntity extends StandEntity<GoldExperienceEntity, Gold
         REKKA1(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.rekka1", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         REKKA2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.rekka2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         REKKA3(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.rekka3", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SOUL_PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.soul_punch", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         OVERCLOCK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.overclock", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.ge.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
         ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),

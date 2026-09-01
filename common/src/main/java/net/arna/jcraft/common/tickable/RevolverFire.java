@@ -45,7 +45,7 @@ public class RevolverFire {
                     if (main.getItem() == JItemRegistry.FV_REVOLVER.get()) {
                         FVRevolverItem.fire(main, world, user);
                     } else if (main.getItem() == JItemRegistry.PEACEMAKER.get()) {
-                        Peacemaker.fireStatic(main, world, user);
+                        Peacemaker.shoot(main, world, user);
                     }
                 }
             }

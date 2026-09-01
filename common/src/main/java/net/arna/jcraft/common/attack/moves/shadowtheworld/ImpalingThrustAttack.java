@@ -4,6 +4,7 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.AttackData;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
@@ -45,6 +46,8 @@ public class ImpalingThrustAttack extends AbstractMove<ImpalingThrustAttack, Sha
         final ServerLevel world = (ServerLevel) attacker.level();
         final CommonShockwaveHandlerComponent shockwaveHandler = JComponentPlatformUtils.getShockwaveHandler(world);
 
+        boolean unblockable = getChargeTime() >= 30;
+
         final Vec3 start = user.getEyePosition(), end = user.getEyePosition().add(user.getLookAngle().scale(8));
         HitResult hitResult = world.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, user));
         final Vec3 pos2 = hitResult.getLocation();
@@ -80,11 +83,17 @@ public class ImpalingThrustAttack extends AbstractMove<ImpalingThrustAttack, Sha
                 );
                 for (LivingEntity ent : hurt) {
                     final LivingEntity target = JUtils.getUserIfStand(ent);
+
                     // +6 on hit/-4 on block launcher
                     // +0 if you count STW desummon not letting you block
-                    damageLogic(world, target,
-                            target.position().subtract(curPos).normalize(), 10 + attacker.getDesummonTime(), 3, false,
-                            8.0f, true, 12, playerSource, user, CommonHitPropertyComponent.HitAnimation.LAUNCH);
+
+                    final var attackData = new AttackData(
+                            target.position().subtract(curPos).normalize(), 10 + attacker.getDesummonTime(), 3, unblockable,
+                            8.0f, true, 12, playerSource, user, CommonHitPropertyComponent.HitAnimation.LAUNCH, null,
+                            true, unblockable, true
+                    );
+
+                    damageLogic(world, target, attackData);
                     target.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
                 }
             }

@@ -1,6 +1,7 @@
 package net.arna.jcraft.common.entity.ai.goal;
 
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.control.LookControl;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -32,11 +33,16 @@ public class SHAAttackGoal extends Goal {
     }
 
     public boolean canContinueToUse() {
-        if (!target.isAlive() || target.isRemoved()) {
+        if (!target.isAlive() || target.isRemoved() || target.isInvulnerable()) {
             return false;
-        } else if (target instanceof Player player && (player.isCreative() || player.isSpectator())) {
+        }
+
+        final var main = JUtils.getUserIfStand(target);
+        if (main instanceof Player player && (player.isCreative() || player.isSpectator())) {
             return false;
-        } else if (sha.distanceToSqr(target) > 1024.0D) {
+        }
+
+        if (sha.distanceToSqr(target) > 1024.0D) {
             return false;
         } else {
             return !sha.getNavigation().isDone() || canUse();

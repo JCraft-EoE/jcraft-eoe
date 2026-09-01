@@ -484,6 +484,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     if (distanceSqr <= 6.25) {
                         setRemote(false);
                         setFlyState(FlyState.NONE);
+                        cancelMove();
                         playSound(JSoundRegistry.AS_LANDING.get());
                     }
                 }
@@ -512,7 +513,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         if (user instanceof Mob mob) {
             final var target = mob.getTarget();
 
-            if (target != null)
+            if (target != null && !forcedReturn)
                 attackOrderMove.setCurrentTarget(target);
         }
 

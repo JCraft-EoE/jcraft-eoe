@@ -228,6 +228,7 @@ public interface JCreativeMenuTabRegistry {
                     entries.accept(JItemRegistry.STONE_MASK.get());
                     entries.accept(JItemRegistry.RED_HAT.get());
                     entries.accept(JItemRegistry.COFFIN_BLOCK.get());
+                    entries.accept(JItemRegistry.HOLSTER.get());
                     entries.accept(JItemRegistry.PEACEMAKER.get());
 
                     // vehicles

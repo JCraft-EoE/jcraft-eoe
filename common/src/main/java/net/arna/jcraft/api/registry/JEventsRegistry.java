@@ -17,6 +17,7 @@ public interface JEventsRegistry {
         // NOTE: THESE ARE ALSO REGISTERED ON THE CLIENT
         EntityEvent.LIVING_HURT.register(JServerEvents::hurt);
         JEntityEvents.POST_ADD.register(JServerEvents::entityLoad);
+        PlayerEvent.PLAYER_RESPAWN.register(JServerEvents::playerRespawn);
         EntityEvent.LIVING_DEATH.register(JServerEvents::death);
         TickEvent.SERVER_POST.register(JServerEvents::serverPostTick);
         TickEvent.SERVER_LEVEL_POST.register(JServerEvents::serverLevelPostTick);

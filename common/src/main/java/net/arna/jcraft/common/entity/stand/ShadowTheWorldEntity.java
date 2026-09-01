@@ -25,15 +25,18 @@ import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.theworld.overheaven.LungeAttack;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.config.JServerConfig;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 /**
@@ -253,13 +256,32 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
     @Override
     public void tick() {
         super.tick();
+
         if (isAnimatedDesummoning()) {
             if (--desummonTime < 1) discard();
         }
+
         if (level().isClientSide()) {
-            //stw particles?
+
+            if (getState() == State.IMPALING_THRUST_CHARGE && getMoveStun() == (IMPALING_THRUST.getDuration() - 30)) {
+                final Vec3 offset = GravityChangerAPI.getEyeOffset(this);
+                final double x = getX() + offset.x, y = getY() + offset.y, z = getZ() + offset.z;
+                for (int i = 0; i < 12; i++) {
+                    level().addParticle(
+                            ParticleTypes.DRAGON_BREATH,
+                            x,
+                            y,
+                            z,
+                            random.nextGaussian() * 1.5f,
+                            random.nextGaussian() * 1.5f,
+                            random.nextGaussian() * 1.5f
+                    );
+                }
+            }
+
             return;
         }
+
         if (tsTime < 1) {
             if ( (getCurrentMove() != null || getState() == State.CHARGE_HIT) && getMoveStun() == 1 && getState() != State.COUNTER && getState() != State.ITEM_TOSS_CHARGE) {
                 // Stay in final attack pose

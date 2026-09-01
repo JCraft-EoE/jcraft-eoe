@@ -1,4 +1,4 @@
-package net.arna.jcraft.client.renderer.entity;
+package net.arna.jcraft.client.renderer.entity.ge;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -8,6 +8,7 @@ import mod.azure.azurelib.animation.controller.AzAnimationControllerContainer;
 import mod.azure.azurelib.model.AzBone;
 import mod.azure.azurelib.render.AzRendererPipelineContext;
 import mod.azure.azurelib.render.layer.AzBlockAndItemLayer;
+import net.arna.jcraft.client.renderer.entity.AbstractEntityRenderer;
 import net.arna.jcraft.common.entity.GESnakeEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

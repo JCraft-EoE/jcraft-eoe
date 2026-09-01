@@ -885,6 +885,11 @@
       "jcraft:stands/silverchariot/poke"
     ]
   },
+  "scthrust": {
+    "sounds": [
+      "jcraft:stands/silverchariot/thrust"
+    ]
+  },
   "hgsummon": {
     "sounds": [
       "jcraft:stands/hierophantgreen/summon"
@@ -1230,6 +1235,26 @@
       "jcraft:specs/hamon/exhale"
     ]
   },
+  "rangerreholster": {
+    "sounds": [
+      "jcraft:specs/ranger/reholster"
+    ]
+  },
+  "rangerunholster": {
+    "sounds": [
+      "jcraft:specs/ranger/unholster"
+    ]
+  },
+  "rangerfocus": {
+    "sounds": [
+      "jcraft:specs/ranger/focus"
+    ]
+  },
+  "rangerfocus_start": {
+    "sounds": [
+      "jcraft:specs/ranger/focus_start"
+    ]
+  },
   "bulletricochet": {
     "sounds": [
       "jcraft:projectiles/bullet/ricochet"
@@ -1386,6 +1411,36 @@
   "matchbox_use": {
     "sounds": [
       "jcraft:projectiles/matchbox/use"
+    ]
+  },
+  "peacemaker_fire": {
+    "sounds": [
+      "jcraft:gun/peacemaker_fire"
+    ]
+  },
+  "gun_cock": {
+    "sounds": [
+      "jcraft:gun/cock"
+    ]
+  },
+  "gun_gate": {
+    "sounds": [
+      "jcraft:gun/gate"
+    ]
+  },
+  "gun_eject": {
+    "sounds": [
+      "jcraft:gun/eject"
+    ]
+  },
+  "gun_load": {
+    "sounds": [
+      "jcraft:gun/load"
+    ]
+  },
+  "gun_cycle": {
+    "sounds": [
+      "jcraft:gun/cycle"
     ]
   }
 }

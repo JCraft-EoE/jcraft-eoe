@@ -116,7 +116,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public DamageSource getDamageSource() {
-        return JDamageSources.create(user.level(), DamageTypes.PLAYER_ATTACK, user);
+        return JDamageSources.spec(user);
     }
 
     @Override

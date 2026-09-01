@@ -9,7 +9,10 @@ import static net.arna.jcraft.api.component.living.CommonHitPropertyComponent.Hi
 import static net.arna.jcraft.api.component.living.CommonHitPropertyComponent.HitAnimation.MID;
 
 @With
-public record AttackData(Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockStun, DamageSource source, Entity attacker, HitAnimation hitAnimation, MoveUsage moveUsage, boolean canBackstab, boolean unblockable, boolean cancelMoves) {
+public record AttackData(
+        Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift, int blockStun,
+        DamageSource source, Entity attacker, HitAnimation hitAnimation, MoveUsage moveUsage,
+        boolean canBackstab, boolean unblockable, boolean cancelMoves) {
 
     public AttackData() {
         this(Vec3.ZERO, 0, 1, false, 0.0f, false, 0, null, null, MID, null, false, false);

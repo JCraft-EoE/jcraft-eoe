@@ -2,11 +2,10 @@ package net.arna.jcraft.common.tickable;
 
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.stand.GEREntity;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.DimensionData;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -97,8 +96,11 @@ public class Timestops {
                         new AABB(pos.add(96.0, 96.0, 96.0), pos.subtract(96.0, 96.0, 96.0)), TIMESTOP_PREDICATE);
 
                 for (final Entity entity : toStop) {
-                    if (!entity.isPassenger() && entity != user && (!(entity instanceof LivingEntity living) || entity != JUtils.getStand(living)) &&
-                            entity != user.getVehicle()) {
+                    if (
+                            !entity.isPassenger()
+                            && entity != user
+                            && !user.isPassengerOfSameVehicle(entity)
+                    ) {
                         if (JComponentPlatformUtils.getTimeStopData(entity).isPresent()) {
                             JComponentPlatformUtils.getTimeStopData(entity).get().setTicks(2);
                         }
