@@ -6,13 +6,14 @@
     "type": "jcraft:shared_simple_uppercut_attack",
     "attack_extras": {
       "backstab": true,
-      "block_stun": 10,
+      "block_stun": 8,
       "hit_animation": "MID",
       "hit_spark": "HIT_SPARK_1",
+      "ipsId": 7,
       "static_height": true
     },
     "cooldown": 10,
-    "damage": 6.0,
+    "damage": 4.0,
     "duration": 17,
     "extras": {
       "actions": [

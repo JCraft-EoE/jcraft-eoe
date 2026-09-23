@@ -3,6 +3,7 @@ package net.arna.jcraft.common.util;
 import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.SheerHeartAttackEntity;
+import net.arna.jcraft.common.entity.projectile.BlockProjectile;
 import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.common.entity.vehicle.AbstractGroundVehicleEntity;
 import net.minecraft.world.entity.Entity;
@@ -49,5 +50,9 @@ public class DummyClientEntityHandler implements IClientEntityHandler {
 
     @Override
     public void spawnGroundedMoshParticles(AbstractArrow projectile) {
+    }
+
+    @Override
+    public void blockProjectileTick(BlockProjectile proj) {
     }
 }

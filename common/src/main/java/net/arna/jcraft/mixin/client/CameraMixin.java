@@ -1,72 +1,82 @@
 package net.arna.jcraft.mixin.client;
 
+import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.common.util.math.V3;
 import net.minecraft.client.Camera;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
-    @Shadow
-    private BlockGetter level;
-    @Shadow
-    private Vec3 position;
-    @Final
-    @Shadow
-    private Vector3f up;
-    @Shadow
-    private Entity entity;
+    @Unique
+    private boolean wasDetached = false;
+    @Unique
+    private final V3 inertia = new V3();
+
     @Shadow
     private boolean detached;
     @Shadow
     private float eyeHeightOld;
     @Shadow
     private float eyeHeight;
+    @Shadow
+    private BlockGetter level;
 
-    private double clipToSpaceVertical(double desiredCameraDistance) {
-        for (int i = 0; i < 8; ++i) {
-            float f = (float) ((i & 1) * 2 - 1);
-            float g = (float) ((i >> 1 & 1) * 2 - 1);
-            float h = (float) ((i >> 2 & 1) * 2 - 1);
-            f *= 0.1F;
-            g *= 0.1F;
-            h *= 0.1F;
-            Vec3 vec3d = position.add(f, g, h);
-            Vec3 vec3d2 = new Vec3(position.x - (double) up.x() * desiredCameraDistance + (double) f + (double) h, position.y - (double) up.y() * desiredCameraDistance + (double) g, position.z - (double) up.z() * desiredCameraDistance + (double) h);
-            HitResult hitResult = level.clip(new ClipContext(vec3d, vec3d2, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, this.entity));
-            if (hitResult.getType() != HitResult.Type.MISS) {
-                double d = hitResult.getLocation().distanceTo(this.position);
-                if (d < desiredCameraDistance) {
-                    desiredCameraDistance = d;
+    @Shadow @Final private BlockPos.MutableBlockPos blockPosition;
+
+    @Shadow private Vec3 position;
+
+    @Inject(method = "setup", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.BEFORE))
+    public void jcraft$prevSetPosUpdate(BlockGetter area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
+
+        if (focusedEntity instanceof LivingEntity living) {
+            if (living.hasEffect(JStatusRegistry.OUT_OF_BODY.get())) {
+                detached = true;
+
+                info.cancel();
+
+                if (detached) {
+                    if (wasDetached) { // slide back
+                        inertia.scale(0.98);
+
+                        CameraInvoker cameraInvoker = (CameraInvoker) this;
+                        cameraInvoker.invokeSetPos(
+                                position.x + inertia.x * tickDelta,
+                                position.y + inertia.y * tickDelta,
+                                position.z + inertia.z * tickDelta
+                        );
+
+                        // bounce out of wall
+                        if (level.getBlockState(blockPosition).isSuffocating(area, blockPosition)) {
+                            cameraInvoker.invokeSetPos(
+                                    position.x - 1.1 * inertia.x * tickDelta,
+                                    position.y - 1.1 * inertia.y * tickDelta,
+                                    position.z - 1.1 * inertia.z * tickDelta
+                            );
+
+                            inertia.scale(-0.7);
+                        }
+                    } else { // initial launch
+                        inertia.set(living.getLookAngle(), -0.4);
+                    }
                 }
             }
         }
 
-        return desiredCameraDistance;
-    }
-
-    @Inject(method = "setup", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.BEFORE))
-    public void jcraft$prevSetPosUpdate(BlockGetter area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
-        if (focusedEntity instanceof LivingEntity living) {
-            if (living.hasEffect(JStatusRegistry.OUTOFBODY.get())) {
-                this.detached = true;
-                info.cancel();
-            }
-        }
+        wasDetached = detached;
     }
 
     @Inject(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.AFTER))
@@ -75,21 +85,12 @@ public abstract class CameraMixin {
         if (stand != null && stand.isRemoteAndControllable()) {
             CameraInvoker cameraInvoker = (CameraInvoker) this;
             cameraInvoker.invokeSetPos(
-                    new Vec3(
-                            Mth.lerp(tickDelta, stand.xo, stand.getX()),
-                            Mth.lerp(tickDelta, stand.yo, stand.getY()) + (double) Mth.lerp(tickDelta, this.eyeHeightOld, this.eyeHeight),
-                            Mth.lerp(tickDelta, stand.zo, stand.getZ())
-                    )
+                    Mth.lerp(tickDelta, stand.xo, stand.getX()),
+                    Mth.lerp(tickDelta, stand.yo, stand.getY()) + (double) Mth.lerp(tickDelta, this.eyeHeightOld, this.eyeHeight),
+                    Mth.lerp(tickDelta, stand.zo, stand.getZ())
             );
-            this.detached = true;
-        }
 
-        /*
-        if (!inverseView) {
-            CameraInvoker cameraInvoker = (CameraInvoker) this;
-            cameraInvoker.invokeMoveBy(-cameraInvoker.invokeClipToSpace(2.5D), 0, 0);
-            cameraInvoker.invokeMoveBy(0, clipToSpaceVertical(0.75D), 0);
-            info.cancel();
-        }*/
+            detached = true;
+        }
     }
 }

@@ -67,7 +67,7 @@ public class FVRevolverItem extends Item {
         data.putInt("Shots", shots - 1);
         world.playSound(null, user.getX(), user.getY(), user.getZ(), JSoundRegistry.REVOLVER_FIRE.get(), SoundSource.PLAYERS, 1f, 1f);
 
-        BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 5);
+        BulletProjectile bullet = new BulletProjectile(world, user, 9f, 10f, 2, 7f);
         bullet.shootFromRotation(user, user.getXRot(), user.getYRot(), 0f, 10, 0F);
         world.addFreshEntity(bullet);
 

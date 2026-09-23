@@ -3,7 +3,7 @@
   "cooldown_type": "UTILITY",
   "move": {
     "type": "jcraft:cmoon_gravitational_hop_move",
-    "cooldown": 340,
+    "cooldown": 280,
     "extras": {
       "description": {
         "translate": "move.jcraft.c_moon.default.gravitational_hoplocal_gravity_change.description"

@@ -82,6 +82,10 @@ public class JComponentPlatformUtilsImpl {
         return TexasHoldEmCapability.getCapability(world);
     }
 
+    public static CommonGunslingerComponent getGunslinger(LivingEntity living) {
+        return GunslingerCapability.getCapability(living);
+    }
+
     public static CommonHamonComponent getHamon(LivingEntity living) {
         return HamonCapability.getCapability(living);
     }

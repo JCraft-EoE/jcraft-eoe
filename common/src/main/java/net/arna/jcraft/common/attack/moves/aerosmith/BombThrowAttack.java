@@ -29,7 +29,7 @@ public class BombThrowAttack<A extends IAttacker<? extends A, ?>> extends Abstra
         final var launchVel = new V3();
 
         location.add(forward, 2.5).add(up, 1.5);
-        launchVel.add(forward, 0.2).add(up, 0.1);
+        launchVel.add(forward, 0.2).add(up, 0.1).add(user.getDeltaMovement().scale(0.75));
 
         final var level = baseEntity.level();
         final var bomb = new AerobombProjectile(level);

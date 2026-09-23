@@ -35,7 +35,7 @@
           "sound": "jcraft:twdonuthit"
         }
       ],
-      "armor": 2147483647,
+      "armor": 3,
       "description": {
         "translate": "move.jcraft.the_world.default.donut.description"
       },

@@ -1100,6 +1100,32 @@ public abstract class AbstractMove<T extends AbstractMove<T, A>, A extends IAtta
      */
     protected abstract @NonNull T getThis();
 
+    public boolean prototypeMatches(AbstractMove<?, ?> other) {
+        if (this instanceof AbstractSimpleAttack<?, ?> aa) {
+            if (other instanceof AbstractSimpleAttack<?, ?> ab) {
+                final int aid = aa.getIpsId(), bid = ab.getIpsId();
+
+                if ( (aid != 0) && (bid != 0) ) return aid == bid;
+
+                if (aa.getStun() != ab.getStun()) return false;
+                if (aa.getOffset() != ab.getOffset()) return false;
+                if (aa.getKnockback() != ab.getKnockback()) return false;
+            } else {
+                return false;
+            }
+        }
+
+        if (this.getClass() != other.getClass()) return false;
+        if (this.getMoveClass() != other.getMoveClass()) return false;
+        if (this.isAerialVariant() != other.isAerialVariant()) return false;
+        if (this.isCrouchingVariant() != other.isCrouchingVariant()) return false;
+        if (this.getCooldown() != other.getCooldown()) return false;
+        if (this.getDuration() != other.getDuration()) return false;
+        if (this.getWindup() != other.getWindup()) return false;
+
+        return true;
+    }
+
     /**
      * Copies all extra data that is not included in the move's constructor to the copy.
      * Should be called in {@link #copy()} and should always call the super method.

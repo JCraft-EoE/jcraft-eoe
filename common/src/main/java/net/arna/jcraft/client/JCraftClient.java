@@ -20,6 +20,7 @@ import net.arna.jcraft.api.pose.PoseModifiers;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.client.aim.GunAimHandler;
 import net.arna.jcraft.client.gravity.util.GravityChannelClient;
 import net.arna.jcraft.client.gui.hud.JCraftAbilityHud;
 import net.arna.jcraft.client.input.AerialKeyBinding;
@@ -34,6 +35,7 @@ import net.arna.jcraft.client.renderer.armor.ArmorRenderer;
 import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.renderer.item.GasCanItemRenderer;
+import net.arna.jcraft.client.renderer.item.PeacemakerItemRenderer;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.rendering.StandUserPoseLoader;
 import net.arna.jcraft.client.rendering.handler.*;
@@ -130,6 +132,7 @@ public class JCraftClient {
 
         BlockBreakerClient.init();
         BoundSoundClient.init();
+        GunAimHandler.init();
 
         // Rendering
         JRenderLayerRegistry.init();
@@ -142,12 +145,14 @@ public class JCraftClient {
         AzArmorRendererRegistry.register(ArmorRenderer.simple("red_hat"), JItemRegistry.RED_HAT.get());
 
         AzItemRendererRegistry.register(JItemRegistry.GAS_CAN.get(), GasCanItemRenderer::new);
+        AzItemRendererRegistry.register(JItemRegistry.PEACEMAKER.get(), PeacemakerItemRenderer::new);
 
         SpecialParticleShaderHandler.INSTANCE.init();
         ZaWarudoShaderHandler.INSTANCE.init();
         CrimsonShaderHandler.INSTANCE.init();
         EpitaphVignetteShaderHandler.INSTANCE.init();
         MandomRewindShaderHandler.INSTANCE.init();
+        RangerFocusShaderHandler.INSTANCE.init();
 
         // Renderer registration
 

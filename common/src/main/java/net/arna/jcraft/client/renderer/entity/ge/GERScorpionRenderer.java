@@ -1,8 +1,9 @@
-package net.arna.jcraft.client.renderer.entity;
+package net.arna.jcraft.client.renderer.entity.ge;
 
 import lombok.NonNull;
 import mod.azure.azurelib.render.entity.AzEntityRendererConfig;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.client.renderer.entity.AbstractEntityRenderer;
 import net.arna.jcraft.common.entity.GERScorpionEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

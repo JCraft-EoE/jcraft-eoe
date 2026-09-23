@@ -155,6 +155,9 @@ public final class JCraft {
      */
     public static final String BASE_CONTROLLER = "base_controller";
 
+    // General-purpose gun controllers
+    public static final String FIRE_CONTROLLER = "fire_controller";
+
     // Dimensional travel bullshit
     /**
      * Used to lock the AU chunks from being unloaded automatically by JServerTickEvents
@@ -268,11 +271,17 @@ public final class JCraft {
         NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_PREDICTION_TRIGGER, PredictionTriggerPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_VARIANT, VariantInputPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_GUN_AIM, GunAimPacket::handle);
     }
 
     private static void registerAzArmor() {
         AzIdentityRegistry.register(JItemRegistry.STONE_MASK.get());
         AzIdentityRegistry.register(JItemRegistry.RED_HAT.get());
+    }
+
+    // Held guns animate per stack, so each one needs its own identity rather than sharing the item's.
+    private static void registerAzItems() {
+        AzIdentityRegistry.register(JItemRegistry.PEACEMAKER.get());
     }
 
     public static void postInit() {
@@ -281,6 +290,7 @@ public final class JCraft {
         initDispenserBehaviors();
         JStatRegistry.initFormatters();
         registerAzArmor();
+        registerAzItems();
         initMoveSets();
     }
 

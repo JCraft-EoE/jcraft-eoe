@@ -156,6 +156,7 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> SC_CLEAVE = register("sccleave");
     RegistrySupplier<SoundEvent> SC_ARMOROFF = register("scarmoroff");
     RegistrySupplier<SoundEvent> SC_POKE = register("scpoke");
+    RegistrySupplier<SoundEvent> SC_THRUST = register("scthrust");
 
     //Golden Experience
     RegistrySupplier<SoundEvent> GE_SUMMON = register("gesummon");
@@ -340,6 +341,13 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> HAMON_CRACKLES = register("hamoncrackles");
     RegistrySupplier<SoundEvent> HAMON_EXHALE = register("hamonexhale");
 
+    // Ranger
+
+    RegistrySupplier<SoundEvent> RANGER_UNHOLSTER = register("rangerunholster");
+    RegistrySupplier<SoundEvent> RANGER_REHOLSTER = register("rangerreholster");
+    RegistrySupplier<SoundEvent> RANGER_FOCUS = register("rangerfocus");
+    RegistrySupplier<SoundEvent> RANGER_FOCUS_START = register("rangerfocus_start");
+
     //// OTHER
     RegistrySupplier<SoundEvent> BULLET_RICOCHET = register("bulletricochet");
     RegistrySupplier<SoundEvent> BULLET_PENETRATE = register("bulletpenetrate");
@@ -348,6 +356,14 @@ public interface JSoundRegistry {
     RegistrySupplier<SoundEvent> GAS_CAN_SPILL = register("gas_can_spill");
     RegistrySupplier<SoundEvent> GAS_CAN_CRASH = register("gas_can_crash");
     RegistrySupplier<SoundEvent> MATCHBOX_USE = register("matchbox_use");
+
+    // GUNS
+    RegistrySupplier<SoundEvent> PEACEMAKER_FIRE = register("peacemaker_fire");
+    RegistrySupplier<SoundEvent> GUN_COCK = register("gun_cock");
+    RegistrySupplier<SoundEvent> GUN_GATE = register("gun_gate");
+    RegistrySupplier<SoundEvent> GUN_EJECT = register("gun_eject");
+    RegistrySupplier<SoundEvent> GUN_LOAD = register("gun_load");
+    RegistrySupplier<SoundEvent> GUN_CYCLE = register("gun_cycle");
 
     // ROAD ROLLER
     RegistrySupplier<SoundEvent> ROAD_ROLLER_HIT = register("rrhit");
