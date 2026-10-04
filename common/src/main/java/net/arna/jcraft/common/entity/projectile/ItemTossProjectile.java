@@ -426,7 +426,7 @@ public class ItemTossProjectile extends AbstractArrow {
         final ItemStack item = getItem();
         // blocks get placed if possible
         final BlockPos pos = result.getBlockPos().relative(result.getDirection());
-        if (item.getItem() instanceof BlockItem block) {
+        if (item.getItem() instanceof BlockItem block && !item.is(Items.POINTED_DRIPSTONE)) {
             final LivingEntity placer = JUtils.getUserIfStand(getOwner()) instanceof LivingEntity living ? living : null;
             if (item.is(JTagRegistry.BRITTLE) && hardness >= Blocks.STONE.defaultDestroyTime()) {
                 // brittle things get destroyed
