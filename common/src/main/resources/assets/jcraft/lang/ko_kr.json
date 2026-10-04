@@ -579,6 +579,7 @@
   "jcraft.commands.changes.removal": "- %s",
   "jcraft.commands.changes.too_long": "변경 사항이 너무 길어서 표시할 수 없습니다",
   "jcraft.commands.changes.type": "%s(으)로 변경했습니다.",
+  "jcraft.commands.error.no_permission": "플레이어에게 권한이 없습니다. (%s)",
   "jcraft.commands.error.nospec": "종족을 찾을 수 없습니다!",
   "jcraft.commands.error.nostand": "스탠드를 찾을 수 없습니다!",
   "jcraft.diarypage.evodesc": "§9(§b§l쉐도우 더 월드§r §9진화 아이템)",
