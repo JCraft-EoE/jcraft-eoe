@@ -1661,7 +1661,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        if (damageSource.getEntity() == this) {
+        if (damageSource.getEntity() == this || damageSource.is(DamageTypes.CACTUS)) {
             return true;
         }
         // Non-remote stands redirect damage within the AbstractSimpleAttack targetting filters.
