@@ -1661,7 +1661,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
     @Override
     public boolean isInvulnerableTo(DamageSource damageSource) {
-        if (damageSource.getEntity() == this || damageSource.is(DamageTypes.CACTUS)) {
+        if (damageSource.getEntity() == this) {
             return true;
         }
         // Non-remote stands redirect damage within the AbstractSimpleAttack targetting filters.
@@ -1693,7 +1693,9 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     public boolean handleDamage(Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift,
                                 int blockstun, DamageSource source, Entity attacker, CommonHitPropertyComponent.HitAnimation hitAnimation,
                                 MoveUsage moveUsage, boolean canBackstab, boolean unblockable, boolean cancelAttacks) {
-        if (!hasUser()) return false;
+        if (!hasUser()) {
+            return false;
+        }
         boolean hit = true;
 
         // Remote stands can only block for themselves
