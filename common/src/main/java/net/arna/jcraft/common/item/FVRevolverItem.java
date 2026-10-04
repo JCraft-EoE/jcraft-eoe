@@ -51,6 +51,7 @@ public class FVRevolverItem extends Item {
         }
         if (!world.isClientSide) {
             user.getCooldowns().addCooldown(JItemRegistry.FV_REVOLVER.get(), 4); // Unusable until fires
+            user.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), 4); // block the other gone
             //RevolverFire.enqueue(new DimensionData(user, world.dimension(), 3));
             fire(itemStack, world, user);
         }
@@ -72,7 +73,8 @@ public class FVRevolverItem extends Item {
         world.addFreshEntity(bullet);
 
         if (user instanceof Player player) {
-            player.getCooldowns().addCooldown(JItemRegistry.FV_REVOLVER.get(), 11); // Refire time
+            player.getCooldowns().addCooldown(JItemRegistry.FV_REVOLVER.get(), 11);
+            player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), 11); // block other gun
             player.awardStat(Stats.ITEM_USED.get(JItemRegistry.FV_REVOLVER.get()));
         }
     }

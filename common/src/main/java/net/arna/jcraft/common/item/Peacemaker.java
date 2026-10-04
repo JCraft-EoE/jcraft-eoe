@@ -132,7 +132,9 @@ public class Peacemaker extends Item {
         // Opening the gate lowers the hammer, so a gun left cocked does not stay that way.
         data.putBoolean(COCKED_ID, false);
         // Shooting stays locked out for exactly as long as the rounds actually being loaded take.
-        user.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), PeacemakerReload.totalTicks(plannedRounds(itemStack, user)));
+        final int cooldownTicks = PeacemakerReload.totalTicks(plannedRounds(itemStack, user));
+        user.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), cooldownTicks);
+        user.getCooldowns().addCooldown(JItemRegistry.FV_REVOLVER.get(), cooldownTicks); // block other gun
         // The reload owns its own animations and sounds, opening gate included.
         PeacemakerReload.start(user, world, hand, itemStack);
     }
@@ -191,6 +193,7 @@ public class Peacemaker extends Item {
         itemStack.getOrCreateTag().putBoolean(RELOADING_ID, false);
         if (user instanceof Player player) {
             player.getCooldowns().removeCooldown(JItemRegistry.PEACEMAKER.get());
+            // do NOT unblock the other gun, that seems abusable as hell
         }
     }
 
@@ -236,7 +239,9 @@ public class Peacemaker extends Item {
         if (data.getBoolean(RELOADING_ID)) {
             if (!world.isClientSide) {
                 PeacemakerReload.finishEarly(peacemakerStack, world);
-                player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), PeacemakerReload.endTicks());
+                final int cooldownTicks = PeacemakerReload.endTicks();
+                player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), cooldownTicks);
+                player.getCooldowns().addCooldown(JItemRegistry.FV_REVOLVER.get(), cooldownTicks); // block the other gun
             }
             return true; // We handled it
         }
@@ -252,6 +257,7 @@ public class Peacemaker extends Item {
             if (data.getBoolean(COCKED_ID)) {
                 data.putBoolean(COCKED_ID, false);
                 player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), FIRE_TICKS);
+                player.getCooldowns().addCooldown(JItemRegistry.FV_REVOLVER.get(), FIRE_TICKS); // block the other gun
 
                 FIRE.sendForItem(player, peacemakerStack);
 
@@ -262,6 +268,7 @@ public class Peacemaker extends Item {
                 // Only long enough to keep one click from reading as two. The hammer can be dropped
                 // before the cock animation has played out, which is what keeps the gun quick.
                 player.getCooldowns().addCooldown(JItemRegistry.PEACEMAKER.get(), COCK_INPUT_LOCKOUT);
+                player.getCooldowns().addCooldown(JItemRegistry.FV_REVOLVER.get(), COCK_INPUT_LOCKOUT); // block the other gun
 
                 COCK.sendForItem(player, peacemakerStack);
 
