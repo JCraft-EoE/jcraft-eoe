@@ -15,6 +15,7 @@ import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.player.CommonPhComponent;
+import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
@@ -379,7 +380,8 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                         List<LivingEntity> potentialTargets = level().getEntitiesOfClass(
                                 LivingEntity.class,
                                 getBoundingBox().inflate(64.0),
-                                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(EntitySelector.LIVING_ENTITY_STILL_ALIVE));
+                                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(EntitySelector.LIVING_ENTITY_STILL_ALIVE)
+                                        .and(entity -> entity.getType() != JEntityTypeRegistry.HAMON_WAVE));
                         potentialTargets.remove(this);
 
                         potentialTargets.sort(distanceComparator);
