@@ -191,10 +191,10 @@ public class Peacemaker extends Item {
 
     private static void clearReloadState(ItemStack itemStack, LivingEntity user) {
         itemStack.getOrCreateTag().putBoolean(RELOADING_ID, false);
-        if (user instanceof Player player) {
+        /*if (user instanceof Player player) {
             player.getCooldowns().removeCooldown(JItemRegistry.PEACEMAKER.get());
             // do NOT unblock the other gun, that seems abusable as hell
-        }
+        }*/
     }
 
     // method to handle left-click firing via PlayerInputPacket
