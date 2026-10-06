@@ -9,8 +9,11 @@ import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.common.attack.moves.hamon.ImproviserMove;
+import net.arna.jcraft.common.attack.moves.ranger.RangerFocusMove;
 import net.arna.jcraft.common.spec.HamonSpec;
+import net.arna.jcraft.common.spec.RangerSpec;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,6 +41,9 @@ public abstract class ProjectileMixin {
     @Unique
     private HamonSpec jcraft$hamon;
 
+    @Unique
+    private boolean jcraft$focusYawUpdated;
+
     @Inject(method = "setOwner(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
     protected void jcraft$hamonize(final Entity owner, final CallbackInfo ci) {
         final Projectile projectile = (Projectile)(Object)this;
@@ -48,6 +54,20 @@ public abstract class ProjectileMixin {
         ) {
             hamon.drainCharge(ImproviserMove.PROJECTILE_IMPROVISER_CHARGE);
             jcraft$hamon = hamon;
+        }
+    }
+
+    @Inject(method = "tick()V", at = @At("TAIL"))
+    protected void jcraft$applyFocusAim(final CallbackInfo ci) {
+        final Projectile projectile = (Projectile)(Object)this;
+        if (projectile.level().isClientSide() || !(projectile.getOwner() instanceof LivingEntity owner)) {
+            return;
+        }
+
+        if (JUtils.getSpec(owner) instanceof RangerSpec) {
+            if (JComponentPlatformUtils.getGunslinger(owner).isFocusActive()) {
+                jcraft$focusYawUpdated |= RangerFocusMove.steerProjectile(projectile, owner, jcraft$focusYawUpdated);
+            }
         }
     }
 

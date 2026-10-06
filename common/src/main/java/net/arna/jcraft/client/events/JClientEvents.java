@@ -20,6 +20,7 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.sound.AerosmithSoundInstance;
+import net.arna.jcraft.client.tracer.MuzzleTracker;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.arna.jcraft.client.input.TrackedKeyBinding;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
@@ -44,10 +45,12 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -321,6 +324,17 @@ public class JClientEvents {
         // Menacing (ゴ/ド) particles — 4-second burst when a stand user enters 100-block radius.
         // Works regardless of whether the local player or target has their stand summoned.
         tickMenacing(client, player);
+    }
+
+    @Nullable
+    private static Vec3 getMainHandMuzzle(Minecraft client, Object2BooleanMap<MoveInputType> moveInput) {
+        if (client.player == null || !client.options.getCameraType().isFirstPerson()) {
+            return null;
+        }
+        if (!moveInput.getOrDefault(MoveInputType.LIGHT, false)) {
+            return null;
+        }
+        return MuzzleTracker.get(client.player.getUUID(), InteractionHand.MAIN_HAND);
     }
 
     public static EventResult onEntityAdd(final Entity entity, final Level level) {

@@ -77,18 +77,18 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
             );
 
     public static final SimpleAttack<VampireSpec> FEEDING_BLOODSUCK_LAUNCH = new SimpleAttack<VampireSpec>(0, 38,
-            46, 1f, 3f, 9, 1.5f, 1.5f, 0f)
+            46, 1f, 3f, 9, 2.0f, 1.5f, 0f)
             .withImpactSound(JSoundRegistry.TW_KICK_HIT)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
             .withInfo(Component.literal("Feeding Blood Suck (Finisher)"), Component.empty());
-    public static final BloodSuckHitsAttack FEEDING_BLOODSUCK_HITS = new BloodSuckHitsAttack(0, 46, 1f,
-            2.5f, 19, 1.5f, 0.6f, -0.1f, IntSet.of(8, 16, 24), 3.0f)
+    public static final BloodSuckHitsAttack FEEDING_BLOODSUCK_HITS = new BloodSuckHitsAttack(0, 46, 0.8f,
+            2.5f, 19, 2.0f, 0.6f, -0.1f, IntSet.of(8, 16, 24), 2.0f)
             .withStunType(StunType.UNBURSTABLE)
             .withFinisher(24, FEEDING_BLOODSUCK_LAUNCH)
             .withInfo(Component.literal("Feeding Blood Suck (Hit)"), Component.empty());
     public static final BloodSuckAttack FEEDING_BLOODSUCK = new BloodSuckAttack(240, 10, 18,
-            1f, 1f, 20, 1.5f, 0f, 0f, FEEDING_BLOODSUCK_HITS,
+            0.8f, 1f, 20, 1.5f, 0f, 0f, FEEDING_BLOODSUCK_HITS,
             FEEDING_BLOODSUCK_HITS.getDuration(), 2f, true)
             .withSound(JSoundRegistry.VAMPIRE_GRAB_HIT)
             .withImpactSound(JSoundRegistry.IMPACT_9)
@@ -98,8 +98,8 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
                     Component.literal("Blockable grab. Much more efficient for feeding than Blood Bottles. Launches the victim away.")
             );
 
-    public static final BloodSuckHitsAttack BLOODSUCK_HITS = new BloodSuckHitsAttack(0, 25, 1f,
-            4, 5, 1.5f, 0.6f, -0.1f, IntSet.of(8, 16, 24), 2.0f)
+    public static final BloodSuckHitsAttack BLOODSUCK_HITS = new BloodSuckHitsAttack(0, 25, 0.8f,
+            4, 5, 2.0f, 0.6f, -0.1f, IntSet.of(8, 16, 24), 1.0f)
             .withStunType(StunType.UNBURSTABLE)
             .withInfo(Component.literal("Blood Suck (Hit)"), Component.empty());
     public static final BloodSuckAttack BLOODSUCK = new BloodSuckAttack(240, 10, 18,

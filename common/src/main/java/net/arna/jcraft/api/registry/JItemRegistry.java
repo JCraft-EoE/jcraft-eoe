@@ -60,6 +60,9 @@ public interface JItemRegistry {
     RegistrySupplier<Item> BOXING_GLOVES = register("boxing_gloves", () -> new BoxingGlovesItem(settings()
             .stacksTo(1), JSpecTypeRegistry.BRAWLER));
 
+    RegistrySupplier<Item> HOLSTER = register("holster", () -> new HolsterItem(settings()
+            .stacksTo(1), JSpecTypeRegistry.RANGER));
+
     // Vehicles
     RegistrySupplier<Item> ROAD_ROLLER = register("road_roller", () -> new VehicleItem<>(
             settings().rarity(Rarity.RARE).stacksTo(1),

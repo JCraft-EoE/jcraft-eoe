@@ -61,6 +61,7 @@
       "jcraft:gravity_shift",
       "jcraft:hamon",
       "jcraft:vampire",
+      "jcraft:gunslinger",
       "jcraft:texas_hold_em"
     ],
     "lithium:options": {

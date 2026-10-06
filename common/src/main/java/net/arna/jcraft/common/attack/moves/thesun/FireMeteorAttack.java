@@ -27,20 +27,20 @@ public class FireMeteorAttack extends AbstractMove<FireMeteorAttack, TheSunEntit
     @Getter
     private final float meteorVelocity, meteorSpeed, meteorDivergence;
     @Getter
-    private final boolean explosiveIfMax;
+    private final double explodeScaleMinimum;
     @Getter
     @NonNull
     private final IntCollection hitMoments;
     private Vec3 targetPosition;
 
     public FireMeteorAttack(int cooldown, int duration, int meteors, float meteorVelocity, float meteorSpeed, float meteorDivergence,
-                            boolean explosiveIfMax, @NonNull IntCollection hitMoments) {
+                            double explodeScaleMinimum, @NonNull IntCollection hitMoments) {
         super(cooldown, hitMoments.intStream().min().orElse(duration + 1), duration, 0);
         this.meteors = meteors;
         this.meteorVelocity = meteorVelocity;
         this.meteorSpeed = meteorSpeed;
         this.meteorDivergence = meteorDivergence;
-        this.explosiveIfMax = explosiveIfMax;
+        this.explodeScaleMinimum = explodeScaleMinimum;
         this.hitMoments = new IntImmutableList(hitMoments.intStream().sorted().toArray());
         ranged = true;
     }
@@ -70,7 +70,7 @@ public class FireMeteorAttack extends AbstractMove<FireMeteorAttack, TheSunEntit
             MeteorProjectile meteor = fireMeteor(attacker, user, pos, velocity, meteorSpeed, meteorDivergence);
             meteor.setNoGravity(true);
 
-            if (explosiveIfMax && attacker.getRawScale() == TheSunEntity.MAX_SCALE) {
+            if (explodeScaleMinimum <= attacker.getRawScale()) {
                 meteor.setExplosive(true);
             }
         }
@@ -105,7 +105,7 @@ public class FireMeteorAttack extends AbstractMove<FireMeteorAttack, TheSunEntit
     @Override
     public @NonNull FireMeteorAttack copy() {
         return copyExtras(new FireMeteorAttack(getCooldown(), getDuration(), meteors, meteorVelocity, meteorSpeed,
-                meteorDivergence, explosiveIfMax, hitMoments));
+                meteorDivergence, explodeScaleMinimum, hitMoments));
     }
 
     public static class Type extends AbstractMove.Type<FireMeteorAttack> {
@@ -118,7 +118,7 @@ public class FireMeteorAttack extends AbstractMove<FireMeteorAttack, TheSunEntit
                     Codec.FLOAT.fieldOf("meteor_velocity").forGetter(FireMeteorAttack::getMeteorVelocity),
                     Codec.FLOAT.fieldOf("meteor_speed").forGetter(FireMeteorAttack::getMeteorSpeed),
                     Codec.FLOAT.fieldOf("meteor_divergence").forGetter(FireMeteorAttack::getMeteorDivergence),
-                    Codec.BOOL.fieldOf("explosive_if_max").forGetter(FireMeteorAttack::isExplosiveIfMax),
+                    Codec.DOUBLE.fieldOf("explosive_scale_minimum").forGetter(FireMeteorAttack::getExplodeScaleMinimum),
                     ExtraCodecs.NON_NEGATIVE_INT.listOf()
                             .<IntCollection>xmap(IntOpenHashSet::new, ArrayList::new)
                             .fieldOf("hit_moments").forGetter(FireMeteorAttack::getHitMoments)

@@ -59,11 +59,19 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
     }
 
     @Override
-    public void jcraft$increaseHitCount() {
+    public void jcraft$increaseHitCount(boolean tsHit) {
         hitCount++;
+        var minimum = JServerConfig.DAMAGE_SCALING_MINIMUM.getValue();
+        var penalty = JServerConfig.SCALING_PENALTY_PER_HIT.getValue();
+
+        if (tsHit) {
+            minimum /= 2.0f;
+            penalty *= 2.0f;
+        }
+
         damageScaling = Math.max(
-                JServerConfig.DAMAGE_SCALING_MINIMUM.getValue(),
-                damageScaling - JServerConfig.SCALING_PENALTY_PER_HIT.getValue()
+                minimum,
+                damageScaling - penalty
         );
     }
 
@@ -80,7 +88,7 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
                 if (
                         moveUsage != pastUsage // Ensure the same move usage only adds to the move list once
                         && Attacks.prototypeMatch(pastUsage.move(), move) // Move equality check that doesn't use instances
-                ) { // TODO: verify prototypeMatch() filters appropriately
+                ) {
                     LivingEntity attackerUser = JUtils.getUserIfStand(attacker);
 
                     if (attackerUser instanceof ServerPlayer serverPlayer) {
@@ -91,7 +99,7 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
                 }
             }
 
-            if (move.isLoopPrevention()) { // TODO: verify noLoopPrevention() is applied to all intended moves
+            if (move.isLoopPrevention()) {
                 moveList.add(moveUsage);
                 return false;
             }

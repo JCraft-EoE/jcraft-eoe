@@ -15,6 +15,7 @@ import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.enums.StunType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.player.CommonPhComponent;
+import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
@@ -91,23 +92,22 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             .summonData(SummonData.of(JSoundRegistry.PH_SUMMON))
             .build();
 
-    private static final @NonNull KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> CROUCHING_LIGHT_FOLLOWUP_ATTACK = BACKHAND_FOLLOWUP.copy().withAnim(State.BACKHAND_FOLLOWUP).allowHitUser();
-    private static final @NonNull BackhandAttack<AbstractPurpleHazeEntity<?, ?>> CROUCHING_LIGHT_ATTACK = BACKHAND.copy().withFollowup(CROUCHING_LIGHT_FOLLOWUP_ATTACK).allowHitUser();
-    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT_FOLLOWUP_ATTACK = LIGHT_FOLLOWUP.copy().withAnim(State.LIGHT_FOLLOWUP).allowHitUser();
-    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT_ATTACK = LIGHT.copy().withFollowup(LIGHT_FOLLOWUP_ATTACK).withCrouchingVariant(CROUCHING_LIGHT_ATTACK).allowHitUser();
-    private static final @NonNull MainBarrageAttack<AbstractPurpleHazeEntity<?, ?>> BARRAGE_ATTACK = AbstractPurpleHazeEntity.BARRAGE.copy().allowHitUser();
-    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> HEAVY_ATTACK = HEAVY.copy().allowHitUser();
-    private static final @NonNull KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_3 = REKKA3.copy().withAnim(State.REKKA3).allowHitUser();
-    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_2 = REKKA2.copy().withAnim(State.REKKA2).withFollowup(REKKA_3).allowHitUser();
-    private static final @NonNull PHRekkaAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_1 = REKKA1.copy().withAnim(State.REKKA1).withFollowup(REKKA_2).allowHitUser();
-    private static final @NonNull PHGroundSlamAttack<AbstractPurpleHazeEntity<?, ?>> GROUND_SLAM = AbstractPurpleHazeEntity.GROUND_SLAM.copy().allowHitUser();
+    private static final @NonNull KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> CROUCHING_LIGHT_FOLLOWUP_ATTACK = BACKHAND_FOLLOWUP.copy().withAnim(State.BACKHAND_FOLLOWUP);
+    private static final @NonNull BackhandAttack<AbstractPurpleHazeEntity<?, ?>> CROUCHING_LIGHT_ATTACK = BACKHAND.copy().withFollowup(CROUCHING_LIGHT_FOLLOWUP_ATTACK);
+    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT_FOLLOWUP_ATTACK = LIGHT_FOLLOWUP.copy().withAnim(State.LIGHT_FOLLOWUP);
+    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> LIGHT_ATTACK = LIGHT.copy().withFollowup(LIGHT_FOLLOWUP_ATTACK).withCrouchingVariant(CROUCHING_LIGHT_ATTACK);
+    private static final @NonNull MainBarrageAttack<AbstractPurpleHazeEntity<?, ?>> BARRAGE_ATTACK = AbstractPurpleHazeEntity.BARRAGE.copy();
+    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> HEAVY_ATTACK = HEAVY.copy();
+    private static final @NonNull KnockdownAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_3 = REKKA3.copy().withAnim(State.REKKA3);
+    private static final @NonNull SimpleAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_2 = REKKA2.copy().withAnim(State.REKKA2).withFollowup(REKKA_3);
+    private static final @NonNull PHRekkaAttack<AbstractPurpleHazeEntity<?, ?>> REKKA_1 = REKKA1.copy().withAnim(State.REKKA1).withFollowup(REKKA_2);
+    private static final @NonNull PHGroundSlamAttack<AbstractPurpleHazeEntity<?, ?>> GROUND_SLAM = AbstractPurpleHazeEntity.GROUND_SLAM.copy();
 
     public static final SimpleAttack<AbstractPurpleHazeEntity<?, ?>> GRAB_HIT_FINAL = new SimpleAttack<AbstractPurpleHazeEntity<?, ?>>(0, 27,
             34, 0.75f, 4f, 8, 2f, 1.25f, 0f)
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withHitSpark(JParticleType.HIT_SPARK_2)
             .withLaunch()
-            .allowHitUser()
             .withInfo(
                     Component.literal("Grab (Final Hit)"),
                     Component.empty()
@@ -117,7 +117,6 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             .withImpactSound(JSoundRegistry.IMPACT_1)
             .withStunType(StunType.UNBURSTABLE)
             .withFinisher(19, GRAB_HIT_FINAL)
-            .allowHitUser()
             .withInfo(
                     Component.literal("Grab (Final Hit)"),
                     Component.empty()
@@ -128,7 +127,6 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
             .withCrouchingVariant(GROUND_SLAM)
             .withSound(JSoundRegistry.D4C_THROW)
             .withImpactSound(JSoundRegistry.PH_GRAB_HIT)
-            .allowHitUser()
             .withInfo(
                     Component.literal("Grab"),
                     Component.literal("unblockable, combo finisher")
@@ -224,13 +222,14 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
     public boolean handleMove(MoveClass moveClass) {
         MoveMap.Entry<PurpleHazeEntity, State> entry = getFirstValidEntry(moveClass);
+
         if (entry == null) return false;
 
         final LivingEntity user = getUser();
 
         if (user == null) return false;
 
-        LivingEntity stateChecker = (isRemote() && !remoteControllable()) ? this : user;
+        final LivingEntity stateChecker = (isRemote() && !remoteControllable()) ? this : user;
 
         if (!stateChecker.onGround() && entry.getAerialVariant() != null) {
             entry = entry.getAerialVariant();
@@ -246,6 +245,12 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
 
         AbstractMove<?, ? super PurpleHazeEntity> move = entry.getMove();
         return handleMove(move.isCopyOnUse() ? move.copy() : move, entry.getCooldownType(), entry.getAnimState());
+    }
+
+    @Override
+    public void setMove(AbstractMove<?, ? super PurpleHazeEntity> move, @Nullable State animState) {
+        super.setMove(move, animState);
+        if (tickCount > 20) move.allowHitUser();
     }
 
     @Override
@@ -375,7 +380,8 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
                         List<LivingEntity> potentialTargets = level().getEntitiesOfClass(
                                 LivingEntity.class,
                                 getBoundingBox().inflate(64.0),
-                                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(EntitySelector.LIVING_ENTITY_STILL_ALIVE));
+                                EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(EntitySelector.LIVING_ENTITY_STILL_ALIVE)
+                                        .and(entity -> entity.getType() != JEntityTypeRegistry.HAMON_WAVE));
                         potentialTargets.remove(this);
 
                         potentialTargets.sort(distanceComparator);
