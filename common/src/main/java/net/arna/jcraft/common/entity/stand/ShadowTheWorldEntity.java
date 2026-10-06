@@ -266,16 +266,11 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
             if (getState() == State.IMPALING_THRUST_CHARGE && getMoveStun() == (IMPALING_THRUST.getDuration() - 30)) {
                 final Vec3 offset = GravityChangerAPI.getEyeOffset(this);
                 final double x = getX() + offset.x, y = getY() + offset.y, z = getZ() + offset.z;
+                final double speedX = random.nextGaussian() * 1.5;
+                final double speedY = random.nextGaussian() * 1.5;
+                final double speedZ = random.nextGaussian() * 1.5;
                 for (int i = 0; i < 12; i++) {
-                    level().addParticle(
-                            ParticleTypes.DRAGON_BREATH,
-                            x,
-                            y,
-                            z,
-                            random.nextGaussian() * 1.5f,
-                            random.nextGaussian() * 1.5f,
-                            random.nextGaussian() * 1.5f
-                    );
+                    level().addParticle(ParticleTypes.DRAGON_BREATH, x, y, z, speedX, speedY, speedZ);
                 }
             }
 

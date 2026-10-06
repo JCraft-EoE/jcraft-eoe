@@ -60,7 +60,7 @@ public final class LaunchAttack<A extends IAttacker<? extends A, ?>> extends Abs
             final var launchDir = new Vector3f(upDir);
 
             if (numProjectiles > 1) {
-                block.timeToLaunch += 10 * (numProjectiles - i);
+                block.setTimeToLaunch(block.getTimeToLaunch() + 10 * (numProjectiles - i));
 
                 launchDir.add(
                         (float)lookAngle.x * i,

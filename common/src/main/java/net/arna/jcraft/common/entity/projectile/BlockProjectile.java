@@ -1,7 +1,9 @@
 package net.arna.jcraft.common.entity.projectile;
 
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
@@ -43,7 +45,9 @@ import static net.arna.jcraft.api.Attacks.damageLogic;
 public class BlockProjectile extends JAttackEntity {
     private static final int MAX_TIME_TO_LAUNCH = 15;
 
-    public int timeToLaunch = MAX_TIME_TO_LAUNCH;
+    @Getter
+    @Setter
+    private int timeToLaunch = MAX_TIME_TO_LAUNCH;
     private int timeLaunched = 0;
     private boolean toRefresh = false;
     private boolean launched = false;

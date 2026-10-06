@@ -49,29 +49,32 @@ public abstract class CameraMixin {
                 info.cancel();
 
                 if (detached) {
-                    if (wasDetached) { // slide back
-                        inertia.scale(0.98);
+                    if (!wasDetached) {
+                        wasDetached = true;
+                        return;
+                    }
+                    // slide back
+                    inertia.scale(0.98);
 
-                        CameraInvoker cameraInvoker = (CameraInvoker) this;
+                    CameraInvoker cameraInvoker = (CameraInvoker) this;
+                    cameraInvoker.invokeSetPos(
+                            position.x + inertia.x * tickDelta,
+                            position.y + inertia.y * tickDelta,
+                            position.z + inertia.z * tickDelta
+                    );
+
+                    // bounce out of wall
+                    if (level.getBlockState(blockPosition).isSuffocating(area, blockPosition)) {
                         cameraInvoker.invokeSetPos(
-                                position.x + inertia.x * tickDelta,
-                                position.y + inertia.y * tickDelta,
-                                position.z + inertia.z * tickDelta
+                                position.x - 1.1 * inertia.x * tickDelta,
+                                position.y - 1.1 * inertia.y * tickDelta,
+                                position.z - 1.1 * inertia.z * tickDelta
                         );
 
-                        // bounce out of wall
-                        if (level.getBlockState(blockPosition).isSuffocating(area, blockPosition)) {
-                            cameraInvoker.invokeSetPos(
-                                    position.x - 1.1 * inertia.x * tickDelta,
-                                    position.y - 1.1 * inertia.y * tickDelta,
-                                    position.z - 1.1 * inertia.z * tickDelta
-                            );
-
-                            inertia.scale(-0.7);
-                        }
-                    } else { // initial launch
-                        inertia.set(living.getLookAngle(), -0.4);
+                        inertia.scale(-0.7);
                     }
+                } else { // initial launch
+                    inertia.set(living.getLookAngle(), -0.4);
                 }
             }
         }
