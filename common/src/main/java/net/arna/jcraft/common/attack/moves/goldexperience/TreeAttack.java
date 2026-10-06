@@ -37,7 +37,7 @@ public final class TreeAttack<A extends IAttacker<? extends A, ?>> extends Abstr
         final Vec3 direction = user.getLookAngle();
         LivingEntity baseEntity = attacker.getBaseEntity();
 
-        final GETreeEntity tree = new GETreeEntity(baseEntity.level(), user, direction.scale(0.67));
+        final var tree = new GETreeEntity(baseEntity.level(), user, direction.scale(1.2));
 
         final Direction gravity = GravityChangerAPI.getGravityDirection(baseEntity);
         GravityChangerAPI.setDefaultGravityDirection(tree, gravity);

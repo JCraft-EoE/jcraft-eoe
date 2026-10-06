@@ -1,6 +1,6 @@
 package net.arna.jcraft.fabric.mixin.client;
 
-import net.arna.jcraft.client.util.TrackedKeyBinding;
+import net.arna.jcraft.client.input.TrackedKeyBinding;
 import net.minecraft.client.KeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

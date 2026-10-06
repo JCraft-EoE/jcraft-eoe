@@ -8,8 +8,12 @@ import com.mojang.blaze3d.platform.Window;
 import net.arna.jcraft.api.attack.moves.AbstractTossMove;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.rendering.api.callbacks.DisplayResizeCallback;
+import net.arna.jcraft.common.attack.moves.ranger.RangerFocusMove;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
+import net.arna.jcraft.common.item.Peacemaker;
+import net.arna.jcraft.common.spec.RangerSpec;
 import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
@@ -56,6 +60,11 @@ public class MinecraftMixin {
 
     @WrapOperation(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;pickBlock()V"))
     private void jcraft$ignorePickBlockWhenStandOut(Minecraft instance, Operation<Void> original) {
+        // A held gun spends the pick block key on reloading instead.
+        if (instance.player != null && instance.player.getMainHandItem().getItem() instanceof Peacemaker) {
+            return;
+        }
+
         final StandEntity<?,?> stand = JUtils.getStand(instance.player);
         if (stand != null && stand.getMove(AbstractTossMove.class) != null) {
             return;
@@ -63,8 +72,28 @@ public class MinecraftMixin {
         original.call(instance);
     }
 
+    /**
+     * Left click works the gun through jcraft's own input map, so vanilla's attack must not also
+     * run: without this the shooter punches, swings and burns melee cooldown while cocking.
+     */
+    @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
+    private void jcraft$noMeleeWithGun(CallbackInfoReturnable<Boolean> cir) {
+        if (player != null && player.getMainHandItem().getItem() instanceof Peacemaker) {
+            cir.setReturnValue(false);
+        }
+    }
+
     @ModifyReturnValue(method = "shouldEntityAppearGlowing", at = @At("RETURN"))
     private boolean jcraft$makeAerosmithGlowWhenNotInLos(boolean original, @Local(argsOnly = true) Entity entity) {
         return original || entity instanceof AerosmithEntity as && as.isRemote() && !as.isInLineOfSight() && as.getUser() == player;
+    }
+
+    // Highlights targets of the ranger's Focus, only on the focusing player's client
+    @ModifyReturnValue(method = "shouldEntityAppearGlowing", at = @At("RETURN"))
+    private boolean jcraft$rangerFocusGlow(boolean original, @Local(argsOnly = true) Entity entity) {
+        if (original || player == null) return original;
+        return JUtils.getSpec(player) instanceof RangerSpec &&
+                JComponentPlatformUtils.getGunslinger(player).isFocusActive() &&
+                RangerFocusMove.selectOutlineTarget(player) == entity;
     }
 }

@@ -160,17 +160,17 @@ public class HamonWaveEntity extends JAttackEntity {
 
                 final double distanceSqr = potentialHit.distanceToSqr(position);
 
-                // Hollow hitsphere
+                // Hollow hitsphere, shell radius 1.5m
                 if (
-                        distanceSqr < ((size - 0.5) * (size - 0.5)) ||
-                        distanceSqr > ((size + 0.5) * (size + 0.5))
+                        distanceSqr < ((size - 0.75) * (size - 0.75)) ||
+                        distanceSqr > ((size + 0.75) * (size + 0.75))
                 ) {
                     continue;
                 }
 
                 Attacks.damageLogic(serverLevel, living, new AttackData(
                         living.position().subtract(position).scale(0.25),
-                        13, StunType.LAUNCH.ordinal(), false, 2f, true, 6,
+                        13, StunType.LAUNCH.ordinal(), false, 3f, true, 7,
                         damageSource, master, CommonHitPropertyComponent.HitAnimation.LAUNCH,
                         null, false, false
                 ));

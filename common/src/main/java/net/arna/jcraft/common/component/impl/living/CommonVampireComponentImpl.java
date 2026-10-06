@@ -26,7 +26,7 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
     private FoodData foodData = null;
     private boolean isVampire = false;
     @Getter
-    private float blood = 20;
+    private float blood = VampireSpec.MAX_BLOOD;
     private byte healCount = 0;
     private int regenTick = 0, starveTick = 0;
 
@@ -111,7 +111,7 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
 
     @Override
     public void setBlood(final float blood) {
-        this.blood = Mth.clamp(blood, 0, 20);
+        this.blood = Mth.clamp(blood, 0, VampireSpec.MAX_BLOOD);
         sync(entity);
     }
 

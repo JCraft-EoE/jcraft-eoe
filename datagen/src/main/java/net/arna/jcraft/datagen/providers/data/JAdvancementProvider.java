@@ -238,7 +238,8 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 JSpecTypeRegistry.ANUBIS,
                 JSpecTypeRegistry.BRAWLER,
                 JSpecTypeRegistry.VAMPIRE,
-                JSpecTypeRegistry.HAMON
+                JSpecTypeRegistry.HAMON,
+                JSpecTypeRegistry.RANGER
         );
         final Advancement.Builder obtainAllSpecsBuilder = Advancement.Builder.advancement()
                 .display(JItemRegistry.SPEC_DISC.get(),

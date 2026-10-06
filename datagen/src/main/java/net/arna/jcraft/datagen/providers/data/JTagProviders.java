@@ -661,6 +661,7 @@ public class JTagProviders {
             neverStands.add(JEntityTypeRegistry.SAND_TORNADO.getId());
             neverStands.add(JEntityTypeRegistry.STAND_METEOR.getId());
             neverStands.add(JEntityTypeRegistry.ROAD_ROLLER.getId());
+            neverStands.add(JEntityTypeRegistry.HAMON_WAVE.getId());
 
             final var noAIStandUsers = getOrCreateTagBuilder(JTagRegistry.NO_STAND_USER_AI);
             noAIStandUsers.add(JEntityTypeRegistry.TRAINING_DUMMY.getId());
@@ -768,7 +769,8 @@ public class JTagProviders {
                     .add(DamageTypes.LAVA)
                     .add(DamageTypes.FALLING_BLOCK)
                     .add(DamageTypes.DROWN)
-                    .add(DamageTypes.IN_WALL);
+                    .add(DamageTypes.IN_WALL)
+                    .add(DamageTypes.CACTUS);
         }
     }
 }

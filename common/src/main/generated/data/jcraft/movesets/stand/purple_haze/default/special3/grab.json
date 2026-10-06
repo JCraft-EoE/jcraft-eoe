@@ -34,7 +34,6 @@
         "description": {
           "translate": "move.jcraft.purple_haze.default.ground_slam.cr.description"
         },
-        "may_hit_user": true,
         "name": {
           "translate": "move.jcraft.purple_haze.default.ground_slam.cr.name"
         }
@@ -77,7 +76,6 @@
       "description": {
         "translate": "move.jcraft.purple_haze.default.grab.description"
       },
-      "may_hit_user": true,
       "name": {
         "translate": "move.jcraft.purple_haze.default.grab.name"
       }
@@ -128,7 +126,6 @@
                   "sound": "jcraft:impact1"
                 }
               ],
-              "may_hit_user": true,
               "name": {
                 "text": "Grab (Final Hit)"
               }
@@ -142,7 +139,6 @@
           },
           "tick": 19
         },
-        "may_hit_user": true,
         "name": {
           "text": "Grab (Final Hit)"
         }

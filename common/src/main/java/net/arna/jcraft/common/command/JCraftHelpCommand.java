@@ -2,6 +2,7 @@ package net.arna.jcraft.common.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -13,6 +14,7 @@ public class JCraftHelpCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("jcraft")
                 .then(Commands.literal("help")
+                        .requires(JPerms.HELP.require())
                         .executes(JCraftHelpCommand::run)
                 )
         );

@@ -174,6 +174,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         standType = type;
         noCulling = true;
 
+        setStandGauge(getMaxStandGauge() * 0.6f);
+
         assert getThis() == this;
     }
 
@@ -494,7 +496,8 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         setFree(true);
 
         Vec3 fPos = user.position().add(user.getLookAngle());
-        remoteSpeed = user.getDeltaMovement().scale(2); // Inertia
+        remoteSpeed = user.getDeltaMovement().scale(1.5); // Inertia
+        setDeltaMovement(remoteSpeed);
 
         setAlphaOverride(0.1f);
 
@@ -666,7 +669,7 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
 
         entityData.define(ALPHA_OVERRIDE, -1f);
 
-        entityData.define(STANDGAUGE, 45f);
+        entityData.define(STANDGAUGE, 0.0f); // called in the Entity() constructor so maxStandGauge is uninitialized
 
         entityData.define(FREE, false);
         entityData.define(REMOTE, false);
@@ -1692,8 +1695,10 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
     @Override
     public boolean handleDamage(Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage, boolean lift,
                                 int blockstun, DamageSource source, Entity attacker, CommonHitPropertyComponent.HitAnimation hitAnimation,
-                                MoveUsage moveUsage, boolean canBackstab, boolean unblockable) {
-        if (!hasUser()) return false;
+                                MoveUsage moveUsage, boolean canBackstab, boolean unblockable, boolean cancelAttacks) {
+        if (!hasUser()) {
+            return false;
+        }
         boolean hit = true;
 
         // Remote stands can only block for themselves
@@ -1730,8 +1735,11 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
 
         if (hit) {
-            AttackData attackData = new AttackData(kbVec, stunTicks, stunLevel, overrideStun, damage, lift, blockstun,
-                    source, attacker, hitAnimation, moveUsage, canBackstab, unblockable);
+            AttackData attackData = new AttackData(
+                    kbVec, stunTicks, stunLevel, overrideStun, damage, lift,
+                    blockstun, source, attacker, hitAnimation, moveUsage,
+                    canBackstab, unblockable, cancelAttacks);
+
             onJCraftDamageReceived(attackData);
             damageLogic(level(), user, attackData);
         }

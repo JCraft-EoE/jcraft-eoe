@@ -38,13 +38,16 @@ public class BloodSuckHitsAttack extends AbstractMultiHitAttack<BloodSuckHitsAtt
 
     @Override
     public @NonNull Set<LivingEntity> perform(VampireSpec attacker, LivingEntity user) {
-        Set<LivingEntity> targets = super.perform(attacker, user);
-        LivingEntity target = this.target.get();
-        float bloodMult = target == null ? 0 : JUtils.getBloodMult(target);
+        final Set<LivingEntity> targets = super.perform(attacker, user);
+
+        final var target = this.target.get();
+        if (target == null) return targets;
+
+        float bloodMult = JUtils.getBloodMult(target);
         if (bloodMult <= 0) return targets;
 
-        user.heal(1);
-        attacker.getVampireComponent().setBlood(attacker.getVampireComponent().getBlood() + 2 * bloodMult);
+        user.heal(bloodGainMult);
+        attacker.getVampireComponent().setBlood(attacker.getVampireComponent().getBlood() + bloodMult * bloodGainMult);
         JUtils.serverPlaySound(JSoundRegistry.VAMPIRE_SUCK.get(), (ServerLevel) user.level(), user.position(), 32);
         return targets;
     }
