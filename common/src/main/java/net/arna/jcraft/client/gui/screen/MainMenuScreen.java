@@ -139,29 +139,37 @@ public class MainMenuScreen extends Screen {
             guiGraphics.drawString(font, NORMAL_MOVES, 10, height/7 + 10, 0xFFFFFF);
             guiGraphics.drawString(font, SPECIAL_MOVES, width/4 + 10, height/7 + 10, 0xFFFFFF);
             final MoveMap<?,?> moveMap = stand.getMoveMap();
-            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.LIGHT)) {
-                drawMoveString(guiGraphics, font, entry, false, 10, 2*height/7 + 10, 0xFFFFFF);
+            if (!moveMap.getEntries(MoveClass.LIGHT).isEmpty()) {
+                drawMoveString(guiGraphics, font, moveMap.getEntries(MoveClass.LIGHT).iterator().next(), false,
+                        10, 2*height/7 + 10, 0xFFFFFF);
             }
-            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.HEAVY)) {
-                drawMoveString(guiGraphics, font, entry, false, 10, 3*height/7 + 10, 0xFFFFFF);
+            if (!moveMap.getEntries(MoveClass.HEAVY).isEmpty()) {
+                drawMoveString(guiGraphics, font, moveMap.getEntries(MoveClass.HEAVY).iterator().next(), false,
+                        10, 3*height/7 + 10, 0xFFFFFF);
             }
-            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.BARRAGE)) {
-                drawMoveString(guiGraphics, font, entry, false, 10, 4*height/7 + 10, 0xFFFFFF);
+            if (!moveMap.getEntries(MoveClass.BARRAGE).isEmpty()) {
+                drawMoveString(guiGraphics, font, moveMap.getEntries(MoveClass.BARRAGE).iterator().next(), false,
+                        10, 4*height/7 + 10, 0xFFFFFF);
             }
-            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.UTILITY)) {
-                drawMoveString(guiGraphics, font, entry, false, 10, 5*height/7 + 10, 0xFFFFFF);
+            if (!moveMap.getEntries(MoveClass.UTILITY).isEmpty()) {
+                drawMoveString(guiGraphics, font, moveMap.getEntries(MoveClass.UTILITY).iterator().next(), false,
+                        10, 5*height/7 + 10, 0xFFFFFF);
             }
-            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL1)) {
-                drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 2*height/7 + 10, 0xFFFFFF);
+            if (!moveMap.getEntries(MoveClass.SPECIAL1).isEmpty()) {
+                drawMoveString(guiGraphics, font, moveMap.getEntries(MoveClass.SPECIAL1).iterator().next(), false,
+                        width/4 + 10, 2*height/7 + 10, 0xFFFFFF);
             }
-            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL2)) {
-                drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 3*height/7 + 10, 0xFFFFFF);
+            if (!moveMap.getEntries(MoveClass.SPECIAL2).isEmpty()) {
+                drawMoveString(guiGraphics, font, moveMap.getEntries(MoveClass.SPECIAL2).iterator().next(), false,
+                        width/4 + 10, 3*height/7 + 10, 0xFFFFFF);
             }
-            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.SPECIAL3)) {
-                drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 4*height/7 + 10, 0xFFFFFF);
+            if (!moveMap.getEntries(MoveClass.SPECIAL3).isEmpty()) {
+                drawMoveString(guiGraphics, font, moveMap.getEntries(MoveClass.SPECIAL3).iterator().next(), false,
+                        width/4 + 10, 4*height/7 + 10, 0xFFFFFF);
             }
-            for (MoveMap.Entry<?,?> entry : moveMap.getEntries(MoveClass.ULTIMATE)) {
-                drawMoveString(guiGraphics, font, entry, false, width/4 + 10, 5*height/7 + 10, 0xFFFFFF);
+            if (!moveMap.getEntries(MoveClass.ULTIMATE).isEmpty()) {
+                drawMoveString(guiGraphics, font, moveMap.getEntries(MoveClass.ULTIMATE).iterator().next(), false,
+                        width/4 + 10, 5*height/7 + 10, 0xFFFFFF);
             }
             // description
             List<FormattedCharSequence> descLines = font.split(Component.translatable(stand.getStandData().getInfo().getNameKey() + ".info.desc"), width/4);
@@ -189,11 +197,46 @@ public class MainMenuScreen extends Screen {
 
     @Override
     public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-        if (stand != null && mouseX >= 3f*width/4 && mouseY >= height/7f + 10 && mouseY < 6f*height/7 + 10) {
-            final SoundEvent summonSound = stand.getStandData().getSummonData().getSound();
-            final LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null && summonSound != null) {
-                player.playSound(summonSound);
+        if (stand != null) {
+            final MoveMap<?,?> moveMap = stand.getMoveMap();
+            if (mouseX >= 3f * width / 4 && mouseY >= height / 7f + 10 && mouseY < 6f * height / 7 + 10) {
+                final SoundEvent summonSound = stand.getStandData().getSummonData().getSound();
+                final LocalPlayer player = Minecraft.getInstance().player;
+                if (player != null && summonSound != null) {
+                    player.playSound(summonSound);
+                    return true;
+                }
+            }
+            if (!moveMap.getEntries(MoveClass.LIGHT).isEmpty() && mouseX >= 10 && mouseX < width/4 + 10 && mouseY >= 2*height/7 + 10 && mouseY <= 3*height/7 + 10) {
+                Minecraft.getInstance().setScreen(new MoveScreen(stand, moveMap.getEntries(MoveClass.LIGHT).iterator().next()));
+                return true;
+            }
+            if (!moveMap.getEntries(MoveClass.HEAVY).isEmpty() && mouseX >= 10 && mouseX < width/4 + 10 && mouseY >= 3*height/7 + 10 && mouseY <= 4*height/7 + 10) {
+                Minecraft.getInstance().setScreen(new MoveScreen(stand, moveMap.getEntries(MoveClass.HEAVY).iterator().next()));
+                return true;
+            }
+            if (!moveMap.getEntries(MoveClass.BARRAGE).isEmpty() && mouseX >= 10 && mouseX < width/4 + 10 && mouseY >= 4*height/7 + 10 && mouseY <= 5*height/7 + 10) {
+                Minecraft.getInstance().setScreen(new MoveScreen(stand, moveMap.getEntries(MoveClass.BARRAGE).iterator().next()));
+                return true;
+            }
+            if (!moveMap.getEntries(MoveClass.UTILITY).isEmpty() && mouseX >= 10 && mouseX < width/4 + 10 && mouseY >= 5*height/7 + 10 && mouseY <= 6*height/7 + 10) {
+                Minecraft.getInstance().setScreen(new MoveScreen(stand, moveMap.getEntries(MoveClass.UTILITY).iterator().next()));
+                return true;
+            }
+            if (!moveMap.getEntries(MoveClass.SPECIAL1).isEmpty() && mouseX >= width/4 + 10 && mouseX < width/2 + 10 && mouseY >= 2*height/7 + 10 && mouseY <= 3*height/7 + 10) {
+                Minecraft.getInstance().setScreen(new MoveScreen(stand, moveMap.getEntries(MoveClass.SPECIAL1).iterator().next()));
+                return true;
+            }
+            if (!moveMap.getEntries(MoveClass.SPECIAL2).isEmpty() && mouseX >= width/4 + 10 && mouseX < width/2 + 10 && mouseY >= 3*height/7 + 10 && mouseY <= 4*height/7 + 10) {
+                Minecraft.getInstance().setScreen(new MoveScreen(stand, moveMap.getEntries(MoveClass.SPECIAL2).iterator().next()));
+                return true;
+            }
+            if (!moveMap.getEntries(MoveClass.SPECIAL3).isEmpty() && mouseX >= width/4 + 10 && mouseX < width/2 + 10 && mouseY >= 4*height/7 + 10 && mouseY <= 5*height/7 + 10) {
+                Minecraft.getInstance().setScreen(new MoveScreen(stand, moveMap.getEntries(MoveClass.SPECIAL3).iterator().next()));
+                return true;
+            }
+            if (!moveMap.getEntries(MoveClass.ULTIMATE).isEmpty() && mouseX >= width/4 + 10 && mouseX < width/2 + 10 && mouseY >= 5*height/7 + 10 && mouseY <= 6*height/7 + 10) {
+                Minecraft.getInstance().setScreen(new MoveScreen(stand, moveMap.getEntries(MoveClass.ULTIMATE).iterator().next()));
                 return true;
             }
         }
