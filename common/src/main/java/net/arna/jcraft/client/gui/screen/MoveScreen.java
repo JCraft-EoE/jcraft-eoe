@@ -3,6 +3,7 @@ package net.arna.jcraft.client.gui.screen;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -11,10 +12,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public class MoveScreen extends Screen {
 
     public static final Component MOVE_VARIANTS = Component.translatable("jcraft.gui.move_variants");
+    public static final Component FRAME_DATA = Component.translatable("jcraft.gui.frame_data");
 
     @NonNull
     protected final IAttacker<?,?> attacker;
@@ -56,6 +59,8 @@ public class MoveScreen extends Screen {
         guiGraphics.drawString(font, MOVE_VARIANTS, 10, height/7 + 10, 0xFFFFFF);
         drawMoveString(guiGraphics, font, baseMove, 10, 2*height/7 + 10, 0xFFFFFF);
         drawDescriptionString(guiGraphics, font, baseMove, 10, 5*height/7 + 10, 0xFFFFFF);
+        guiGraphics.drawString(font, FRAME_DATA, 3*width/4 + 10, height/7 + 10, 0xFFFFFF);
+        drawFrameData(guiGraphics, font, baseMove, 3*width/4 + 10, 2*height/7 + 10, 0xFFFFFF);
     }
 
     protected void drawMoveString(final @NonNull GuiGraphics guiGraphics, final @NonNull Font font, final @NonNull MoveMap.Entry<?,?> move, final int x, final int y, final int color) {
@@ -123,6 +128,29 @@ public class MoveScreen extends Screen {
         int currentY = y;
         for (final String line : lines) {
             guiGraphics.drawString(font, line, x, currentY, color);
+            currentY += 10;
+        }
+    }
+
+    protected void drawFrameData(final @NonNull GuiGraphics guiGraphics, final Font font, final MoveMap.Entry<?,?> baseMove, final int x, final int y, final int color) {
+        final AbstractMove<?,?> move = switch (selectedMove) {
+            case 1 -> baseMove.getCrouchingVariant().getMove();
+            case 2 -> baseMove.getAerialVariant().getMove();
+            default -> baseMove.getMove();
+        };
+        int currentY = y;
+        guiGraphics.drawString(font, Component.translatable("jcraft.gui.move_distance").append(Component.literal(": §6" + move.getMoveDistance() + "§r m")), x, currentY, color);
+        currentY += 10;
+        final int armor = move.getArmor();
+        if (armor > 0) {
+            MutableComponent armorComponent = Component.translatable("jcraft.gui.armor");
+            if (armor == Integer.MAX_VALUE) {
+                armorComponent = armorComponent.append(Component.literal(": ")).append(Component.translatable("jcraft.gui.hyper_armor"));
+            }
+            else {
+                armorComponent = armorComponent.append(Component.literal(": " + armor + " ")).append(Component.translatable("jcraft.gui.armor_points"));
+            }
+            guiGraphics.drawString(font, armorComponent, x, currentY, color);
             currentY += 10;
         }
     }
