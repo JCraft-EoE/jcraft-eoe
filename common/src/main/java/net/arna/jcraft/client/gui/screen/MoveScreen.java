@@ -60,7 +60,11 @@ public class MoveScreen extends Screen {
 
     protected void drawMoveString(final @NonNull GuiGraphics guiGraphics, final @NonNull Font font, final @NonNull MoveMap.Entry<?,?> move, final int x, final int y, final int color) {
         int currentY = y;
-        guiGraphics.drawString(font, move.getMove().getName().copy().withStyle(ChatFormatting.DARK_PURPLE), x, currentY, color);
+        ChatFormatting formatting = switch (selectedMove) {
+            case 1,2 -> ChatFormatting.DARK_PURPLE;
+            default -> ChatFormatting.YELLOW;
+        };
+        guiGraphics.drawString(font, move.getMove().getName().copy().withStyle(formatting), x, currentY, color);
         Component text = Component.empty()
                 .append(move.getMoveClass().getFriendlyName())
                 .append(Component.empty()
@@ -70,7 +74,13 @@ public class MoveScreen extends Screen {
         guiGraphics.drawString(font, text, x, currentY + 10, color);
         if (move.getCrouchingVariant() != null) {
             currentY += height/7;
-            guiGraphics.drawString(font, move.getCrouchingVariant().getMove().getName().copy().withStyle(ChatFormatting.DARK_PURPLE), x, currentY, color);
+            if (selectedMove == 1) {
+                formatting = ChatFormatting.YELLOW;
+            }
+            else {
+                formatting = ChatFormatting.DARK_PURPLE;
+            }
+            guiGraphics.drawString(font, move.getCrouchingVariant().getMove().getName().copy().withStyle(formatting), x, currentY, color);
             text = Component.empty()
                     .append(move.getMoveClass().getFriendlyName())
                     .append(Component.empty()
@@ -83,7 +93,13 @@ public class MoveScreen extends Screen {
         }
         if (move.getAerialVariant() != null) {
             currentY += height/7;
-            guiGraphics.drawString(font, move.getAerialVariant().getMove().getName().copy().withStyle(ChatFormatting.DARK_PURPLE), x, currentY, color);
+            if (selectedMove == 2) {
+                formatting = ChatFormatting.YELLOW;
+            }
+            else {
+                formatting = ChatFormatting.DARK_PURPLE;
+            }
+            guiGraphics.drawString(font, move.getAerialVariant().getMove().getName().copy().withStyle(formatting), x, currentY, color);
             text = Component.empty()
                     .append(move.getMoveClass().getFriendlyName())
                     .append(Component.empty()
