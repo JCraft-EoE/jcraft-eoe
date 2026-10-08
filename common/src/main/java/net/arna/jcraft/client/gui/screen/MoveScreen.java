@@ -53,6 +53,7 @@ public class MoveScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTick); // takes care of widgets and such
         guiGraphics.drawString(font, MOVE_VARIANTS, 10, height/7 + 10, 0xFFFFFF);
         drawMoveString(guiGraphics, font, baseMove, 10, 2*height/7 + 10, 0xFFFFFF);
+        drawDescriptionString(guiGraphics, font, baseMove, 10, 5*height/7 + 10, 0xFFFFFF);
     }
 
     protected void drawMoveString(final @NonNull GuiGraphics guiGraphics, final @NonNull Font font, final @NonNull MoveMap.Entry<?,?> move, final int x, final int y, final int color) {
@@ -91,6 +92,10 @@ public class MoveScreen extends Screen {
                             .append(Component.literal(")")));
             guiGraphics.drawString(font, text, x, currentY + 10, color);
         }
+    }
+
+    protected void drawDescriptionString(final @NonNull GuiGraphics guiGraphics, final Font font, final MoveMap.Entry<?,?> move, final int x, final int y, final int color) {
+        guiGraphics.drawString(font, move.getMove().getDescription(), x, y, color);
     }
 
 }
