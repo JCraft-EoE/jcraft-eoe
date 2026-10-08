@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 
 public class MoveScreen extends Screen {
@@ -18,6 +19,7 @@ public class MoveScreen extends Screen {
     @NonNull
     protected final IAttacker<?,?> attacker;
     protected final MoveMap.Entry<?,?> baseMove;
+    protected byte selectedMove = 0;
 
     /**
      * Making sure that the given stand has the given attack is the responsibility of the caller.
@@ -95,7 +97,42 @@ public class MoveScreen extends Screen {
     }
 
     protected void drawDescriptionString(final @NonNull GuiGraphics guiGraphics, final Font font, final MoveMap.Entry<?,?> move, final int x, final int y, final int color) {
-        guiGraphics.drawString(font, move.getMove().getDescription(), x, y, color);
+        final Component description = switch (selectedMove) {
+            case 1 -> move.getCrouchingVariant().getMove().getDescription();
+            case 2 -> move.getAerialVariant().getMove().getDescription();
+            default -> move.getMove().getDescription();
+        };
+        final String translation = I18n.get(description.getString());
+        final String[] lines = translation.split("\n");
+        int currentY = y;
+        for (final String line : lines) {
+            guiGraphics.drawString(font, line, x, currentY, color);
+            currentY += 10;
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
+        if (mouseX >= 10 && mouseX < width/4 + 10 && mouseY >= 2*height/7 + 10 && mouseY <= 3*height/7 + 10) {
+            selectedMove = 0;
+            return true;
+        }
+        if (mouseX >= 10 && mouseX < width/4 + 10 && mouseY >= 3*height/7 + 10 && mouseY <= 4*height/7 + 10) {
+            if (baseMove.getCrouchingVariant() != null) {
+                selectedMove = 1;
+                return true;
+            }
+            else if (baseMove.getAerialVariant() != null) {
+                selectedMove = 2;
+                return true;
+            }
+        }
+        if (baseMove.getCrouchingVariant() != null && baseMove.getAerialVariant() != null &&
+                mouseX >= 10 && mouseX < width/4 + 10 && mouseY >= 4*height/7 + 10 && mouseY <= 5*height/7 + 10) {
+            selectedMove = 2;
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
 }
