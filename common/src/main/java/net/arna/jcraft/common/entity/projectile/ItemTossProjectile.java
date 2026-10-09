@@ -267,7 +267,10 @@ public class ItemTossProjectile extends AbstractArrow {
                 itemSkin = data.getInt("Skin");
             }
             // apply stand
-            if (itemStand != null && !JCraft.getExclusiveStandsData().isStandUsed(itemStand)) {
+            if (itemStand != null && !JCraft.getExclusiveStandsData().isStandUsed(itemStand) && (
+                    (livingEntity instanceof Player && !StandTypeUtil.isIn(itemStand, JTagRegistry.PLAYER_STAND_BLACKLIST, level().registryAccess())) ||
+                    (!(livingEntity instanceof Player) && !StandTypeUtil.isIn(itemStand, JTagRegistry.MOB_STAND_BLACKLIST, level().registryAccess())))
+            ) {
                 final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(livingEntity);
                 if (standData.getType() == null) { // don't override current stand
                     standData.setTypeAndSkin(itemStand, itemSkin, false);

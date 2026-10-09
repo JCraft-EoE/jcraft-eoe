@@ -2,6 +2,7 @@ package net.arna.jcraft.common.item;
 
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -85,6 +86,11 @@ public class StandDiscItem extends Item {
             if (itemStand != null) {
                 user.displayClientMessage(Component.translatable("jcraft.disc.same_stand"), true);
             }
+            return InteractionResultHolder.fail(itemStack);
+        }
+
+        if (StandTypeUtil.isIn(itemStand, JTagRegistry.PLAYER_STAND_BLACKLIST, world.registryAccess())) {
+            user.displayClientMessage(Component.translatable("jcraft.disc.blacklisted"), true);
             return InteractionResultHolder.fail(itemStack);
         }
 

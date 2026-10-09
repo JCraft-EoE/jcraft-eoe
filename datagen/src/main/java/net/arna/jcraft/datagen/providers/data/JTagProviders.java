@@ -1,6 +1,7 @@
 package net.arna.jcraft.datagen.providers.data;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.registry.*;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -773,4 +774,23 @@ public class JTagProviders {
                     .add(DamageTypes.CACTUS);
         }
     }
+
+    public static class JStandTypeTags extends FabricTagProvider<StandType> {
+
+        public JStandTypeTags(final FabricDataOutput output, final CompletableFuture<HolderLookup.Provider> registriesFuture) {
+            super(output, JRegistries.STAND_TYPE_REGISTRY_KEY, registriesFuture);
+        }
+
+        @Override
+        protected void addTags(final HolderLookup.Provider provider) {
+            getOrCreateTagBuilder(JTagRegistry.PLAYER_STAND_BLACKLIST)
+                    .add(JStandTypeRegistry.THE_SUN.get())
+                    .add(JStandTypeRegistry.STAR_PLATINUM_THE_WORLD.get());
+            getOrCreateTagBuilder(JTagRegistry.MOB_STAND_BLACKLIST)
+                    .add(JStandTypeRegistry.MANDOM.get())
+                    .add(JStandTypeRegistry.THE_WORLD_OVER_HEAVEN.get());
+        }
+
+    }
+
 }

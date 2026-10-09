@@ -97,7 +97,7 @@ public class StandArrowItem extends ArrowItem {
             final StandType oldType = standData.getType();
             StandType newType;
             do {
-                newType = StandTypeUtil.getRandomRegular(random);
+                newType = StandTypeUtil.getRandomRegular(random, world.registryAccess(), true, false);
             } while (newType == oldType);
 
             standData.setType(newType);

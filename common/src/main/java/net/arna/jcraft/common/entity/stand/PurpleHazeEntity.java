@@ -19,6 +19,7 @@ import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.*;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
 import net.arna.jcraft.common.ai.CombatEntityContext;
@@ -183,10 +184,13 @@ public final class PurpleHazeEntity extends AbstractPurpleHazeEntity<PurpleHazeE
         final LivingEntity user = getUser();
 
         if (user != null) {
-            if (toEvolve) {
-                JComponentPlatformUtils.getStandComponent(getUserOrThrow())
+            if (toEvolve && (
+                    (user instanceof Player && !StandTypeUtil.isIn(JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get(), JTagRegistry.PLAYER_STAND_BLACKLIST, level().registryAccess())) ||
+                    (!(user instanceof Player) && !StandTypeUtil.isIn(JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get(), JTagRegistry.MOB_STAND_BLACKLIST, level().registryAccess()))
+            )) {
+                JComponentPlatformUtils.getStandComponent(user)
                         .setType(JStandTypeRegistry.PURPLE_HAZE_DISTORTION.get());
-                JCraft.summon(level(), getUserOrThrow());
+                JCraft.summon(level(), user);
             }
 
             if (!JUtils.canAct(this) || !JUtils.canAct(user)) {

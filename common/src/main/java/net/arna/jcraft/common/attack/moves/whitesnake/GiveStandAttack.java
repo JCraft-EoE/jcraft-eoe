@@ -12,12 +12,14 @@ import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Set;
@@ -70,7 +72,10 @@ public final class GiveStandAttack<A extends IAttacker<? extends A, ?>> extends 
             }
 
             itemStand = StandDiscItem.getStandType(itemStack);
-            if (itemStand == null) {
+            if (itemStand == null ||
+                    (user instanceof Player && StandTypeUtil.isIn(itemStand, JTagRegistry.PLAYER_STAND_BLACKLIST, user.level().registryAccess())) ||
+                    (!(user instanceof Player) && StandTypeUtil.isIn(itemStand, JTagRegistry.MOB_STAND_BLACKLIST, user.level().registryAccess()))
+            ) {
                 return;
             }
 
