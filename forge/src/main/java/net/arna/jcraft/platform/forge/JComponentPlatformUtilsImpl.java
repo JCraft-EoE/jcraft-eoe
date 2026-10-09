@@ -23,74 +23,71 @@ import net.minecraft.world.level.Level;
 import java.util.Optional;
 
 public class JComponentPlatformUtilsImpl {
-    public static CommonStandComponent getStandComponent(LivingEntity entity) {
+
+    public static CommonStandComponent getStandComponent(final LivingEntity entity) {
         return StandCapability.getCapability(entity);
     }
 
-
-    public static CommonSpecComponent getSpecData(LivingEntity livingEntity) {
+    public static CommonSpecComponent getSpecData(final LivingEntity livingEntity) {
         return SpecCapability.getCapability(livingEntity);
     }
 
-
-    public static CommonPhComponent getPhData(Player player) {
+    public static CommonPhComponent getPhData(final Player player) {
         return PhCapability.getCapability(player);
     }
 
-
-    public static CommonCooldownsComponent getCooldowns(LivingEntity entity) {
+    public static CommonCooldownsComponent getCooldowns(final LivingEntity entity) {
         return CooldownsCapability.getCapability(entity);
     }
 
-
-    public static Optional<TimeStopCapability> getTimeStopData(Entity entity) {
+    public static Optional<TimeStopCapability> getTimeStopData(final Entity entity) {
         return TimeStopCapability.getCapabilityOptional(entity);
     }
 
-
-    public static CommonMiscComponent getMiscData(LivingEntity entity) {
+    public static CommonMiscComponent getMiscData(final LivingEntity entity) {
         return MiscCapability.getCapability(entity);
     }
 
-
-    public static CommonBombTrackerComponent getBombTracker(LivingEntity entity) {
+    public static CommonBombTrackerComponent getBombTracker(final LivingEntity entity) {
         return BombTrackerCapability.getCapability(entity);
     }
 
-
-    public static CommonGrabComponent getGrab(LivingEntity entity) {
+    public static CommonGrabComponent getGrab(final LivingEntity entity) {
         return GrabCapability.getCapability(entity);
     }
 
-
-    public static CommonHitPropertyComponent getHitProperties(LivingEntity livingEntity) {
+    public static CommonHitPropertyComponent getHitProperties(final LivingEntity livingEntity) {
         return HitPropertyCapability.getCapability(livingEntity);
     }
 
-    public static Optional<GravityCapability> getGravity(Entity entity) {
+    public static Optional<GravityCapability> getGravity(final Entity entity) {
         return GravityCapability.getCapabilityOptional(entity);
     }
-    public static CommonGravityShiftComponent getGravityShift(LivingEntity entity) {
+    public static CommonGravityShiftComponent getGravityShift(final LivingEntity entity) {
         return GravityShiftCapability.getCapability(entity);
     }
 
-    public static CommonShockwaveHandlerComponent getShockwaveHandler(Level world) {
+    public static CommonShockwaveHandlerComponent getShockwaveHandler(final Level world) {
         return ShockwaveHandlerCapability.getCapability(world);
     }
 
-    public static CommonTexasHoldEmComponent getTexasHoldEmHandler(Level world) {
+    public static CommonTexasHoldEmComponent getTexasHoldEmHandler(final Level world) {
         return TexasHoldEmCapability.getCapability(world);
     }
 
-    public static CommonGunslingerComponent getGunslinger(LivingEntity living) {
-        return GunslingerCapability.getCapability(living);
-    }
-
-    public static CommonHamonComponent getHamon(LivingEntity living) {
+    public static CommonHamonComponent getHamon(final LivingEntity living) {
         return HamonCapability.getCapability(living);
     }
 
-    public static CommonVampireComponent getVampirism(LivingEntity living) {
+    public static CommonVampireComponent getVampirism(final LivingEntity living) {
         return VampireCapability.getCapability(living);
+    }
+
+    public static CommonGunslingerComponent getGunslinger(final LivingEntity living) {
+        return GunslingerCapability.getCapability(living);
+    }
+
+    public static CommonSpinComponent getSpin(final LivingEntity living) {
+        return SpinCapability.getCapability(living);
     }
 }

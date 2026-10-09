@@ -13,6 +13,7 @@ import net.arna.jcraft.fabric.common.component.entity.GrabComponent;
 import net.arna.jcraft.fabric.common.component.entity.GravityComponent;
 import net.arna.jcraft.fabric.common.component.entity.TimeStopComponent;
 import net.arna.jcraft.fabric.common.component.impl.GravityShiftComponentImpl;
+import net.arna.jcraft.fabric.common.component.impl.living.SpinComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.living.VampireComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.entity.GrabComponentImpl;
 import net.arna.jcraft.fabric.common.component.impl.entity.GravityComponentImpl;
@@ -35,6 +36,7 @@ import net.arna.jcraft.fabric.common.component.living.GunslingerComponent;
 import net.arna.jcraft.fabric.common.component.living.HamonComponent;
 import net.arna.jcraft.fabric.common.component.living.HitPropertyComponent;
 import net.arna.jcraft.fabric.common.component.living.MiscComponent;
+import net.arna.jcraft.fabric.common.component.living.SpinComponent;
 import net.arna.jcraft.fabric.common.component.living.StandComponent;
 import net.arna.jcraft.fabric.common.component.living.VampireComponent;
 import net.arna.jcraft.fabric.common.component.player.PhComponent;
@@ -78,6 +80,8 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
             ComponentRegistry.getOrCreate(JCraft.id("vampire"), VampireComponent.class);
     public static final ComponentKey<GunslingerComponent> GUNSLINGER =
             ComponentRegistry.getOrCreate(JCraft.id("gunslinger"), GunslingerComponent.class);
+    public static final ComponentKey<SpinComponent> SPIN =
+            ComponentRegistry.getOrCreate(JCraft.id("spin"), SpinComponent.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
@@ -130,6 +134,10 @@ public class JComponents implements EntityComponentInitializer, WorldComponentIn
                 .respawnStrategy(RespawnCopyStrategy.CHARACTER)
                 .impl(GunslingerComponentImpl.class)
                 .end(GunslingerComponentImpl::new);
+        registry.beginRegistration(LivingEntity.class, SPIN)
+                .respawnStrategy(RespawnCopyStrategy.CHARACTER)
+                .impl(SpinComponentImpl.class)
+                .end(SpinComponentImpl::new);
     }
 
     @Override

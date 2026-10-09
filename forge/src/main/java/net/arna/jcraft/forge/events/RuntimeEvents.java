@@ -55,6 +55,7 @@ public class RuntimeEvents {
             event.addCapability(JCraft.id("hamon_capability"), new JCapabilityProvider<>(HamonCapability.CAPABILITY, () -> new HamonCapability(living)));
             event.addCapability(JCraft.id("vampire_capability"), new JCapabilityProvider<>(VampireCapability.CAPABILITY, () -> new VampireCapability(living)));
             event.addCapability(JCraft.id("gunslinger_capability"), new JCapabilityProvider<>(GunslingerCapability.CAPABILITY, () -> new GunslingerCapability(living)));
+            event.addCapability(JCraft.id("spin_capability"), new JCapabilityProvider<>(SpinCapability.CAPABILITY, () -> new SpinCapability(living)));
 
             event.addCapability(JCraft.id("gravity_shift_capability"), new JCapabilityProvider<>(GravityShiftCapability.CAPABILITY, () -> new GravityShiftCapability(living)));
 

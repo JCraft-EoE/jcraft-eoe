@@ -19,51 +19,44 @@ import java.util.Optional;
 
 public class JComponentPlatformUtilsImpl {
 
-    public static CommonStandComponent getStandComponent(LivingEntity entity) {
+    public static CommonStandComponent getStandComponent(final LivingEntity entity) {
         return JComponents.STAND.get(entity);
     }
 
-
-    public static CommonSpecComponent getSpecData(LivingEntity livingEntity) {
+    public static CommonSpecComponent getSpecData(final LivingEntity livingEntity) {
         return JComponents.SPEC.get(livingEntity);
     }
 
-
-    public static CommonPhComponent getPhData(Player player) {
+    public static CommonPhComponent getPhData(final Player player) {
         return JComponents.PH.get(player);
     }
 
-
-    public static CommonCooldownsComponent getCooldowns(LivingEntity entity) {
+    public static CommonCooldownsComponent getCooldowns(final LivingEntity entity) {
         return JComponents.COOLDOWNS.get(entity);
     }
 
-
-    public static Optional<TimeStopComponent> getTimeStopData(Entity entity) {
+    public static Optional<TimeStopComponent> getTimeStopData(final Entity entity) {
         return JComponents.TIME_STOP.maybeGet(entity);
     }
 
-
-    public static CommonMiscComponent getMiscData(LivingEntity entity) {
+    public static CommonMiscComponent getMiscData(final LivingEntity entity) {
         return JComponents.MISC.get(entity);
     }
 
-
-    public static CommonBombTrackerComponent getBombTracker(LivingEntity entity) {
+    public static CommonBombTrackerComponent getBombTracker(final LivingEntity entity) {
         return JComponents.BOMB_TRACKER.get(entity);
     }
 
-
-    public static CommonGrabComponent getGrab(LivingEntity entity) {
+    public static CommonGrabComponent getGrab(final LivingEntity entity) {
         return JComponents.GRAB.get(entity);
     }
 
 
-    public static CommonHitPropertyComponent getHitProperties(LivingEntity livingEntity) {
+    public static CommonHitPropertyComponent getHitProperties(final LivingEntity livingEntity) {
         return JComponents.HIT_PROPERTY.get(livingEntity);
     }
 
-    public static Optional<CommonGravityComponent> getGravity(Entity entity) {
+    public static Optional<CommonGravityComponent> getGravity(final Entity entity) {
         if (entity instanceof ComponentProvider p) {
             var cc = p.getComponentContainer();
             if (cc != null) {
@@ -74,27 +67,31 @@ public class JComponentPlatformUtilsImpl {
         return Optional.empty();
     }
 
-    public static CommonGravityShiftComponent getGravityShift(LivingEntity livingEntity) {
+    public static CommonGravityShiftComponent getGravityShift(final LivingEntity livingEntity) {
         return JComponents.GRAVITY_SHIFT.get(livingEntity);
     }
 
-    public static CommonShockwaveHandlerComponent getShockwaveHandler(Level world) {
+    public static CommonShockwaveHandlerComponent getShockwaveHandler(final Level world) {
         return JComponents.SHOCKWAVE_HANDLER.get(world);
     }
 
-    public static CommonTexasHoldEmComponent getTexasHoldEm(Level world) {
+    public static CommonTexasHoldEmComponent getTexasHoldEm(final Level world) {
         return JComponents.TEXAS_HOLD_EM.get(world);
     }
 
-    public static CommonHamonComponent getHamon(LivingEntity living) {
+    public static CommonHamonComponent getHamon(final LivingEntity living) {
         return JComponents.HAMON.get(living);
     }
 
-    public static CommonVampireComponent getVampirism(LivingEntity living) {
+    public static CommonVampireComponent getVampirism(final LivingEntity living) {
         return JComponents.VAMPIRE.get(living);
     }
 
-    public static CommonGunslingerComponent getGunslinger(LivingEntity living) {
+    public static CommonGunslingerComponent getGunslinger(final LivingEntity living) {
         return JComponents.GUNSLINGER.get(living);
+    }
+
+    public static CommonSpinComponent getSpin(final LivingEntity living) {
+        return JComponents.SPIN.get(living);
     }
 }

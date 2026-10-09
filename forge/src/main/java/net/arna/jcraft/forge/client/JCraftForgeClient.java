@@ -221,6 +221,15 @@ public class JCraftForgeClient {
             }
         });
 
+        NetworkManager.registerReceiver(NetworkManager.Side.S2C, SpinCapability.SPIN_S2C, (buf, context) -> {
+            // Received by the SpinCapability holder and only them
+            LocalPlayer localPlayer = Minecraft.getInstance().player;
+            if (localPlayer != null) {
+                SpinCapability.getCapabilityOptional(localPlayer).ifPresent(c -> c.applySyncPacket(buf));
+            }
+        });
+
+
         NetworkManager.registerReceiver(NetworkManager.Side.S2C, SHOCK_S2C, (buf, context) -> {
             ClientLevel clientWorld = Minecraft.getInstance().level;
             if (clientWorld == null) return;

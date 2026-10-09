@@ -62,6 +62,7 @@
       "jcraft:hamon",
       "jcraft:vampire",
       "jcraft:gunslinger",
+      "jcraft:spin",
       "jcraft:texas_hold_em"
     ],
     "lithium:options": {

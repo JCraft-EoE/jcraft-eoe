@@ -24,82 +24,88 @@ import java.util.Optional;
 public class JComponentPlatformUtils {
 
     @ExpectPlatform
-    public static CommonStandComponent getStandComponent(LivingEntity entity) {
+    public static CommonStandComponent getStandComponent(final LivingEntity entity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonSpecComponent getSpecData(LivingEntity livingEntity) {
+    public static CommonSpecComponent getSpecData(final LivingEntity livingEntity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonPhComponent getPhData(Player player) {
+    public static CommonPhComponent getPhData(final Player player) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonCooldownsComponent getCooldowns(LivingEntity entity) {
+    public static CommonCooldownsComponent getCooldowns(final LivingEntity entity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static Optional<CommonTimeStopComponent> getTimeStopData(Entity entity) {
+    public static Optional<CommonTimeStopComponent> getTimeStopData(final Entity entity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonMiscComponent getMiscData(LivingEntity entity) {
+    public static CommonMiscComponent getMiscData(final LivingEntity entity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonBombTrackerComponent getBombTracker(LivingEntity entity) {
+    public static CommonBombTrackerComponent getBombTracker(final LivingEntity entity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonGrabComponent getGrab(LivingEntity entity) {
+    public static CommonGrabComponent getGrab(final LivingEntity entity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonHitPropertyComponent getHitProperties(LivingEntity livingEntity) {
+    public static CommonHitPropertyComponent getHitProperties(final LivingEntity livingEntity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static Optional<CommonGravityComponent> getGravity(Entity entity) {
+    public static Optional<CommonGravityComponent> getGravity(final Entity entity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonGravityShiftComponent getGravityShift(LivingEntity entity) {
+    public static CommonGravityShiftComponent getGravityShift(final LivingEntity entity) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonShockwaveHandlerComponent getShockwaveHandler(Level world) {
+    public static CommonShockwaveHandlerComponent getShockwaveHandler(final Level world) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonTexasHoldEmComponent getTexasHoldEmComponent(Level world) {
+    public static CommonTexasHoldEmComponent getTexasHoldEmComponent(final Level world) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonHamonComponent getHamon(LivingEntity living) {
+    public static CommonHamonComponent getHamon(final LivingEntity living) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonVampireComponent getVampirism(LivingEntity living) {
+    public static CommonVampireComponent getVampirism(final LivingEntity living) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static CommonGunslingerComponent getGunslinger(LivingEntity living) {
+    public static CommonGunslingerComponent getGunslinger(final LivingEntity living) {
         throw new AssertionError();
     }
+
+    @ExpectPlatform
+    public static CommonSpinComponent getSpin(final LivingEntity living) {
+        throw new AssertionError();
+    }
+
 }
