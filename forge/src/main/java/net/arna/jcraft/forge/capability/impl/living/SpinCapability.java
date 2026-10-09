@@ -20,7 +20,7 @@ import net.minecraftforge.common.util.LazyOptional;
 public class SpinCapability extends CommonSpinComponentImpl implements JCapability {
 
     public static Capability<SpinCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
-    public static ResourceLocation SPIN_S2C = JCraft.id("spn_s2c");
+    public static ResourceLocation SPIN_S2C = JCraft.id("sp_s2c");
 
     public SpinCapability(final @NonNull LivingEntity entity) {
         super(entity);
