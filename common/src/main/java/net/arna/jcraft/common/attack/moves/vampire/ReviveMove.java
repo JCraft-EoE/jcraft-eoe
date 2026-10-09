@@ -3,9 +3,9 @@ package net.arna.jcraft.common.attack.moves.vampire;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.tickable.Revivables;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JStatRegistry;
@@ -19,18 +19,18 @@ import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Set;
 
-public final class ReviveMove extends AbstractMove<ReviveMove, VampireSpec> {
+public final class ReviveMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<ReviveMove<A>, A> {
     public ReviveMove(final int cooldown, final int windup, final int duration, final float reviveDistance) {
         super(cooldown, windup, duration, reviveDistance);
     }
 
     @Override
-    public @NonNull MoveType<ReviveMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<ReviveMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final VampireSpec attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final MinecraftServer server = user.getServer();
         if (server == null) {
             return Set.of();
@@ -79,20 +79,20 @@ public final class ReviveMove extends AbstractMove<ReviveMove, VampireSpec> {
     }
 
     @Override
-    protected @NonNull ReviveMove getThis() {
+    protected @NonNull ReviveMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull ReviveMove copy() {
-        return copyExtras(new ReviveMove(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+    public @NonNull ReviveMove<A> copy() {
+        return copyExtras(new ReviveMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
-    public static class Type extends AbstractMove.Type<ReviveMove> {
+    public static class Type extends AbstractMove.Type<ReviveMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<ReviveMove>, ReviveMove> buildCodec(RecordCodecBuilder.Instance<ReviveMove> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<ReviveMove<?>>, ReviveMove<?>> buildCodec(RecordCodecBuilder.Instance<ReviveMove<?>> instance) {
             return baseDefault(instance, ReviveMove::new);
         }
     }

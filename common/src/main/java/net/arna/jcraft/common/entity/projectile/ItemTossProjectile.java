@@ -2,6 +2,7 @@ package net.arna.jcraft.common.entity.projectile;
 
 import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
+import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
 import net.arna.jcraft.api.stand.StandEntity;
@@ -36,6 +37,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.*;
@@ -180,7 +182,11 @@ public class ItemTossProjectile extends AbstractArrow {
     }
 
     @Override
-    protected void onHitEntity(final EntityHitResult result) {
+    protected void onHitEntity(final @NonNull EntityHitResult result) {
+        if (level().isClientSide()) {
+            return;
+        }
+
         // this part has been heavily inspired by AbstractArrow
         Entity entity = result.getEntity();
         Entity entity2 = JUtils.getUserIfStand(this.getOwner());
@@ -261,7 +267,10 @@ public class ItemTossProjectile extends AbstractArrow {
                 itemSkin = data.getInt("Skin");
             }
             // apply stand
-            if (itemStand != null && !JCraft.getExclusiveStandsData().isStandUsed(itemStand)) {
+            if (itemStand != null && !JCraft.getExclusiveStandsData().isStandUsed(itemStand) && (
+                    (livingEntity instanceof Player && !StandTypeUtil.isIn(itemStand, JTagRegistry.PLAYER_STAND_BLACKLIST, level().registryAccess())) ||
+                    (!(livingEntity instanceof Player) && !StandTypeUtil.isIn(itemStand, JTagRegistry.MOB_STAND_BLACKLIST, level().registryAccess())))
+            ) {
                 final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(livingEntity);
                 if (standData.getType() == null) { // don't override current stand
                     standData.setTypeAndSkin(itemStand, itemSkin, false);
@@ -281,14 +290,24 @@ public class ItemTossProjectile extends AbstractArrow {
         // force feed
         if (entity instanceof LivingEntity livingEntity && getItem().isEdible()) {
             if (!JComponentPlatformUtils.getVampirism(livingEntity).isVampire()) {
-                livingEntity.eat(level(), getItem());
-                if (getItem().getItem() instanceof BowlFoodItem) {
-                    setItem(Items.BOWL.getDefaultInstance());
-                    dropItem(result.getLocation()); // FIXME doesn't work?
+                boolean canEat = true;
+
+                if (livingEntity instanceof Player player)
+                    canEat = player.getFoodData().needsFood();
+
+                if (canEat) {
+                    livingEntity.eat(level(), getItem());
+
+                    if (getItem().getItem() instanceof BowlFoodItem) {
+                        setItem(Items.BOWL.getDefaultInstance());
+                        dropItem(result.getLocation()); // FIXME doesn't work?
+                    }
+
+                    effectActivated = true;
                 }
-                effectActivated = true;
             }
         }
+
         // force drink potions
         if (entity instanceof LivingEntity living && getItem().getItem() instanceof PotionItem) {
             for (MobEffectInstance mobEffectInstance : PotionUtils.getMobEffects(getItem())) {
@@ -410,7 +429,7 @@ public class ItemTossProjectile extends AbstractArrow {
         final ItemStack item = getItem();
         // blocks get placed if possible
         final BlockPos pos = result.getBlockPos().relative(result.getDirection());
-        if (item.getItem() instanceof BlockItem block) {
+        if (item.getItem() instanceof BlockItem block && !item.is(Items.POINTED_DRIPSTONE)) {
             final LivingEntity placer = JUtils.getUserIfStand(getOwner()) instanceof LivingEntity living ? living : null;
             if (item.is(JTagRegistry.BRITTLE) && hardness >= Blocks.STONE.defaultDestroyTime()) {
                 // brittle things get destroyed

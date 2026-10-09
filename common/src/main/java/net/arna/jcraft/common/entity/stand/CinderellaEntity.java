@@ -27,7 +27,7 @@ import net.minecraft.world.level.Level;
  */
 public class CinderellaEntity extends StandEntity<CinderellaEntity, CinderellaEntity.State> {
     public static final MoveSet<CinderellaEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CINDERELLA,
-            CinderellaEntity::registerMoves, State.class);
+            CinderellaEntity::registerMoves, CinderellaEntity.class, State.class);
     public static final StandData DATA = StandData.of(StandInfo.of(Component.translatable("entity.jcraft.cinderella")))
             .withObtainable(false);
 

@@ -97,4 +97,9 @@ public class JComponentPlatformUtils {
     public static CommonVampireComponent getVampirism(LivingEntity living) {
         throw new AssertionError();
     }
+
+    @ExpectPlatform
+    public static CommonGunslingerComponent getGunslinger(LivingEntity living) {
+        throw new AssertionError();
+    }
 }

@@ -5,26 +5,25 @@ import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSet;
+import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
-import net.arna.jcraft.api.attack.MoveSet;
-import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
-import net.arna.jcraft.api.attack.enums.MoveClass;
-import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.attack.moves.magiciansred.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
-import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -59,7 +58,8 @@ import java.util.Collection;
  */
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
     public static final MoveSet<MagiciansRedEntity, MagiciansRedEntity.State> MOVE_SET = MoveSetManager.create(
-            JStandTypeRegistry.MAGICIANS_RED, "default", MagiciansRedEntity::registerMoves, MagiciansRedEntity.State.class);
+            JStandTypeRegistry.MAGICIANS_RED, MagiciansRedEntity::registerMoves,
+            MagiciansRedEntity.class, MagiciansRedEntity.State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .info(StandInfo.builder()
@@ -87,7 +87,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .summonData(SummonData.of(JSoundRegistry.MR_SUMMON))
             .build();
 
-    public static final RedirectAttack REDIRECT = new RedirectAttack(0, 7, 10, 0.75f)
+    public static final RedirectAttack<MagiciansRedEntity> REDIRECT = new RedirectAttack<MagiciansRedEntity>(0, 7, 10, 0.75f)
             .withAnim(State.REDIRECT)
             .withSound(JSoundRegistry.MR_REDIRECT)
             .withInfo(
@@ -143,7 +143,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Component.literal("Hammerfist"),
                     Component.literal("two-hit launcher")
             );
-    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(200,
+    public static final FlamethrowerAttack<MagiciansRedEntity> FLAMETHROWER = new FlamethrowerAttack<MagiciansRedEntity>(200,
             0,40, 0.75f, 0.4f, 0, 2, 0.25f, 0, 3)
             .withArmor(1)
             .withSound(JSoundRegistry.MR_BARRAGE)
@@ -151,25 +151,25 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Component.literal("Flamethrower"),
                     Component.literal("fast reliable damage cash-out tool, no stun, burns for 3 seconds")
             );
-    public static final CrossfireAttack CROSSFIRE = new CrossfireAttack(100, 8, 10, 0.75f)
+    public static final CrossfireAttack<MagiciansRedEntity> CROSSFIRE = new CrossfireAttack<MagiciansRedEntity>(100, 8, 10, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
             .withInfo(
                     Component.literal("Crossfire"),
                     Component.literal("fires 3 stunning ankhs")
             );
-    public static final CrossfireVariationAttack CROSSFIRE_VARIATION = new CrossfireVariationAttack(600, 12, 17, 0.75f)
+    public static final CrossfireVariationAttack<MagiciansRedEntity> CROSSFIRE_VARIATION = new CrossfireVariationAttack<MagiciansRedEntity>(600, 12, 17, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
             .withInfo(
                     Component.literal("Crossfire Variation"),
                     Component.literal("summons 6 ankhs that orbit around the user, crouch as they come out to increase orbit distance")
             );
-    public static final CrossfireHurricaneAttack CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack(800, 18, 22, 0.75f)
+    public static final CrossfireHurricaneAttack<MagiciansRedEntity> CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack<MagiciansRedEntity>(800, 18, 22, 0.75f)
             .withSound(JSoundRegistry.MR_ULT)
             .withInfo(
                     Component.literal("Crossfire Hurricane"),
                     Component.literal("summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything")
             );
-    public static final RedBindAttack RED_BIND = new RedBindAttack(100,
+    public static final RedBindAttack<MagiciansRedEntity> RED_BIND = new RedBindAttack<MagiciansRedEntity>(100,
             12, 22, 0.75f, 3, 15, 1.5f, 0, 0)
             .withSound(JSoundRegistry.MR_REDBIND)
             .withImpactSound(JSoundRegistry.IMPACT_3)
@@ -177,7 +177,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Component.literal("Red Bind"),
                     Component.literal("on hit, wraps opponent in fiery rings that launch them in the direction they are hit")
             );
-    public static final LifeDetectorAttack LIFE_DETECTOR = new LifeDetectorAttack(200, 13, 20, 0.75f)
+    public static final LifeDetectorAttack<MagiciansRedEntity> LIFE_DETECTOR = new LifeDetectorAttack<MagiciansRedEntity>(200, 13, 20, 0.75f)
             .withSound(JSoundRegistry.MR_DETECTOR)
             .withInfo(
                     Component.literal("Life Detector"),
@@ -185,7 +185,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final MagiciansRedTossMove TOSS = new MagiciansRedTossMove(0, 1, 1, 0.75f)
+    public static final MagiciansRedTossMove<MagiciansRedEntity> TOSS = new MagiciansRedTossMove<MagiciansRedEntity>(0, 1, 1, 0.75f)
             .withAnim(MagiciansRedEntity.State.ITEM_TOSS);
     public static final TossChargeMove<MagiciansRedEntity> TOSS_CHARGE = new TossChargeMove<MagiciansRedEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);

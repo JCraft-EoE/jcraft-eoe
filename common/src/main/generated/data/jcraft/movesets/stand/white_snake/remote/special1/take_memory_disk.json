@@ -32,6 +32,11 @@
           "effects": [
             {
               "amplifier": 0,
+              "duration": 160,
+              "effect": "jcraft:specless"
+            },
+            {
+              "amplifier": 0,
               "duration": 600,
               "effect": "minecraft:weakness"
             },
@@ -39,6 +44,11 @@
               "amplifier": 0,
               "duration": 600,
               "effect": "minecraft:mining_fatigue"
+            },
+            {
+              "amplifier": 0,
+              "duration": 20,
+              "effect": "jcraft:knockdown"
             }
           ],
           "run": "on_strike"

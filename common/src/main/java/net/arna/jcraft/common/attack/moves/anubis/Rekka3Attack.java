@@ -27,9 +27,7 @@ public class Rekka3Attack extends AbstractMultiHitAttack<Rekka3Attack, AnubisSpe
             attacker.curMove = getFollowup();
         }
 
-        Set<LivingEntity> targets = super.perform(attacker, user);
-        attacker.tryIncrementBloodlust(targets);
-        return targets;
+        return super.perform(attacker, user);
     }
 
     @Override

@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
  */
 public class GooGooDollsEntity extends StandEntity<GooGooDollsEntity, GooGooDollsEntity.State> {
     public static final MoveSet<GooGooDollsEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.GOO_GOO_DOLLS,
-            GooGooDollsEntity::registerMoves, State.class);
+            GooGooDollsEntity::registerMoves, GooGooDollsEntity.class, State.class);
     public static final StandData DATA = StandData.of(StandInfo.of(Component.translatable("entity.jcraft.goo_goo_dolls")))
             .withObtainable(false);
 

@@ -4,23 +4,24 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.moves.AbstractBarrageAttack;
 import net.arna.jcraft.common.entity.stand.TheFoolEntity;
 import net.minecraft.world.entity.LivingEntity;
 
-public final class AirBarrageAttack extends AbstractBarrageAttack<AirBarrageAttack, TheFoolEntity> {
+public final class AirBarrageAttack<A extends IAttacker<? extends A, ?>> extends AbstractBarrageAttack<AirBarrageAttack<A>, A> {
     public AirBarrageAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun,
                             final float hitboxSize, final float knockback, final float offset, final int interval) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset, interval);
     }
 
     @Override
-    public @NonNull MoveType<AirBarrageAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<AirBarrageAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void activeTick(final TheFoolEntity attacker, final int moveStun) {
+    public void activeTick(final A attacker, final int moveStun) {
         super.activeTick(attacker, moveStun);
 
         if (!attacker.hasUser()) {
@@ -33,21 +34,21 @@ public final class AirBarrageAttack extends AbstractBarrageAttack<AirBarrageAtta
     }
 
     @Override
-    protected @NonNull AirBarrageAttack getThis() {
+    protected @NonNull AirBarrageAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull AirBarrageAttack copy() {
-        return copyExtras(new AirBarrageAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
+    public @NonNull AirBarrageAttack<A> copy() {
+        return copyExtras(new AirBarrageAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
                 getDamage(), getStun(), getHitboxSize(), getKnockback(), getOffset(), getInterval()));
     }
 
-    public static class Type extends AbstractBarrageAttack.Type<AirBarrageAttack> {
+    public static class Type extends AbstractBarrageAttack.Type<AirBarrageAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<AirBarrageAttack>, AirBarrageAttack> buildCodec(RecordCodecBuilder.Instance<AirBarrageAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<AirBarrageAttack<?>>, AirBarrageAttack<?>> buildCodec(RecordCodecBuilder.Instance<AirBarrageAttack<?>> instance) {
             return barrageDefault(instance, AirBarrageAttack::new);
         }
     }

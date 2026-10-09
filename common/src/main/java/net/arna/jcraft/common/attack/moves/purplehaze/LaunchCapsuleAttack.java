@@ -17,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
-public class LaunchCapsuleAttack extends AbstractMove<LaunchCapsuleAttack, AbstractPurpleHazeEntity<?, ?>> {
+public class LaunchCapsuleAttack<A extends AbstractPurpleHazeEntity<? extends A, ?>> extends AbstractMove<LaunchCapsuleAttack<A>, A> {
     public LaunchCapsuleAttack(int cooldown, int windup, int duration, float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
         ranged = true;
@@ -37,12 +37,12 @@ public class LaunchCapsuleAttack extends AbstractMove<LaunchCapsuleAttack, Abstr
     }
 
     @Override
-    public @NonNull MoveType<LaunchCapsuleAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<LaunchCapsuleAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(AbstractPurpleHazeEntity<?, ?> attacker, LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(A attacker, LivingEntity user) {
         final LivingEntity shooter = (attacker.isRemote() && !attacker.remoteControllable()) ? attacker : user;
         LaunchCapsuleAttack.launchCapsule(attacker, shooter, GravityChangerAPI.getGravityDirection(shooter), 0.8F, shooter.getYRot());
 
@@ -50,20 +50,20 @@ public class LaunchCapsuleAttack extends AbstractMove<LaunchCapsuleAttack, Abstr
     }
 
     @Override
-    protected @NonNull LaunchCapsuleAttack getThis() {
+    protected @NonNull LaunchCapsuleAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull LaunchCapsuleAttack copy() {
-        return copyExtras(new LaunchCapsuleAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+    public @NonNull LaunchCapsuleAttack<A> copy() {
+        return copyExtras(new LaunchCapsuleAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
-    public static class Type extends AbstractMove.Type<LaunchCapsuleAttack> {
+    public static class Type extends AbstractMove.Type<LaunchCapsuleAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<LaunchCapsuleAttack>, LaunchCapsuleAttack> buildCodec(RecordCodecBuilder.Instance<LaunchCapsuleAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<LaunchCapsuleAttack<?>>, LaunchCapsuleAttack<?>> buildCodec(RecordCodecBuilder.Instance<LaunchCapsuleAttack<?>> instance) {
             return baseDefault(instance, LaunchCapsuleAttack::new);
         }
     }

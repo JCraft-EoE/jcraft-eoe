@@ -20,7 +20,12 @@ public class EnumOption<E extends Enum<?>> extends ConfigOption {
     private final E defaultValue;
 
     public EnumOption(final ResourceLocation key, final ResourceLocation category, final Class<E> clazz, final E value) {
-        super(key, category);
+        this(key, category, null, clazz, value);
+    }
+
+    public EnumOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory,
+                      final Class<E> clazz, final E value) {
+        super(key, category, subcategory);
         this.clazz = clazz;
         this.value = this.defaultValue = value;
     }

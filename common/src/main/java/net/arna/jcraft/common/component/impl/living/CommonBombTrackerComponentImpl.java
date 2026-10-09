@@ -9,12 +9,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
-public class CommonBombTrackerComponentImpl implements CommonBombTrackerComponent {
+public abstract class CommonBombTrackerComponentImpl implements CommonBombTrackerComponent {
     private final Entity entity;
     public final BombData main = new BombData();
     public final BombData btd = new BombData();
 
-    public CommonBombTrackerComponentImpl(final @NonNull Entity entity) {
+    protected CommonBombTrackerComponentImpl(final @NonNull Entity entity) {
         this.entity = entity;
     }
 

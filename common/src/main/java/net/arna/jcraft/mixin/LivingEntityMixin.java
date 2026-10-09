@@ -7,7 +7,6 @@ import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.registry.JTagRegistry;
-import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.effects.FlammableEffect;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
@@ -23,7 +22,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -61,11 +59,19 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
     }
 
     @Override
-    public void jcraft$increaseHitCount() {
+    public void jcraft$increaseHitCount(boolean tsHit) {
         hitCount++;
+        var minimum = JServerConfig.DAMAGE_SCALING_MINIMUM.getValue();
+        var penalty = JServerConfig.SCALING_PENALTY_PER_HIT.getValue();
+
+        if (tsHit) {
+            minimum /= 2.0f;
+            penalty *= 2.0f;
+        }
+
         damageScaling = Math.max(
-                JServerConfig.DAMAGE_SCALING_MINIMUM.getValue(),
-                damageScaling - JServerConfig.SCALING_PENALTY_PER_HIT.getValue()
+                minimum,
+                damageScaling - penalty
         );
     }
 
@@ -82,7 +88,7 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
                 if (
                         moveUsage != pastUsage // Ensure the same move usage only adds to the move list once
                         && Attacks.prototypeMatch(pastUsage.move(), move) // Move equality check that doesn't use instances
-                ) { // TODO: verify prototypeMatch() filters appropriately
+                ) {
                     LivingEntity attackerUser = JUtils.getUserIfStand(attacker);
 
                     if (attackerUser instanceof ServerPlayer serverPlayer) {
@@ -93,7 +99,7 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
                 }
             }
 
-            if (move.isLoopPrevention()) { // TODO: verify noLoopPrevention() is applied to all intended moves
+            if (move.isLoopPrevention()) {
                 moveList.add(moveUsage);
                 return false;
             }
@@ -182,21 +188,8 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
     // Counter hook - Living entity
     @Inject(cancellable = true, at = @At("HEAD"), method = "actuallyHurt")
     protected void jcraft$applyDamage(DamageSource source, float amount, CallbackInfo info) {
-        LivingEntity player = ((LivingEntity) (Object) this);
-
-        if (!(player.getFirstPassenger() instanceof StandEntity<?, ?> stand)) {
-            return;
-        }
-        AbstractMove<?, ?> attack = stand.getCurrentMove();
-        if (attack == null || !attack.isCounter() || stand.getMoveStun() >= (attack.getDuration() - attack.getWindup())) {
-            return;
-        }
-
-        //noinspection unchecked,rawtypes // Generic types can be annoying sometimes. This is fine.
-        ((AbstractCounterAttack) attack).counter(stand, source.getEntity(), source);
-//        stand.counter(source.getAttacker(), source); // Initiate counter
-        player.removeEffect(JStatusRegistry.DAZED.get());
-        info.cancel();
+        LivingEntity living = ((LivingEntity) (Object) this);
+        AbstractCounterAttack.handleCounter(living, source, amount, info);
     }
 
     // Living entities can't attack while stunned/enslaved/time erased thanks to this and an attack attribute nullifier

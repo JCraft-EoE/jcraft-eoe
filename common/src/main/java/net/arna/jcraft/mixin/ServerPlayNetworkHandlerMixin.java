@@ -1,40 +1,33 @@
 package net.arna.jcraft.mixin;
 
+import net.arna.jcraft.common.item.Peacemaker;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class ServerPlayNetworkHandlerMixin {
-    /*
-    @Redirect(
-            method = "onPlayerAction",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerPlayerEntity;dropSelectedItem(Z)Z",
-                    ordinal = 0
-            )
-    )
-    private boolean jcraft$dropSelectedItem(ServerPlayerEntity instance, boolean entireStack) {
-        return false;
-    }
-
     @Shadow
-    public ServerPlayerEntity player;
-    @Inject(cancellable = true, at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;clampHorizontal(D)D",
-            shift = At.Shift.BEFORE, ordinal = 0)
-            , method = "onPlayerMove"
-            )
-    public void jcraft$onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-        if ( player.getFirstPassenger() instanceof StandEntity<?, ?> stand) {
-            stand.UpdateRemoveMovement(
-                    player.prevX - packet.getX(player.getX()),
-                    player.prevY - packet.getX(player.getY()),
-                    player.prevZ - packet.getX(player.getZ())
-                    );
+    public ServerPlayer player;
+
+    /**
+     * Swapping hands bypasses the inventory slots entirely, so guns have to be turned away here
+     * as well to keep them out of the offhand.
+     */
+    @Inject(method = "handlePlayerAction", at = @At("HEAD"), cancellable = true)
+    private void jcraft$noGunsInOffhand(ServerboundPlayerActionPacket packet, CallbackInfo ci) {
+        if (packet.getAction() != ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND) {
+            return;
+        }
+
+        if (player.getMainHandItem().getItem() instanceof Peacemaker
+                || player.getOffhandItem().getItem() instanceof Peacemaker) {
             ci.cancel();
         }
     }
-     */
 }

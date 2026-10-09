@@ -1,5 +1,8 @@
 {
-  "aerial_variant": {
+  "anim_state": "SAWBLADE",
+  "class": "BARRAGE",
+  "cooldown_type": "STAND_BARRAGE",
+  "crouching_variant": {
     "anim_state": "CHARGE",
     "class": "BARRAGE",
     "cooldown_type": "STAND_BARRAGE",
@@ -31,10 +34,10 @@
           }
         ],
         "description": {
-          "translate": "move.jcraft.aerosmith.default.dive_charge.air.description"
+          "translate": "move.jcraft.aerosmith.default.dive_charge.cr.description"
         },
         "name": {
-          "translate": "move.jcraft.aerosmith.default.dive_charge.air.name"
+          "translate": "move.jcraft.aerosmith.default.dive_charge.cr.name"
         }
       },
       "hit_moments": [
@@ -55,9 +58,6 @@
       "stun": 15
     }
   },
-  "anim_state": "SAWBLADE",
-  "class": "BARRAGE",
-  "cooldown_type": "STAND_BARRAGE",
   "move": {
     "type": "jcraft:shared_main_barrage_attack",
     "attack_extras": {

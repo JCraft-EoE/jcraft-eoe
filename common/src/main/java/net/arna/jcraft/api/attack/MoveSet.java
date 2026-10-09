@@ -23,6 +23,13 @@ public interface MoveSet<A extends IAttacker<? extends A, S>, S extends Enum<S>>
     IAttackerType getType();
 
     /**
+     * Gets the ID of the type of the move set.
+     *
+     * @return The ID of the type of the move set.
+     */
+    ResourceLocation getTypeId();
+
+    /**
      * Load the move set from the given data.
      * Stores the result in the moveMap field and notifies all listeners.
      *

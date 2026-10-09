@@ -4,9 +4,9 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.common.entity.stand.CMoonEntity;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public final class GravityShiftPulseMove extends AbstractMove<GravityShiftPulseMove, CMoonEntity> {
+public final class GravityShiftPulseMove<A extends IAttacker<? extends A, ?>> extends AbstractMove<GravityShiftPulseMove<A>, A> {
     @Getter
     private final int radius;
 
@@ -24,32 +24,35 @@ public final class GravityShiftPulseMove extends AbstractMove<GravityShiftPulseM
     }
 
     @Override
-    public @NotNull MoveType<GravityShiftPulseMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<GravityShiftPulseMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final CMoonEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         JComponentPlatformUtils.getGravityShift(user).startDirectional(radius);
         return Set.of();
     }
 
     @Override
-    protected @NonNull GravityShiftPulseMove getThis() {
+    protected @NonNull GravityShiftPulseMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull GravityShiftPulseMove copy() {
-        return copyExtras(new GravityShiftPulseMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), 16));
+    public @NonNull GravityShiftPulseMove<A> copy() {
+        return copyExtras(new GravityShiftPulseMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), 16));
     }
 
-    public static class Type extends AbstractMove.Type<GravityShiftPulseMove> {
+    public static class Type extends AbstractMove.Type<GravityShiftPulseMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<GravityShiftPulseMove>, GravityShiftPulseMove> buildCodec(RecordCodecBuilder.Instance<GravityShiftPulseMove> instance) {
-            return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("radius").forGetter(GravityShiftPulseMove::getRadius)).apply(instance, applyExtras(GravityShiftPulseMove::new));
+        protected @NotNull App<RecordCodecBuilder.Mu<GravityShiftPulseMove<?>>, GravityShiftPulseMove<?>> buildCodec(
+                final RecordCodecBuilder.Instance<GravityShiftPulseMove<?>> instance) {
+            return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("radius").forGetter(GravityShiftPulseMove::getRadius))
+                    .apply(instance, applyExtras(GravityShiftPulseMove::new));
         }
     }
 }

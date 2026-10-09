@@ -3,12 +3,12 @@ package net.arna.jcraft.common.attack.moves.vampire;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.entity.projectile.LaserProjectile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
-import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JSoundRegistry;
@@ -18,19 +18,19 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
-public final class SpaceRipperAttack extends AbstractMove<SpaceRipperAttack, VampireSpec> {
+public final class SpaceRipperAttack<A extends IAttacker<? extends A, ?>> extends AbstractMove<SpaceRipperAttack<A>, A> {
     public SpaceRipperAttack(final int cooldown, final int windup, final int duration, final float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
         ranged = true;
     }
 
     @Override
-    public @NonNull MoveType<SpaceRipperAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<SpaceRipperAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final VampireSpec attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Vec3 rotVec = user.getLookAngle();
 
         int chargeTime = getChargeTime();
@@ -59,20 +59,20 @@ public final class SpaceRipperAttack extends AbstractMove<SpaceRipperAttack, Vam
     }
 
     @Override
-    protected @NonNull SpaceRipperAttack getThis() {
+    protected @NonNull SpaceRipperAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull SpaceRipperAttack copy() {
-        return copyExtras(new SpaceRipperAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+    public @NonNull SpaceRipperAttack<A> copy() {
+        return copyExtras(new SpaceRipperAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
-    public static class Type extends AbstractMove.Type<SpaceRipperAttack> {
+    public static class Type extends AbstractMove.Type<SpaceRipperAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<SpaceRipperAttack>, SpaceRipperAttack> buildCodec(RecordCodecBuilder.Instance<SpaceRipperAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<SpaceRipperAttack<?>>, SpaceRipperAttack<?>> buildCodec(RecordCodecBuilder.Instance<SpaceRipperAttack<?>> instance) {
             return baseDefault(instance, SpaceRipperAttack::new);
         }
     }

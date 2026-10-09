@@ -47,7 +47,7 @@ import java.util.Objects;
  */
 public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
     public static final MoveSet<HorusEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.HORUS,
-            HorusEntity::registerMoves, State.class);
+            HorusEntity::registerMoves, HorusEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.horus"))
@@ -116,7 +116,7 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
                     Component.literal("Slash"),
                     Component.literal("quick combo starter, has a standing and crouching followup")
             );
-    public static final HorusBarrageAttack BARRAGE = new HorusBarrageAttack(240,
+    public static final HorusBarrageAttack<HorusEntity> BARRAGE = new HorusBarrageAttack<HorusEntity>(240,
             5, 80,0.75f, 0, 0, 0, 0, 0, 5)
             .withInfo(
                     Component.literal("Barrage"),
@@ -163,7 +163,7 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
                             Fires a large icicle that detonates after 2s.""")
             )
             .withSound(JSoundRegistry.HORUS_LANCE_CHARGE);
-    public static final ScatterAttack SCATTER = new ScatterAttack(60, 16, 20, 0.75f)
+    public static final ScatterAttack<HorusEntity> SCATTER = new ScatterAttack<HorusEntity>(60, 16, 20, 0.75f)
             .withCrouchingVariant(LANCE)
             .withInfo(
                     Component.literal("Scatter"),
@@ -173,7 +173,7 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
             )
             .withSound(JSoundRegistry.HORUS_SCATTER);
     // Special 2
-    public static final IcicleFireAttack CHARGE_FIRE = new IcicleFireAttack(0, 1, 11, 0.75f)
+    public static final IcicleFireAttack<HorusEntity> CHARGE_FIRE = new IcicleFireAttack<HorusEntity>(0, 1, 11, 0.75f)
             .withInfo(
                     Component.literal("Icicle Fire"),
                     Component.empty()
@@ -190,13 +190,13 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
                             If charged fully, attack becomes unblockable and launches far."""
                     ));
     // Special 3
-    public static final ChasingFreezeAttack PLACE = new ChasingFreezeAttack(200, 8, 14, 0.75f)
+    public static final ChasingFreezeAttack<HorusEntity> PLACE = new ChasingFreezeAttack<HorusEntity>(200, 8, 14, 0.75f)
             .withInfo(
                     Component.literal("Chasing Freeze"),
                     Component.empty()
             )
             .withSound(JSoundRegistry.HORUS_PlACE_CREEPING_ICE);
-    public static final PerfectFreezeAttack PERFECT_FREEZE = new PerfectFreezeAttack(50 * 20, 14, 30,
+    public static final PerfectFreezeAttack<HorusEntity> PERFECT_FREEZE = new PerfectFreezeAttack<HorusEntity>(50 * 20, 14, 30,
             0f, 4f, 10, 2.5f, 0.3f, 0)
             .withInfo(
                     Component.literal("Perfect Freeze"),

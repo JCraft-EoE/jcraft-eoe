@@ -45,7 +45,7 @@ import java.util.function.Supplier;
  */
 public final class StarPlatinumEntity extends AbstractStarPlatinumEntity<StarPlatinumEntity, StarPlatinumEntity.State> {
     public static final MoveSet<StarPlatinumEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.STAR_PLATINUM,
-            StarPlatinumEntity::registerMoves, State.class);
+            StarPlatinumEntity::registerMoves, StarPlatinumEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .info(StandInfo.builder()

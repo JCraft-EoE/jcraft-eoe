@@ -7,11 +7,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
-public class CommonPhComponentImpl implements CommonPhComponent {
+public abstract class CommonPhComponentImpl implements CommonPhComponent {
     private final Player player;
     private int level = 0;
 
-    public CommonPhComponentImpl(final Player player) {
+    protected CommonPhComponentImpl(final Player player) {
         this.player = player;
     }
 

@@ -8,6 +8,7 @@ import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -25,6 +26,7 @@ public class AboutSpecCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("spec")
                 .then(Commands.literal("about")
+                        .requires(JPerms.SPEC_ABOUT.require())
                         .executes(AboutSpecCommand::run)));
     }
 

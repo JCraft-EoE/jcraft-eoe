@@ -55,7 +55,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
-    public static final MoveSet<HamonSpec, HamonSpec.State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.HAMON, HamonSpec::registerMoves, HamonSpec.State.class);
+    public static final MoveSet<HamonSpec, HamonSpec.State> MOVE_SET = MoveSetManager.create(JSpecTypeRegistry.HAMON, HamonSpec::registerMoves, HamonSpec.class, HamonSpec.State.class);
     public static final SpecData DATA = SpecData.builder()
             .name(Component.translatable("spec.jcraft.hamon"))
             .description(Component.literal("Versatility perfected"))

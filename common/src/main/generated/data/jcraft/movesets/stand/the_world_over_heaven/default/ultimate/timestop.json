@@ -21,7 +21,7 @@
         "translate": "move.jcraft.the_world_over_heaven.default.timestop.name"
       }
     },
-    "time_stop_duration": "twohTimeStopDuration",
+    "time_stop_duration": "jcraft:twoh_time_stop_duration",
     "windup": 45
   }
 }

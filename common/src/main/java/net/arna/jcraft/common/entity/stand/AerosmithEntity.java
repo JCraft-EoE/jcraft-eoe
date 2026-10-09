@@ -60,7 +60,7 @@ import org.joml.Vector3f;
 
 public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntity.State> {
     public static final MoveSet<AerosmithEntity, AerosmithEntity.State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.AEROSMITH,
-            AerosmithEntity::registerDefaultMoves, AerosmithEntity.State.class);
+            AerosmithEntity::registerDefaultMoves, AerosmithEntity.class, AerosmithEntity.State.class);
 
     public static final EntityDataAccessor<Float> OVERHEAT = SynchedEntityData.defineId(AerosmithEntity.class, EntityDataSerializers.FLOAT);
     public static final float OVERHEAT_MAX = 15f;
@@ -142,7 +142,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
             0, 24, 0.9f, 1f, 13, 1.5f, 0.1f, 0f, 3, Blocks.OAK_LEAVES.defaultDestroyTime())
             .withSound(JSoundRegistry.AS_NAME)
             .withImpactSound(JSoundRegistry.AS_BARRAGE_HIT)
-            .withAerialVariant(CHARGE)
+            .withCrouchingVariant(CHARGE)
             .withInfo(
                     Component.literal("Propeller Strike"),
                     Component.literal("A makeshift barrage wielding Aerosmith as a saw-blade.")
@@ -160,7 +160,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     Component.literal("Orders Aerosmith to fly to a given location, returning after arriving.")
             );
 
-    public static final BombThrowAttack BOMB_THROW = new BombThrowAttack(200, 9, 42, 1.2f)
+    public static final BombThrowAttack<AerosmithEntity> BOMB_THROW = new BombThrowAttack<AerosmithEntity>(200, 9, 42, 1.2f)
             .withSound(JSoundRegistry.AS_BARRAGE)
             .withInfo(
                     Component.literal("Loft Bombing"),
@@ -306,7 +306,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     private static void registerDefaultMoves(final @NonNull MoveMap<AerosmithEntity, AerosmithEntity.State> moves) {
         moves.register(MoveClass.LIGHT, BULLET, State.LIGHT);
         moves.register(MoveClass.HEAVY, BOMB_DROP, State.ACTIVE);
-        moves.register(MoveClass.BARRAGE, SAWBLADE, State.SAWBLADE).withAerialVariant(State.CHARGE);
+        moves.register(MoveClass.BARRAGE, SAWBLADE, State.SAWBLADE).withCrouchingVariant(State.CHARGE);
         moves.register(MoveClass.SPECIAL1, FLYBY);
         moves.register(MoveClass.SPECIAL2, BOMB_THROW, State.BOMB);
         moves.register(MoveClass.SPECIAL3, XRAY);
@@ -484,6 +484,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
                     if (distanceSqr <= 6.25) {
                         setRemote(false);
                         setFlyState(FlyState.NONE);
+                        cancelMove();
                         playSound(JSoundRegistry.AS_LANDING.get());
                     }
                 }
@@ -512,7 +513,7 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
         if (user instanceof Mob mob) {
             final var target = mob.getTarget();
 
-            if (target != null)
+            if (target != null && !forcedReturn)
                 attackOrderMove.setCurrentTarget(target);
         }
 

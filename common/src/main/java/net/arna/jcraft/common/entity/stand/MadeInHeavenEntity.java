@@ -22,11 +22,7 @@ import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.actions.EffectAction;
 import net.arna.jcraft.common.attack.moves.madeinheaven.*;
-import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
-import net.arna.jcraft.common.attack.moves.shared.MainBarrageAttack;
-import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
-import net.arna.jcraft.common.attack.moves.shared.TossMove;
+import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.effects.ExhaustionEffect;
 import net.arna.jcraft.common.network.s2c.TimeAccelStatePacket;
@@ -72,7 +68,7 @@ import java.util.UUID;
  */
 public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHeavenEntity.State> {
     public static final MoveSet<MadeInHeavenEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.MADE_IN_HEAVEN,
-            MadeInHeavenEntity::registerMoves, State.class);
+            MadeInHeavenEntity::registerMoves, MadeInHeavenEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-45f)
             .evolution(true)
@@ -82,7 +78,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     .conCount(2)
                     .freeSpace(Component.literal("""
                         PASSIVE: Acceleration
-                            moving forward ramps up to Speed 70 over 1s
+                            moving forward ramps up to Speed 30 over 7s
                             backstepping cancels the buildup
                             faster movement drains more hunger
                             (backstep drains 2x); autostep is always on
@@ -98,12 +94,13 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
             .summonData(SummonData.of(JSoundRegistry.MIH_SUMMON))
             .build();
 
-    public static final SimpleAttack<MadeInHeavenEntity> SPEED_CHOP = new SimpleAttack<MadeInHeavenEntity>(0,
+    public static final SimpleAttack<MadeInHeavenEntity> SPEED_CHOP = new SimpleAttack<MadeInHeavenEntity>(15,
             6, 11, 0.75f, 3f, 8, 1.5f, 0.5f, -0.1f)
             .withAnim(State.SPEED_CHOP)
             .withAction(EffectAction.inflict(JStatusRegistry.BLEEDING, 80, 1, true, false, true))
             .withImpactSound(SoundEvents.TRIDENT_HIT)
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.HIGH)
+            .withBlockStun(3)
             .withInfo(
                     Component.literal("Speed Chop"),
                     Component.literal("tiny stun, procs bleed")
@@ -176,7 +173,7 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
                     Component.literal("Low Kick"),
                     Component.literal("combo starter/extender, mih hoofs the enemies legs in a quick, stunning attack")
             );
-    public static final FuryChopAttack FURY_CHOP = new FuryChopAttack(24,
+    public static final FuryChopAttack<MadeInHeavenEntity> FURY_CHOP = new FuryChopAttack<MadeInHeavenEntity>(24,
             15, 24, 0.85f,7f, 20, 1.6f, 0.25f, 0.2f)
             .withSound(JSoundRegistry.MIH_FURYCHOP)
             .withImpactSound(JSoundRegistry.IMPACT_2)
@@ -237,11 +234,11 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     private static final EntityDataAccessor<Integer> SPEED_RAMP = SynchedEntityData.defineId(MadeInHeavenEntity.class, EntityDataSerializers.INT);
 
     public static final int MAXIMUM_SPEEDOMETER = 30;
-    public static final int EXHAUSTION_DURATION = 20 * 5; // 5 seconds
+    public static final int EXHAUSTION_DURATION = 20 * 6; // 6 seconds
 
-    // Acceleration passive: ramps movement speed up to Speed 70 over RAMP_TICKS while moving forward.
-    private static final int RAMP_TICKS = 120; // 6 second to reach max speed
-    private static final double MAX_SPEED_BONUS = 0.2 * 70; // MULTIPLY_TOTAL bonus equal to Speed 70
+    // Acceleration passive: ramps movement speed up to Speed 30 over RAMP_TICKS while moving forward.
+    private static final int RAMP_TICKS = 20 * 7; // 7 seconds to reach max speed
+    private static final double MAX_SPEED_BONUS = 0.2 * 30; // MULTIPLY_TOTAL bonus equal to Speed -> 0.2 * N
     private static final UUID RAMP_SPEED_UUID = UUID.fromString("7a3b2c1d-0e9f-4a8b-9c7d-1e2f3a4b5c6d");
     private static final float AUTOSTEP_HEIGHT = 1.0f; // walk straight up full blocks
     private static final float DEFAULT_STEP_HEIGHT = 0.6f; // vanilla player/mob step height
@@ -432,9 +429,16 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
 
         if (user.isSprinting()) {
             user.setMaxUpStep(AUTOSTEP_HEIGHT);
+
+            setAfterimage(true);
+            user.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 2,10));
+            user.addEffect(new MobEffectInstance(JStatusRegistry.WATER_WALKING.get(), 2));
         }
         else {
             user.setMaxUpStep(DEFAULT_STEP_HEIGHT);
+            if (getState() != State.TIME_ACCELERATION) {
+                setAfterimage(false);
+            }
         }
 
         if (aTime > 0 && !user.hasEffect(JStatusRegistry.DAZED.get())) {

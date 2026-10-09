@@ -28,6 +28,7 @@ import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
 import net.arna.jcraft.common.spec.VampireSpec;
+import net.arna.jcraft.common.system.GunAiming;
 import net.arna.jcraft.common.tickable.*;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin_logic.EntityAddon;
@@ -56,13 +57,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ArmorMaterials;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Explosion;
@@ -424,7 +419,7 @@ public class JServerEvents {
             if (100 - random.nextInt(0, 100) > gameRules.getInt(CHANCE_MOB_SPAWNS_WITH_STAND)) {
                 return EventResult.pass();
             }
-            final StandType type = StandTypeUtil.generateStandTypeForMob(gameRules);
+            final StandType type = StandTypeUtil.generateStandTypeForMob(gameRules, world.registryAccess());
             standData.setType(type);
 
             // ATTRIBUTES
@@ -552,7 +547,7 @@ public class JServerEvents {
                     final StandType standType = standData.getType();
                     if (standType != null && standType != JStandTypeRegistry.NONE.get()) {
                         final int skin = Math.max(0, Math.min(standData.getSkin(), standType.getData().getInfo().getSkinCount() - 1));
-                        final ItemStack disc = StandDiscItem.createDiscStack(standType, skin);
+                        final ItemStack disc = StandDiscItem.createDiscStack(standType, skin, true);
                         Containers.dropItemStack(serverWorld, living.getX(), living.getY(), living.getZ(), disc);
                     }
                     standData.setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0, false);
@@ -594,9 +589,11 @@ public class JServerEvents {
     public static EventResult hurt(LivingEntity entity, DamageSource source, float damage) {
         // No snowball shenanigans
         if (damage < 0.01f) return EventResult.pass();
+
         if (entity.level() instanceof ServerLevel serverWorld) {
             maybeLaunch(entity, source, serverWorld, entity.getEffect(JStatusRegistry.DAZED.get()), source.getEntity());
         }
+
         return EventResult.pass();
     }
 
@@ -751,4 +748,13 @@ public class JServerEvents {
         return EventResult.pass();
     }
 
+    public static void playerRespawn(final ServerPlayer serverPlayer, boolean conqueredEnd) {
+        GunAiming.set(serverPlayer, false);
+
+        final var vamp = JComponentPlatformUtils.getVampirism(serverPlayer);
+
+        if (vamp == null) return;
+
+        vamp.resetBlood();
+    }
 }

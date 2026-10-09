@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class CommonMiscComponentImpl implements CommonMiscComponent {
+public abstract class CommonMiscComponentImpl implements CommonMiscComponent {
     private final LivingEntity entity;
     @Getter
     private Vec3 desiredVelocity = Vec3.ZERO;
@@ -44,7 +44,7 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
     @Setter
     private float aerosmithOverheat = 0f;
 
-    public CommonMiscComponentImpl(final LivingEntity entity) {
+    protected CommonMiscComponentImpl(final LivingEntity entity) {
         this.entity = entity;
     }
 

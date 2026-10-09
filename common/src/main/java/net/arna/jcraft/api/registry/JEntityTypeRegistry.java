@@ -201,9 +201,16 @@ public interface JEntityTypeRegistry {
 
     RegistrySupplier<EntityType<GETreeEntity>> GE_TREE = ENTITY_TYPE_REGISTRY.register(JCraft.id("getree"),
             () -> EntityType.Builder.of(
-                    ((EntityType<GETreeEntity> type, Level world) -> new GETreeEntity(world)),
+                    WorldOnlyEntityFactory.from(GETreeEntity::new),
                     MobCategory.MISC
-            ).sized(0.6f, 0.8f).build("goldexperience")
+            ).sized(0.6f, 0.8f).build("getree")
+    );
+
+    RegistrySupplier<EntityType<GEVinesEntity>> GE_VINES = ENTITY_TYPE_REGISTRY.register(JCraft.id("gevines"),
+            () -> EntityType.Builder.of(
+                    WorldOnlyEntityFactory.from(GEVinesEntity::new),
+                    MobCategory.MISC
+            ).sized(0.6f, 0.6f).build("gevines")
     );
 
     RegistrySupplier<EntityType<GESnakeEntity>> GE_SNAKE = ENTITY_TYPE_REGISTRY.register(JCraft.id("gesnake"),

@@ -2,6 +2,53 @@
   "anim_state": "HEAVY",
   "class": "HEAVY",
   "cooldown_type": "STAND_HEAVY",
+  "crouching_variant": {
+    "anim_state": "UNDERHAND",
+    "class": "HEAVY",
+    "cooldown_type": "STAND_HEAVY",
+    "move": {
+      "type": "jcraft:goldexperience_vine_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 11,
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_3",
+        "override_stun": true,
+        "shockwaves": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 100,
+      "damage": 7.0,
+      "duration": 22,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "run": "at_init",
+            "sound": "jcraft:getree"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact2"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.gold_experience.default.underhand_carve.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.gold_experience.default.underhand_carve.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 1.1,
+      "move_distance": 1.5,
+      "offset": 0.0,
+      "stun": 10,
+      "windup": 13
+    }
+  },
   "move": {
     "type": "jcraft:shared_movement_slowing_simple_attack",
     "attack_extras": {
@@ -18,7 +65,7 @@
       "shockwaves": true,
       "stun_type": "LAUNCH"
     },
-    "cooldown": 22,
+    "cooldown": 0,
     "damage": 9.0,
     "duration": 22,
     "extras": {

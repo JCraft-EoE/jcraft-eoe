@@ -9,8 +9,8 @@ import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.splatter.JSplatterManager;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
-import net.arna.jcraft.common.entity.stand.MagiciansRedEntity;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.arna.jcraft.common.util.JUtils;
@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
-public final class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurricaneAttack, MagiciansRedEntity> {
+public final class CrossfireHurricaneAttack<A extends StandEntity<? extends A, ?>> extends AbstractMove<CrossfireHurricaneAttack<A>, A> {
     private int hurricaneTime = 0;
     private Vec3 hurricanePos = Vec3.ZERO;
 
@@ -39,23 +39,23 @@ public final class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurric
     }
 
     @Override
-    public @NonNull MoveType<CrossfireHurricaneAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<CrossfireHurricaneAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void tick(final MagiciansRedEntity attacker) {
+    public void tick(final A attacker) {
         tickHurricane(attacker);
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final MagiciansRedEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         hurricaneTime = 50;
         hurricanePos = attacker.position();
         return Set.of();
     }
 
-    public void tickHurricane(final MagiciansRedEntity stand) {
+    public void tickHurricane(final A stand) {
         // Init variables
         final LivingEntity user = stand.getUserOrThrow();
         final Entity vehicle = user.getVehicle();
@@ -121,20 +121,20 @@ public final class CrossfireHurricaneAttack extends AbstractMove<CrossfireHurric
     }
 
     @Override
-    protected @NonNull CrossfireHurricaneAttack getThis() {
+    protected @NonNull CrossfireHurricaneAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull CrossfireHurricaneAttack copy() {
-        return copyExtras(new CrossfireHurricaneAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+    public @NonNull CrossfireHurricaneAttack<A> copy() {
+        return copyExtras(new CrossfireHurricaneAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
-    public static class Type extends AbstractMove.Type<CrossfireHurricaneAttack> {
+    public static class Type extends AbstractMove.Type<CrossfireHurricaneAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<CrossfireHurricaneAttack>, CrossfireHurricaneAttack> buildCodec(RecordCodecBuilder.Instance<CrossfireHurricaneAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<CrossfireHurricaneAttack<?>>, CrossfireHurricaneAttack<?>> buildCodec(RecordCodecBuilder.Instance<CrossfireHurricaneAttack<?>> instance) {
             return baseDefault(instance, CrossfireHurricaneAttack::new);
         }
     }

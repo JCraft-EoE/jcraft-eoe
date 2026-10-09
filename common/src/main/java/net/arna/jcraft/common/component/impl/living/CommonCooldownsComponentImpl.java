@@ -18,13 +18,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-public class CommonCooldownsComponentImpl implements CommonCooldownsComponent {
+public abstract class CommonCooldownsComponentImpl implements CommonCooldownsComponent {
     public final Object2IntMap<CooldownType> cooldowns = new Object2IntRBTreeMap<>();
     protected final Object2IntMap<CooldownType> initialDurations = new Object2IntRBTreeMap<>();
     private final Entity entity;
     public boolean skipSync;
 
-    public CommonCooldownsComponentImpl(final @NonNull Entity entity) {
+    protected CommonCooldownsComponentImpl(final @NonNull Entity entity) {
         this.entity = entity;
     }
 

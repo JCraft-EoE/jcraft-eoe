@@ -69,6 +69,9 @@ dependencies {
     // jjbacosplay
     modImplementation "com.jcraft-eoe.jjbacosplay:jjbacosplay-fabric:${rootProject.jjbacosplay_version}"
 
+    // Lucko's Permissions API
+    include modImplementation('me.lucko:fabric-permissions-api:0.3.1') { transitive false }
+
     // distant horizons for structure spotting
     modImplementation "curse.maven:distant-horizons-508933:8037629"
 

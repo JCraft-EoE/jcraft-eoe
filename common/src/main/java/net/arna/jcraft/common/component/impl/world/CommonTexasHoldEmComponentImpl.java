@@ -12,12 +12,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
-public class CommonTexasHoldEmComponentImpl implements CommonTexasHoldEmComponent {
+public abstract class CommonTexasHoldEmComponentImpl implements CommonTexasHoldEmComponent {
 
     protected final Level world;
     protected Collection<TexasHoldEm> games = new HashSet<>();
 
-    public CommonTexasHoldEmComponentImpl(final Level world) {
+    protected CommonTexasHoldEmComponentImpl(final Level world) {
         this.world = Objects.requireNonNull(world);
     }
 

@@ -6,16 +6,18 @@ import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.Attacks;
-import net.arna.jcraft.api.stand.StandData;
-import net.arna.jcraft.api.stand.StandEntity;
-import net.arna.jcraft.api.stand.StandInfo;
-import net.arna.jcraft.api.stand.SummonData;
+import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.StateContainer;
 import net.arna.jcraft.api.attack.enums.MoveClass;
-import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.enums.StunType;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.api.stand.StandData;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.api.stand.StandInfo;
+import net.arna.jcraft.api.stand.SummonData;
 import net.arna.jcraft.common.attack.moves.purplehaze.BackhandAttack;
 import net.arna.jcraft.common.attack.moves.purplehaze.PHRekkaAttack;
 import net.arna.jcraft.common.attack.moves.purplehaze.distortion.DistortionMove;
@@ -24,8 +26,6 @@ import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -37,7 +37,7 @@ import org.joml.Vector3f;
  */
 public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<PurpleHazeDistortionEntity, PurpleHazeDistortionEntity.State> {
     public static final MoveSet<PurpleHazeDistortionEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.PURPLE_HAZE_DISTORTION,
-            PurpleHazeDistortionEntity::registerMoves, State.class);
+            PurpleHazeDistortionEntity::registerMoves, PurpleHazeDistortionEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .evolution(true)
@@ -74,7 +74,7 @@ public final class PurpleHazeDistortionEntity extends AbstractPurpleHazeEntity<P
                     Component.literal("5m range")
             );
 
-    public static final DistortionMove DISTORTION = new DistortionMove(20)
+    public static final DistortionMove<PurpleHazeDistortionEntity> DISTORTION = new DistortionMove<PurpleHazeDistortionEntity>(20)
             .withCrouchingVariant(PILOT_MODE)
             .withInfo(
                     Component.literal("Distortion"),
