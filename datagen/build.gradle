@@ -68,6 +68,19 @@ processResources {
     }
 }
 
+sourcesJar {
+    dependsOn "copyAccessWidener"
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE // Ignore duplicate jcraft.accesswidener files
+
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+
+    def fabricSources = project(":fabric").sourcesJar
+    dependsOn fabricSources
+    from fabricSources.archiveFile.map { zipTree(it) }
+}
+
 // Ensure fabric project is evaluated before this project
 evaluationDependsOn(':fabric')
 

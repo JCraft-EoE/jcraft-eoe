@@ -30,7 +30,7 @@
               "type": "jcraft:play_sound",
               "bind": false,
               "run": "on_hit",
-              "sound": "jcraft:twkickhit"
+              "sound": "jcraft:impact7"
             }
           ],
           "description": {

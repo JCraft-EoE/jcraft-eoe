@@ -56,7 +56,7 @@
         ],
         "armor": 2147483647,
         "description": {
-          "text": "quick, armored knockdown"
+          "text": "Quick, armored knockdown."
         },
         "name": {
           "text": "Counter (Hit)"

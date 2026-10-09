@@ -64,11 +64,11 @@ public class CarbonDioxideRadarRenderer extends AbstractEntityRenderer<CarbonDio
      * alpha pass in {@code AzEntityRendererPipeline.preRender}, so we return
      * exactly {@code 1F} in the normal case to keep the fast path.
      */
-    private static Float alpha(final CarbonDioxideRadarEntity entity) {
+    private static float alpha(final CarbonDioxideRadarEntity entity) {
         final Minecraft mc = Minecraft.getInstance();
         if (mc.options.getCameraType().isFirstPerson()
                 && mc.getCameraEntity() == entity.getUser()) {
-            return 0.5F;
+            return 0.1F;
         }
         return 1.0F;
     }

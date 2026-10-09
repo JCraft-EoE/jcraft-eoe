@@ -116,7 +116,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public DamageSource getDamageSource() {
-        return JDamageSources.create(user.level(), DamageTypes.PLAYER_ATTACK, user);
+        return JDamageSources.spec(user);
     }
 
     @Override
@@ -208,9 +208,9 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
             return false;
         }
 
-        boolean crouching = hasUser() && user.isShiftKeyDown();
-        boolean aerial = hasUser() && !user.onGround();
-        MoveMap.Entry<A, S> entry = moveMap.getFirstValidEntry(type.getMoveClass(), getThis(), crouching, aerial);
+        boolean crouching = hasUser() && isSelectingCrouch();
+        boolean aerial = hasUser() && isSelectingAerial();
+        MoveMap.Entry<A, S> entry = getMoveEntry(type.getMoveClass(), crouching, aerial);
         return entry == null ? type.isHoldable() : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable());
     }
 
@@ -238,19 +238,11 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     public boolean handleMove(MoveClass moveClass, float animationSpeed) {
-        boolean crouching = hasUser() && user.isShiftKeyDown();
-        boolean aerial = hasUser() && !user.onGround();
+        boolean crouching = hasUser() && isSelectingCrouch();
+        boolean aerial = hasUser() && isSelectingAerial();
         MoveMap.Entry<A, S> entry = getMoveEntry(moveClass, crouching, aerial);
         if (entry == null) {
             return false;
-        }
-
-        if (user.isShiftKeyDown()) {
-            if (entry.getCrouchingVariant() != null) {
-                entry = entry.getCrouchingVariant();
-            }
-        } else if (!user.onGround() && entry.getAerialVariant() != null) {
-            entry = entry.getAerialVariant();
         }
 
         final AbstractMove<?, ? super A> move = overrideMoveSelection(entry.getMove(), crouching, aerial);

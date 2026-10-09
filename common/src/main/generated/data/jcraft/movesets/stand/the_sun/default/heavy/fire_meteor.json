@@ -7,7 +7,7 @@
     "move": {
       "type": "jcraft:thesun_fire_sun_beam_attack",
       "beams": 1,
-      "cooldown": 20,
+      "cooldown": 100,
       "divergence": 0.0,
       "duration": 10,
       "extras": {
@@ -24,9 +24,9 @@
   },
   "move": {
     "type": "jcraft:thesun_fire_meteor_attack",
-    "cooldown": 20,
-    "duration": 10,
-    "explosive_if_max": true,
+    "cooldown": 0,
+    "duration": 20,
+    "explosive_scale_minimum": 2.0,
     "extras": {
       "description": {
         "translate": "move.jcraft.the_sun.default.fire_meteor.description"

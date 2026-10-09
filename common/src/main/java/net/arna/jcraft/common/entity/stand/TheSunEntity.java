@@ -100,25 +100,25 @@ public final class TheSunEntity extends StandEntity<TheSunEntity, TheSunEntity.S
                     .build())
             .build();
 
-    private static final FireSunBeamAttack FIRE_SUNBEAM = new FireSunBeamAttack(20, 5, 10, 1, 0)
+    private static final FireSunBeamAttack FIRE_SUNBEAM = new FireSunBeamAttack(100, 5, 10, 1, 0)
             .withInfo(
                     Component.nullToEmpty("Fire Sunbeam"),
                     Component.nullToEmpty("""
                             Fires a sunbeam with perfect precision.""")
             );
 
-    private static final FireMeteorAttack FIRE_METEOR = new FireMeteorAttack(20, 10, 1, 1,
-            2.5f, 0f, true, IntSet.of(5))
+    private static final FireMeteorAttack FIRE_METEOR = new FireMeteorAttack(0, 20, 1, 1,
+            2.5f, 0f, 2.0F, IntSet.of(5))
             .withCrouchingVariant(FIRE_SUNBEAM)
             .withInfo(
                     Component.nullToEmpty("Fire Meteor"),
                     Component.nullToEmpty("""
                             Fires a high-velocity meteor with perfect precision.
-                            At max size, the meteor is explosive.""")
+                            Past 75% of max size, the meteor is explosive.""")
             );
 
     private static final FireMeteorAttack STARBURST = new FireMeteorAttack(40, 24, 3, 1.75f,
-            2.5f, 10f, false, IntSet.of(8, 16, 24))
+            2.5f, 10f, 2.0F, IntSet.of(8, 16, 24))
             .withInfo(
                     Component.nullToEmpty("Starburst"),
                     Component.nullToEmpty("""

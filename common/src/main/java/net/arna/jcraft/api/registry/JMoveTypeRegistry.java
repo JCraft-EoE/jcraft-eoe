@@ -10,10 +10,7 @@ import net.arna.jcraft.common.attack.moves.anubis.*;
 import net.arna.jcraft.common.attack.moves.cmoon.*;
 import net.arna.jcraft.common.attack.moves.cream.*;
 import net.arna.jcraft.common.attack.moves.dirtydeedsdonedirtcheap.*;
-import net.arna.jcraft.common.attack.moves.goldexperience.BerryBushAttack;
-import net.arna.jcraft.common.attack.moves.goldexperience.LifeGiverAttack;
-import net.arna.jcraft.common.attack.moves.goldexperience.OverclockAttack;
-import net.arna.jcraft.common.attack.moves.goldexperience.TreeAttack;
+import net.arna.jcraft.common.attack.moves.goldexperience.*;
 import net.arna.jcraft.common.attack.moves.goldexperience.requiem.*;
 import net.arna.jcraft.common.attack.moves.hamon.*;
 import net.arna.jcraft.common.attack.moves.hierophantgreen.EmeraldSplashAttack;
@@ -29,6 +26,10 @@ import net.arna.jcraft.common.attack.moves.mandom.RewindMove;
 import net.arna.jcraft.common.attack.moves.metallica.*;
 import net.arna.jcraft.common.attack.moves.purplehaze.*;
 import net.arna.jcraft.common.attack.moves.purplehaze.distortion.DistortionMove;
+import net.arna.jcraft.common.attack.moves.ranger.RangerFocusMove;
+import net.arna.jcraft.common.attack.moves.ranger.RangerHolsterMove;
+import net.arna.jcraft.common.attack.moves.ranger.RangerRollMove;
+import net.arna.jcraft.common.attack.moves.ranger.RangerSlideMove;
 import net.arna.jcraft.common.attack.moves.shadowtheworld.ImpalingThrustAttack;
 import net.arna.jcraft.common.attack.moves.shadowtheworld.STWChargeAttack;
 import net.arna.jcraft.common.attack.moves.shadowtheworld.STWCounterAttack;
@@ -69,6 +70,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> CMOON_GROUND_SLAM_ATTACK = register("cmoon_ground_slam_attack", CGroundSlamAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CMOON_LAUNCH_ATTACK = register("cmoon_launch_attack", LaunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CMOON_TOSS_MOVE = register("cmoon_toss_move", CMoonTossMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> CMOON_DIVEKICK_ATTACK = register("cmoon_divekick_attack", CDivekickAttack.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> CREAM_BALL_CHARGE_ATTACK = register("cream_ball_charge_attack", BallChargeAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> CREAM_BALL_MODE_ENTER_MOVE = register("cream_ball_mode_enter_move", BallModeEnterMove.Type.INSTANCE);
@@ -91,6 +93,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_LIFE_GIVER_ATTACK = register("goldexperience_life_giver_attack", LifeGiverAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_OVERCLOCK_ATTACK = register("goldexperience_overclock_attack", OverclockAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_TREE_ATTACK = register("goldexperience_tree_attack", TreeAttack.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_VINE_ATTACK = register("goldexperience_vine_attack", VineAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_REQUIEM_FLIGHT_MOVE = register("goldexperience_requiem_flight_move", FlightMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_REQUIEM_LIFE_BEAM_ATTACK = register("goldexperience_requiem_life_beam_attack", LifeBeamAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> GOLDEXPERIENCE_REQUIEM_NULLIFICATION_ATTACK = register("goldexperience_requiem_nullification_attack", NullificationAttack.Type.INSTANCE);
@@ -263,6 +266,11 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> HAMON_ZOOM_PUNCH_ATTACK = register("hamon_zoom_punch_attack", ZoomPunchAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_ATTACK = register("hamon_improviser_attack", ImproviserAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> HAMON_IMPROVISER_MOVE = register("hamon_improviser_move", ImproviserMove.Type.INSTANCE);
+
+    RegistrySupplier<MoveType<?>> RANGER_FOCUS_MOVE = register("ranger_focus_move", RangerFocusMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> RANGER_HOLSTER_MOVE = register("ranger_holster_move", RangerHolsterMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> RANGER_ROLL_MOVE = register("ranger_roll_move", RangerRollMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> RANGER_SLIDE_MOVE = register("ranger_slide_move", RangerSlideMove.Type.INSTANCE);
 
 
     RegistrySupplier<MoveType<?>> WHITESNAKE_CHARGED_SPEW_ATTACK = register("whitesnake_charged_spew_attack", ChargedSpewAttack.Type.INSTANCE);

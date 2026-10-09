@@ -155,6 +155,9 @@ public final class JCraft {
      */
     public static final String BASE_CONTROLLER = "base_controller";
 
+    // General-purpose gun controllers
+    public static final String FIRE_CONTROLLER = "fire_controller";
+
     // Dimensional travel bullshit
     /**
      * Used to lock the AU chunks from being unloaded automatically by JServerTickEvents
@@ -259,19 +262,26 @@ public final class JCraft {
         VillagerTradesModifier.init();
         ConditionalFlightHandler.init();
 
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_REMOTE_STAND_INTERACT, RemoteStandInteractPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_PREDICTION_TRIGGER, PredictionTriggerPacket::handle);
-        NetworkManager.registerReceiver(NetworkManager.Side.C2S, JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_PLAYER_INPUT, PlayerInputPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket::handleHold);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), ConfigUpdatePacket.ID, ConfigUpdatePacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_STAND_BLOCK, StandBlockPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_COOLDOWN_CANCEL, CooldownCancelPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_REMOTE_STAND_INTERACT, RemoteStandInteractPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_PREDICTION_TRIGGER, PredictionTriggerPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_VARIANT, VariantInputPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_GUN_AIM, GunAimPacket::handle);
     }
 
     private static void registerAzArmor() {
         AzIdentityRegistry.register(JItemRegistry.STONE_MASK.get());
         AzIdentityRegistry.register(JItemRegistry.RED_HAT.get());
+    }
+
+    // Held guns animate per stack, so each one needs its own identity rather than sharing the item's.
+    private static void registerAzItems() {
+        AzIdentityRegistry.register(JItemRegistry.PEACEMAKER.get());
     }
 
     public static void postInit() {
@@ -280,6 +290,7 @@ public final class JCraft {
         initDispenserBehaviors();
         JStatRegistry.initFormatters();
         registerAzArmor();
+        registerAzItems();
         initMoveSets();
     }
 

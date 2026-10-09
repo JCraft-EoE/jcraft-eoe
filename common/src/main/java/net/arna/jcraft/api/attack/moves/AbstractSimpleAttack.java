@@ -79,6 +79,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
     private int blockStun = -1;
     private boolean staticY;
     private boolean doShockwaves = false;
+    private int ipsId = 0; // 0 is none and thus ignored
     private @Nullable CommonHitPropertyComponent.HitAnimation hitAnimation = CommonHitPropertyComponent.HitAnimation.MID;
     private @NonNull BlockableType blockableType = BlockableType.BLOCKABLE;
     protected @Nullable JParticleType hitSpark = JParticleType.HIT_SPARK_1;
@@ -323,6 +324,11 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
 
     public T withShockwaves(final boolean shockwaves) {
         this.doShockwaves = shockwaves;
+        return getThis();
+    }
+
+    public T withIpsId(int id) {
+        this.ipsId = id;
         return getThis();
     }
 
@@ -682,6 +688,7 @@ public abstract class AbstractSimpleAttack<T extends AbstractSimpleAttack<T, A>,
         cast.lift = lift;
         cast.canBackstab = canBackstab;
         cast.doShockwaves = doShockwaves;
+        cast.ipsId = ipsId;
         cast.blockStun = blockStun;
         cast.staticY = staticY;
         cast.blockableType = blockableType;

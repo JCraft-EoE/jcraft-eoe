@@ -1,14 +1,17 @@
 package net.arna.jcraft.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.arna.jcraft.client.aim.GunAimHandler;
 import net.arna.jcraft.client.rendering.api.PostEffect;
 import net.arna.jcraft.client.rendering.api.PostProcessHandler;
 import net.arna.jcraft.client.rendering.api.callbacks.PostShaderRenderCallback;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.common.util.JUtils;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.server.packs.resources.ResourceProvider;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,5 +58,17 @@ public class GameRendererMixin {
     @Inject(method = "reloadShaders", at = @At("RETURN"))
     private void loadShaders(ResourceProvider resourceProvider, CallbackInfo ci) {
         PostEffect.initAll();
+    }
+
+    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
+    private void jcraft$aimZoom(Camera camera, float partialTick, boolean useFOVSetting, CallbackInfoReturnable<Double> cir) {
+        if (!useFOVSetting) {
+            return;
+        }
+        float progress = GunAimHandler.progress(partialTick);
+        if (progress <= 0f) {
+            return;
+        }
+        cir.setReturnValue(cir.getReturnValue() / Mth.lerp(progress, 1.0f, GunAimHandler.ZOOM));
     }
 }

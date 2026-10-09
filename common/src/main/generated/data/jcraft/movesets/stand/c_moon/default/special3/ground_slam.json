@@ -43,10 +43,10 @@
         "translate": "move.jcraft.c_moon.default.ground_slam.name"
       }
     },
-    "hitbox_size": 3.0,
+    "hitbox_size": 2.0,
     "knockback": 0.2,
     "move_distance": 1.0,
-    "offset": 1.4,
+    "offset": 0.7,
     "stun": 17,
     "windup": 10
   }

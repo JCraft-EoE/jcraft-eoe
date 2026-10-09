@@ -7,8 +7,12 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.spec.SpecType;
-import net.arna.jcraft.common.spec.*;
+import net.arna.jcraft.common.spec.AnubisSpec;
+import net.arna.jcraft.common.spec.BrawlerSpec;
 import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.common.spec.HamonSpec;
+import net.arna.jcraft.common.spec.RangerSpec;
+import net.arna.jcraft.common.spec.VampireSpec;
 import net.minecraft.Util;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -22,6 +26,7 @@ public interface JSpecTypeRegistry {
     RegistrySupplier<SpecType> ANUBIS = register("anubis", AnubisSpec::new);
     RegistrySupplier<SpecType> VAMPIRE = register("vampire", VampireSpec::new);
     RegistrySupplier<SpecType> HAMON = register("hamon", HamonSpec::new);
+    RegistrySupplier<SpecType> RANGER = register("ranger", RangerSpec::new);
     RegistrySupplier<SpecType> SPIN = register("spin", SpinSpec::new);
 
     Int2ObjectMap<RegistrySupplier<SpecType>> LEGACY_ORDINALS = Util.make(new Int2ObjectArrayMap<>(), map -> {
