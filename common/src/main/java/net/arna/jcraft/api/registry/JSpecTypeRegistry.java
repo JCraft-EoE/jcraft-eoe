@@ -12,6 +12,7 @@ import net.arna.jcraft.common.spec.BrawlerSpec;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.common.spec.HamonSpec;
 import net.arna.jcraft.common.spec.RangerSpec;
+import net.arna.jcraft.common.spec.SpinSpec;
 import net.arna.jcraft.common.spec.VampireSpec;
 import net.minecraft.Util;
 import net.minecraft.world.entity.LivingEntity;
