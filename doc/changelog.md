@@ -5,16 +5,18 @@
 ### Stands & Specs
 * Ranger Spec:
   * Can roll and slide
-  * Can aim with gun, reducing its spread
   * Has a free item space (holster)
   * Use Holster item to unlock Spec
-  * Bullets are armor-piercing
+  * Focus move make all projectiles owned by the user homed in on the highlighted entity
 * Introduced Spec damage type
 * Nerfed HG heavy
 * Aerosmith:
   * Bomb inertia improved
   * Overheat is harsher now
-* Poison UI for PH
+* Poison UI for PHD:
+  * Purple indicates normal virus status effect
+  * White indicates virus cleanse, removing the affected entity's virus effect
+  * Black indicates blindness, weakness, and slowness
 * C-Moon:
   * Updated skins and animations
   * Buffed cr.H
@@ -27,7 +29,7 @@
 * Buffed STW Special 3
 * Minor SC rework
 * Rebalanced the Sun
-* Vampire
+* Vampire:
   * Nerfed Bloodsuck
   * Added cooldown to blood bottles
 * Buffed Hamon Wave
@@ -45,10 +47,12 @@
 * Added Peacemaker item: it's a gun that needs Bullets
 * Added Holster item: use to get Ranger Spec
 * Guns share a cooldown now
+* Bullet projectiles are now armor-piercing
+* Added aiming to gun, reducing its spread
 ### Effects
 * Out-of-Body effect knocks camera out
 ### Languages
-* Added Italian and Chile-Spanish translation
+* Added Italian and Chilean-Spanish translation
 ### Bug Fixes
 * Fixed Anubis infinite Combo
 * Fixed SHA dealing double damage
