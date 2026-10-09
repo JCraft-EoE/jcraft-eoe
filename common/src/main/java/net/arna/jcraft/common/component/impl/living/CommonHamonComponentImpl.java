@@ -14,7 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 import java.util.UUID;
 
-public class CommonHamonComponentImpl implements CommonHamonComponent {
+public abstract class CommonHamonComponentImpl implements CommonHamonComponent {
 
     private final LivingEntity entity;
     // only needs to be synchronized to the client, not persisted
@@ -48,7 +48,7 @@ public class CommonHamonComponentImpl implements CommonHamonComponent {
     private int activeLesson;
     private final int[] lessonTicks = new int[6];
 
-    public CommonHamonComponentImpl(final LivingEntity entity) {
+    protected CommonHamonComponentImpl(final LivingEntity entity) {
         this.entity = entity;
     }
 

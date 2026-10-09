@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
-public class CommonGunslingerComponentImpl implements CommonGunslingerComponent {
+public abstract class CommonGunslingerComponentImpl implements CommonGunslingerComponent {
 
     private final LivingEntity entity;
     @Getter
@@ -23,7 +23,7 @@ public class CommonGunslingerComponentImpl implements CommonGunslingerComponent 
     @Getter
     private float focus = RangerSpec.MAX_FOCUS;
 
-    public CommonGunslingerComponentImpl(final LivingEntity entity) {
+    protected CommonGunslingerComponentImpl(final LivingEntity entity) {
         this.entity = entity;
     }
 

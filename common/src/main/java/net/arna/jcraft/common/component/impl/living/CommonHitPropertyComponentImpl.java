@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Random;
 
-public class CommonHitPropertyComponentImpl implements CommonHitPropertyComponent {
+public abstract class CommonHitPropertyComponentImpl implements CommonHitPropertyComponent {
     protected final Entity entity;
     protected long endHitAnimTime = 0;
     @Getter
@@ -19,7 +19,7 @@ public class CommonHitPropertyComponentImpl implements CommonHitPropertyComponen
     protected Vec3 randomRotation = Vec3.ZERO;
     protected final Random random;
 
-    public CommonHitPropertyComponentImpl(final Entity entity) {
+    protected CommonHitPropertyComponentImpl(final Entity entity) {
         this.entity = entity;
         this.random = new Random();
     }
