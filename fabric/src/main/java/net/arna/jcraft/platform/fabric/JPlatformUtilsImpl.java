@@ -39,7 +39,7 @@ public class JPlatformUtilsImpl {
             @NonNull
             @Override
             public Component getDisplayName() {
-                return Component.literal("Hey");
+                return Component.translatable("jcraft.gui.disc_case");
             }
 
             @Override

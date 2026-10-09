@@ -31,7 +31,7 @@ public class JPlatformUtilsImpl {
         player.openMenu(new MenuProvider() {
             @Override
             public Component getDisplayName() {
-                return Component.literal("Hey");
+                return Component.translatable("jcraft.gui.disc_case");
             }
 
             @Override
