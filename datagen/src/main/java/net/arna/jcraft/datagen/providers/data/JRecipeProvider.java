@@ -64,6 +64,14 @@ public class JRecipeProvider extends FabricRecipeProvider {
                         200)
                 .unlockedBy("has_glass_pane", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LIGHT_BLUE_STAINED_GLASS_PANE))
                 .save(exporter, JCraft.id("disc"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, JItemRegistry.DISC_CASE.get())
+                .pattern("WWW")
+                .pattern("FDF")
+                .pattern("WWW")
+                .define('D', JItemRegistry.DISC.get())
+                .define('F', Items.FLINT)
+                .define('W', ItemTags.WOOL)
+                .unlockedBy("has_disc", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DISC.get()));
         // stellar iron block from ingot
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, JBlockRegistry.STELLAR_IRON_BLOCK.get())
                 .requires(JItemRegistry.STELLAR_IRON_INGOT.get())
