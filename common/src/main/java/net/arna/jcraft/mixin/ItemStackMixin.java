@@ -1,5 +1,11 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.arna.jcraft.common.attack.moves.kingcrimson.TimeEraseMove;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
 import net.arna.jcraft.common.item.MockItem;
@@ -20,24 +26,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
 
-    @Inject(method = "is(Lnet/minecraft/world/item/Item;)Z", at = @At("HEAD"), cancellable = true)
-    private void jcraft$mockItem(Item item, CallbackInfoReturnable<Boolean> cir) {
+    @WrapMethod(method = "is(Lnet/minecraft/world/item/Item;)Z")
+    private boolean jcraft$mockItem(final Item item, final Operation<Boolean> original) {
         ItemStack thiz = (ItemStack)(Object)this;
         if (thiz.getItem() instanceof MockItem) {
-            cir.setReturnValue(MockItem.getMockedStack(thiz).is(item));
+            return MockItem.getMockedStack(thiz).is(item);
         }
+        return original.call(item);
     }
 
-    @Inject(method = "matches", at = @At("HEAD"), cancellable = true)
-    private static void jcraft$mockItemEqualsCheck(ItemStack left, ItemStack right, CallbackInfoReturnable<Boolean> cir) {
-        if (!(left.getItem() instanceof MockItem) && !(right.getItem() instanceof  MockItem)) {
-            return;
+    @WrapMethod(method = "matches")
+    private static boolean jcraft$mockItemEqualsCheck(final ItemStack stack, final ItemStack other, final Operation<Boolean> original) {
+        if (stack.getItem() instanceof MockItem || other.getItem() instanceof  MockItem) {
+            ItemStack stack1 = stack.getItem() instanceof MockItem ? MockItem.getMockedStack(stack) : stack;
+            ItemStack stack2 = other.getItem() instanceof MockItem ? MockItem.getMockedStack(other) : other;
+            return ItemStack.matches(stack1, stack2);
         }
+        return original.call(stack, other);
+    }
 
-        ItemStack stack1 = left.getItem() instanceof MockItem ? MockItem.getMockedStack(left) : left;
-        ItemStack stack2 = right.getItem() instanceof MockItem ? MockItem.getMockedStack(right) : right;
-
-        cir.setReturnValue(ItemStack.matches(stack1, stack2));
+    @Definition(id = "stack", local = @Local(type = ItemStack.class, ordinal = 0, argsOnly = true))
+    @Definition(id = "is", method = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z")
+    @Definition(id = "other", local = @Local(type = ItemStack.class, ordinal = 1, argsOnly = true))
+    @Definition(id = "getItem", method = "Lnet/minecraft/world/item/ItemStack;getItem()Lnet/minecraft/world/item/Item;")
+    @Expression("stack.is(other.getItem())")
+    @ModifyExpressionValue(method = "isSameItemSameTags(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private static boolean jcraft$mockItemStackEqualsCheck(final boolean original, final ItemStack stack, final ItemStack other) {
+        return original || (stack.getItem() instanceof MockItem && other.getItem() instanceof MockItem);
     }
 
     @Inject(method = "useOn(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;", at = @At("HEAD"))
