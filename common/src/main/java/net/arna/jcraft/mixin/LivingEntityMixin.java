@@ -1,5 +1,8 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import lombok.NonNull;
 import net.arna.jcraft.api.Attacks;
 import net.arna.jcraft.api.MoveUsage;
@@ -29,7 +32,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,30 +39,31 @@ import java.util.Map;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin implements IJCraftComboTracker {
+
     @Shadow protected int lastHurtByPlayerTime;
     @Shadow @Nullable protected Player lastHurtByPlayer;
     // Damage scaling
     @Unique
-    private float damageScaling = 1.00f;
+    private float jcraft$damageScaling = 1.00f;
     @Unique
-    private int hitCount = 0;
+    private int jcraft$hitCount = 0;
     // The relevant HashSets are lazy-loaded
     @Unique
-    private final Map<LivingEntity, HashSet<MoveUsage>> usedComboMoves = new HashMap<>();
+    private final Map<LivingEntity, HashSet<MoveUsage>> jcraft$usedComboMoves = new HashMap<>();
 
     @Override
     public float jcraft$getDamageScaling() {
-        return damageScaling;
+        return jcraft$damageScaling;
     }
 
     @Override
     public int jcraft$getHitCount() {
-        return hitCount;
+        return jcraft$hitCount;
     }
 
     @Override
-    public void jcraft$increaseHitCount(boolean tsHit) {
-        hitCount++;
+    public void jcraft$increaseHitCount(final boolean tsHit) {
+        jcraft$hitCount++;
         var minimum = JServerConfig.DAMAGE_SCALING_MINIMUM.getValue();
         var penalty = JServerConfig.SCALING_PENALTY_PER_HIT.getValue();
 
@@ -69,9 +72,9 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
             penalty *= 2.0f;
         }
 
-        damageScaling = Math.max(
+        jcraft$damageScaling = Math.max(
                 minimum,
-                damageScaling - penalty
+                jcraft$damageScaling - penalty
         );
     }
 
@@ -79,10 +82,10 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
      * @return Whether this move was present in the combo beforehand
      */
     @Override
-    public boolean jcraft$addMoveToCombo(@NonNull LivingEntity attacker, MoveUsage moveUsage) {
-        if (usedComboMoves.containsKey(attacker)) {
+    public boolean jcraft$addMoveToCombo(final @NonNull LivingEntity attacker, final MoveUsage moveUsage) {
+        if (jcraft$usedComboMoves.containsKey(attacker)) {
             final AbstractMove<?, ?> move = moveUsage.move();
-            final HashSet<MoveUsage> moveList = usedComboMoves.get(attacker);
+            final HashSet<MoveUsage> moveList = jcraft$usedComboMoves.get(attacker);
 
             for (MoveUsage pastUsage : moveList) {
                 if (
@@ -109,18 +112,18 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
 
             if (move.isLoopPrevention()) {
                 moveList.add(moveUsage);
-                usedComboMoves.put(attacker, moveList);
+                jcraft$usedComboMoves.put(attacker, moveList);
             }
         }
         return false;
     }
 
     @Override
-    public boolean jcraft$comboFromAttackerContains(LivingEntity attacker, AbstractMove<?, ?> move) {
-        if (!usedComboMoves.containsKey(attacker))
+    public boolean jcraft$comboFromAttackerContains(final LivingEntity attacker, final AbstractMove<?, ?> move) {
+        if (!jcraft$usedComboMoves.containsKey(attacker))
             return false;
 
-        for (var moveUsage : usedComboMoves.get(attacker)) {
+        for (var moveUsage : jcraft$usedComboMoves.get(attacker)) {
             if (Attacks.prototypeMatch(moveUsage.move(), move)) return true;
         }
 
@@ -129,18 +132,18 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
 
     @Override
     public void jcraft$resetCombo() {
-        for (var entry : usedComboMoves.entrySet()) {
+        for (var entry : jcraft$usedComboMoves.entrySet()) {
             entry.getValue().clear();
         }
-        damageScaling = 1.00f;
-        hitCount = 0;
+        jcraft$damageScaling = 1.00f;
+        jcraft$hitCount = 0;
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V", shift = At.Shift.AFTER))
-    public void jcraft$tick(CallbackInfo callbackInfo) {
+    public void jcraft$tick(final CallbackInfo callbackInfo) {
         LivingEntity living = LivingEntity.class.cast(this);
-        if (hitCount > 0 && !living.hasEffect(JStatusRegistry.DAZED.get())) {
-            ((IJCraftComboTracker) this).jcraft$resetCombo();
+        if (jcraft$hitCount > 0 && !living.hasEffect(JStatusRegistry.DAZED.get())) {
+            ((IJCraftComboTracker)this).jcraft$resetCombo();
         }
 
         if (!living.level().isClientSide() && FlammableEffect.isFlammable(living)) {
@@ -156,103 +159,102 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
         }
     }
 
-    @Inject(cancellable = true, method = "setLastHurtMob", at = @At("HEAD"))
-    public void jcraft$onAttacking(Entity target, CallbackInfo info) {
-        if (JUtils.isAffectedByTimeStop((LivingEntity) (Object) this)) {
-            info.cancel();
+    @WrapMethod(method = "setLastHurtMob")
+    public void jcraft$onAttacking(final Entity entity, final Operation<Void> original) {
+        if (!JUtils.isAffectedByTimeStop((LivingEntity)(Object)this)) {
+            original.call(entity);
         }
     }
 
     // Inability to jump in specific circumstances
-    @Inject(cancellable = true, method = "getJumpBoostPower", at = @At("HEAD"))
-    public void jcraft$getJumpBoostVelocityModifier(CallbackInfoReturnable<Float> cir) {
-        LivingEntity entity = ((LivingEntity) (Object) this);
-        if (!JUtils.canJump(entity)) {
-            cir.setReturnValue(-1.0f); // Nullify jump
+    @WrapMethod(method = "getJumpBoostPower")
+    public float jcraft$getJumpBoostVelocityModifier(final Operation<Float> original) {
+        if (!JUtils.canJump((LivingEntity)(Object)this)) {
+            return -1f; // Nullify jump
         }
-        /*
-        else if (stand != null && (stand.curAttack != null && stand.curAttack.attackType == AttackType.BARRAGE)) { // Stand ON and barraging
-            cir.setReturnValue(-0.5D); // Reduce jump
-        }
-         */
+        return original.call();
     }
 
-    @Inject(cancellable = true, method = "jumpFromGround", at = @At("HEAD"))
-    public void jcraft$jumpFromGround(CallbackInfo ci) {
-        LivingEntity entity = ((LivingEntity) (Object) this);
-        if (!JUtils.canJump(entity)) {
-            ci.cancel();
+    @WrapMethod(method = "jumpFromGround")
+    public void jcraft$jumpFromGround(final Operation<Void> original) {
+        if (JUtils.canJump((LivingEntity)(Object)this)) {
+            original.call();
         }
     }
 
     // Counter hook - Living entity
-    @Inject(cancellable = true, at = @At("HEAD"), method = "actuallyHurt")
-    protected void jcraft$applyDamage(DamageSource source, float amount, CallbackInfo info) {
-        LivingEntity living = ((LivingEntity) (Object) this);
-        AbstractCounterAttack.handleCounter(living, source, amount, info);
-    }
-
-    // Living entities can't attack while stunned/enslaved/time erased thanks to this and an attack attribute nullifier
-    @Inject(cancellable = true, method = "hasLineOfSight", at = @At("HEAD"))
-    public void jcraft$canSee(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        LivingEntity livingEntity = (LivingEntity) (Object) this;
-
-        doChecks(entity, cir, livingEntity);
-    }
-
-    @Inject(cancellable = true, method = "canAttack(Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At("HEAD"))
-    public void jcraft$canTarget(LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
-        doChecks(target, cir, (LivingEntity) (Object) this);
-    }
-
-    // This is actually an implementation for players (mobs have their effect ticking properly stopped in TS), but PlayerEntity doesn't override this
-    @Inject(cancellable = true, at = @At("HEAD"), method = "tickEffects")
-    protected void jcraft$tickStatusEffects(CallbackInfo ci) {
-        if (JComponentPlatformUtils.getTimeStopData((LivingEntity) (Object) this).isPresent()) {
-            if (JComponentPlatformUtils.getTimeStopData((LivingEntity) (Object) this).get().getTicks() > 0) {
-                ci.cancel();
-            }
+    @WrapMethod(method = "actuallyHurt")
+    protected void jcraft$applyDamage(final DamageSource damageSource, final float damageAmount, final Operation<Void> original) {
+        if (!AbstractCounterAttack.handleCounter((LivingEntity)(Object)this, damageSource, damageAmount)) {
+            original.call(damageSource, damageAmount);
         }
     }
 
-    private static @Unique void doChecks(Entity entity, CallbackInfoReturnable<Boolean> cir, LivingEntity livingEntity) {
+    // Living entities can't attack while stunned/enslaved/time erased thanks to this and an attack attribute nullifier
+    @WrapMethod(method = "hasLineOfSight")
+    public boolean jcraft$canSee(final Entity entity, final Operation<Boolean> original) {
+        if (!jcraft$doChecks(entity, (LivingEntity)(Object)this)) {
+            return original.call(entity);
+        }
+        return false;
+    }
+
+    @WrapMethod(method = "canAttack(Lnet/minecraft/world/entity/LivingEntity;)Z")
+    public boolean jcraft$canTarget(final LivingEntity target, final Operation<Boolean> original) {
+        if (!jcraft$doChecks(target, (LivingEntity)(Object)this)) {
+            return original.call(target);
+        }
+        return false;
+    }
+
+    // This is actually an implementation for players (mobs have their effect ticking properly stopped in TS), but PlayerEntity doesn't override this
+    @WrapMethod(method = "tickEffects")
+    protected void jcraft$tickStatusEffects(final Operation<Void> original) {
+        final LivingEntity entity = (LivingEntity)(Object)this;
+        if (JComponentPlatformUtils.getTimeStopData(entity).isEmpty() ||
+                JComponentPlatformUtils.getTimeStopData(entity).get().getTicks() <= 0
+        ) {
+            original.call();
+        }
+    }
+
+    /**
+     * @return <code>true</code> if the checks succeeded
+     */
+    private static @Unique boolean jcraft$doChecks(Entity entity, LivingEntity livingEntity) {
         if (
                 ((livingEntity.hasEffect(JStatusRegistry.DAZED.get()) && !JUtils.isBlocking(livingEntity))
                         || livingEntity.hasEffect(JStatusRegistry.KNOCKDOWN.get()))
                         && (!livingEntity.getType().is(JTagRegistry.CANNOT_BE_STUNNED))
         ) {
-            cir.setReturnValue(false);
+            return true;
         }
-
         if (entity.getFirstPassenger() instanceof KingCrimsonEntity kingCrimson && kingCrimson.getTETime() > 0) {
-            cir.setReturnValue(false);
+            return true;
         }
-
         if (JComponentPlatformUtils.getMiscData(livingEntity).getMaster() == entity) {
-            cir.setReturnValue(false);
+            return true;
+        }
+
+        return false;
+    }
+
+    @WrapMethod(method = "dropFromLootTable(Lnet/minecraft/world/damagesource/DamageSource;Z)V")
+    protected void jcraft$dropFromLootTable(final DamageSource damageSource, final boolean hitByPlayer, final Operation<Void> original) {
+        if (JComponentPlatformUtils.getMiscData((LivingEntity)(Object)this).getMaster() == null) {
+            original.call(damageSource, hitByPlayer);
         }
     }
 
-    @Inject(cancellable = true, method = "dropFromLootTable(Lnet/minecraft/world/damagesource/DamageSource;Z)V", at = @At("HEAD"))
-    protected void jcraft$dropFromLootTable(final DamageSource damageSource, final boolean hitByPlayer, final CallbackInfo ci) {
-        LivingEntity living = (LivingEntity) (Object) this;
-        if (JComponentPlatformUtils.getMiscData(living).getMaster() != null) {
-            ci.cancel();
-        }
+    @ModifyReturnValue(method = "canStandOnFluid(Lnet/minecraft/world/level/material/FluidState;)Z", at = @At("RETURN"))
+    protected boolean jcraft$walkOnLiquid(final boolean original) {
+        final LivingEntity living = (LivingEntity)(Object)this;
+        return original || LivingEntityMixinLogic.canWalkOnLiquid(living.level(), living);
     }
 
-    @Inject(method = "canStandOnFluid(Lnet/minecraft/world/level/material/FluidState;)Z", at = @At("RETURN"), cancellable = true)
-    protected void jcraft$walkOnLiquid(final CallbackInfoReturnable<Boolean> cir) {
-        if (!cir.getReturnValueZ()) {
-            final LivingEntity living = (LivingEntity)(Object)this;
-            cir.setReturnValue(LivingEntityMixinLogic.canWalkOnLiquid(living.level(), living));
-        }
+    @ModifyReturnValue(method = "isAffectedByPotions()Z", at = @At("RETURN"))
+    public boolean jcraft$dontApplyPotionsToTE(final boolean original) {
+        return original && !JUtils.inTimeErase((LivingEntity)(Object)this);
     }
 
-    @Inject(method = "isAffectedByPotions()Z", at = @At("RETURN"), cancellable = true)
-    public void jcraft$dontApplyPotionsToTE(final CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValue() && JUtils.inTimeErase((LivingEntity)(Object)this)) {
-            cir.setReturnValue(false);
-        }
-    }
 }

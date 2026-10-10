@@ -75,6 +75,7 @@ public abstract class ProjectileMixin {
      * If the projectile should display hamon particles. Only gets called if the projectile is hamonized.
      * @return <code>true</code> if particles should be displayed, <code>false</code> otherwise.
      */
+    @SuppressWarnings("ConstantValue")
     @Unique
     protected boolean jcraft$shouldDisplayHamonParticles() {
         return hasBeenShot && !((Projectile)(Object)this).onGround();

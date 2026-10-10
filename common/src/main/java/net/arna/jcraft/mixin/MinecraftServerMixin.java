@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Map;
 
 @Mixin(MinecraftServer.class)
-public class MinecraftServerMixin {
+public abstract class MinecraftServerMixin {
 
     @Shadow
     @Final
@@ -25,7 +25,7 @@ public class MinecraftServerMixin {
     @Inject(method = "prepareLevels", at = @At("HEAD"))
     private void disableSetBlockEvent(ChunkProgressListener listener, CallbackInfo ci) {
         for (ServerLevel level : levels.values()) {
-            ((LevelAddon) level).jcraft$setIgnoreSetBlock(true);
+            ((LevelAddon)level).jcraft$setIgnoreSetBlock(true);
         }
     }
 
@@ -35,4 +35,5 @@ public class MinecraftServerMixin {
             ((LevelAddon) level).jcraft$setIgnoreSetBlock(false);
         }
     }
+
 }

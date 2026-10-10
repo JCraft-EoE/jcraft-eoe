@@ -10,7 +10,6 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Set;
 
@@ -58,20 +57,28 @@ public abstract class AbstractCounterAttack<T extends AbstractCounterAttack<T, A
         attacker.setCurrentMove(null);
     }
 
-    public static void handleCounter(LivingEntity living, DamageSource source, float amount, CallbackInfo info) {
+    /**
+     * @return <code>true</code> if the counter was successful
+     */
+    public static boolean handleCounter(LivingEntity living, DamageSource source, float amount) {
         final StandEntity<?, ?> stand = JUtils.getStand(living);
 
-        if (stand == null) return;
+        if (stand == null) {
+            return false;
+        }
 
         final AbstractMove<?, ?> attack = stand.getCurrentMove();
 
-        if (attack == null || !attack.isCounter() || stand.getMoveStun() >= (attack.getDuration() - attack.getWindup()))
-            return;
+        if (attack == null || !attack.isCounter() || stand.getMoveStun() >= (attack.getDuration() - attack.getWindup())) {
+            return false;
+        }
 
         //noinspection rawtypes
         var counter = (AbstractCounterAttack)attack;
 
-        if ( !counter.canCounter(source, amount) ) return;
+        if (!counter.canCounter(source, amount)) {
+            return false;
+        }
 
         final var causingEntity = source.getEntity();
 
@@ -79,7 +86,8 @@ public abstract class AbstractCounterAttack<T extends AbstractCounterAttack<T, A
             //noinspection unchecked
             counter.counter(stand, causingEntity, source);
             living.removeEffect(JStatusRegistry.DAZED.get());
-            info.cancel();
+            return true;
         }
+        return false;
     }
 }

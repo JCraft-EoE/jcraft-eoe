@@ -14,8 +14,10 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(Structure.class)
 public abstract class StructureMixin {
+
     @WrapMethod(method = "afterPlace")
     protected void jcraft$overrideForJigsaw(final WorldGenLevel level, final StructureManager structureManager, final ChunkGenerator chunkGenerator, final RandomSource random, final BoundingBox boundingBox, final ChunkPos chunkPos, final PiecesContainer pieces, final Operation<Void> original) {
         // intentionally left empty
     }
+
 }
