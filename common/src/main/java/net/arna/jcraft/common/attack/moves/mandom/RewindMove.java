@@ -7,7 +7,6 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
-import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.marker.BlockMarker;
 import net.arna.jcraft.common.marker.EntityMarker;
 import net.arna.jcraft.common.network.s2c.ShaderActivationPacket;
@@ -69,7 +68,7 @@ public final class RewindMove<A extends StandEntity<? extends A, ?>> extends Abs
         }
 
         // Clean up
-        countdownMove.getIteration().add(true);
+        countdownMove.getIteration().set(countdownMove.getIteration().size() - 1, true);
         entityMarkers.clear();
         blockMarkers.clear();
         countdownMove.getRewindInfo().clear();

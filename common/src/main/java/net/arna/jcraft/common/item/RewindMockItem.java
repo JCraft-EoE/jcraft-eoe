@@ -3,16 +3,11 @@ package net.arna.jcraft.common.item;
 import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 import java.util.Optional;
@@ -62,16 +57,17 @@ public class RewindMockItem extends MockItem {
         if (move.isEmpty()) {
             return ItemStack.EMPTY;
         }
+        if (move.get().getIteration().size() > run || !move.get().isRecording()) {
+            // if the rewind was successful executed
+            if (move.get().getIteration().get(run - 1)) {
+                return ItemStack.EMPTY;
+            }
+            else { // otherwise rewind didn't happen, make item real
+                return MockItem.getMockedStack(stack);
+            }
+        }
         // if the move is still running, return the stack
-        if (move.get().getIteration().size() == run) {
-            return stack;
-        }
-        // if the rewind was successful executed
-        if (move.get().getIteration().get(run)) {
-            return ItemStack.EMPTY;
-        }
-        // otherwise rewind didn't happen, make item real
-        return MockItem.getMockedStack(stack);
+        return stack;
     }
 
 }

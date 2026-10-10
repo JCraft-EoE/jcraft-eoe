@@ -15,7 +15,6 @@ import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.common.config.JServerConfig;
-import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.marker.*;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.TriConsumer;
@@ -167,9 +166,7 @@ public final class CountdownMove<A extends StandEntity<? extends A, ?>> extends 
     @Override
     public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         lastLevel = attacker.level();
-        if (isRecording()) {
-            getIteration().add(false);
-        }
+        getIteration().add(false);
         BlockMarkerMoves.add(attacker, this);
         final List<Entity> toCapture = attacker.level().getEntitiesOfClass(Entity.class,
                 attacker.getBoundingBox().inflate(radius),
