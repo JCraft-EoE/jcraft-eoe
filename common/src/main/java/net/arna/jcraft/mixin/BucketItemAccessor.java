@@ -10,4 +10,5 @@ public interface BucketItemAccessor {
 
     @Accessor
     Fluid getContent();
+
 }

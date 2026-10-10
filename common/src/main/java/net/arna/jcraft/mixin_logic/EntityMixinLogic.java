@@ -24,60 +24,14 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
 public class EntityMixinLogic {
-    public static void jcraft$updatePassengerPosition(final Entity thisEntity, final Entity passenger, final Entity.MoveFunction positionUpdater, final CallbackInfo info) {
-        if (passenger instanceof StandEntity<?, ?> stand) {
-            if (stand.isFree() && !stand.isRemote()) {
-                Vector3f freePos = stand.getFreePos();
-                positionUpdater.accept(passenger, freePos.x(), freePos.y(), freePos.z());
-                info.cancel();
-                return;
-            }
 
-            final double dist = stand.getDistanceOffset();
-
-            float y = thisEntity.getYRot() + stand.getRotationOffset();
-            y *= Mth.DEG_TO_RAD;
-
-            final Direction gravity = GravityChangerAPI.getGravityDirection(thisEntity);
-            final var axis = gravity.getAxis();
-
-            // When the stand should track the user's look pitch (i.e. during attacks), position it along the
-            // full look direction at `dist` so it follows where the user is looking, instead of staying at a
-            // fixed horizontal distance with only a small vertical nudge.
-            float pitch = stand.shouldOffsetHeight() ? thisEntity.getXRot() * Mth.DEG_TO_RAD : 0f;
-
-            if (axis != Direction.Axis.Y) {
-                y *= -1.0f;
-                pitch += Math.PI;
-
-                if (axis == Direction.Axis.Z) {
-                    y += Math.PI;
-                }
-            }
-
-            final double horizontalDist = dist * Mth.cos(pitch);
-            final double heightOffset = -dist * Mth.sin(pitch);
-
-            final Vec3 adjustedOffset = RotationUtil.vecWorldToPlayer(
-                    Mth.cos(y) * horizontalDist,
-                    passenger.getMyRidingOffset() + heightOffset + stand.getYDistanceOffset(),
-                    Mth.sin(y) * horizontalDist,
-                    gravity
-            );
-
-            positionUpdater.accept(passenger, thisEntity.getX() + adjustedOffset.x, thisEntity.getY() + adjustedOffset.y, thisEntity.getZ() + adjustedOffset.z);
-            info.cancel();
-        }
-    }
-
-    public static void doNotPlayDesummonSoundWhenMovingWorld(Entity entity) {
+    public static void jcraft$doNotPlayDesummonSoundWhenMovingWorld(Entity entity) {
         if (!(entity instanceof LivingEntity living)) {
             return;
         }
@@ -90,7 +44,7 @@ public class EntityMixinLogic {
         stand.setPlayDesummonSound(false);
     }
 
-    public static void inject_calculateBoundingBox(Entity entity, CallbackInfoReturnable<AABB> cir) {
+    public static void jcraft$inject_calculateBoundingBox(Entity entity, CallbackInfoReturnable<AABB> cir) {
         if (entity instanceof Projectile) {
             return;
         }
@@ -107,7 +61,7 @@ public class EntityMixinLogic {
         cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).move(entity.position()));
     }
 
-    public static void inject_calculateBoundsForPose(Entity entity, CallbackInfoReturnable<AABB> cir) {
+    public static void jcraft$inject_calculateBoundsForPose(Entity entity, CallbackInfoReturnable<AABB> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return;
@@ -120,7 +74,7 @@ public class EntityMixinLogic {
         cir.setReturnValue(RotationUtil.boxPlayerToWorld(box, gravityDirection).move(entity.position()));
     }
 
-    public static void inject_getRotationVector(Entity entity, CallbackInfoReturnable<Vec3> cir) {
+    public static void jcraft$inject_getRotationVector(Entity entity, CallbackInfoReturnable<Vec3> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return;
@@ -129,7 +83,7 @@ public class EntityMixinLogic {
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(cir.getReturnValue(), gravityDirection));
     }
 
-    public static void inject_getVelocityAffectingPos(Entity entity, CallbackInfoReturnable<BlockPos> cir) {
+    public static void jcraft$inject_getVelocityAffectingPos(Entity entity, CallbackInfoReturnable<BlockPos> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return;
@@ -138,7 +92,7 @@ public class EntityMixinLogic {
         cir.setReturnValue(BlockPos.containing(entity.position().add(Vec3.atLowerCornerOf(gravityDirection.getNormal()).scale(0.5000001D))));
     }
 
-    public static void inject_getEyePos(Entity entity, CallbackInfoReturnable<Vec3> cir) {
+    public static void jcraft$inject_getEyePos(Entity entity, CallbackInfoReturnable<Vec3> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return;
@@ -147,7 +101,7 @@ public class EntityMixinLogic {
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(0.0D, entity.getEyeHeight(), 0.0D, gravityDirection).add(entity.position()));
     }
 
-    public static void inject_getCameraPosVec(Entity entity, float tickDelta, CallbackInfoReturnable<Vec3> cir) {
+    public static void jcraft$inject_getCameraPosVec(Entity entity, float tickDelta, CallbackInfoReturnable<Vec3> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return;
@@ -161,7 +115,7 @@ public class EntityMixinLogic {
         cir.setReturnValue(new Vec3(d, e, f));
     }
 
-    public static void inject_getBrightnessAtFEyes(Entity entity, CallbackInfoReturnable<Float> cir) {
+    public static void jcraft$inject_getBrightnessAtFEyes(Entity entity, CallbackInfoReturnable<Float> cir) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return;
@@ -170,7 +124,7 @@ public class EntityMixinLogic {
         cir.setReturnValue(entity.level().hasChunkAt(entity.getBlockX(), entity.getBlockZ()) ? entity.level().getLightLevelDependentMagicValue(BlockPos.containing(entity.getEyePosition())) : 0.0F);
     }
 
-    public static void inject_pushAwayFrom(Entity thisEntity, Entity entity, CallbackInfo ci) {
+    public static void jcraft$inject_pushAwayFrom(Entity thisEntity, Entity entity, CallbackInfo ci) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(thisEntity);
         Direction otherGravityDirection = GravityChangerAPI.getGravityDirection(entity);
 
@@ -235,11 +189,11 @@ public class EntityMixinLogic {
         }
     }
 
-    public static void redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(
+    public static void jcraft$redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(
             @Nullable Entity entity, Vec3 movement,
             AABB entityBoundingBox, Level world, ImmutableList.Builder<VoxelShape> shapeListBuilder, CallbackInfoReturnable<Vec3> cir
             ) {
-        redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(entity, movement, entityBoundingBox, world, shapeListBuilder.build(), cir);
+        jcraft$redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(entity, movement, entityBoundingBox, world, shapeListBuilder.build(), cir);
     }
 
     /**
@@ -247,7 +201,7 @@ public class EntityMixinLogic {
      * Has a problem with Lithium, causing choppy movement. Related Lithium mixin can be found
      * <a href="https://github.com/CaffeineMC/lithium-fabric/blob/1.20.1/src/main/java/me/jellysquid/mods/lithium/mixin/entity/collisions/movement/EntityMixin.java">here</a>
      */
-    public static void redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(
+    public static void jcraft$redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(
             @Nullable final Entity entity, final Vec3 movement, AABB entityBoundingBox,
             final Level world, final List<VoxelShape> collisions, final CallbackInfoReturnable<Vec3> cir
     ) {
@@ -290,7 +244,7 @@ public class EntityMixinLogic {
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection));
     }
 
-    public static void inject_spawnSprintingParticles(Entity entity, RandomSource random, EntityDimensions dimensions, CallbackInfo ci) {
+    public static void jcraft$inject_spawnSprintingParticles(Entity entity, RandomSource random, EntityDimensions dimensions, CallbackInfo ci) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return;

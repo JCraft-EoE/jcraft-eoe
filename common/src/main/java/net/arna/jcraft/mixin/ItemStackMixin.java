@@ -22,7 +22,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "is(Lnet/minecraft/world/item/Item;)Z", at = @At("HEAD"), cancellable = true)
     private void jcraft$mockItem(Item item, CallbackInfoReturnable<Boolean> cir) {
-        ItemStack thiz = (ItemStack) (Object) this;
+        ItemStack thiz = (ItemStack)(Object)this;
         if (thiz.getItem() instanceof MockItem) {
             cir.setReturnValue(MockItem.getMockedStack(thiz).is(item));
         }
@@ -60,4 +60,5 @@ public abstract class ItemStackMixin {
             }
         }
     }
+
 }

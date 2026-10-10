@@ -19,13 +19,13 @@ import java.util.Map;
 import java.util.UUID;
 
 @Mixin(FoodData.class)
-public class FoodDataMixin {
+public abstract class FoodDataMixin {
 
     @Unique
     private final Map<UUID, Integer> jcraft$healCounter = new HashMap<>();
 
     @WrapOperation(method = "tick(Lnet/minecraft/world/entity/player/Player;)V", at =
-    @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V"))
+        @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;heal(F)V"))
     private void jcraft$increaseHealCounter(final Player instance, final float v, final Operation<Void> original) {
         original.call(instance, v);
         jcraft$healCounter.put(instance.getUUID(), 1 + jcraft$healCounter.getOrDefault(instance.getUUID(), 0));

@@ -57,7 +57,7 @@ public abstract class EntityMixin {
             cancellable = true
     )
     private void inject_calculateBoundingBox(CallbackInfoReturnable<AABB> cir) {
-        EntityMixinLogic.inject_calculateBoundingBox((Entity) (Object) this, cir);
+        EntityMixinLogic.jcraft$inject_calculateBoundingBox((Entity) (Object) this, cir);
     }
 
     @Inject(
@@ -66,7 +66,7 @@ public abstract class EntityMixin {
             cancellable = true
     )
     private void inject_calculateBoundsForPose(Pose pos, CallbackInfoReturnable<AABB> cir) {
-        EntityMixinLogic.inject_calculateBoundsForPose((Entity) (Object) this, cir);
+        EntityMixinLogic.jcraft$inject_calculateBoundsForPose((Entity) (Object) this, cir);
     }
 
     @Inject(
@@ -75,7 +75,7 @@ public abstract class EntityMixin {
             cancellable = true
     )
     private void inject_getRotationVector(CallbackInfoReturnable<Vec3> cir) {
-        EntityMixinLogic.inject_getRotationVector((Entity) (Object) this, cir);
+        EntityMixinLogic.jcraft$inject_getRotationVector((Entity) (Object) this, cir);
     }
 
     @Inject(
@@ -84,7 +84,7 @@ public abstract class EntityMixin {
             cancellable = true
     )
     private void inject_getVelocityAffectingPos(CallbackInfoReturnable<BlockPos> cir) {
-        EntityMixinLogic.inject_getVelocityAffectingPos((Entity) (Object) this, cir);
+        EntityMixinLogic.jcraft$inject_getVelocityAffectingPos((Entity) (Object) this, cir);
     }
 
     @Inject(
@@ -93,7 +93,7 @@ public abstract class EntityMixin {
             cancellable = true
     )
     private void inject_getEyePos(CallbackInfoReturnable<Vec3> cir) {
-        EntityMixinLogic.inject_getEyePos((Entity) (Object) this, cir);
+        EntityMixinLogic.jcraft$inject_getEyePos((Entity) (Object) this, cir);
     }
 
     @Inject(
@@ -102,7 +102,7 @@ public abstract class EntityMixin {
             cancellable = true
     )
     private void inject_getCameraPosVec(float tickDelta, CallbackInfoReturnable<Vec3> cir) {
-        EntityMixinLogic.inject_getCameraPosVec((Entity) (Object) this, tickDelta, cir);
+        EntityMixinLogic.jcraft$inject_getCameraPosVec((Entity) (Object) this, tickDelta, cir);
     }
 
     @Inject(
@@ -111,7 +111,7 @@ public abstract class EntityMixin {
             cancellable = true
     )
     private void inject_getBrightnessAtFEyes(CallbackInfoReturnable<Float> cir) {
-        EntityMixinLogic.inject_getBrightnessAtFEyes((Entity) (Object) this, cir);
+        EntityMixinLogic.jcraft$inject_getBrightnessAtFEyes((Entity) (Object) this, cir);
     }
 
     @ModifyVariable(
@@ -375,7 +375,7 @@ public abstract class EntityMixin {
     private static void redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(
             @Nullable Entity entity, Vec3 movement, AABB entityBoundingBox, Level world,
             List<VoxelShape> collisions, CallbackInfoReturnable<Vec3> cir) {
-        EntityMixinLogic.redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(entity, movement, entityBoundingBox, world, collisions, cir);
+        EntityMixinLogic.jcraft$redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(entity, movement, entityBoundingBox, world, collisions, cir);
     }
 
     /*
@@ -460,7 +460,7 @@ public abstract class EntityMixin {
             cancellable = true
     )
     private void inject_spawnSprintingParticles(CallbackInfo ci) {
-        EntityMixinLogic.inject_spawnSprintingParticles((Entity) (Object) this, this.random, this.dimensions, ci);
+        EntityMixinLogic.jcraft$inject_spawnSprintingParticles((Entity) (Object) this, this.random, this.dimensions, ci);
     }
 
     @Inject(
@@ -469,7 +469,7 @@ public abstract class EntityMixin {
             cancellable = true
     )
     private void inject_pushAwayFrom(Entity entity, CallbackInfo ci) {
-        EntityMixinLogic.inject_pushAwayFrom((Entity) (Object) this, entity, ci);
+        EntityMixinLogic.jcraft$inject_pushAwayFrom((Entity) (Object) this, entity, ci);
     }
 
     @Inject(

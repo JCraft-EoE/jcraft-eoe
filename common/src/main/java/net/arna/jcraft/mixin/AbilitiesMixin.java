@@ -1,5 +1,6 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.arna.jcraft.mixin_logic.AbilitiesAddon;
 import net.minecraft.world.entity.player.Abilities;
@@ -7,26 +8,28 @@ import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Abilities.class)
-public class AbilitiesMixin implements AbilitiesAddon {
-    private @Unique Player player;
+public abstract class AbilitiesMixin implements AbilitiesAddon {
 
-    @Inject(method = "getFlyingSpeed", at = @At("HEAD"), cancellable = true)
-    private void jcraft$overrideFlightSpeedIfCreaming(CallbackInfoReturnable<Float> cir) {
-        if (CreamEntity.isCreaming(player))
-            cir.setReturnValue(CreamEntity.VOIDING_FLIGHT_SPEED);
+    private @Unique Player jcraft$player;
+
+    @ModifyReturnValue(method = "getFlyingSpeed", at = @At("RETURN"))
+    private float jcraft$overrideFlightSpeedIfCreaming(final float original) {
+        if (CreamEntity.isCreaming(jcraft$player)) {
+            return CreamEntity.VOIDING_FLIGHT_SPEED;
+        }
+        return original;
     }
 
     @Override
     public Player jcraft$getPlayer() {
-        return player;
+        return jcraft$player;
     }
 
     @Override
     public void jcraft$setPlayer(Player player) {
-        this.player = player;
+        this.jcraft$player = player;
     }
+
 }

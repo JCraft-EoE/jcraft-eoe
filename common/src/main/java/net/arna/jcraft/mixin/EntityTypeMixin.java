@@ -1,5 +1,7 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -18,36 +20,37 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Mixin(EntityType.class)
-public class EntityTypeMixin {
-    private static @Unique int shouldLoadStands = 0;
+public abstract class EntityTypeMixin {
+
+    private static @Unique int jcraft$shouldLoadStands = 0;
 
     // Prevent stand entities from being loaded from NBT, they will be reconstructed instead.
     // Loading stands from NBT tends to break them.
-    @Inject(method = "create(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/Level;)Ljava/util/Optional;", at = @At("HEAD"), cancellable = true)
-    private static void doNotLoadStandEntities(CompoundTag nbt, Level world, CallbackInfoReturnable<Optional<Entity>> cir) {
-        if (shouldLoadStands > 0) {
-            return;
+    @WrapMethod(method = "create(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/Level;)Ljava/util/Optional;")
+    private static Optional<Entity> jcraft$doNotLoadStandEntities(final CompoundTag tag, final Level level, final Operation<Optional<Entity>> original) {
+        if (jcraft$shouldLoadStands <= 0) {
+            EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(tag.getString("id")));
+            if (StandTypeUtil.streamEntityTypes().toList().contains(entityType)) {
+                return Optional.empty();
+            }
         }
-
-        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(nbt.getString("id")));
-        if (StandTypeUtil.streamEntityTypes().toList().contains(entityType)) {
-            cir.setReturnValue(Optional.empty());
-        }
+        return original.call(tag, level);
     }
 
     @Inject(method = "method_17843", at = @At("HEAD"))
-    private static void doLoadStandsWhenLoadingArmorStandPre(CompoundTag nbtCompound, Level world, Function<Entity, Entity> function,
-                                                             Entity entity, CallbackInfoReturnable<Entity> cir) {
+    private static void jcraft$doLoadStandsWhenLoadingArmorStandPre(CompoundTag compoundTag, Level level, Function<Entity, Entity> function,
+                                                                    Entity entity, CallbackInfoReturnable<Entity> cir) {
         if (entity instanceof ArmorStand) {
-            shouldLoadStands = Math.max(1, shouldLoadStands + 1);
+            jcraft$shouldLoadStands = Math.max(1, jcraft$shouldLoadStands + 1);
         }
     }
 
     @Inject(method = "method_17843", at = @At("RETURN"))
-    private static void doLoadStandsWhenLoadingArmorStandPost(CompoundTag nbtCompound, Level world, Function<Entity, Entity> function,
-                                                              Entity entity, CallbackInfoReturnable<Entity> cir) {
+    private static void jcraft$doLoadStandsWhenLoadingArmorStandPost(CompoundTag compoundTag, Level level, Function<Entity, Entity> function,
+                                                                     Entity entity, CallbackInfoReturnable<Entity> cir) {
         if (entity instanceof ArmorStand) {
-            shouldLoadStands--;
+            jcraft$shouldLoadStands--;
         }
     }
+
 }

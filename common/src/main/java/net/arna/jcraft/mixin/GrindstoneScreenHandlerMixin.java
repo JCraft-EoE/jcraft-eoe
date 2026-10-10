@@ -16,22 +16,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(GrindstoneMenu.class)
-public class GrindstoneScreenHandlerMixin {
+public abstract class GrindstoneScreenHandlerMixin {
+
     @Shadow
     @Final
     Container repairSlots;
 
     @ModifyVariable(method = "createResult", at = @At("STORE"), ordinal = 2)
-    private boolean allowStandDiscs(boolean value) {
-        ItemStack stack1 = repairSlots.getItem(0);
-        ItemStack stack2 = repairSlots.getItem(1);
+    private boolean jcraft$allowStandDiscs(boolean value) {
+        final ItemStack stack1 = repairSlots.getItem(0);
+        final ItemStack stack2 = repairSlots.getItem(1);
 
-        ItemStack stack = stack1.isEmpty() ? stack2 : stack1;
+        final ItemStack stack = stack1.isEmpty() ? stack2 : stack1;
         if (stack.getItem() != JItemRegistry.STAND_DISC.get()) {
             return value;
         }
 
-        return StandDiscItem.isEmptyDisc(stack); // True means not allowed
+        return StandDiscItem.isEmptyDisc(stack); // true means not allowed
     }
 
     @Inject(method = "removeNonCurses", at = @At("RETURN"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)

@@ -27,19 +27,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(Explosion.class)
-public class ExplosionMixin implements IJExplosion {
+public abstract class ExplosionMixin implements IJExplosion {
     @Shadow
     @Final
     private Level level;
-    private @Unique JExplosionModifier modifier;
+    private @Unique JExplosionModifier jcraft$modifier;
 
     // Interface implementation
     @Override
     public void jcraft$setModifier(JExplosionModifier modifier) {
-        this.modifier = modifier;
+        this.jcraft$modifier = modifier;
     }
 
     // Functionality
@@ -48,68 +49,68 @@ public class ExplosionMixin implements IJExplosion {
             at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Explosion;blockInteraction:Lnet/minecraft/world/level/Explosion$BlockInteraction;", opcode = Opcodes.GETFIELD)
     )
     private Explosion.BlockInteraction jcraft$overrideBlockInteraction(Explosion instance, Operation<Explosion.BlockInteraction> original) {
-        return modifier == null || modifier.getBlockInteraction() == null ? original.call(instance) : modifier.getBlockInteraction();
+        return jcraft$modifier == null || jcraft$modifier.getBlockInteraction() == null ? original.call(instance) : jcraft$modifier.getBlockInteraction();
     }
 
     @ModifyExpressionValue(method = "finalizeExplosion", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Explosion;fire:Z", opcode = Opcodes.GETFIELD))
     private boolean jcraft$overrideCreateFire(boolean original) {
-        if (modifier == null || modifier.getCreateFire() == null) {
+        if (jcraft$modifier == null || jcraft$modifier.getCreateFire() == null) {
             return original;
         }
-        return modifier.getCreateFire();
+        return jcraft$modifier.getCreateFire();
     }
 
     @ModifyVariable(method = "finalizeExplosion", at = @At("HEAD"), argsOnly = true)
     private boolean jcraft$overrideParticlesArgument(boolean particles) {
-        return particles || modifier != null && modifier.getParticle() != null;
+        return particles || jcraft$modifier != null && jcraft$modifier.getParticle() != null;
     }
 
     @ModifyArg(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"), require = 2)
     private ParticleOptions jcraft$overrideParticleEffect(ParticleOptions particle) {
-        return modifier == null || modifier.getParticle() == null ? particle : modifier.getParticle();
+        return jcraft$modifier == null || jcraft$modifier.getParticle() == null ? particle : jcraft$modifier.getParticle();
     }
 
     @ModifyArg(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"),
             require = 2, index = 4)
     private double jcraft$overrideParticleVelocityX(double x) {
-        return modifier == null || modifier.getParticleVelocity() == null ? x : modifier.getParticleVelocity().x;
+        return jcraft$modifier == null || jcraft$modifier.getParticleVelocity() == null ? x : jcraft$modifier.getParticleVelocity().x;
     }
 
     @ModifyArg(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"),
             require = 2, index = 5)
     private double jcraft$overrideParticleVelocityY(double y) {
-        return modifier == null || modifier.getParticleVelocity() == null ? y : modifier.getParticleVelocity().y;
+        return jcraft$modifier == null || jcraft$modifier.getParticleVelocity() == null ? y : jcraft$modifier.getParticleVelocity().y;
     }
 
     @ModifyArg(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"),
             require = 2, index = 6)
     private double jcraft$overrideParticleVelocityZ(double z) {
-        return modifier == null || modifier.getParticleVelocity() == null ? z : modifier.getParticleVelocity().z;
+        return jcraft$modifier == null || jcraft$modifier.getParticleVelocity() == null ? z : jcraft$modifier.getParticleVelocity().z;
     }
 
     @ModifyArg(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V"))
     private SoundEvent jcraft$overrideSound(SoundEvent sound) {
-        return modifier == null || modifier.getSound() == null ? sound : modifier.getSound();
+        return jcraft$modifier == null || jcraft$modifier.getSound() == null ? sound : jcraft$modifier.getSound();
     }
 
     @ModifyArg(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V"))
     private SoundSource jcraft$overrideSoundCategory(SoundSource category) {
-        return modifier == null || modifier.getSoundCategory() == null ? category : modifier.getSoundCategory();
+        return jcraft$modifier == null || jcraft$modifier.getSoundCategory() == null ? category : jcraft$modifier.getSoundCategory();
     }
 
     @ModifyArg(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V"), index = 5)
     private float jcraft$overrideVolume(float volume) {
-        return modifier == null || modifier.getVolumeGetter() == null ? volume : modifier.getVolumeGetter().apply(level.random);
+        return jcraft$modifier == null || jcraft$modifier.getVolumeGetter() == null ? volume : jcraft$modifier.getVolumeGetter().apply(level.random);
     }
 
     @ModifyArg(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playLocalSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZ)V"), index = 6)
     private float jcraft$overridePitch(float pitch) {
-        return modifier == null || modifier.getPitchGetter() == null ? pitch : modifier.getPitchGetter().apply(level.random);
+        return jcraft$modifier == null || jcraft$modifier.getPitchGetter() == null ? pitch : jcraft$modifier.getPitchGetter().apply(level.random);
     }
 
     @WrapOperation(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getDrops(Lnet/minecraft/world/level/storage/loot/LootParams$Builder;)Ljava/util/List;"))
-    private List<ItemStack> jcraft$processBlockLoot(BlockState state, LootParams.Builder builder, Operation<List<ItemStack>> original) {
-        List<ItemStack> loot = original.call(state, builder);
+    private List<ItemStack> jcraft$processBlockLoot(final BlockState state, final LootParams.Builder builder, final Operation<List<ItemStack>> original) {
+        final List<ItemStack> loot = new ArrayList<>(original.call(state, builder));
         if (!(level instanceof ServerLevel serverLevel)) {
             return loot;
         }
@@ -121,6 +122,7 @@ public class ExplosionMixin implements IJExplosion {
 
     @WrapOperation(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;ignoreExplosion()Z"))
     private boolean jcraft$checkHurtPredicate(Entity instance, Operation<Boolean> original) {
-        return original.call(instance) || (modifier != null && modifier.getHurtFilter() != null && !modifier.getHurtFilter().test(instance));
+        return original.call(instance) || (jcraft$modifier != null && jcraft$modifier.getHurtFilter() != null && !jcraft$modifier.getHurtFilter().test(instance));
     }
+
 }

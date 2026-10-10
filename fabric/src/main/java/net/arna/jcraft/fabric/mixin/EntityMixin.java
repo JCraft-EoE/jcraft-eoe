@@ -15,6 +15,6 @@ public abstract class EntityMixin {
 
     @Inject(method = "changeDimension", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;restoreFrom(Lnet/minecraft/world/entity/Entity;)V"))
     private void doNotPlayDesummonSoundWhenMovingWorld(ServerLevel destination, CallbackInfoReturnable<Entity> cir) {
-        EntityMixinLogic.doNotPlayDesummonSoundWhenMovingWorld((Entity) (Object) this);
+        EntityMixinLogic.jcraft$doNotPlayDesummonSoundWhenMovingWorld((Entity) (Object) this);
     }
 }
