@@ -1,5 +1,6 @@
 package net.arna.jcraft.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.JCraft;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
 public abstract class InGameHudMixin {
+
     @Shadow
     @Final
     private Minecraft minecraft;
@@ -149,10 +151,11 @@ public abstract class InGameHudMixin {
         JCraftHudOverlay.render(context);
     }
 
-    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    private void jcraft$hideCrosshairWhileAiming(GuiGraphics context, CallbackInfo ci) {
-        if (GunAimHandler.HIDE_CROSSHAIR && GunAimHandler.isAiming()) {
-            ci.cancel();
+    @WrapMethod(method = "renderCrosshair")
+    private void jcraft$hideCrosshairWhileAiming(final GuiGraphics guiGraphics, final Operation<Void> original) {
+        if (!GunAimHandler.HIDE_CROSSHAIR || !GunAimHandler.isAiming()) {
+            original.call(guiGraphics);
         }
     }
+    
 }

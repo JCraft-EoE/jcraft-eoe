@@ -1,6 +1,7 @@
 package net.arna.jcraft.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -24,10 +25,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Minecraft.class)
-public class MinecraftMixin {
+public abstract class MinecraftMixin {
+
     @Shadow @Final private Window window;
 
     @Shadow
@@ -42,20 +43,16 @@ public class MinecraftMixin {
     /**
      * Makes Aerosmith appear glowing (outline visible through blocks) only to its user's client,
      * and only while it is flying remotely without a direct line of sight to the user.
+     *
+     * @return
      */
-    @Inject(method = "shouldEntityAppearGlowing", at = @At("RETURN"), cancellable = true)
-    private void jcraft$aerosmithUserGlow(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValue()) return; // already glowing for another reason
-
-        if (!(entity instanceof AerosmithEntity aerosmith)) return;
-        if (!aerosmith.isRemote()) return;
-
-        final LocalPlayer player = ((Minecraft) (Object) this).player;
-        if (player == null) return;
-        if (JUtils.getStand(player) != aerosmith) return;
-        if (player.hasLineOfSight(aerosmith)) return;
-
-        cir.setReturnValue(true);
+    @ModifyReturnValue(method = "shouldEntityAppearGlowing", at = @At("RETURN"))
+    private boolean jcraft$aerosmithUserGlow(final boolean original, final Entity entity) {
+        final LocalPlayer player = ((Minecraft)(Object)this).player;
+        return original || (entity instanceof final AerosmithEntity aerosmith &&
+            aerosmith.isRemote() && player != null &&
+            JUtils.getStand(player) == aerosmith &&
+            !player.hasLineOfSight(aerosmith));
     }
 
     @WrapOperation(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;pickBlock()V"))
@@ -75,12 +72,15 @@ public class MinecraftMixin {
     /**
      * Left click works the gun through jcraft's own input map, so vanilla's attack must not also
      * run: without this the shooter punches, swings and burns melee cooldown while cocking.
+     *
+     * @return
      */
-    @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
-    private void jcraft$noMeleeWithGun(CallbackInfoReturnable<Boolean> cir) {
+    @WrapMethod(method = "startAttack")
+    private boolean jcraft$noMeleeWithGun(final Operation<Boolean> original) {
         if (player != null && player.getMainHandItem().getItem() instanceof Peacemaker) {
-            cir.setReturnValue(false);
+            return false;
         }
+        return original.call();
     }
 
     @ModifyReturnValue(method = "shouldEntityAppearGlowing", at = @At("RETURN"))
@@ -89,6 +89,7 @@ public class MinecraftMixin {
     }
 
     // Highlights targets of the ranger's Focus, only on the focusing player's client
+    @SuppressWarnings("ConstantValue")
     @ModifyReturnValue(method = "shouldEntityAppearGlowing", at = @At("RETURN"))
     private boolean jcraft$rangerFocusGlow(boolean original, @Local(argsOnly = true) Entity entity) {
         if (original || player == null) return original;
@@ -96,4 +97,5 @@ public class MinecraftMixin {
                 JComponentPlatformUtils.getGunslinger(player).isFocusActive() &&
                 RangerFocusMove.selectOutlineTarget(player) == entity;
     }
+
 }

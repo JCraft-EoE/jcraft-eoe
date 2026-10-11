@@ -1,5 +1,7 @@
 package net.arna.jcraft.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.util.JUtils;
@@ -21,10 +23,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
+
     @Unique
-    private boolean wasDetached = false;
+    private boolean jcraft$wasDetached = false;
     @Unique
-    private final V3 inertia = new V3();
+    private final V3 jcraft$inertia = new V3();
 
     @Shadow
     private boolean detached;
@@ -32,54 +35,50 @@ public abstract class CameraMixin {
     private float eyeHeightOld;
     @Shadow
     private float eyeHeight;
-    @Shadow
-    private BlockGetter level;
 
     @Shadow @Final private BlockPos.MutableBlockPos blockPosition;
 
     @Shadow private Vec3 position;
 
-    @Inject(method = "setup", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.BEFORE))
-    public void jcraft$prevSetPosUpdate(BlockGetter area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo info) {
+    @WrapOperation(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V"))
+    public void jcraft$prevSetPosUpdate(final Camera instance, final double x, final double y, final double z, final Operation<Void> original, final BlockGetter level, final Entity entity, final boolean detached, final boolean thirdPersonReverse, final float partialTick) {
+        if (entity instanceof final LivingEntity living && living.hasEffect(JStatusRegistry.OUT_OF_BODY.get())) {
+            this.detached = true;
 
-        if (focusedEntity instanceof LivingEntity living) {
-            if (living.hasEffect(JStatusRegistry.OUT_OF_BODY.get())) {
-                detached = true;
+            if (detached) {
+                if (!jcraft$wasDetached) {
+                    jcraft$wasDetached = true;
+                    return;
+                }
+                // slide back
+                jcraft$inertia.scale(0.98);
 
-                info.cancel();
+                CameraInvoker cameraInvoker = (CameraInvoker) this;
+                cameraInvoker.invokeSetPos(
+                        position.x + jcraft$inertia.x * partialTick,
+                        position.y + jcraft$inertia.y * partialTick,
+                        position.z + jcraft$inertia.z * partialTick
+                );
 
-                if (detached) {
-                    if (!wasDetached) {
-                        wasDetached = true;
-                        return;
-                    }
-                    // slide back
-                    inertia.scale(0.98);
-
-                    CameraInvoker cameraInvoker = (CameraInvoker) this;
+                // bounce out of wall
+                if (level.getBlockState(blockPosition).isSuffocating(level, blockPosition)) {
                     cameraInvoker.invokeSetPos(
-                            position.x + inertia.x * tickDelta,
-                            position.y + inertia.y * tickDelta,
-                            position.z + inertia.z * tickDelta
+                            position.x - 1.1 * jcraft$inertia.x * partialTick,
+                            position.y - 1.1 * jcraft$inertia.y * partialTick,
+                            position.z - 1.1 * jcraft$inertia.z * partialTick
                     );
 
-                    // bounce out of wall
-                    if (level.getBlockState(blockPosition).isSuffocating(area, blockPosition)) {
-                        cameraInvoker.invokeSetPos(
-                                position.x - 1.1 * inertia.x * tickDelta,
-                                position.y - 1.1 * inertia.y * tickDelta,
-                                position.z - 1.1 * inertia.z * tickDelta
-                        );
-
-                        inertia.scale(-0.7);
-                    }
-                } else { // initial launch
-                    inertia.set(living.getLookAngle(), -0.4);
+                    jcraft$inertia.scale(-0.7);
                 }
+            } else { // initial launch
+                jcraft$inertia.set(living.getLookAngle(), -0.4);
             }
         }
+        else {
+            original.call(instance, x, y, z);
+        }
 
-        wasDetached = detached;
+        jcraft$wasDetached = detached;
     }
 
     @Inject(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.AFTER))
@@ -96,4 +95,5 @@ public abstract class CameraMixin {
             detached = true;
         }
     }
+
 }

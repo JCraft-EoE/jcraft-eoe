@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -32,15 +34,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.SortedSet;
 
-@SuppressWarnings("AddedMixinMembersNamePattern") // We use @Unique, this makes no sense.
 @Mixin(LevelRenderer.class)
-public class LevelRendererMixin {
-    @Shadow
-    @Final
-    private Minecraft minecraft;
+public abstract class LevelRendererMixin {
+
     @Unique
-    private Entity entity;
-    private @Unique float tsStartPartialTick, tsStartRainLevel;
+    private Entity jcraft$entity;
+    private @Unique float jcraft$tsStartPartialTick, jcraft$tsStartRainLevel;
 
     @Inject(
             method = "renderLevel",
@@ -51,47 +50,48 @@ public class LevelRendererMixin {
                     @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;depthMask(Z)V", ordinal = 1, shift = At.Shift.AFTER)
             }
     )
-    private void hookPostWorldRender(PoseStack matrices, float tickDelta, long nanoTime, boolean renderBlockOutline,
-                                     Camera camera, GameRenderer renderer, LightTexture lmTexManager, Matrix4f matrix4f, CallbackInfo ci) {
+    private void jcraft$hookPostWorldRender(PoseStack matrices, float tickDelta, long nanoTime, boolean renderBlockOutline,
+                                            Camera camera, GameRenderer renderer, LightTexture lmTexManager, Matrix4f matrix4f, CallbackInfo ci) {
         ((StillDepthHolder) Minecraft.getInstance().getMainRenderTarget()).jcraft$freezeDepth();
         PostWorldRenderCallback.EVENT.invoker().onWorldRendered(matrices, camera, tickDelta, nanoTime);
     }
 
     @ModifyArg(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderSnowAndRain(Lnet/minecraft/client/renderer/LightTexture;FDDD)V"), index = 1)
-    private float freezePrecipitationInTimestop(float partialTick) {
+    private float jcraft$freezePrecipitationInTimestop(float partialTick) {
         if (!JClientUtils.isInTSRange(Minecraft.getInstance().cameraEntity)) {
-            tsStartPartialTick = partialTick;
+            jcraft$tsStartPartialTick = partialTick;
             return partialTick;
         }
 
-        return tsStartPartialTick;
+        return jcraft$tsStartPartialTick;
     }
 
     @ModifyExpressionValue(method = "renderSnowAndRain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getRainLevel(F)F"))
-    private float restoreRainLevelInTS(float original) {
+    private float jcraft$restoreRainLevelInTS(float original) {
         if (!JClientUtils.isInTSRange(Minecraft.getInstance().cameraEntity)) {
-            tsStartRainLevel = original;
+            jcraft$tsStartRainLevel = original;
             return original;
         }
 
-        return tsStartRainLevel;
+        return jcraft$tsStartRainLevel;
     }
 
-    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-    private void cancelTickInTS(CallbackInfo ci) {
-        if (JClientUtils.isInTSRange(Minecraft.getInstance().cameraEntity)) {
-            ci.cancel();
+    @WrapMethod(method = "tick")
+    private void jcraft$cancelTickInTS(final Operation<Void> original) {
+        if (!JClientUtils.isInTSRange(Minecraft.getInstance().cameraEntity)) {
+            original.call();
         }
     }
 
-    @Inject(method = "renderSky", at = @At("HEAD"), cancellable = true)
-    private void renderSky(PoseStack matrices, Matrix4f matrix4f, float tickDelta, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci) {
+    @WrapMethod(method = "renderSky")
+    private void jcraft$renderSky(final PoseStack poseStack, final Matrix4f projectionMatrix, final float partialTick, final Camera camera, final boolean isFoggy, final Runnable skyFogSetup, final Operation<Void> original) {
         SkyBoxManager skyboxManager = SkyBoxManager.getInstance();
         if (skyboxManager.isEnabled() && skyboxManager.getCurrentSkybox() != null) {
-            runnable.run();
-            skyboxManager.renderSkyBox(matrices, matrix4f, tickDelta, camera, bl);
-            ci.cancel();
+            skyFogSetup.run();
+            skyboxManager.renderSkyBox(poseStack, projectionMatrix, partialTick, camera, isFoggy);
+            return;
         }
+        original.call(poseStack, projectionMatrix, partialTick, camera, isFoggy, skyFogSetup);
     }
 
     @ModifyArg(method = "renderEntity",
@@ -99,7 +99,7 @@ public class LevelRendererMixin {
                     target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;render(Lnet/minecraft/world/entity/Entity;DDDFFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V")
     )
     private Entity jcraft$deltaTick(Entity entity) {
-        this.entity = entity;
+        this.jcraft$entity = entity;
         return entity;
     }
 
@@ -109,8 +109,8 @@ public class LevelRendererMixin {
             index = 5
     )
     private float jcraft$deltaTick(float yaw) {
-        if (JComponentPlatformUtils.getTimeStopData(entity).isPresent()) {
-            if (JComponentPlatformUtils.getTimeStopData(entity).get().getTicks() > 0) {
+        if (JComponentPlatformUtils.getTimeStopData(jcraft$entity).isPresent()) {
+            if (JComponentPlatformUtils.getTimeStopData(jcraft$entity).get().getTicks() > 0) {
                 return 0;
             } // Args 0 = ent, 5 = deltatick
         }
@@ -119,11 +119,12 @@ public class LevelRendererMixin {
     }
 
     @ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;long2ObjectEntrySet()Lit/unimi/dsi/fastutil/objects/ObjectSet;"))
-    private ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> injectBlockBreakerBreakage(ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> original) {
+    private ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> jcraft$injectBlockBreakerBreakage(ObjectSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> original) {
         if (BlockBreakerClient.isEmpty()) return original;
 
         ObjectOpenHashSet<Long2ObjectMap.Entry<SortedSet<BlockDestructionProgress>>> set = new ObjectOpenHashSet<>(original);
         set.addAll(BlockBreakerClient.getBreakStates());
         return set;
     }
+
 }

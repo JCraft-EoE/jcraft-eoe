@@ -1,5 +1,8 @@
 package net.arna.jcraft.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.arna.jcraft.client.aim.GunAimHandler;
 import net.arna.jcraft.client.rendering.api.PostEffect;
@@ -18,12 +21,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static org.spongepowered.asm.mixin.injection.At.Shift.AFTER;
 
 @Mixin(GameRenderer.class)
-public class GameRendererMixin {
+public abstract class GameRendererMixin {
 
     @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;)V", shift = At.Shift.AFTER))
     private void jcraft$renderWorldLast(float tickDelta, long limitTime, PoseStack matrix, CallbackInfo ci) {
@@ -39,11 +41,12 @@ public class GameRendererMixin {
         PostProcessHandler.resize(width, height);
     }
 
-    @Inject(method = "method_18144", at = @At("HEAD"), cancellable = true)
-    private static void preventUserHittingCreamWhenInBall(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+    @WrapMethod(method = "method_18144")
+    private static boolean preventUserHittingCreamWhenInBall(final Entity entity, final Operation<Boolean> original) {
         if (entity instanceof CreamEntity cream && cream.isHalfBall() && JUtils.getStand(Minecraft.getInstance().player) == cream) {
-            cir.setReturnValue(false);
+            return false;
         }
+        return original.call(entity);
     }
 
     // Right after the world has been rendered, just before the post-effect and GUI rendering.
@@ -51,8 +54,8 @@ public class GameRendererMixin {
             method = "render",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;doEntityOutline()V", shift = AFTER)
     )
-    private void hookShaderRender(float tickDelta, long nanoTime, boolean renderLevel, CallbackInfo info) {
-        PostShaderRenderCallback.EVENT.invoker().renderEffect(tickDelta);
+    private void hookShaderRender(final float partialTicks, final long nanoTime, final boolean renderLevel, final CallbackInfo info) {
+        PostShaderRenderCallback.EVENT.invoker().renderEffect(partialTicks);
     }
 
     @Inject(method = "reloadShaders", at = @At("RETURN"))
@@ -60,15 +63,16 @@ public class GameRendererMixin {
         PostEffect.initAll();
     }
 
-    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
-    private void jcraft$aimZoom(Camera camera, float partialTick, boolean useFOVSetting, CallbackInfoReturnable<Double> cir) {
+    @ModifyReturnValue(method = "getFov", at = @At("RETURN"))
+    private double jcraft$aimZoom(final double original, final Camera activeRenderInfo, final float partialTicks, final boolean useFOVSetting) {
         if (!useFOVSetting) {
-            return;
+            return original;
         }
-        float progress = GunAimHandler.progress(partialTick);
+        float progress = GunAimHandler.progress(partialTicks);
         if (progress <= 0f) {
-            return;
+            return original;
         }
-        cir.setReturnValue(cir.getReturnValue() / Mth.lerp(progress, 1.0f, GunAimHandler.ZOOM));
+        return original / Mth.lerp(progress, 1f, GunAimHandler.ZOOM);
     }
+
 }
