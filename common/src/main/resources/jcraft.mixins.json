@@ -134,7 +134,6 @@
     "gravity.PointedDripstoneBlockMixin",
     "gravity.ProjectileEntityMixin",
     "gravity.RamImpactTaskMixin",
-    "gravity.ServerPlayerEntityMixin",
     "gravity.ServerPlayNetworkHandlerMixin",
     "gravity.ShulkerBoxBlockEntityMixin",
     "gravity.ShulkerEntityMixin",

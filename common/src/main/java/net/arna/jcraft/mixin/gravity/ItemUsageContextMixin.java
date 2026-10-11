@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -8,11 +10,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.UseOnContext;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(UseOnContext.class)
 public abstract class ItemUsageContextMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "getRotation",
             at = @At(
                     value = "INVOKE",
@@ -20,12 +22,13 @@ public abstract class ItemUsageContextMixin {
                     ordinal = 0
             )
     )
-    private float redirect_getPlayerYaw_getYaw_0(Player entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private float jcraft$getPlayerYaw_getYaw_0(final Player instance, final Operation<Float> original) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getYRot();
+            return original.call(instance);
         }
 
-        return RotationUtil.rotPlayerToWorld(entity.getYRot(), entity.getXRot(), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(instance), instance.getXRot(), gravityDirection).x;
     }
+
 }

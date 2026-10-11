@@ -32,7 +32,7 @@ public abstract class ThrownEntityMixin {
             )
             , ordinal = 0
     )
-    public Vec3 tick(Vec3 modify) {
+    public Vec3 jcraft$tick(Vec3 modify) {
         //if(this instanceof RotatableEntityAccessor) {
         modify = new Vec3(modify.x, modify.y + this.getGravity(), modify.z);
         modify = RotationUtil.vecWorldToPlayer(modify, GravityChangerAPI.getGravityDirection((ThrowableProjectile) (Object) this));
@@ -42,7 +42,7 @@ public abstract class ThrownEntityMixin {
         return modify;
     }
 
-    @ModifyArg(//<init>(Lnet/minecraft/entity/EntityType;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;)V
+    @ModifyArg(
             method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;)V",
             at = @At(
                     value = "INVOKE",
@@ -50,13 +50,12 @@ public abstract class ThrownEntityMixin {
             ),
             index = 1
     )
-    private static double modifyargs_init_init_0(double x, @Local LivingEntity owner) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
+    private static double jcraft$modifyarg_init_init_0(final double x, final @Local LivingEntity owner) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
         if (gravityDirection == Direction.DOWN) {
             return x;
         }
-
-        Vec3 pos = owner.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
+        final Vec3 pos = owner.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
         return pos.x;
     }
 
@@ -68,13 +67,12 @@ public abstract class ThrownEntityMixin {
             ),
             index = 2
     )
-    private static double modifyargs_init_init_1(double y, @Local LivingEntity owner) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
+    private static double jcraft$modifyarg_init_init_1(final double y, final @Local LivingEntity owner) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
         if (gravityDirection == Direction.DOWN) {
             return y;
         }
-
-        Vec3 pos = owner.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
+        final Vec3 pos = owner.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
         return pos.y;
     }
 
@@ -86,13 +84,12 @@ public abstract class ThrownEntityMixin {
             ),
             index = 3
     )
-    private static double modifyargs_init_init_2(double z, @Local LivingEntity owner) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
+    private static double jcraft$modifyargs_init_init_2(final double z, final @Local LivingEntity owner) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
         if (gravityDirection == Direction.DOWN) {
             return z;
         }
-
-        Vec3 pos = owner.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
+        final Vec3 pos = owner.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
         return pos.z;
     }
 

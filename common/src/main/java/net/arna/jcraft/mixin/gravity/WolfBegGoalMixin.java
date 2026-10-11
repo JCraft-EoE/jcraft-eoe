@@ -1,49 +1,49 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.ai.goal.BegGoal;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(BegGoal.class)
 public abstract class WolfBegGoalMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "tick",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/player/Player;getEyeY()D"
             )
     )
-    private double redirect_tick_getEyeY_0(Player playerEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
+    private double jcraft$tick_getEyeY_0(final Player instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return playerEntity.getEyeY();
+            return original.call(instance);
         }
-
-        return playerEntity.getEyePosition().y;
+        return instance.getEyePosition().y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "tick",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/player/Player;getX()D"
             )
     )
-    private double redirect_tick_getX_0(Player playerEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
+    private double jcraft$tick_getX_0(final Player instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return playerEntity.getX();
+            return original.call(instance);
         }
-
-        return playerEntity.getEyePosition().x;
+        return instance.getEyePosition().x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "tick",
             at = @At(
                     value = "INVOKE",
@@ -51,12 +51,12 @@ public abstract class WolfBegGoalMixin {
                     ordinal = 0
             )
     )
-    private double redirect_tick_getZ_0(Player playerEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
+    private double jcraft$tick_getZ_0(final Player instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return playerEntity.getZ();
+            return original.call(instance);
         }
-
-        return playerEntity.getEyePosition().z;
+        return instance.getEyePosition().z;
     }
+
 }
