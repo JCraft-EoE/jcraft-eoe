@@ -237,6 +237,11 @@ public final class CountdownMove<A extends StandEntity<? extends A, ?>> extends 
         }
     }
 
+    // Ticks left before the countdown expires, or 0 when it is not running
+    public int getRemainingTicks() {
+        return countdownActive ? maxCountdownTicks - countdownTicks : 0;
+    }
+
     @Override
     public boolean isInRange(final @NonNull BlockPos pos, final @NonNull Level level) {
         return level == lastLevel && pos.distSqr(attackerBlockPos) <= radius * radius;

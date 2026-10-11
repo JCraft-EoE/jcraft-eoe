@@ -35,7 +35,12 @@ public class JCraftHudOverlay {
 
     private static final Vector3f
             BLOCK_GAUGE_UNDER_THIRD = new Vector3f(0.5f, 0.5f, 1.0f),
-            BLOCK_GAUGE_OVER_THIRD = new Vector3f(0.55f, 0.8f, 1.0f);
+            BLOCK_GAUGE_OVER_THIRD = new Vector3f(0.55f, 0.8f, 1.0f),
+            WHITE = new Vector3f(1.0f, 1.0f, 1.0f);
+
+    // Mandom's countdown gauge starts flashing with 5 seconds left, and flashes faster in the last 2.
+    private static final int COUNTDOWN_WARNING_TICKS = 100;
+    private static final int COUNTDOWN_URGENT_TICKS = 40;
 
     private static final Gauge
             BLOCK_GAUGE = new Gauge(0.5f, 0.5f, 1.0f, 90),
@@ -116,6 +121,14 @@ public class JCraftHudOverlay {
             }
             else if (stand instanceof MadeInHeavenEntity madeInHeaven && madeInHeaven.getAccelTime() > 0) {
                 TIME_ACCEL_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, madeInHeaven.getSpeedometer());
+            }
+            else if (stand instanceof MandomEntity mandom && mandom.getCountdownRemaining() > 0) {
+                final int remaining = mandom.getCountdownRemaining();
+                // Flashes white as the window to Rewind closes, and ramps up at the end
+                final int blinkTicks = remaining <= COUNTDOWN_URGENT_TICKS ? 2 : 4;
+                final boolean flash = remaining <= COUNTDOWN_WARNING_TICKS && (mandom.tickCount / blinkTicks) % 2 == 0;
+                new Gauge(flash ? WHITE : mandom.getAuraColor(), mandom.getCountdownLength())
+                        .render(ctx, gaugeX, height + gaugeHeightOffset, remaining);
             }
         }
 

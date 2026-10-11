@@ -25,6 +25,9 @@ import net.arna.jcraft.common.attack.moves.mandom.RewindMove;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.util.StandAnimationState;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
@@ -71,6 +74,10 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
                     Component.literal("Rewind"),
                     Component.literal("Returns all entities to their saved positions. Requires Countdown to be active."));
 
+    // The countdown itself only runs on the server, so its progress is mirrored here for the hud
+    private static final EntityDataAccessor<Integer> COUNTDOWN_REMAINING = SynchedEntityData.defineId(MandomEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> COUNTDOWN_LENGTH = SynchedEntityData.defineId(MandomEntity.class, EntityDataSerializers.INT);
+
     public MandomEntity(Level worldIn) {
         super(JStandTypeRegistry.MANDOM.get(), worldIn);
 
@@ -85,6 +92,34 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
     private static void registerMoves(MoveMap<MandomEntity, State> moves) {
         moves.register(MoveClass.ULTIMATE, REWIND, State.REWIND);
         moves.register(MoveClass.UTILITY, COUNTDOWN, State.COUNTDOWN);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        getEntityData().define(COUNTDOWN_REMAINING, 0);
+        getEntityData().define(COUNTDOWN_LENGTH, 0);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        CountdownMove countdownMove = getMove(CountdownMove.class);
+        if (level().isClientSide() || countdownMove == null) {
+            return;
+        }
+
+        entityData.set(COUNTDOWN_REMAINING, countdownMove.getRemainingTicks());
+        entityData.set(COUNTDOWN_LENGTH, countdownMove.getMaxCountdownTicks());
+    }
+
+    public int getCountdownRemaining() {
+        return entityData.get(COUNTDOWN_REMAINING);
+    }
+
+    public int getCountdownLength() {
+        return entityData.get(COUNTDOWN_LENGTH);
     }
 
     @Override
