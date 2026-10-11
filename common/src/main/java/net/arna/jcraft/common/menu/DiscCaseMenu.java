@@ -50,7 +50,27 @@ public class DiscCaseMenu extends AbstractContainerMenu {
     @NonNull
     @Override
     public ItemStack quickMoveStack(final @NonNull Player player, final int index) {
-        return ItemStack.EMPTY;
+        final Slot slot = getSlot(index);
+        if (!slot.hasItem()) {
+            return ItemStack.EMPTY;
+        }
+
+        final ItemStack stack = slot.getItem();
+        final ItemStack original = stack.copy();
+        // The case slots come first, followed by the player's inventory and hotbar.
+        final boolean moved = index < slots
+                ? moveItemStackTo(stack, slots, super.slots.size(), true)
+                : moveItemStackTo(stack, 0, slots, false);
+        if (!moved) {
+            return ItemStack.EMPTY;
+        }
+
+        if (stack.isEmpty()) {
+            slot.setByPlayer(ItemStack.EMPTY);
+        } else {
+            slot.setChanged();
+        }
+        return original;
     }
 
     @Override
