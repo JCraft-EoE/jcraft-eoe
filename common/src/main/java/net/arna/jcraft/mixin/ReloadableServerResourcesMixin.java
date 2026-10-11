@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(value = ReloadableServerResources.class, priority = 100)
-public class ReloadableServerResourcesMixin {
+public abstract class ReloadableServerResourcesMixin {
 
     @ModifyReturnValue(method = "listeners", at = @At("RETURN"))
     private List<PreparableReloadListener> addListeners(final List<PreparableReloadListener> original) {
@@ -19,4 +19,5 @@ public class ReloadableServerResourcesMixin {
         JServerReloadListenerRegistry.register(listeners::add);
         return listeners;
     }
+
 }
