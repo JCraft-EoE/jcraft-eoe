@@ -1,17 +1,19 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EnderMan.EndermanFreezeWhenLookedAt.class)
 public abstract class EndermanEntity$ChasePlayerGoalMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "tick",
             at = @At(
                     value = "INVOKE",
@@ -19,16 +21,15 @@ public abstract class EndermanEntity$ChasePlayerGoalMixin {
                     ordinal = 0
             )
     )
-    private double redirect_tick_getEyeY_0(LivingEntity livingEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
+    private double jcraft$tick_getEyeY_0(final LivingEntity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return livingEntity.getEyeY();
+            return original.call(instance);
         }
-
-        return livingEntity.getEyePosition().y;
+        return instance.getEyePosition().y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "tick",
             at = @At(
                     value = "INVOKE",
@@ -36,16 +37,15 @@ public abstract class EndermanEntity$ChasePlayerGoalMixin {
                     ordinal = 0
             )
     )
-    private double redirect_tick_getX_0(LivingEntity livingEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
+    private double jcraft$tick_getX_0(final LivingEntity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return livingEntity.getX();
+            return original.call(instance);
         }
-
-        return livingEntity.getEyePosition().x;
+        return instance.getEyePosition().x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "tick",
             at = @At(
                     value = "INVOKE",
@@ -53,12 +53,12 @@ public abstract class EndermanEntity$ChasePlayerGoalMixin {
                     ordinal = 0
             )
     )
-    private double redirect_tick_getZ_0(LivingEntity livingEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
+    private double jcraft$tick_getZ_0(final LivingEntity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return livingEntity.getZ();
+            return original.call(instance);
         }
-
-        return livingEntity.getEyePosition().z;
+        return instance.getEyePosition().z;
     }
+
 }

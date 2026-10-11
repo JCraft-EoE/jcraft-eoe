@@ -1,55 +1,56 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Direction.class)
 public abstract class DirectionMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "orderedByNearest",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getViewYRot(F)F"
             )
     )
-    private static float redirect_getEntityFacingOrder_getYaw_0(Entity entity, float tickDelta) {
-        if (entity == null) {
+    private static float jcraft$getEntityFacingOrder_getYaw_0(final Entity instance, final float partialTick, final Operation<Float> original) {
+        if (instance == null) {
             return 1f;
         }
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getViewYRot(tickDelta);
+            return original.call(instance, partialTick);
         }
 
-        return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(instance, partialTick), instance.getViewXRot(partialTick), gravityDirection).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "orderedByNearest",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getViewXRot(F)F"
             )
     )
-    private static float redirect_getEntityFacingOrder_getPitch_0(Entity entity, float tickDelta) {
-        if (entity == null) {
+    private static float jcraft$getEntityFacingOrder_getPitch_0(final Entity instance, final float partialTicks, final Operation<Float> original) {
+        if (instance == null) {
             return 1f;
         }
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getViewXRot(tickDelta);
+            return original.call(instance, partialTicks);
         }
-
-        return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), entity.getViewXRot(tickDelta), gravityDirection).y;
+        return RotationUtil.rotPlayerToWorld(instance.getViewYRot(partialTicks), original.call(instance, partialTicks), gravityDirection).y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "getFacingAxis",
             at = @At(
                     value = "INVOKE",
@@ -57,16 +58,15 @@ public abstract class DirectionMixin {
                     ordinal = 0
             )
     )
-    private static float redirect_getLookDirectionForAxis_getYaw_0(Entity entity, float tickDelta) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private static float jcraft$getLookDirectionForAxis_getYaw_0(final Entity instance, final float partialTick, final Operation<Float> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getViewYRot(tickDelta);
+            return original.call(instance, partialTick);
         }
-
-        return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(instance, partialTick), instance.getViewXRot(partialTick), gravityDirection).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "getFacingAxis",
             at = @At(
                     value = "INVOKE",
@@ -74,28 +74,28 @@ public abstract class DirectionMixin {
                     ordinal = 1
             )
     )
-    private static float redirect_getLookDirectionForAxis_getYaw_1(Entity entity, float tickDelta) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private static float jcraft$getLookDirectionForAxis_getYaw_1(final Entity instance, final float partialTick, final Operation<Float> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getViewYRot(tickDelta);
+            return original.call(instance, partialTick);
         }
-
-        return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), entity.getViewXRot(tickDelta), gravityDirection).x;
+        return RotationUtil.rotPlayerToWorld(original.call(instance, partialTick), instance.getViewXRot(partialTick), gravityDirection).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "getFacingAxis",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getViewXRot(F)F"
             )
     )
-    private static float redirect_getLookDirectionForAxis_getPitch_0(Entity entity, float tickDelta) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private static float jcraft$getLookDirectionForAxis_getPitch_0(final Entity instance, final float partialTicks, final Operation<Float> original) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getViewXRot(tickDelta);
+            return original.call(instance, partialTicks);
         }
 
-        return RotationUtil.rotPlayerToWorld(entity.getViewYRot(tickDelta), entity.getViewXRot(tickDelta), gravityDirection).y;
+        return RotationUtil.rotPlayerToWorld(instance.getViewYRot(partialTicks), original.call(instance, partialTicks), gravityDirection).y;
     }
+
 }
