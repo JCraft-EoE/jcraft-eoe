@@ -24,6 +24,12 @@ public class DiscCaseMenuScreen extends AbstractContainerScreen<DiscCaseMenu> {
     }
 
     @Override
+    public void render(final @NonNull GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    @Override
     protected void renderBg(final GuiGraphics guiGraphics, final float partialTick, final int mouseX, final int mouseY) {
         guiGraphics.blit(DISC_CASE_BACKGROUND, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
         guiGraphics.blit(DISC_CASE_BACKGROUND, leftPos + 7 + 9 * (9 - slots / 2), topPos + 26, 7, 83, 9 * slots, 36);

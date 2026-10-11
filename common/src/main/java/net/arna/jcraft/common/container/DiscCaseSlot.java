@@ -21,11 +21,4 @@ public class DiscCaseSlot extends Slot {
     public int getMaxStackSize(final @NonNull ItemStack stack) {
         return 1;
     }
-
-    // Shift clicking fills slots through this overload instead, so it has to agree, or a stack of blank discs would land in a single slot.
-    @Override
-    public int getMaxStackSize() {
-        return 1;
-    }
-
 }

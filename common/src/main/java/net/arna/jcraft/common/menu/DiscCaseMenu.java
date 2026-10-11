@@ -60,7 +60,7 @@ public class DiscCaseMenu extends AbstractContainerMenu {
         // The case slots come first, followed by the player's inventory and hotbar.
         final boolean moved = index < slots
                 ? moveItemStackTo(stack, slots, super.slots.size(), true)
-                : moveItemStackTo(stack, 0, slots, false);
+                : moveIntoCase(stack);
         if (!moved) {
             return ItemStack.EMPTY;
         }
@@ -70,7 +70,21 @@ public class DiscCaseMenu extends AbstractContainerMenu {
         } else {
             slot.setChanged();
         }
-        return original;
+        // Vanilla repeats a shift click for as long as this hands the item back, so moving into the case hands back nothing, letting in one disc per click.
+        return index < slots ? original : ItemStack.EMPTY;
+    }
+
+
+    // Puts a single disc into the first free case slot
+    private boolean moveIntoCase(final ItemStack stack) {
+        for (int i = 0; i < slots; i++) {
+            final Slot caseSlot = getSlot(i);
+            if (!caseSlot.hasItem() && caseSlot.mayPlace(stack)) {
+                caseSlot.setByPlayer(stack.split(1));
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
