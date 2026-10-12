@@ -6,11 +6,13 @@ import lombok.NonNull;
 import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractHoldableMove;
+import net.arna.jcraft.api.component.living.CommonSpinComponent;
 import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.spec.SpinSpec;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public final class SpinChargeMove<A extends IAttacker<A, ?>> extends AbstractHoldableMove<SpinChargeMove<A>, A> {
@@ -33,37 +35,39 @@ public final class SpinChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
         final LivingEntity baseEntity = spinSpec.getBaseEntity();
 
         InteractionHand itemHand = InteractionHand.MAIN_HAND;
-        ItemStack projectileSource = baseEntity.getItemInHand(itemHand);
-        if (projectileSource.isEmpty() || projectileSource.is(JTagRegistry.UNTHROWABLE)) {
+        ItemStack spinningItem = baseEntity.getItemInHand(itemHand);
+        if (spinningItem.isEmpty() || spinningItem.is(JTagRegistry.UNTHROWABLE) || spinningItem.getCount() != 1) {
             itemHand = InteractionHand.OFF_HAND;
-            projectileSource = baseEntity.getItemInHand(itemHand);
+            spinningItem = baseEntity.getItemInHand(itemHand);
         }
-
-        if (projectileSource.isEmpty() || projectileSource.is(JTagRegistry.UNTHROWABLE)) {
-            itemHand = null;
+        final CommonSpinComponent spin = JComponentPlatformUtils.getSpin(attacker.getBaseEntity());
+        if (spinningItem.isEmpty() || spinningItem.is(JTagRegistry.UNTHROWABLE) || spinningItem.getCount() != 1) {
+            spin.cancelSpinning();
         }
-
-        JComponentPlatformUtils.getSpin(baseEntity).setItemHand(itemHand);
+        else {
+            if (attacker.getBaseEntity() instanceof final Player player) {
+                spin.setSlot(itemHand == InteractionHand.OFF_HAND ? 0 : (byte)player.getInventory().selected);
+            }
+            else {
+                spin.setSlot(itemHand == InteractionHand.OFF_HAND ? 0 : (byte)1);
+            }
+        }
     }
 
     @Override
     public boolean conditionsMet(A attacker) {
         final LivingEntity baseEntity = attacker.getBaseEntity();
-        if (baseEntity == null) {
-            return false;
+        ItemStack spinningItem = baseEntity.getItemInHand(InteractionHand.MAIN_HAND);
+        if (spinningItem.isEmpty() || spinningItem.is(JTagRegistry.UNTHROWABLE) || spinningItem.getCount() != 1) {
+            spinningItem = baseEntity.getItemInHand(InteractionHand.OFF_HAND);
         }
-        final InteractionHand itemInMainHand = JComponentPlatformUtils.getSpin(baseEntity).getItemHand();
-        if (itemInMainHand == null) {
-            return false;
-        }
-        final ItemStack holdItem = baseEntity.getItemInHand(itemInMainHand);
-        return super.conditionsMet(attacker) && !holdItem.isEmpty() && !holdItem.is(JTagRegistry.UNTHROWABLE);
+        return !spinningItem.isEmpty() && !spinningItem.is(JTagRegistry.UNTHROWABLE) && spinningItem.getCount() == 1;
     }
 
     @Override
     public void onCancel(final A attacker) {
         if (attacker != null && attacker.getBaseEntity() != null) {
-            JComponentPlatformUtils.getSpin(attacker.getBaseEntity()).setItemHand(null);
+            JComponentPlatformUtils.getSpin(attacker.getBaseEntity()).cancelSpinning();
         }
     }
 

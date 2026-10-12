@@ -1,0 +1,27 @@
+{
+  "anim_state": "SPIN_CHARGE",
+  "class": "SPECIAL1",
+  "cooldown_type": "STAND_SP1",
+  "followup": {
+    "anim_state": "SPIN_SHOOT",
+    "class": "SPECIAL1",
+    "cooldown_type": "STAND_SP1",
+    "move": {
+      "type": "jcraft:spin_toss_move",
+      "cooldown": 0,
+      "duration": 1,
+      "move_distance": 0.75,
+      "spreadMultiplier": 1.0,
+      "velocityMultiplier": 0.13,
+      "windup": 1
+    }
+  },
+  "move": {
+    "type": "jcraft:spin_charge_move",
+    "cooldown": 70,
+    "duration": 40,
+    "minimum_charge": 10,
+    "move_distance": 1.0,
+    "windup": 21
+  }
+}

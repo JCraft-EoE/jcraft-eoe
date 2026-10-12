@@ -1,12 +1,15 @@
 package net.arna.jcraft.api.component.living;
 
 import net.arna.jcraft.api.component.JComponent;
-import net.minecraft.world.InteractionHand;
 
 public interface CommonSpinComponent extends JComponent {
 
-    InteractionHand getItemHand();
+    Byte getSlot();
 
-    void setItemHand(final InteractionHand itemHand);
+    void setSlot(final Byte slot);
+
+    void cancelSpinning();
+
+    void endSpinning();
 
 }

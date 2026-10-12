@@ -272,6 +272,9 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> RANGER_ROLL_MOVE = register("ranger_roll_move", RangerRollMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> RANGER_SLIDE_MOVE = register("ranger_slide_move", RangerSlideMove.Type.INSTANCE);
 
+    RegistrySupplier<MoveType<?>> SPIN_CHARGE_MOVE = register("spin_charge_move", SpinChargeMove.Type.INSTANCE);
+    RegistrySupplier<MoveType<?>> SPIN_TOSS_MOVE = register("spin_toss_move", SpinMove.Type.INSTANCE);
+
 
     RegistrySupplier<MoveType<?>> WHITESNAKE_CHARGED_SPEW_ATTACK = register("whitesnake_charged_spew_attack", ChargedSpewAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> WHITESNAKE_GIVE_STAND_ATTACK = register("whitesnake_give_stand_attack", GiveStandAttack.Type.INSTANCE);
