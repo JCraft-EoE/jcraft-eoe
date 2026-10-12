@@ -10,6 +10,8 @@ import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecData;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.shared.SpinChargeMove;
+import net.arna.jcraft.common.attack.moves.shared.SpinMove;
 import net.arna.jcraft.common.util.SpecAnimationState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
@@ -40,12 +42,18 @@ public class SpinSpec extends JSpec<SpinSpec, SpinSpec.State> {
             .withFollowup(KICK)
             .withInfo(Component.literal("Knee"), Component.literal("Fast, short-ranged jab."));
 
+    public static final SpinMove<SpinSpec> SPIN_SHOOT = new SpinMove<SpinSpec>(0, 1, 1, 0.75f,0.13f)
+            .withAnim(State.SPIN_SHOOT);
+    public static final SpinChargeMove<SpinSpec> SPIN_CHARGE = new SpinChargeMove<SpinSpec>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
+            .withFollowup(SPIN_SHOOT);
+
     public SpinSpec(LivingEntity livingEntity) {
         super(JSpecTypeRegistry.SPIN.get(), livingEntity);
     }
 
     private static void registerMoves(MoveMap<SpinSpec, SpinSpec.State> moves) {
         moves.registerImmediate(MoveClass.HEAVY, KNEE, State.KNEE);
+        moves.register(MoveClass.SPECIAL1, SPIN_CHARGE, State.SPIN_CHARGE).withFollowup(State.SPIN_SHOOT);
     }
 
     @Override
@@ -56,6 +64,8 @@ public class SpinSpec extends JSpec<SpinSpec, SpinSpec.State> {
     public enum State implements SpecAnimationState<SpinSpec> {
         KNEE("sp.kn"),
         KICK("sp.kk"),
+        SPIN_CHARGE("sp.sc"),
+        SPIN_SHOOT("sp.ss")
 
         ;
 
