@@ -149,6 +149,7 @@ public interface JEntityRendererRegister {
             new RendererData<>(JEntityTypeRegistry.TRAINING_DUMMY, TrainingDummyRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE, ItemTossProjectileRenderer::new),
+            new RendererData<>(JEntityTypeRegistry.ITEM_SPIN_PROJECTILE, ItemSpinProjectileRenderer::new),
 
             new RendererData<>(JEntityTypeRegistry.BRAWLER_SPEC_USER, context -> new SpecUserRenderer<>(context, JCraft.id("geo/humanoid.geo.json"), JCraft.id("textures/entity/jonathan.png"))),
             new RendererData<>(JEntityTypeRegistry.HAMON_SPEC_USER, context -> new SpecUserRenderer<>(context, JCraft.id("geo/hamon_monk.geo.json"), JCraft.id("textures/entity/hamon_spec_user.png"))),

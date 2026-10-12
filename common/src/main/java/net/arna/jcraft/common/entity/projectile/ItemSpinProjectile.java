@@ -1,0 +1,629 @@
+package net.arna.jcraft.common.entity.projectile;
+
+import com.mojang.datafixers.util.Pair;
+import lombok.Getter;
+import lombok.NonNull;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.component.living.CommonBombTrackerComponent;
+import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.registry.JEntityTypeRegistry;
+import net.arna.jcraft.api.registry.JItemRegistry;
+import net.arna.jcraft.api.registry.JTagRegistry;
+import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.api.stand.StandType;
+import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
+import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
+import net.arna.jcraft.common.util.JUtils;
+import net.arna.jcraft.mixin.BucketItemAccessor;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.Saddleable;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BowlFoodItem;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ExperienceBottleItem;
+import net.minecraft.world.item.HoeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.LingeringPotionItem;
+import net.minecraft.world.item.PotionItem;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.JukeboxBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+public class ItemSpinProjectile extends AbstractArrow {
+
+    protected static final EntityDataAccessor<ItemStack> ITEM;
+
+    protected static final EntityDataAccessor<Integer> RICOCHETS;
+
+    static {
+        ITEM = SynchedEntityData.defineId(ItemSpinProjectile.class, EntityDataSerializers.ITEM_STACK);
+        RICOCHETS = SynchedEntityData.defineId(ItemSpinProjectile.class, EntityDataSerializers.INT);
+    }
+
+    private static final float SPIN_DEGREES_PER_VELOCITY = 40f;
+
+    @Getter
+    private float prevSpinAngle = 0f;
+    @Getter
+    private float spinAngle = 0f;
+
+    public ItemSpinProjectile(final Level level) {
+        super(JEntityTypeRegistry.ITEM_TOSS_PROJECTILE.get(), level);
+        setItem(ItemStack.EMPTY);
+    }
+
+    public ItemSpinProjectile(final LivingEntity shooter, final Level level, final ItemStack item) {
+        super(JEntityTypeRegistry.ITEM_SPIN_PROJECTILE.get(), shooter, level);
+        setCritArrow(true); // leverages vanilla's built-in crit particle spawning each tick for a free particle trail
+        setItem(item);
+        if (getItem().is(JTagRegistry.HEAVY_IMPACT)) {
+            this.setBaseDamage(2d);
+            this.setKnockback(4);
+        }
+        else {
+            this.setBaseDamage(0d);
+            this.setKnockback(0);
+        }
+    }
+
+    @Override
+    public void tick() {
+        prevSpinAngle = spinAngle;
+        if (!inGround) {
+            spinAngle += (float) getDeltaMovement().length() * SPIN_DEGREES_PER_VELOCITY;
+        }
+        super.tick();
+    }
+
+    public ItemStack getItem() {
+        return this.entityData.get(ITEM);
+    }
+
+    protected void setItem(@NotNull ItemStack item) {
+        this.entityData.set(ITEM, item.copyWithCount(1));
+    }
+
+    public int getRicochets() {
+        return this.entityData.get(RICOCHETS);
+    }
+
+    protected void incrementRicochets() {
+        this.entityData.set(RICOCHETS, getRicochets() + 1);
+    }
+
+    @Override
+    protected ItemStack getPickupItem() {
+        return getItem();
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(ITEM, ItemStack.EMPTY);
+        this.entityData.define(RICOCHETS, 0);
+    }
+
+    @Override
+    public boolean isOnFire() {
+        // this might be better to move to doPostHurtEffects
+        return super.isOnFire() || getItem().is(JTagRegistry.BURNS_ON_IMPACT);
+    }
+
+    @Override
+    protected void doPostHurtEffects(LivingEntity target) {
+        if (getItem().is(JTagRegistry.BLINDS_ON_IMPACT)) {
+            target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 40));
+        }
+        if (getItem().is(JTagRegistry.SLOWS_ON_IMPACT)) {
+            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60));
+        }
+        if (getItem().is(JTagRegistry.POISONS_ON_IMPACT)) {
+            target.addEffect(new MobEffectInstance(MobEffects.POISON, 60));
+        }
+    }
+
+    protected boolean maybeExplode() {
+        if (!level().isClientSide && getItem().is(JTagRegistry.EXPLODES_ON_IMPACT)) {
+            final boolean grief = level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+            final boolean standGrief = !(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING);
+            level().explode(this, getX(), getY(), getZ(), 1, grief && standGrief, Level.ExplosionInteraction.MOB);
+            discard();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void onHit(HitResult result) {
+        final HitResult.Type type = result.getType();
+        if (type == HitResult.Type.ENTITY) {
+            this.onHitEntity((EntityHitResult)result);
+        } else if (type == HitResult.Type.BLOCK) {
+            BlockHitResult blockHitResult = (BlockHitResult)result;
+            this.onHitBlock(blockHitResult);
+        }
+    }
+
+    @Override
+    protected void onHitEntity(final @NonNull EntityHitResult result) {
+        if (level().isClientSide()) {
+            return;
+        }
+
+        // this part has been heavily inspired by AbstractArrow
+        Entity entity = result.getEntity();
+        Entity entity2 = JUtils.getUserIfStand(this.getOwner());
+        DamageSource damageSource;
+        if (entity2 == null) {
+            damageSource = this.damageSources().arrow(this, this);
+        } else {
+            damageSource = this.damageSources().arrow(this, entity2);
+            if (entity2 instanceof LivingEntity) {
+                ((LivingEntity)entity2).setLastHurtMob(entity);
+            }
+        }
+
+        boolean targetIsEnderman = entity.getType() == EntityType.ENDERMAN;
+
+        if (this.isOnFire() && !targetIsEnderman) {
+            entity.setSecondsOnFire(5);
+        }
+
+        entity.hurt(damageSource, calculateDamage(entity));
+
+        if (targetIsEnderman) {
+            return;
+        }
+
+        final int fireSeconds = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FIRE_ASPECT, getItem()) * 4;
+        if (fireSeconds > 0) {
+            entity.setSecondsOnFire(fireSeconds);
+        }
+
+        boolean effectActivated = false;
+
+        if (entity instanceof final LivingEntity livingEntity) {
+            // handle knockback
+            float knockback = calculateKnockback();
+            if (knockback > 0) {
+                double d = Math.max(0, 1f - livingEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
+                Vec3 vec3 = this.getDeltaMovement().multiply(1f, 0f, 1f).normalize().scale(knockback * 0.6 * d);
+                if (vec3.lengthSqr() > 0) {
+                    livingEntity.push(vec3.x, 0.1, vec3.z);
+                }
+            }
+            if (getOwner() instanceof LivingEntity owner) {
+                EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
+                EnchantmentHelper.doPostDamageEffects(owner, livingEntity);
+            }
+            this.doPostHurtEffects(livingEntity);
+//            if (entity2 != null && livingEntity != entity2 && livingEntity instanceof Player && entity2 instanceof ServerPlayer && !this.isSilent()) {
+//                ((ServerPlayer)entity2).connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.ARROW_HIT_PLAYER, 0.0F));
+//            }
+        }
+
+        if (maybeExplode()) {
+            return;
+        }
+
+        // transfer KQ bomb to hit entity
+        if (getOwner() instanceof AbstractKillerQueenEntity<?, ?> kq && kq.hasUser()) {
+            final CommonBombTrackerComponent.BombData bombData = JComponentPlatformUtils.getBombTracker(kq.getUserOrThrow()).getMainBomb();
+            if (bombData.isEntity && bombData.bombEntityID == this.getId()) {
+                bombData.setBomb(entity);
+                this.discard();
+                return;
+            }
+        }
+
+        // force stand on target — only WhiteSnake can throw discs, and can do so into any living entity
+        if (entity instanceof LivingEntity livingEntity && getOwner() instanceof WhiteSnakeEntity
+                && getItem().is(JItemRegistry.STAND_DISC.get())) {
+            // get NBT
+            StandType itemStand = null;
+            int itemSkin = 0;
+            final CompoundTag data = getItem().getOrCreateTag();
+            if (data.contains("StandID")) {
+                itemStand = StandTypeUtil.readFromNBT(data, "StandID");
+            }
+            if (data.contains("Skin", Tag.TAG_INT)) {
+                itemSkin = data.getInt("Skin");
+            }
+            // apply stand
+            if (itemStand != null && !JCraft.getExclusiveStandsData().isStandUsed(itemStand) && (
+                    (livingEntity instanceof Player && !StandTypeUtil.isIn(itemStand, JTagRegistry.PLAYER_STAND_BLACKLIST, level().registryAccess())) ||
+                    (!(livingEntity instanceof Player) && !StandTypeUtil.isIn(itemStand, JTagRegistry.MOB_STAND_BLACKLIST, level().registryAccess())))
+            ) {
+                final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(livingEntity);
+                if (standData.getType() == null) { // don't override current stand
+                    standData.setTypeAndSkin(itemStand, itemSkin, false);
+                    JCraft.summon(level(), livingEntity);
+                }
+                effectActivated = true;
+            }
+        }
+        // force equip thrown stuff
+        if (entity instanceof Mob mob && getItem().is(JTagRegistry.EQUIPABLES)) {
+            mob.equipItemIfPossible(getItem());
+            effectActivated = true;
+        }
+
+        // TODO spec obtainment items
+
+        // force feed
+        if (entity instanceof LivingEntity livingEntity && getItem().isEdible()) {
+            if (!JComponentPlatformUtils.getVampirism(livingEntity).isVampire()) {
+                boolean canEat = true;
+
+                if (livingEntity instanceof Player player)
+                    canEat = player.getFoodData().needsFood();
+
+                if (canEat) {
+                    livingEntity.eat(level(), getItem());
+
+                    if (getItem().getItem() instanceof BowlFoodItem) {
+                        setItem(Items.BOWL.getDefaultInstance());
+                        dropItem(result.getLocation()); // FIXME doesn't work?
+                    }
+
+                    effectActivated = true;
+                }
+            }
+        }
+
+        // force drink potions
+        if (entity instanceof LivingEntity living && getItem().getItem() instanceof PotionItem) {
+            for (MobEffectInstance mobEffectInstance : PotionUtils.getMobEffects(getItem())) {
+                if (mobEffectInstance.getEffect().isInstantenous()) {
+                    mobEffectInstance.getEffect().applyInstantenousEffect(getOwner(), getOwner(), living, mobEffectInstance.getAmplifier(), 1d);
+                } else {
+                    living.addEffect(new MobEffectInstance(mobEffectInstance));
+                }
+            }
+            effectActivated = true;
+        }
+
+        // slab iron on iron golem
+        if (entity instanceof IronGolem golem && getItem().is(Items.IRON_INGOT)) {
+            float prevHealHealth = golem.getHealth();
+            golem.heal(25.0F);
+            if (golem.getHealth() != prevHealHealth) {
+                float g = 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F;
+                this.playSound(SoundEvents.IRON_GOLEM_REPAIR, 1.0F, g);
+            }
+            effectActivated = true;
+        }
+
+        // force equip saddles
+        if (entity instanceof Saddleable saddleable && getItem().is(Items.SADDLE)) {
+            saddleable.equipSaddle(null);float g = 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F;
+            this.playSound(saddleable.getSaddleSoundEvent(), 1.0F, g);
+            effectActivated = true;
+        }
+
+        // force equip horse armor
+        if (entity instanceof AbstractHorse horse && horse.isArmor(getItem())) {
+            // this is needed because the equipArmor method of the horse wants a player
+            horse.inventory.setItem(1, getItem());
+            effectActivated = true;
+        }
+
+        // TODO also, what about throwing a sword, bone meal, fire charge, shears,
+
+        // end of inspired part
+        if (!this.level().isClientSide && getItem().is(JTagRegistry.EXPLODES_ON_IMPACT)) {
+            entity.hurt(this.damageSources().arrow(this, entity2), 6f);
+        }
+        // a little bit more inspiration
+        if (this.getPierceLevel() <= 0) {
+            // drop if not used
+            if (!(effectActivated || getItem().is(JTagRegistry.BLINDS_ON_IMPACT) ||
+                    getItem().is(JTagRegistry.BURNS_ON_IMPACT) ||
+                    getItem().is(JTagRegistry.HEAVY_IMPACT) ||
+                    getItem().is(JTagRegistry.EXPLODES_ON_IMPACT) ||
+                    getItem().is(JTagRegistry.SLOWS_ON_IMPACT) ||
+                    getItem().is(JTagRegistry.POISONS_ON_IMPACT))) {
+                // drop at owner position so the item doesn't land on the target and get picked up
+                final Vec3 dropTarget = entity2 != null ? entity2.position() : result.getLocation();
+                dropItem(dropTarget);
+            }
+            this.discard();
+        }
+    }
+
+    private float calculateDamage(final Entity target) {
+        float damage = (float)getBaseDamage();
+        if (!(target instanceof final LivingEntity livingTarget)
+                || !(JUtils.getUserIfStand(getOwner()) instanceof final LivingEntity owner)
+                /*|| !(getItem().getItem() instanceof final TieredItem tieredItem)*/) {
+            return damage;
+        }
+        damage = (float)owner.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        damage += EnchantmentHelper.getDamageBonus(getItem(), livingTarget.getMobType());
+        return damage;
+    }
+
+    private float calculateKnockback() {
+        int knockbackLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.KNOCKBACK, getItem());
+        return getKnockback() + 0.5f * knockbackLevel;
+    }
+
+    @Override
+    protected void onHitBlock(final BlockHitResult result) {
+        final BlockState blockstate = level().getBlockState(result.getBlockPos());
+        // notify the block it has been hit with something
+        blockstate.onProjectileHit(level(), blockstate, result, this);
+
+        final BlockState hitBlock = level().getBlockState(result.getBlockPos());
+        double hardness = hitBlock.getBlock().defaultDestroyTime();
+        if (hardness < 0d) { // unbreakable
+            hardness = Double.MAX_VALUE;
+        }
+
+        if (maybeExplode()) {
+            return;
+        }
+
+        // ricochet
+        incrementRicochets();
+        if (getRicochets() <= maxRicochets()) {
+            // calculate penetrative value and decide if it should land
+            final Vec3i intNormal = result.getDirection().getNormal();
+            final Vec3 normal = new Vec3(intNormal.getX(), intNormal.getY(), intNormal.getZ());
+            final Vec3 impactVec = getDeltaMovement();
+
+            // a*b = |a|*|b|*cos(φ) , a*b = a.dotProduct(b)
+            final double impactAngleRad = Math.acos(normal.dot(impactVec.normalize())) - Math.PI / 2.0;
+            final double impactAngleDeg = Math.toDegrees(impactAngleRad);
+
+            // Ek = mv^2/2
+            final double kineticEnergy = mass() * impactVec.lengthSqr() / 2;
+            final double penAngle = penetrationAngle() + hardness * 5; // This is bs but so is minecraft physics
+
+            final boolean lowEnergy = kineticEnergy < 0.001;
+            if (impactAngleDeg <= penAngle && !lowEnergy) { // If penetrated or ran out of energy
+                setDeltaMovement(impactVec.add(normal).scale(0.5 / hardness));
+                // don't hit the ground
+                return;
+            }
+        }
+
+        // hit the ground
+        final ItemStack item = getItem();
+        // blocks get placed if possible
+        final BlockPos pos = result.getBlockPos().relative(result.getDirection());
+        if (item.getItem() instanceof BlockItem block && !item.is(Items.POINTED_DRIPSTONE)) {
+            final LivingEntity placer = JUtils.getUserIfStand(getOwner()) instanceof LivingEntity living ? living : null;
+            if (item.is(JTagRegistry.BRITTLE) && hardness >= Blocks.STONE.defaultDestroyTime()) {
+                // brittle things get destroyed
+            } else if (!JUtils.mayAlter(level(), placer, pos, null)) {
+                // the stand's user may not build where the block landed, so drop it as an item instead of placing
+                dropItem(result.getLocation());
+            } else if ((!(getOwner() instanceof StandEntity<?,?>) || level().getGameRules().getBoolean(JCraft.STAND_GRIEFING)) &&
+                    InteractionResult.SUCCESS != block.place(new BlockPlaceContext(new UseOnContext(level(), null, InteractionHand.MAIN_HAND, item, result)))) {
+                dropItem(result.getLocation());
+            }
+        }
+        // axe get used
+        else if (item.getItem() instanceof AxeItem axe) {
+            BlockState blockState = level().getBlockState(result.getBlockPos());
+            Optional<BlockState> stripped = axe.getStripped(blockState);
+            if (stripped.isPresent()) {
+                level().setBlockAndUpdate(result.getBlockPos(), stripped.get());
+                item.hurtAndBreak(1, (LivingEntity)getOwner(), owner -> {/* do nothing */});
+            }
+            stickOrDrop(result.getLocation());
+        }
+        // hoe get used
+        else if (item.getItem() instanceof HoeItem) {
+            final UseOnContext context = new UseOnContext(level(), null, InteractionHand.MAIN_HAND, item, result);
+            final Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> pair = HoeItem.TILLABLES.get(level().getBlockState(result.getBlockPos()).getBlock());
+            if (pair != null) {
+                Predicate<UseOnContext> predicate = pair.getFirst();
+                Consumer<UseOnContext> consumer =    pair.getSecond();
+                if (predicate.test(context)) { // check if tilling is possible
+                    if (!level().isClientSide) {
+                        consumer.accept(context); // actual tilling happening
+                        context.getItemInHand().hurtAndBreak(1, (LivingEntity) getOwner(), owner -> {});
+                    }
+                }
+            }
+            stickOrDrop(result.getLocation());
+        }
+        // buckets empty their content if any
+        else if (item.getItem() instanceof BucketItem bucket && ((BucketItemAccessor) bucket).getContent() != Fluids.EMPTY) {
+            if (bucket.emptyContents(null, level(), result.getBlockPos(), result)) {
+                bucket.checkExtraContent(null, level(), item, pos);
+                setItem(Items.BUCKET.getDefaultInstance());
+            }
+            dropItem(result.getLocation());
+        }
+        // music disks fling into a jukebox
+        else if (item.is(ItemTags.MUSIC_DISCS)) {
+            final BlockState box = level().getBlockState(result.getBlockPos());
+            if (box.is(Blocks.JUKEBOX) && !box.getValue(JukeboxBlock.HAS_RECORD)) {
+                BlockEntity blockEntity = level().getBlockEntity(result.getBlockPos());
+                if (blockEntity instanceof JukeboxBlockEntity boxEntity) {
+                    boxEntity.setFirstItem(item.copy());
+                }
+                else { // shouldn't happen, but who knows?
+                    dropItem(result.getLocation());
+                }
+            }
+            else {
+                dropItem(result.getLocation());
+            }
+        }
+        // arrows get flinged
+        // TODO implement
+        // potions get activated
+        else if (item.getItem() instanceof PotionItem potion) {
+            final ThrownPotion thrown = new ThrownPotion(level(), result.getLocation().x, result.getLocation().y, result.getLocation().z);
+            final Potion effect = PotionUtils.getPotion(item);
+            thrown.setItem(item);
+            if (potion instanceof LingeringPotionItem) {
+                thrown.makeAreaOfEffectCloud(item, effect);
+            }
+            else {
+                thrown.applySplash(PotionUtils.getMobEffects(item), null);
+            }
+            int i = effect.hasInstantEffects() ? 2007 : 2002;
+            this.level().levelEvent(i, pos, PotionUtils.getColor(item));
+        }
+        // XP bottle gets activated
+        else if (item.getItem() instanceof ExperienceBottleItem) {
+            if (!level().isClientSide()) {
+                level().levelEvent(2002, pos, PotionUtils.getColor(Potions.WATER));
+                int amount = 3 + level().random.nextInt(5) + level().random.nextInt(5);
+                ExperienceOrb.award((ServerLevel)level(), result.getLocation(), amount);
+            }
+        }
+        // spawn eggs get activated
+        else if (item.getItem() instanceof SpawnEggItem egg) {
+            final EntityType<?> entityType2 = egg.getType(item.getTag());
+            if (!level().isClientSide()) {
+                entityType2.spawn((ServerLevel)level(), item, null, pos, MobSpawnType.SPAWN_EGG, true, false);
+            }
+        }
+        // rest just get dropped (or stuck if damageable)
+        else {
+            stickOrDrop(result.getLocation());
+        }
+        if (pickup == Pickup.ALLOWED) {
+            // Position flush with the block face so the item doesn't sink in
+            final Vec3 loc = result.getLocation();
+            final Vec3 toHit = loc.subtract(getX(), getY(), getZ()).normalize().scale(0.05);
+            setPosRaw(loc.x - toHit.x, loc.y - toHit.y, loc.z - toHit.z);
+            setDeltaMovement(Vec3.ZERO);
+            inGround = true;
+        } else {
+            inGround = true;
+            discard();
+        }
+    }
+
+    /**
+     * Drops the item, or sticks it in the block if it has durability (axes, swords, pickaxes, etc.).
+     * Returns true if sticking, false if dropped.
+     */
+    private boolean stickOrDrop(final Vec3 pos) {
+        if (getItem().getItem() instanceof TieredItem) {
+            pickup = Pickup.ALLOWED;
+            return true;
+        }
+        dropItem(pos);
+        return false;
+    }
+
+    /**
+     * Drops the item behind this projectile at the specified location. Does NOT discard this projectile.
+     */
+    private void dropItem(final Vec3 pos) {
+        final Vec3 vec3 = pos.subtract(getX(), getY(), getZ());
+        setDeltaMovement(vec3);
+        final Vec3 vecN = vec3.normalize().scale(0.05d);
+        Containers.dropItemStack(level(), getX() - vecN.x, getY() - vecN.y, getZ() - vecN.z, getItem());
+    }
+
+    /**
+     * Maximal number of ricocheting this projectile can do.
+     */
+    public int maxRicochets() {
+        if (getItem().is(JTagRegistry.SUPER_BOUNCY)) {
+            return 15;
+        }
+        if (getItem().is(JTagRegistry.BOUNCY)) {
+            return 10;
+        }
+        if (getItem().is(JTagRegistry.SOMEWHAT_BOUNCY)) {
+            return 5;
+        }
+        return 0;
+    }
+
+    public double penetrationAngle() {
+        if (getItem().is(JTagRegistry.ACUTE)) {
+            return 15d;
+        }
+        if (getItem().is(JTagRegistry.OBTUSE)) {
+            return 60d;
+        }
+        return 45d;
+    }
+
+    /**
+     * Mass of the projectile.
+     */
+    public double mass() {
+        if (getItem().is(JTagRegistry.VERY_HEAVY)) {
+            return 50d;
+        }
+        if (getItem().is(JTagRegistry.HEAVY)) {
+            return 10d;
+        }
+        if (getItem().is(JTagRegistry.LIGHT)) {
+            return 0.1;
+        }
+        return 1d;
+    }
+
+    public boolean isFerrous() {
+        final ItemStack stack = getItem();
+        return stack != null && stack.is(JTagRegistry.FERROUS_ITEMS);
+    }
+
+}

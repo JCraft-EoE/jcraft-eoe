@@ -922,9 +922,21 @@ public final class JUtils {
         tossItem(player, player.level(), player.getItemInHand(InteractionHand.MAIN_HAND), 1f, 1f, !player.getAbilities().instabuild);
     }
 
-    public static Entity spinItem(final LivingEntity user, final Level level, final ItemStack itemStack, final float velocity, final float spreadMultiplier, final boolean decrement, final @NonNull Vec3 spawnPos) {
-        // TODO implement
-        return null;
+    public static Entity spinItem(final LivingEntity shooter, final Level level, final ItemStack itemStack, final float velocity, final float spreadMultiplier, final boolean decrement, final Vec3 spawnPos) {
+        if (level.isClientSide() || itemStack.isEmpty()) {
+            return null;
+        }
+        final Vec3 resolvedSpawnPos = spawnPos != null ? spawnPos : shooter.position().add(getEyePos(shooter));
+        // other cases
+        final Projectile spawned;
+        spawned = new ItemTossProjectile(shooter, level, itemStack);
+        spawned.setPos(resolvedSpawnPos);
+        spawned.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0f, velocity, spreadMultiplier);
+        level.addFreshEntity(spawned);
+        if (decrement) {
+            itemStack.shrink(1);
+        }
+        return spawned;
     }
 
     public static double nullSafeDistanceSqr(@Nullable Entity a, @Nullable Entity b) {
