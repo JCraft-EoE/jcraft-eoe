@@ -18,4 +18,8 @@ public class SpinComponentImpl extends CommonSpinComponentImpl implements SpinCo
         JComponents.SPIN.sync(entity);
     }
 
+    public void tick() {
+        super.tick();
+    }
+
 }

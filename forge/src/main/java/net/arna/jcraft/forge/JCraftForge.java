@@ -73,6 +73,7 @@ public final class JCraftForge {
 
             HamonCapability.getCapability(living).tick();
             VampireCapability.getCapability(living).tick();
+            SpinCapability.getCapability(living).tick();
         }
     }
 

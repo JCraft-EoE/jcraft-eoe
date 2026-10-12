@@ -3,6 +3,7 @@ package net.arna.jcraft.common.component.impl.living;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.living.CommonSpinComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -45,6 +46,10 @@ public abstract class CommonSpinComponentImpl implements CommonSpinComponent {
 
     public void writeToNbt(final @NonNull CompoundTag tag) {
         // intentionally left empty
+    }
+
+    public void tick() {
+        JCraft.LOGGER.warn("I'm ticking!");
     }
 
 }
