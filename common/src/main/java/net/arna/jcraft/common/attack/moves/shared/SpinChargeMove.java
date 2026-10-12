@@ -12,6 +12,7 @@ import net.arna.jcraft.common.spec.SpinSpec;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -46,10 +47,10 @@ public final class SpinChargeMove<A extends IAttacker<A, ?>> extends AbstractHol
         }
         else {
             if (attacker.getBaseEntity() instanceof final Player player) {
-                spin.setSlot(itemHand == InteractionHand.OFF_HAND ? 0 : (byte)player.getInventory().selected);
+                spin.setSlot(itemHand == InteractionHand.OFF_HAND ? Inventory.SLOT_OFFHAND : (byte)player.getInventory().selected);
             }
             else {
-                spin.setSlot(itemHand == InteractionHand.OFF_HAND ? 0 : (byte)1);
+                spin.setSlot(itemHand == InteractionHand.OFF_HAND ? Inventory.SLOT_OFFHAND : (byte)0);
             }
         }
     }
