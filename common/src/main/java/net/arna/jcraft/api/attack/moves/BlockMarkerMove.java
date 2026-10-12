@@ -1,7 +1,10 @@
 package net.arna.jcraft.api.attack.moves;
 
+import lombok.Getter;
 import lombok.NonNull;
+import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -27,9 +30,45 @@ public interface BlockMarkerMove {
 
     boolean isInRange(final @NonNull BlockPos pos, final @NonNull Level level);
 
-    boolean isRecording();
+    default boolean isRecording() {
+        return getRemainingRecordingTime() > 0;
+    }
+
+    int getMaxRecordingTime();
+
+    int getRemainingRecordingTime();
+
+    default void addRecordingTimes(final @NonNull LivingEntity living) {
+        JComponentPlatformUtils.getMiscData(living).addRecordingTimes(
+                new RecordingTimes(getMaxRecordingTime(), getRemainingRecordingTime(), getUuid())
+        );
+    }
+
+    default void removeRecordingTimes(final @NonNull LivingEntity living, boolean shouldSync) {
+        JComponentPlatformUtils.getMiscData(living).removeRecordingTimes(getUuid(), shouldSync);
+    }
 
     UUID getUuid();
 
     List<Boolean> getIteration();
+
+    @Getter
+    final class RecordingTimes {
+
+        private final int max;
+        private int remaining;
+        private final UUID uuid;
+
+        public RecordingTimes(int max, int remaining, UUID uuid) {
+            this.max = max;
+            this.remaining = remaining;
+            this.uuid = uuid;
+        }
+
+        public void decreaseRemaining() {
+            remaining--;
+        }
+
+    }
+
 }

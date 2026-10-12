@@ -1,5 +1,7 @@
 package net.arna.jcraft.api.component.living;
 
+import lombok.NonNull;
+import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.JComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -7,6 +9,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.UUID;
 
 public interface CommonMiscComponent extends JComponent {
+
     // General
     Vec3 getDesiredVelocity();
 
@@ -54,4 +57,11 @@ public interface CommonMiscComponent extends JComponent {
     // AerosmithEntity
     float getAerosmithOverheat();
     void setAerosmithOverheat(final float overheat);
+
+    void addRecordingTimes(final @NonNull BlockMarkerMove.RecordingTimes recordingTimes);
+
+    void removeRecordingTimes(final @NonNull UUID uuid, final boolean shouldSync);
+
+    Iterable<? extends BlockMarkerMove.RecordingTimes> viewActiveBlockMarkerMoves();
+
 }

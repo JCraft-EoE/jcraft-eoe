@@ -18,6 +18,7 @@ import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -103,10 +104,16 @@ public class SetStandCommand {
                 }
                 final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(livingEntity);
                 if (type != null) {
+                    if ((entity instanceof Player && StandTypeUtil.isIn(type, JTagRegistry.PLAYER_STAND_BLACKLIST, ctx.getSource().registryAccess())) ||
+                            (!(entity instanceof Player) && StandTypeUtil.isIn(type, JTagRegistry.MOB_STAND_BLACKLIST, ctx.getSource().registryAccess()))
+                    ) {
+                        continue;
+                    }
                     standData.setTypeAndSkin(type, skin, false);
                 }
                 else { // i.e. rng != null
-                    standData.setType(StandTypeUtil.getRandom(rng));
+                    final RegistryAccess registryAccess = ctx.getSource().registryAccess();
+                    standData.setType(StandTypeUtil.getRandom(rng, true, registryAccess, registryAccess != null, false));
                 }
 
                 livingEntity.unRide();

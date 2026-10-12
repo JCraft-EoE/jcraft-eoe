@@ -34,7 +34,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-public class CommonGravityComponentImpl implements CommonGravityComponent {
+public abstract class CommonGravityComponentImpl implements CommonGravityComponent {
     private Direction gravityDirection = Direction.DOWN;
     private Direction defaultGravityDirection = Direction.DOWN;
     private Direction prevGravityDirection = Direction.DOWN;
@@ -44,7 +44,7 @@ public class CommonGravityComponentImpl implements CommonGravityComponent {
     private List<Gravity> gravityList = new ArrayList<>();
     private final Entity entity;
 
-    public CommonGravityComponentImpl(final Entity entity) {
+    protected CommonGravityComponentImpl(final Entity entity) {
         this.entity = entity;
     }
 

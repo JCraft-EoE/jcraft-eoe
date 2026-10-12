@@ -9,6 +9,7 @@ import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JItemRegistry;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -39,7 +40,7 @@ public class StandArrowEntity extends AbstractArrow {
             }
             final CommonStandComponent standData = JComponentPlatformUtils.getStandComponent(mob);
             if (standData.getType() == null && !mob.getType().is(JTagRegistry.CAN_NEVER_HAVE_STAND)) {
-                standData.setType(StandTypeUtil.getRandomRegular(random));
+                standData.setType(StandTypeUtil.getRandomRegular(random, level.registryAccess(), mob instanceof Player, !(mob instanceof Player)));
                 mob.unRide();
                 JCraft.summon(mob.level(), mob);
             } else {
@@ -50,4 +51,5 @@ public class StandArrowEntity extends AbstractArrow {
             }
         }
     }
+
 }

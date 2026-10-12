@@ -2,6 +2,7 @@ package net.arna.jcraft.client.gui.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.common.entity.stand.*;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.spec.AnubisSpec;
@@ -34,13 +35,14 @@ public class JCraftHudOverlay {
     private static final int STAND_GAUGE_FLASH_DURATION = 60;
 
     private static final Vector3f
-            BLOCK_GAUGE_UNDER_THIRD = new Vector3f(0.5f, 0.5f, 1.0f),
-            BLOCK_GAUGE_OVER_THIRD = new Vector3f(0.55f, 0.8f, 1.0f);
+            BLOCK_GAUGE_UNDER_THIRD = new Vector3f(0.5f, 0.5f, 1f),
+            BLOCK_GAUGE_OVER_THIRD = new Vector3f(0.55f, 0.8f, 1f),
+            BLOCK_MARKER_MOVE_COLOR = new Vector3f(1f, 0.2f, 0.6f);
 
     private static final Gauge
-            BLOCK_GAUGE = new Gauge(0.5f, 0.5f, 1.0f, 90),
-            SUN_SIZE_GAUGE = new Gauge(1.0f, 0.7f, 0.4f, 30),
-            TIME_ACCEL_GAUGE = new Gauge(1.0f, 0.8f, 0.0f, MadeInHeavenEntity.MAXIMUM_SPEEDOMETER),
+            BLOCK_GAUGE = new Gauge(0.5f, 0.5f, 1f, 90),
+            SUN_SIZE_GAUGE = new Gauge(1f, 0.7f, 0.4f, 30),
+            TIME_ACCEL_GAUGE = new Gauge(1f, 0.8f, 0.0f, MadeInHeavenEntity.MAXIMUM_SPEEDOMETER),
             BLOODLUST_GAUGE = new Gauge(0.8f, 0.1f, 0.2f, 5),
             HAMON_GAUGE = new Gauge(0.8f, 0.5f, 0.2f, (int) HamonSpec.MAX_CHARGE),
             FOCUS_GAUGE = new Gauge(0.4f, 0.75f, 0.5f, (int) RangerSpec.MAX_FOCUS),
@@ -116,6 +118,13 @@ public class JCraftHudOverlay {
             }
             else if (stand instanceof MadeInHeavenEntity madeInHeaven && madeInHeaven.getAccelTime() > 0) {
                 TIME_ACCEL_GAUGE.render(ctx, gaugeX, height + gaugeHeightOffset, madeInHeaven.getSpeedometer());
+            }
+
+            for (final BlockMarkerMove.RecordingTimes recordingTimes : JComponentPlatformUtils.getMiscData(player).viewActiveBlockMarkerMoves()) {
+                if (recordingTimes.getRemaining() > 0) {
+                    new Gauge(BLOCK_MARKER_MOVE_COLOR, recordingTimes.getMax())
+                            .render(ctx, gaugeX, height + gaugeHeightOffset, recordingTimes.getRemaining());
+                }
             }
         }
 
