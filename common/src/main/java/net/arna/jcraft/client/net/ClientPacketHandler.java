@@ -20,6 +20,7 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.gui.ServerConfigUI;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
+import net.arna.jcraft.client.gui.screen.GoldenSpiralScreen;
 import net.arna.jcraft.client.renderer.effects.AttackHitboxEffectRenderer;
 import net.arna.jcraft.client.renderer.effects.TimeErasePredictionEffectRenderer;
 import net.arna.jcraft.client.rendering.DamageIndicatorManager;
@@ -96,6 +97,11 @@ public class ClientPacketHandler {
         register(S2C_DAMAGE_NUMBER, ClientPacketHandler::handleDamageNumber);
         register(S2C_BLOCK_BREAKAGE, ClientPacketHandler::handleBlockBreakage);
         register(S2C_BOUND_SOUND, ClientPacketHandler::handleBoundSound);
+        register(S2C_SPIRAL_CALL, ClientPacketHandler::handleSpiralScreen);
+    }
+
+    private static void handleSpiralScreen(final Minecraft minecraft, final FriendlyByteBuf friendlyByteBuf) {
+        minecraft.setScreen(new GoldenSpiralScreen());
     }
 
     private static void handleBoundSound(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
