@@ -23,6 +23,7 @@ public class GoldenSpiralScreen extends Screen {
     protected final List<Square> squares = new LinkedList<>();
     protected final List<Vec2> spiralPoints = new ArrayList<>();
     protected final List<Vec2> playerPoints = new ArrayList<>();
+    protected boolean tracing = false;
 
     public GoldenSpiralScreen() {
         super(Component.literal("Golden Spiral Screen"));
@@ -31,11 +32,6 @@ public class GoldenSpiralScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
     }
 
     public void calculatePoints(final float startX, final float startY, final float scale) {
@@ -99,6 +95,8 @@ public class GoldenSpiralScreen extends Screen {
     public void resize(final @NonNull Minecraft minecraft, final int width, final int height) {
         super.resize(minecraft, width, height);
         calculatePoints(width / 3f, height / 2.8f, 3f);
+        tracing = false;
+        playerPoints.clear();
     }
 
     // draw spiral in this method
@@ -136,7 +134,7 @@ public class GoldenSpiralScreen extends Screen {
                     .endVertex();
             currentPoint = nextPoint;
         }
-        if (!playerPoints.isEmpty()) {
+        if (!playerPoints.isEmpty() && !tracing) {
             consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
             currentPoint = playerPoints.get(0);
             for (int i = 1; i < playerPoints.size(); i++) {
@@ -159,12 +157,30 @@ public class GoldenSpiralScreen extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(final double mouseX, final double mouseY, final int button, final double dragX, final double dragY) {
+    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
         if (button == 0) {
+            playerPoints.clear();
+            tracing = true;
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(final double mouseX, final double mouseY, final int button, final double dragX, final double dragY) {
+        if (button == 0 && tracing) {
             playerPoints.add(new Vec2((float)(mouseX + dragX), (float)(mouseY + dragY)));
             return true;
         }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
+        if (button == 0) {
+            tracing = false;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     protected record Square(int x, int y, int length) {
