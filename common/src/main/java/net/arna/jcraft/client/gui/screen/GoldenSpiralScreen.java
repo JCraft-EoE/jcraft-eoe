@@ -29,6 +29,7 @@ public class GoldenSpiralScreen extends Screen {
 
     protected final List<Square> squares = new LinkedList<>();
     protected final List<Vec2> spiralPoints = new ArrayList<>();
+    protected final List<Vec2> playerPoints = new LinkedList<>();
 
     public GoldenSpiralScreen() {
         super(Component.literal("Golden Spiral Screen"));
@@ -119,6 +120,7 @@ public class GoldenSpiralScreen extends Screen {
 
         final int gridColor = Color.getHSBColor(0, 0, 0.3f).getRGB();
         final int spiralColor = 0xFFD48F38;
+        final int playerColor = 0xFF38D48F;
 
         if (squares.isEmpty()) {
             calculatePoints(x, y, scale);
@@ -127,14 +129,14 @@ public class GoldenSpiralScreen extends Screen {
         for (final Square square : squares) {
             drawBorderedSquare(guiGraphics, square.x, square.y, square.length, gridColor);
         }
-//        RenderSystem.enableBlend();
-//        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
 //        RenderSystem.setShader(GameRenderer::getPositionColorShader);
         final Matrix4f matrix4f = guiGraphics.pose().last().pose();
 //        final Tesselator tesselator = Tesselator.getInstance();
 //        final BufferBuilder bufferBuilder = tesselator.getBuilder();
 //        bufferBuilder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
-        final VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
+        VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
         for (final Vec2 point : spiralPoints) {
             consumer.vertex(matrix4f, point.x, point.y, 0).color(spiralColor).endVertex();
 //            bufferBuilder.vertex(matrix4f, point.x, point.y, 0).color(spiralColor).endVertex();
@@ -142,13 +144,27 @@ public class GoldenSpiralScreen extends Screen {
 //        BufferUploader.drawWithShader(bufferBuilder.end());
 //        RenderSystem.disableBlend();
         guiGraphics.flush();
+        consumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
+        for (final Vec2 point : playerPoints) {
+            consumer.vertex(matrix4f, point.x, point.y, 0).color(playerColor).endVertex();
+        }
+        guiGraphics.flush();
     }
 
-    private void drawBorderedSquare(final @NonNull GuiGraphics graphics, final int x, final int y, final int length, final int color) {
+    protected void drawBorderedSquare(final @NonNull GuiGraphics graphics, final int x, final int y, final int length, final int color) {
         graphics.hLine(x, x + length, y, color);
         graphics.hLine(x, x + length, y + length, color);
         graphics.vLine(x, y, y + length, color);
         graphics.vLine(x + length, y, y + length, color);
+    }
+
+    @Override
+    public boolean mouseDragged(final double mouseX, final double mouseY, final int button, final double dragX, final double dragY) {
+        if (button == 0) {
+            playerPoints.add(new Vec2((float)(mouseX + dragX), (float)(mouseY + dragY)));
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     protected record Square(int x, int y, int length) {
