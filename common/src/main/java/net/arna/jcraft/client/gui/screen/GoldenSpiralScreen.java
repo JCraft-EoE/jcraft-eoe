@@ -9,7 +9,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
-import org.joml.Matrix3f;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -84,14 +83,16 @@ public class GoldenSpiralScreen extends Screen {
                     arcStartAngle = 180;
                 }
             }
-            for (int s = 0; s <= ARC_SEGMENTS; s++) {
-                double currentAngle = arcStartAngle + (s * (90d / ARC_SEGMENTS));
+            for (int s = 0; s < ARC_SEGMENTS; s++) {
+                final double currentAngle = arcStartAngle + (s * (90d / ARC_SEGMENTS));
                 spiralPoints.add(new Vec2(
                         (float)(arcX + size * Math.cos(Math.toRadians(currentAngle))),
                         (float)(arcY - size * Math.sin(Math.toRadians(currentAngle)))
                 ));
             }
         }
+        spiralPoints.add(new Vec2(x + f1 * scale, y));
+        spiralPoints.add(new Vec2(x + f1 * scale, y-1));
     }
 
     @Override
@@ -124,20 +125,29 @@ public class GoldenSpiralScreen extends Screen {
 
         final PoseStack.Pose pose = guiGraphics.pose().last();
         VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
-        for (final Vec2 point : spiralPoints) {
-            final float length = point.length();
-            consumer.vertex(pose.pose(), point.x, point.y, 0f)
+        Vec2 currentPoint = spiralPoints.get(0);
+        Vec2 nextPoint;
+        for (int i = 1; i < spiralPoints.size(); i++) {
+            nextPoint = spiralPoints.get(i);
+            final Vec2 diff = nextPoint.add(currentPoint.negated());
+            consumer.vertex(pose.pose(), currentPoint.x, currentPoint.y, 0f)
                     .color(spiralColor)
-                    .normal(new Matrix3f(), point.y / length, -point.x / length, 0f)
+                    .normal(pose.normal(), diff.x, diff.y, 0f)
                     .endVertex();
+            currentPoint = nextPoint;
         }
-        consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
-        for (final Vec2 point : playerPoints) {
-            final float length = point.length();
-            consumer.vertex(pose.pose(), point.x, point.y, 0f)
-                    .color(playerColor)
-                    .normal(new Matrix3f(), point.y / length, -point.x / length, 0f)
-                    .endVertex();
+        if (!playerPoints.isEmpty()) {
+            consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
+            currentPoint = playerPoints.get(0);
+            for (int i = 1; i < playerPoints.size(); i++) {
+                nextPoint = playerPoints.get(i);
+                final Vec2 diff = nextPoint.add(currentPoint.negated());
+                consumer.vertex(pose.pose(), currentPoint.x, currentPoint.y, 0f)
+                        .color(playerColor)
+                        .normal(pose.normal(), diff.x, diff.y, 0f)
+                        .endVertex();
+                currentPoint = nextPoint;
+            }
         }
     }
 
