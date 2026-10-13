@@ -1,21 +1,15 @@
 package net.arna.jcraft.client.gui.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import lombok.NonNull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
-import org.joml.Matrix4f;
+import org.joml.Matrix3f;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -29,7 +23,7 @@ public class GoldenSpiralScreen extends Screen {
 
     protected final List<Square> squares = new LinkedList<>();
     protected final List<Vec2> spiralPoints = new ArrayList<>();
-    protected final List<Vec2> playerPoints = new LinkedList<>();
+    protected final List<Vec2> playerPoints = new ArrayList<>();
 
     public GoldenSpiralScreen() {
         super(Component.literal("Golden Spiral Screen"));
@@ -79,9 +73,7 @@ public class GoldenSpiralScreen extends Screen {
             int arcStartAngle = 0;
             switch (i % 4) {
                 case 0 -> arcStartAngle = 270;
-                case 1 -> {
-                    arcY += size;
-                }
+                case 1 -> arcY += size;
                 case 2 -> {
                     arcX += size;
                     arcY += size;
@@ -129,26 +121,24 @@ public class GoldenSpiralScreen extends Screen {
         for (final Square square : squares) {
             drawBorderedSquare(guiGraphics, square.x, square.y, square.length, gridColor);
         }
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-//        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        final Matrix4f matrix4f = guiGraphics.pose().last().pose();
-//        final Tesselator tesselator = Tesselator.getInstance();
-//        final BufferBuilder bufferBuilder = tesselator.getBuilder();
-//        bufferBuilder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
-        VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
+
+        final PoseStack.Pose pose = guiGraphics.pose().last();
+        VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
         for (final Vec2 point : spiralPoints) {
-            consumer.vertex(matrix4f, point.x, point.y, 0).color(spiralColor).endVertex();
-//            bufferBuilder.vertex(matrix4f, point.x, point.y, 0).color(spiralColor).endVertex();
+            final float length = point.length();
+            consumer.vertex(pose.pose(), point.x, point.y, 0f)
+                    .color(spiralColor)
+                    .normal(new Matrix3f(), point.y / length, -point.x / length, 0f)
+                    .endVertex();
         }
-//        BufferUploader.drawWithShader(bufferBuilder.end());
-//        RenderSystem.disableBlend();
-        guiGraphics.flush();
-        consumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
+        consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
         for (final Vec2 point : playerPoints) {
-            consumer.vertex(matrix4f, point.x, point.y, 0).color(playerColor).endVertex();
+            final float length = point.length();
+            consumer.vertex(pose.pose(), point.x, point.y, 0f)
+                    .color(playerColor)
+                    .normal(new Matrix3f(), point.y / length, -point.x / length, 0f)
+                    .endVertex();
         }
-        guiGraphics.flush();
     }
 
     protected void drawBorderedSquare(final @NonNull GuiGraphics graphics, final int x, final int y, final int length, final int color) {
