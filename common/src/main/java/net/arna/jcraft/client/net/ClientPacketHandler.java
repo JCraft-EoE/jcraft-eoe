@@ -101,7 +101,7 @@ public class ClientPacketHandler {
     }
 
     private static void handleSpiralScreen(final Minecraft minecraft, final FriendlyByteBuf friendlyByteBuf) {
-        minecraft.setScreen(new GoldenSpiralScreen());
+        minecraft.execute(() -> minecraft.setScreen(new GoldenSpiralScreen()));
     }
 
     private static void handleBoundSound(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
