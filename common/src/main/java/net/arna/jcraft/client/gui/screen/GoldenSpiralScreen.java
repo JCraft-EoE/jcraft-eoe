@@ -122,9 +122,19 @@ public class GoldenSpiralScreen extends Screen {
         }
 
         final PoseStack.Pose pose = guiGraphics.pose().last();
-        VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
         Vec2 currentPoint = spiralPoints.get(0);
-        Vec2 nextPoint;
+        Vec2 nextPoint = spiralPoints.get(spiralPoints.size() - 2);
+        // draw start or goal square
+        if (!tracing) {
+            guiGraphics.fill((int)currentPoint.x - 2, (int)currentPoint.y - 2,
+                    (int)currentPoint.x + 2, (int)currentPoint.y + 2, 0xFFFF0000);
+        }
+        else {
+            guiGraphics.fill((int)nextPoint.x - 2, (int)nextPoint.y - 2,
+                    (int)nextPoint.x + 2, (int)nextPoint.y + 2, 0xFFFF0000);
+        }
+        VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
+        // draw the spiral
         for (int i = 1; i < spiralPoints.size(); i++) {
             nextPoint = spiralPoints.get(i);
             final Vec2 diff = nextPoint.add(currentPoint.negated());
