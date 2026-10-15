@@ -30,7 +30,8 @@ void main() {
         blendFactor = 1.0 - smoothstep(0.95, 1.05, adjustedTime);
     }
 
-    vec3 finalTint = mix(dayTint, nightTint, blendFactor);
+    vec3 biomeTint = mix(dayTint, nightTint, blendFactor);
+    vec3 finalTint = mix(vec3(1.0), biomeTint, BiomeWeight);
     color.rgb *= finalTint;
 
     fragColor = color;
