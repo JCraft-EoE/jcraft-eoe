@@ -4,8 +4,8 @@
     "srcrgb": "one",
     "dstrgb": "zero"
   },
-  "vertex": "minecraft:rendertype_solid",
-  "fragment": "minecraft:rendertype_solid",
+  "vertex": "jcraft:position_getter",
+  "fragment": "jcraft:devils_palm",
   "attributes": [
     "Position",
     "Color",
