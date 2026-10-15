@@ -13,7 +13,7 @@ void main() {
     vec3 dayTint   = vec3(1.0, 0.9, 0.3); // warm yellow
     vec3 nightTint = vec3(0.2, 0.2, 1.0); // cold blue
 
-    float blendFactor = 0.0; // Default to Day (0.0)
+    float blendFactor = 0.0; // default to day
 
     // sunset
     if (GameTime >= 0.45 && GameTime <= 0.55) {
@@ -25,7 +25,7 @@ void main() {
     }
     // sunrise
     else if (GameTime >= 0.95 || GameTime <= 0.05) {
-        // Adjust for the 1.0 to 0.0 loop boundary point
+        // adjust for the 1.0 to 0.0 loop boundary point
         float adjustedTime = (GameTime >= 0.95) ? GameTime : (GameTime + 1.0);
         blendFactor = 1.0 - smoothstep(0.95, 1.05, adjustedTime);
     }
