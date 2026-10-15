@@ -25,7 +25,9 @@ public class DevilsPalmShaderHandler implements PostShaderRenderCallback {
     public void renderEffect(final float tickDelta) {
         final ClientLevel level = Minecraft.getInstance().level;
         final LocalPlayer player = Minecraft.getInstance().player;
-        if (level != null && player != null && level.getBiome(player.getOnPos()).is(JBiomeRegistry.DEVILS_PALM)) {
+        if (level != null && player != null && level.getBiome(player.blockPosition()).is(JBiomeRegistry.DEVILS_PALM)) {
+            float timeFraction = (level.getDayTime() % 24000L) / 24000.0f;
+            EFFECT.getUniform("GameTime").set(timeFraction);
             EFFECT.render(tickDelta);
         }
     }
