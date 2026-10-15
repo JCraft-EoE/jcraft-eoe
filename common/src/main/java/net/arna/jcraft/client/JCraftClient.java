@@ -153,6 +153,7 @@ public class JCraftClient {
         EpitaphVignetteShaderHandler.INSTANCE.init();
         MandomRewindShaderHandler.INSTANCE.init();
         RangerFocusShaderHandler.INSTANCE.init();
+        DevilsPalmShaderHandler.INSTANCE.init();
 
         // Renderer registration
 
