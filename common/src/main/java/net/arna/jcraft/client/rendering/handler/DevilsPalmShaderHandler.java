@@ -1,8 +1,12 @@
 package net.arna.jcraft.client.rendering.handler;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.registry.JBiomeRegistry;
 import net.arna.jcraft.client.rendering.api.PostEffect;
 import net.arna.jcraft.client.rendering.api.callbacks.PostShaderRenderCallback;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 
 public class DevilsPalmShaderHandler implements PostShaderRenderCallback {
 
@@ -19,7 +23,11 @@ public class DevilsPalmShaderHandler implements PostShaderRenderCallback {
 
     @Override
     public void renderEffect(final float tickDelta) {
-        EFFECT.render(tickDelta);
+        final ClientLevel level = Minecraft.getInstance().level;
+        final LocalPlayer player = Minecraft.getInstance().player;
+        if (level != null && player != null && level.getBiome(player.getOnPos()).is(JBiomeRegistry.DEVILS_PALM)) {
+            EFFECT.render(tickDelta);
+        }
     }
 
 }
