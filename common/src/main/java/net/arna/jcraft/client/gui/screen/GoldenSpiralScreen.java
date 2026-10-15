@@ -19,10 +19,12 @@ public class GoldenSpiralScreen extends Screen {
 
     public static final int ITERATIONS = 9;
     public static final int ARC_SEGMENTS = 32;
+    public static final int TOLERANCE_SQR = 200;
 
     protected final List<Square> squares = new LinkedList<>();
     protected final List<Vec2> spiralPoints = new ArrayList<>();
     protected final List<Vec2> playerPoints = new ArrayList<>();
+    protected final List<Float> playerSquaredDeviations = new ArrayList<>();
     protected boolean tracing = false;
 
     public GoldenSpiralScreen() {
@@ -48,7 +50,6 @@ public class GoldenSpiralScreen extends Screen {
 
             final float size = f1 * scale;
 
-            // (x,y) is the upper left corner of the square
             switch (i % 4) {
                 case 0 -> {
                     x += f0 * scale;
@@ -61,6 +62,7 @@ public class GoldenSpiralScreen extends Screen {
                 case 2 -> x -= size;
                 case 3 -> y += f0 * scale;
             }
+            // (x,y) is now the upper left corner of the square
             squares.add(new Square((int)x, (int)y, (int)size));
 
             double arcX = x;
@@ -91,12 +93,44 @@ public class GoldenSpiralScreen extends Screen {
         spiralPoints.add(new Vec2(x + f1 * scale, y-1));
     }
 
+    public void calculatePoints() {
+        calculatePoints(width / 3f, height / 2.8f, 3f);
+    }
+
+    public void cancelTracing() {
+        tracing = false;
+        playerPoints.clear();
+        playerSquaredDeviations.clear();
+    }
+
+    public float findShortestDeviationSqr(final @NonNull Vec2 point) {
+        if (spiralPoints.isEmpty()) {
+            calculatePoints();
+        }
+        float shortest = Float.MAX_VALUE;
+        for (final Vec2 spiralPoint : spiralPoints) {
+            float current = point.distanceToSqr(spiralPoint);
+            if (current < shortest) {
+                shortest = current;
+            }
+        }
+        return shortest;
+    }
+
+    public float calculateStandardDeviation() {
+        float expectedValue = (float)playerSquaredDeviations.stream()
+                .mapToDouble(f -> Math.sqrt((double)f))
+                .average().getAsDouble();
+        return (float)Math.sqrt(playerSquaredDeviations.stream()
+                .mapToDouble(f -> Math.pow(expectedValue - Math.sqrt(f), 2))
+                .sum());
+    }
+
     @Override
     public void resize(final @NonNull Minecraft minecraft, final int width, final int height) {
         super.resize(minecraft, width, height);
-        calculatePoints(width / 3f, height / 2.8f, 3f);
-        tracing = false;
-        playerPoints.clear();
+        calculatePoints();
+        cancelTracing();
     }
 
     // draw spiral in this method
@@ -130,8 +164,8 @@ public class GoldenSpiralScreen extends Screen {
                     (int)currentPoint.x + 2, (int)currentPoint.y + 2, 0xFFFF0000);
         }
         else {
-            guiGraphics.fill((int)nextPoint.x - 2, (int)nextPoint.y - 2,
-                    (int)nextPoint.x + 2, (int)nextPoint.y + 2, 0xFFFF0000);
+            guiGraphics.fill((int)nextPoint.x - 4, (int)nextPoint.y - 4,
+                    (int)nextPoint.x + 4, (int)nextPoint.y + 4, 0xFFFF0000);
         }
         VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
         // draw the spiral
@@ -144,7 +178,7 @@ public class GoldenSpiralScreen extends Screen {
                     .endVertex();
             currentPoint = nextPoint;
         }
-        if (!playerPoints.isEmpty() && !tracing) {
+        if (!playerPoints.isEmpty()) {
             consumer = guiGraphics.bufferSource().getBuffer(RenderType.lineStrip());
             currentPoint = playerPoints.get(0);
             for (int i = 1; i < playerPoints.size(); i++) {
@@ -169,9 +203,13 @@ public class GoldenSpiralScreen extends Screen {
     @Override
     public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
         if (button == 0) {
-            playerPoints.clear();
-            tracing = true;
-            return true;
+            final Vec2 startPoint = spiralPoints.get(0);
+            if (mouseX >= startPoint.x - 4 && mouseX <= startPoint.x + 4 &&
+                    mouseY >= startPoint.y - 4 && mouseY <= startPoint.y + 4) {
+                cancelTracing();
+                tracing = true;
+                return true;
+            }
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -179,7 +217,13 @@ public class GoldenSpiralScreen extends Screen {
     @Override
     public boolean mouseDragged(final double mouseX, final double mouseY, final int button, final double dragX, final double dragY) {
         if (button == 0 && tracing) {
-            playerPoints.add(new Vec2((float)(mouseX + dragX), (float)(mouseY + dragY)));
+            final Vec2 playerPoint = new Vec2((float)(mouseX + dragX), (float)(mouseY + dragY));
+            playerPoints.add(playerPoint);
+            float shortestDeviationSqr = findShortestDeviationSqr(playerPoint);
+            if (shortestDeviationSqr > TOLERANCE_SQR) {
+                cancelTracing();
+            }
+            playerSquaredDeviations.add(shortestDeviationSqr);
             return true;
         }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
@@ -188,7 +232,18 @@ public class GoldenSpiralScreen extends Screen {
     @Override
     public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
         if (button == 0) {
+            if (tracing) {
+                final Vec2 endPoint = spiralPoints.get(spiralPoints.size() - 2); // -2 because the last point is just there for rendering purposes
+                if (mouseX >= endPoint.x - 2 && mouseX <= endPoint.x + 2 &&
+                        mouseY >= endPoint.y - 2 && mouseY <= endPoint.y + 2) {
+                    Minecraft.getInstance().player.sendSystemMessage(Component.literal("You got " + calculateStandardDeviation() + " standard deviation!"));
+                }
+                else {
+                    Minecraft.getInstance().player.sendSystemMessage(Component.literal("You suck!"));
+                }
+            }
             tracing = false;
+            return true;
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
