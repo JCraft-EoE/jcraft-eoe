@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -346,7 +345,7 @@ public abstract class EntityMixin {
         return RotationUtil.vecWorldToPlayer(original, gravityDirection);
     }
 
-    @ModifyReturnValue(method = "collideBoundingBox", at = @At("RETURN"))
+    /*@ModifyReturnValue(method = "collideBoundingBox", at = @At("RETURN"))
     private static Vec3 jcraft$adjustMovementForCollisions_adjustMovementForCollisions_0(
             final Vec3 original, final @Nullable Entity entity, final Vec3 vec, final AABB collisionBox, final Level level, final List<VoxelShape> potentialHits) {
         final Direction gravityDirection;
@@ -387,7 +386,7 @@ public abstract class EntityMixin {
         }
 
         return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);
-    }
+    }*/
 
     /*
     @Inject(
