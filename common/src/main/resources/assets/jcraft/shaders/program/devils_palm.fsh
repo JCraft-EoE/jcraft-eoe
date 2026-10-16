@@ -2,6 +2,7 @@
 
 uniform sampler2D DiffuseSampler;
 uniform float GameTime;
+uniform float BiomeWeight;
 
 in vec2 texCoord;
 
