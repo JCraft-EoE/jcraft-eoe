@@ -208,7 +208,7 @@ public abstract class EntityMixin {
         if (gravityDirection == Direction.DOWN) {
             return original.call();
         }
-        return BlockPos.containing(RotationUtil.vecPlayerToWorld(0.0D, -0.2F, 0.0D, gravityDirection).add(this.position()));
+        return BlockPos.containing(RotationUtil.vecPlayerToWorld(0d, -0.2f, 0d, gravityDirection).add(this.position()));
     }
 
     @WrapMethod(method = "getOnPos()Lnet/minecraft/core/BlockPos;")
@@ -217,7 +217,7 @@ public abstract class EntityMixin {
         if (gravityDirection == Direction.DOWN) {
             return original.call();
         }
-        return BlockPos.containing(RotationUtil.vecPlayerToWorld(0.0D, -1.0E-5F, 0.0D, gravityDirection).add(this.position()));
+        return BlockPos.containing(RotationUtil.vecPlayerToWorld(0d, -1.0e-5f, 0d, gravityDirection).add(this.position()));
     }
 
     //todo: copy getOnPos(F) inject from actual gravityapi
@@ -335,7 +335,7 @@ public abstract class EntityMixin {
     }
 
     @ModifyReturnValue(method = "collideBoundingBox", at = @At("RETURN"))
-    private static Vec3 inject_adjustMovementForCollisions(final Vec3 original, final @Nullable Entity entity, final Vec3 vec, final AABB collisionBox, final Level level, final List<VoxelShape> potentialHits) {
+    private static Vec3 jcraft$adjustMovementForCollisions(final Vec3 original, final @Nullable Entity entity, final Vec3 vec, final AABB collisionBox, final Level level, final List<VoxelShape> potentialHits) {
         if (entity == null) {
             return original;
         }
