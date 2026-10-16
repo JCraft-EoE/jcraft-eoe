@@ -193,6 +193,8 @@ public final class CountdownMove<A extends StandEntity<? extends A, ?>> extends 
         countdownActive = true;
         countdownTicks = 0;
         resolving = false;
+        removeRecordingTimes(user, false); // make sure that we refresh
+        addRecordingTimes(user);
 
         // Put both UTILITY and ULTIMATE on cooldown for 6 seconds
         CommonCooldownsComponent cooldowns = JComponentPlatformUtils.getCooldowns(user);
@@ -242,6 +244,16 @@ public final class CountdownMove<A extends StandEntity<? extends A, ?>> extends 
     @Override
     public boolean isRecording() {
         return countdownActive;
+    }
+
+    @Override
+    public int getMaxRecordingTime() {
+        return maxCountdownTicks;
+    }
+
+    @Override
+    public int getRemainingRecordingTime() {
+        return maxCountdownTicks - countdownTicks;
     }
 
     @Override

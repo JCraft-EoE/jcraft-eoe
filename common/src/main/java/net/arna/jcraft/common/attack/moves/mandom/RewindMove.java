@@ -51,6 +51,8 @@ public final class RewindMove<A extends StandEntity<? extends A, ?>> extends Abs
             ShaderActivationPacket.sendMandomRewind(serverPlayer, 23, attacker.getAuraColor());
         }
 
+        countdownMove.removeRecordingTimes(user, true);
+
         final List<BlockMarker> blockMarkers = countdownMove.getTimeBlockMarkers();
         countdownMove.setResolving(true);
         for (final BlockMarker marker : blockMarkers) {
