@@ -1,0 +1,18 @@
+{
+  "anim_state": "SPIN_GOLDEN_RATIO",
+  "class": "SPECIAL3",
+  "cooldown_type": "STAND_SP3",
+  "move": {
+    "type": "jcraft:spin_golden_ratio_move",
+    "cooldown": 50,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.spin.default.null.description"
+      },
+      "name": {
+        "translate": "move.jcraft.spin.default.null.name"
+      }
+    },
+    "windup": 20
+  }
+}

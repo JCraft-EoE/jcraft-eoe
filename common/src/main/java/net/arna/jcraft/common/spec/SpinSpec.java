@@ -9,6 +9,7 @@ import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecData;
+import net.arna.jcraft.common.attack.moves.shared.GoldenRatioMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.SpinChargeMove;
 import net.arna.jcraft.common.attack.moves.shared.SpinMove;
@@ -42,10 +43,13 @@ public class SpinSpec extends JSpec<SpinSpec, SpinSpec.State> {
             .withFollowup(KICK)
             .withInfo(Component.literal("Knee"), Component.literal("Fast, short-ranged jab."));
 
+    // TODO Arna: withInfo x 3
     public static final SpinMove<SpinSpec> SPIN_SHOOT = new SpinMove<SpinSpec>(0, 1, 1, 0.75f,0.13f)
             .withAnim(State.SPIN_SHOOT);
     public static final SpinChargeMove<SpinSpec> SPIN_CHARGE = new SpinChargeMove<SpinSpec>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(SPIN_SHOOT);
+    public static final GoldenRatioMove<SpinSpec> GOLDEN_RATIO = new GoldenRatioMove<SpinSpec>(50, 20)
+            .withAnim(State.SPIN_GOLDEN_RATIO);
 
     public SpinSpec(LivingEntity livingEntity) {
         super(JSpecTypeRegistry.SPIN.get(), livingEntity);
@@ -54,6 +58,7 @@ public class SpinSpec extends JSpec<SpinSpec, SpinSpec.State> {
     private static void registerMoves(MoveMap<SpinSpec, SpinSpec.State> moves) {
         moves.registerImmediate(MoveClass.HEAVY, KNEE, State.KNEE);
         moves.register(MoveClass.SPECIAL1, SPIN_CHARGE, State.SPIN_CHARGE).withFollowup(State.SPIN_SHOOT);
+        moves.register(MoveClass.SPECIAL3, GOLDEN_RATIO, State.SPIN_GOLDEN_RATIO);
     }
 
     @Override
@@ -65,8 +70,8 @@ public class SpinSpec extends JSpec<SpinSpec, SpinSpec.State> {
         KNEE("sp.kn"),
         KICK("sp.kk"),
         SPIN_CHARGE("sp.sc"),
-        SPIN_SHOOT("sp.ss")
-
+        SPIN_SHOOT("sp.ss"),
+        SPIN_GOLDEN_RATIO("sp.kk"/* TODO change to sp.gr once we have an animation */)
         ;
 
         private final String key;
