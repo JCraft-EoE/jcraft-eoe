@@ -8,6 +8,8 @@ import net.arna.jcraft.api.registry.JTagRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -45,17 +47,17 @@ public abstract class CommonSpinComponentImpl implements CommonSpinComponent {
 
     @Override
     public void goldenRatioC(final int amount) {
-
+        entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100)); // TODO replace placeholder
     }
 
     @Override
     public void goldenRatioB(final int amount) {
-
+        entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100)); // TODO replace placeholder
     }
 
     @Override
     public void goldenRatioA(final int amount) {
-
+        entity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100)); // TODO replace placeholder
     }
 
     public void tick() {
