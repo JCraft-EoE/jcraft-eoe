@@ -272,6 +272,7 @@ public final class JCraft {
         NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_MENU_CALL, MenuCallPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_VARIANT, VariantInputPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_GUN_AIM, GunAimPacket::handle);
+        NetworkManager.registerReceiver(NetworkManager.c2s(), JPacketRegistry.C2S_GOLDEN_RATIO, GoldenRatioPacket::handle);
     }
 
     private static void registerAzArmor() {

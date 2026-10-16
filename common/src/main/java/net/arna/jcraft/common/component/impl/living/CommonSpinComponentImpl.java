@@ -43,6 +43,21 @@ public abstract class CommonSpinComponentImpl implements CommonSpinComponent {
         sync(entity);
     }
 
+    @Override
+    public void goldenRatioC(final int amount) {
+
+    }
+
+    @Override
+    public void goldenRatioB(final int amount) {
+
+    }
+
+    @Override
+    public void goldenRatioA(final int amount) {
+
+    }
+
     public void tick() {
         // check the current selected slot for changes
         if (entity instanceof final Player player) {

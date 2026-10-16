@@ -2,7 +2,11 @@ package net.arna.jcraft.client.gui.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import dev.architectury.networking.NetworkManager;
 import lombok.NonNull;
+import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.registry.JPacketRegistry;
+import net.arna.jcraft.common.network.c2s.GoldenRatioPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -236,10 +240,13 @@ public class GoldenSpiralScreen extends Screen {
                 final Vec2 endPoint = spiralPoints.get(spiralPoints.size() - 2); // -2 because the last point is just there for rendering purposes
                 if (mouseX >= endPoint.x - 2 && mouseX <= endPoint.x + 2 &&
                         mouseY >= endPoint.y - 2 && mouseY <= endPoint.y + 2) {
-                    Minecraft.getInstance().player.sendSystemMessage(Component.literal("You got " + calculateStandardDeviation() + " standard deviation!"));
+                    final float score = calculateStandardDeviation();
+                    NetworkManager.sendToServer(JPacketRegistry.C2S_GOLDEN_RATIO, GoldenRatioPacket.write(score));
+                    JCraft.LOGGER.info("You got {} standard deviation!", score);
+                    Minecraft.getInstance().setScreen(null);
                 }
                 else {
-                    Minecraft.getInstance().player.sendSystemMessage(Component.literal("You suck!"));
+                    JCraft.LOGGER.info("You failed the Golden Spiral tracing!");
                 }
             }
             tracing = false;

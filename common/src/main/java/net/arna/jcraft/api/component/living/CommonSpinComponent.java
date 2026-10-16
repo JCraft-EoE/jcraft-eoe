@@ -12,4 +12,10 @@ public interface CommonSpinComponent extends JComponent {
 
     void endSpinning();
 
+    void goldenRatioC(int amount);
+
+    void goldenRatioB(int amount);
+
+    void goldenRatioA(int amount);
+
 }
