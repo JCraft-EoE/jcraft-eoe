@@ -70,7 +70,7 @@ public abstract class ItemPickupParticleMixin {
         if (gravityDirection == Direction.DOWN) {
             return value;
         }
-        return value + RotationUtil.vecPlayerToWorld(0.0D, 0.5D, 0.0D, gravityDirection).z;
+        return value + RotationUtil.vecPlayerToWorld(0d, 0.5, 0d, gravityDirection).z;
     }
 
 }

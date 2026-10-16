@@ -69,12 +69,12 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
             Direction direction = null;
             double minDistToEdge = Double.MAX_VALUE;
 
-            Direction[] directions = new Direction[]{Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH};
+            final Direction[] directions = new Direction[]{Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH};
             for (Direction playerDirection : directions) {
                 Direction worldDirection = RotationUtil.dirPlayerToWorld(playerDirection, gravityDirection);
 
-                double g = worldDirection.getAxis().choose(dx, dy, dz);
-                double distToEdge = worldDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1.0D - g : g;
+                final double g = worldDirection.getAxis().choose(dx, dy, dz);
+                final double distToEdge = worldDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1d - g : g;
                 if (distToEdge < minDistToEdge && !this.suffocatesAt(blockPos.relative(worldDirection))) {
                     minDistToEdge = distToEdge;
                     direction = playerDirection;
@@ -84,9 +84,9 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
             if (direction != null) {
                 Vec3 velocity = this.getDeltaMovement();
                 if (direction.getAxis() == Direction.Axis.X) {
-                    this.setDeltaMovement(0.1D * (double) direction.getStepX(), velocity.y, velocity.z);
+                    this.setDeltaMovement(0.1 * (double)direction.getStepX(), velocity.y, velocity.z);
                 } else if (direction.getAxis() == Direction.Axis.Z) {
-                    this.setDeltaMovement(velocity.x, velocity.y, 0.1D * (double) direction.getStepZ());
+                    this.setDeltaMovement(velocity.x, velocity.y, 0.1 * (double)direction.getStepZ());
                 }
             }
         }

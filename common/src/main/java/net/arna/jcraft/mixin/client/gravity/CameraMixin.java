@@ -61,7 +61,7 @@ public abstract class CameraMixin {
             original.call(camera, x, y, z);
             return;
         }
-        long timeMs = entity.level().getGameTime()*50+(long)(jcraft$storedTickDelta *50);
+        long timeMs = entity.level().getGameTime() * 50 + (long)(jcraft$storedTickDelta * 50);
         final Quaternionf gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
 
         double entityX = Mth.lerp(partialTick, entity.xOld, entity.getX());
@@ -90,14 +90,14 @@ public abstract class CameraMixin {
                     remap = false
             )
     )
-    private void inject_setRotation(CallbackInfo ci) {
-        if (this.entity !=null) {
+    private void inject_setRotation(final CallbackInfo ci) {
+        if (this.entity != null) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.entity);
             Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
             if(animationOptional.isEmpty()) return;
             RotationAnimation animation = animationOptional.get();
             if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) return;
-            long timeMs = entity.level().getGameTime()*50+(long)(jcraft$storedTickDelta *50);
+            long timeMs = entity.level().getGameTime() * 50 + (long)(jcraft$storedTickDelta * 50);
             Quaternionf rotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
             Quaternionf product = CompatMath.hamiltonProduct(rotation,this.rotation);
             this.rotation.set(product.x(), product.y(), product.z(), product.w());

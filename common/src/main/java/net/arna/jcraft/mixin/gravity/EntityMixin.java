@@ -122,7 +122,7 @@ public abstract class EntityMixin {
         final Entity entity = (Entity)(Object)this;
         final Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection != Direction.DOWN) {
-            Vec3 vec3d = RotationUtil.vecPlayerToWorld(0.0D, entity.getEyeHeight(), 0.0D, gravityDirection);
+            Vec3 vec3d = RotationUtil.vecPlayerToWorld(0d, entity.getEyeHeight(), 0d, gravityDirection);
             double d = Mth.lerp(partialTicks, entity.xo, entity.getX()) + vec3d.x;
             double e = Mth.lerp(partialTicks, entity.yo, entity.getY()) + vec3d.y;
             double f = Mth.lerp(partialTicks, entity.zo, entity.getZ()) + vec3d.z;

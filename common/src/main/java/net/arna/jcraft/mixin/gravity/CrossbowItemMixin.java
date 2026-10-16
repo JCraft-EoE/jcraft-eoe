@@ -25,7 +25,7 @@ public abstract class CrossbowItemMixin {
         if (gravityDirection == Direction.DOWN) {
             return original.call(instance);
         }
-        return instance.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0d, 0.15000000596046448d, 0d, gravityDirection)).x;
+        return instance.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0d, 0.15000000596046448, 0d, gravityDirection)).x;
     }
 
     @WrapOperation(
@@ -40,7 +40,7 @@ public abstract class CrossbowItemMixin {
         if (gravityDirection == Direction.DOWN) {
             return original.call(instance);
         }
-        return instance.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0d, 0.15000000596046448d, 0d, gravityDirection)).y + 0.15000000596046448d;
+        return instance.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0d, 0.15000000596046448, 0d, gravityDirection)).y + 0.15000000596046448;
     }
 
     @WrapOperation(
@@ -55,7 +55,7 @@ public abstract class CrossbowItemMixin {
         if (gravityDirection == Direction.DOWN) {
             return original.call(instance);
         }
-        return instance.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0d, 0.15000000596046448d, 0d, gravityDirection)).z;
+        return instance.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0d, 0.15000000596046448, 0d, gravityDirection)).z;
     }
 
 }

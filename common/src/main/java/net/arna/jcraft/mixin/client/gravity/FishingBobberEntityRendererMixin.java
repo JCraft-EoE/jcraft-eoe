@@ -75,10 +75,10 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         Matrix4f matrix4f = entry.pose();
         Matrix3f matrix3f = entry.normal();
         VertexConsumer vertexConsumer = buffer.getBuffer(RENDER_TYPE);
-        vertex(vertexConsumer, matrix4f, matrix3f, packedLight, 0.0F, 0, 0, 1);
-        vertex(vertexConsumer, matrix4f, matrix3f, packedLight, 1.0F, 0, 1, 1);
-        vertex(vertexConsumer, matrix4f, matrix3f, packedLight, 1.0F, 1, 1, 0);
-        vertex(vertexConsumer, matrix4f, matrix3f, packedLight, 0.0F, 1, 0, 0);
+        vertex(vertexConsumer, matrix4f, matrix3f, packedLight, 0f, 0, 0, 1);
+        vertex(vertexConsumer, matrix4f, matrix3f, packedLight, 1f, 0, 1, 1);
+        vertex(vertexConsumer, matrix4f, matrix3f, packedLight, 1f, 1, 1, 0);
+        vertex(vertexConsumer, matrix4f, matrix3f, packedLight, 0f, 1, 0, 0);
         poseStack.popPose();
         int armOffset = playerEntity.getMainArm() == HumanoidArm.RIGHT ? 1 : -1;
         ItemStack itemStack = playerEntity.getMainHandItem();
@@ -87,37 +87,37 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         }
 
         float handSwingProgress = playerEntity.getAttackAnim(partialTicks);
-        float sinHandSwingProgress = Mth.sin(Mth.sqrt(handSwingProgress) * 3.1415927F);
-        float radBodyYaw = Mth.lerp(partialTicks, playerEntity.yBodyRotO, playerEntity.yBodyRot) * 0.017453292F;
+        float sinHandSwingProgress = Mth.sin(Mth.sqrt(handSwingProgress) * 3.1415927f);
+        float radBodyYaw = Mth.lerp(partialTicks, playerEntity.yBodyRotO, playerEntity.yBodyRot) * 0.017453292f;
         double sinBodyYaw = Mth.sin(radBodyYaw);
         double cosBodyYaw = Mth.cos(radBodyYaw);
-        double scaledArmOffset = (double) armOffset * 0.35D;
+        double scaledArmOffset = (double)armOffset * 0.35;
         Vec3 lineStart;
         if ((this.entityRenderDispatcher.options == null || this.entityRenderDispatcher.options.getCameraType().isFirstPerson()) && playerEntity == Minecraft.getInstance().player) {
-            Vec3 lineOffset = RotationUtil.vecWorldToPlayer(this.entityRenderDispatcher.camera.getNearPlane().getPointOnPlane((float) armOffset * 0.525F, -0.1F), gravityDirection);
-            lineOffset = lineOffset.scale(960.0D / this.entityRenderDispatcher.options.fov().get());
-            lineOffset = lineOffset.yRot(sinHandSwingProgress * 0.5F);
-            lineOffset = lineOffset.xRot(-sinHandSwingProgress * 0.7F);
+            Vec3 lineOffset = RotationUtil.vecWorldToPlayer(this.entityRenderDispatcher.camera.getNearPlane().getPointOnPlane((float) armOffset * 0.525f, -0.1f), gravityDirection);
+            lineOffset = lineOffset.scale(960d / this.entityRenderDispatcher.options.fov().get());
+            lineOffset = lineOffset.yRot(sinHandSwingProgress * 0.5f);
+            lineOffset = lineOffset.xRot(-sinHandSwingProgress * 0.7f);
             lineStart = new Vec3(
                     Mth.lerp(partialTicks, playerEntity.xo, playerEntity.getX()),
                     Mth.lerp(partialTicks, playerEntity.yo, playerEntity.getY()),
                     Mth.lerp(partialTicks, playerEntity.zo, playerEntity.getZ())
-            ).add(RotationUtil.vecPlayerToWorld(lineOffset.add(0.0D, playerEntity.getEyeHeight(), 0.0D), gravityDirection));
+            ).add(RotationUtil.vecPlayerToWorld(lineOffset.add(0d, playerEntity.getEyeHeight(), 0d), gravityDirection));
         } else {
             lineStart = new Vec3(
                     Mth.lerp(partialTicks, playerEntity.xo, playerEntity.getX()),
                     playerEntity.yo + (playerEntity.getY() - playerEntity.yo) * partialTicks,
                     Mth.lerp(partialTicks, playerEntity.zo, playerEntity.getZ())
             ).add(RotationUtil.vecPlayerToWorld(
-                    -cosBodyYaw * scaledArmOffset - sinBodyYaw * 0.8D,
-                    playerEntity.getEyeHeight() + (playerEntity.isCrouching() ? -0.1875D : 0.0D) - 0.45D,
-                    -sinBodyYaw * scaledArmOffset + cosBodyYaw * 0.8D,
+                    -cosBodyYaw * scaledArmOffset - sinBodyYaw * 0.8,
+                    playerEntity.getEyeHeight() + (playerEntity.isCrouching() ? -0.1875 : 0d) - 0.45,
+                    -sinBodyYaw * scaledArmOffset + cosBodyYaw * 0.8,
                     gravityDirection
             ));
         }
 
         double bobberX = Mth.lerp(partialTicks, entity.xo, entity.getX());
-        double bobberY = Mth.lerp(partialTicks, entity.yo, entity.getY()) + 0.25D;
+        double bobberY = Mth.lerp(partialTicks, entity.yo, entity.getY()) + 0.25;
         double bobberZ = Mth.lerp(partialTicks, entity.zo, entity.getZ());
         float relX = (float) (lineStart.x - bobberX);
         float relY = (float) (lineStart.y - bobberY);
@@ -132,4 +132,5 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
+
 }
