@@ -15,6 +15,7 @@ import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -23,7 +24,6 @@ import java.util.Optional;
 
 @Mixin(value = Camera.class, priority = 1001)
 public abstract class CameraMixin {
-    @Shadow protected abstract void setPosition(double x, double y, double z);
 
     @Shadow private Entity entity;
 
@@ -33,11 +33,12 @@ public abstract class CameraMixin {
 
     @Shadow private float eyeHeight; // cameraY
 
-    private float storedTickDelta = 0.f;
+    @Unique
+    private float jcraft$storedTickDelta = 0f;
 
-    @Inject(method="setup", at=@At("HEAD"))
-    private void inject_update(BlockGetter area, Entity entity, boolean detached, boolean thirdPersonReverse, float tickDelta, CallbackInfo ci){
-        storedTickDelta = tickDelta;
+    @Inject(method = "setup", at = @At("HEAD"))
+    private void jcraft$update(final BlockGetter level, final Entity entity, final boolean detached, final boolean thirdPersonReverse, float partialTick, final CallbackInfo ci) {
+        jcraft$storedTickDelta = partialTick;
     }
 
     @WrapOperation(
@@ -48,32 +49,32 @@ public abstract class CameraMixin {
                     ordinal = 0
             )
     )
-    private void wrapOperation_update_setPos_0(Camera camera, double x, double y, double z, Operation<Void> original, BlockGetter area, Entity entity, boolean thirdPerson, boolean inverseView, float tickDelta) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
-        if(animationOptional.isEmpty()){
-            original.call(this, x, y, z);
+    private void wrapOperation_update_setPos_0(final Camera camera, final double x, final double y, final double z, final Operation<Void> original, final BlockGetter level, final Entity entity, final boolean detached, final boolean thirdPersonReverse, final float partialTick) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+        final Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
+        if (animationOptional.isEmpty()) {
+            original.call(camera, x, y, z);
             return;
         }
-        RotationAnimation animation = animationOptional.get();
+        final RotationAnimation animation = animationOptional.get();
         if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
-            original.call(this, x, y, z);
+            original.call(camera, x, y, z);
             return;
         }
-        long timeMs = entity.level().getGameTime()*50+(long)(storedTickDelta*50);
-        Quaternionf gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
+        long timeMs = entity.level().getGameTime() * 50 + (long)(jcraft$storedTickDelta * 50);
+        final Quaternionf gravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
 
-        double entityX = Mth.lerp(tickDelta, entity.xOld, entity.getX());
-        double entityY = Mth.lerp(tickDelta, entity.yOld, entity.getY());
-        double entityZ = Mth.lerp(tickDelta, entity.zOld, entity.getZ());
+        double entityX = Mth.lerp(partialTick, entity.xOld, entity.getX());
+        double entityY = Mth.lerp(partialTick, entity.yOld, entity.getY());
+        double entityZ = Mth.lerp(partialTick, entity.zOld, entity.getZ());
 
-        double currentCameraY = Mth.lerp(tickDelta, this.eyeHeightOld, this.eyeHeight);
+        double currentCameraY = Mth.lerp(partialTick, this.eyeHeightOld, this.eyeHeight);
 
         Vector3f eyeOffset = new Vector3f(0, (float) currentCameraY, 0);
         eyeOffset.rotate(gravityRotation);
 
         original.call(
-                this,
+                camera,
                 entityX + eyeOffset.x(),
                 entityY + eyeOffset.y(),
                 entityZ + eyeOffset.z()
@@ -89,17 +90,18 @@ public abstract class CameraMixin {
                     remap = false
             )
     )
-    private void inject_setRotation(CallbackInfo ci) {
-        if(this.entity !=null) {
+    private void inject_setRotation(final CallbackInfo ci) {
+        if (this.entity != null) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.entity);
             Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
             if(animationOptional.isEmpty()) return;
             RotationAnimation animation = animationOptional.get();
             if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) return;
-            long timeMs = entity.level().getGameTime()*50+(long)(storedTickDelta*50);
+            long timeMs = entity.level().getGameTime() * 50 + (long)(jcraft$storedTickDelta * 50);
             Quaternionf rotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
             Quaternionf product = CompatMath.hamiltonProduct(rotation,this.rotation);
             this.rotation.set(product.x(), product.y(), product.z(), product.w());
         }
     }
+
 }

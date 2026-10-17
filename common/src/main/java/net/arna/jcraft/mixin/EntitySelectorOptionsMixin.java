@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 
 @Mixin(EntitySelectorOptions.class)
 public abstract class EntitySelectorOptionsMixin {
+
     @Shadow
     private static void register(final String id, final EntitySelectorOptions.Modifier handler,
                                  final Predicate<EntitySelectorParser> predicate, final Component tooltip) {
@@ -25,4 +26,5 @@ public abstract class EntitySelectorOptionsMixin {
         JCraft.registerEntitySelectorOptions((id, handler, predicate, tooltip) ->
                 register(id, handler, predicate, tooltip));
     }
+
 }

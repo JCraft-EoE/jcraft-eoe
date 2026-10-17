@@ -14,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(FogRenderer.class)
-public class BackgroundRenderMixin {
+public abstract class BackgroundRenderMixin {
+
     @Shadow
     private static float fogRed;
 
@@ -33,4 +34,5 @@ public class BackgroundRenderMixin {
     private static void jcraft$getFog(Camera camera, FogRenderer.FogMode fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci, FogType cameraSubmersionType, Entity entity, FogRenderer.FogData fogData) {
         RenderHandler.cacheFogData(fogData.start, fogData.end, fogData.shape);
     }
+
 }

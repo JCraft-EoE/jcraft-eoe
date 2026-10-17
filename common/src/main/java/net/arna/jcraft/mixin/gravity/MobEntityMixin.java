@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -9,11 +11,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Mob.class)
 public abstract class MobEntityMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "doHurtTarget",
             at = @At(
                     value = "INVOKE",
@@ -21,16 +23,15 @@ public abstract class MobEntityMixin {
                     ordinal = 0
             )
     )
-    private float redirect_tryAttack_getYaw_0(Mob attacker, Entity target) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
+    private float jcraft$tryAttack_getYaw_0(final Mob instance, final Operation<Float> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return attacker.getYRot();
+            return original.call(instance);
         }
-
-        return RotationUtil.rotWorldToPlayer(attacker.getYRot(), attacker.getXRot(), gravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(original.call(instance), instance.getXRot(), gravityDirection).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "doHurtTarget",
             at = @At(
                     value = "INVOKE",
@@ -38,16 +39,15 @@ public abstract class MobEntityMixin {
                     ordinal = 1
             )
     )
-    private float redirect_tryAttack_getYaw_1(Mob attacker, Entity target) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
+    private float jcraft$tryAttack_getYaw_1(final Mob instance, final Operation<Float> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return attacker.getYRot();
+            return original.call(instance);
         }
-
-        return RotationUtil.rotWorldToPlayer(attacker.getYRot(), attacker.getXRot(), gravityDirection).x;
+        return RotationUtil.rotWorldToPlayer(original.call(instance), instance.getXRot(), gravityDirection).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "lookAt",
             at = @At(
                     value = "INVOKE",
@@ -55,16 +55,16 @@ public abstract class MobEntityMixin {
                     ordinal = 0
             )
     )
-    private double redirect_lookAtEntity_getEyeY_0(LivingEntity livingEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(livingEntity);
+    private double jcraft$lookAtEntity_getEyeY_0(final LivingEntity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return livingEntity.getEyeY();
+            return original.call(instance);
         }
 
-        return livingEntity.getEyePosition().y;
+        return instance.getEyePosition().y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "lookAt",
             at = @At(
                     value = "INVOKE",
@@ -72,16 +72,15 @@ public abstract class MobEntityMixin {
                     ordinal = 0
             )
     )
-    private double redirect_lookAtEntity_getX_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$lookAtEntity_getX_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getX();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().x;
+        return instance.getEyePosition().x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "lookAt",
             at = @At(
                     value = "INVOKE",
@@ -89,12 +88,12 @@ public abstract class MobEntityMixin {
                     ordinal = 0
             )
     )
-    private double redirect_lookAtEntity_getZ_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$lookAtEntity_getZ_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getZ();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().z;
+        return instance.getEyePosition().z;
     }
+
 }

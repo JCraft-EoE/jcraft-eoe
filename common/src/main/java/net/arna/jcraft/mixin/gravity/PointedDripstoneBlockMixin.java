@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,11 +13,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(PointedDripstoneBlock.class)
 public abstract class PointedDripstoneBlockMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "fallOn",
             at = @At(
                     value = "INVOKE",
@@ -23,12 +25,12 @@ public abstract class PointedDripstoneBlockMixin {
                     ordinal = 0
             )
     )
-    private Comparable<Direction> redirect_onLandedUpon_get_0(BlockState blockState, Property<Direction> property, Level world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+    private Comparable<Direction> jcraft$onLandedUpon_get_0(final BlockState instance, final Property property, final Operation<Comparable> original, final Level level, final BlockState state, final BlockPos pos, final Entity entity, final float fallDistance) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
-            return blockState.getValue(property);
+            return original.call(instance, property);
         }
-
-        return blockState.getValue(property) == gravityDirection.getOpposite() ? Direction.UP : Direction.DOWN;
+        return instance.getValue(property) == gravityDirection.getOpposite() ? Direction.UP : Direction.DOWN;
     }
+
 }

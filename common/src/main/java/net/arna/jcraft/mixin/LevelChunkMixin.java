@@ -11,18 +11,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelChunk.class)
-public class LevelChunkMixin {
+public abstract class LevelChunkMixin {
+
     @Shadow
     @Final
     Level level;
 
     @Inject(method = "postProcessGeneration", at = @At("HEAD"))
     private void disableSetBlockEvent(CallbackInfo ci) {
-        ((LevelAddon) level).jcraft$setIgnoreSetBlock(true);
+        ((LevelAddon)level).jcraft$setIgnoreSetBlock(true);
     }
 
     @Inject(method = "postProcessGeneration", at = @At("RETURN"))
     private void enableSetBlockEvent(CallbackInfo ci) {
-        ((LevelAddon) level).jcraft$setIgnoreSetBlock(false);
+        ((LevelAddon)level).jcraft$setIgnoreSetBlock(false);
     }
+
 }

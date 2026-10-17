@@ -7,11 +7,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Level.class)
-public class WorldMixin implements IJSplatterManagerHolder {
-    private final @Unique JSplatterManager splatterManager = new JSplatterManager((Level) (Object) this);
+public abstract class WorldMixin implements IJSplatterManagerHolder {
+
+    private final @Unique JSplatterManager jcraft$splatterManager = new JSplatterManager((Level)(Object)this);
 
     @Override
     public JSplatterManager jcraft$getSplatterManager() {
-        return splatterManager;
+        return jcraft$splatterManager;
     }
+
 }

@@ -20,6 +20,7 @@ import static org.lwjgl.opengl.GL14.GL_DEPTH_COMPONENT24;
 
 @Mixin(RenderTarget.class)
 public abstract class RenderTargetMixin implements StillDepthHolder {
+
     @Shadow @Final public boolean useDepth;
     @Shadow public int width, height;
     private @Unique int jcraft$depthTexture; // already unique, but suppressing warning
@@ -65,4 +66,5 @@ public abstract class RenderTargetMixin implements StillDepthHolder {
         // Copy the depth buffer to the texture
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
     }
+
 }

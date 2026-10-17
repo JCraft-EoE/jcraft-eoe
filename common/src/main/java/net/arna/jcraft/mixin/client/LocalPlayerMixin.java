@@ -10,12 +10,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(LocalPlayer.class)
-public class LocalPlayerMixin {
+public abstract class LocalPlayerMixin {
 
     @WrapOperation(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Abilities;flying:Z", opcode = Opcodes.PUTFIELD))
     private void jcraft$disableSpaceDoubleTapWhenCreaming(Abilities instance, boolean value, Operation<Void> original) {
-        if (!CreamEntity.isCreaming((LocalPlayer) (Object) this)) {
+        if (!CreamEntity.isCreaming((LocalPlayer)(Object)this)) {
             original.call(instance, value);
         }
     }
+
 }

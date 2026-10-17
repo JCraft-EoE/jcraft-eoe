@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(BlockEntityRenderDispatcher.class)
-public class BlockEntityRenderDispatcherMixin {
+public abstract class BlockEntityRenderDispatcherMixin {
 
     @ModifyArg(
             method = "setupAndRender",
@@ -21,4 +21,5 @@ public class BlockEntityRenderDispatcherMixin {
     private static float modifyTickDelta(float partialTick, @Local(argsOnly = true) BlockEntity blockEntity) {
         return JClientUtils.getTicksIfInTSRange(blockEntity.getBlockPos()) > 0 ? 0 : partialTick;
     }
+
 }

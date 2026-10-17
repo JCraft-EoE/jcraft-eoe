@@ -1,5 +1,7 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.arna.jcraft.common.util.IJSplatterManagerHolder;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.server.level.ServerLevel;
@@ -13,17 +15,18 @@ import java.util.function.BooleanSupplier;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerWorldMixin implements IJSplatterManagerHolder {
-    // Serverside timestop handling
-    @Inject(cancellable = true, at = @At("HEAD"), method = "tickNonPassenger")
-    private void timestopTick(Entity entity, CallbackInfo ci) {
-        if (JComponentPlatformUtils.getTimeStopData(entity).isPresent()) {
-            JComponentPlatformUtils.getTimeStopData(entity).get().tick(ci);
-        }
 
+    // Serverside timestop handling
+    @WrapMethod(method = "tickNonPassenger")
+    private void timestopTick(final Entity entity, final Operation<Void> original) {
+        if (JComponentPlatformUtils.getTimeStopData(entity).isEmpty() || !JComponentPlatformUtils.getTimeStopData(entity).get().tick()) {
+            original.call(entity);
+        }
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
-    private void tickSplatters(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+    private void tickSplatters(final BooleanSupplier hasTimeLeft, final CallbackInfo ci) {
         jcraft$getSplatterManager().tick();
     }
+
 }

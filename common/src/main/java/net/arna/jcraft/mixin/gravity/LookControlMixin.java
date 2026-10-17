@@ -1,33 +1,34 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.control.LookControl;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LookControl.class)
 public abstract class LookControlMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "getWantedY(Lnet/minecraft/world/entity/Entity;)D",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getEyeY()D"
             )
     )
-    private static double redirect_getLookingHeightForgetEyeY_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private static double jcraft$getLookingHeightForgetEyeY_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getEyeY();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().y;
+        return instance.getEyePosition().y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "setLookAt(Lnet/minecraft/world/entity/Entity;)V",
             at = @At(
                     value = "INVOKE",
@@ -35,16 +36,15 @@ public abstract class LookControlMixin {
                     ordinal = 0
             )
     )
-    private double redirect_lookAt_getX_0_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$lookAt_getX_0_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getX();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().x;
+        return instance.getEyePosition().x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "setLookAt(Lnet/minecraft/world/entity/Entity;)V",
             at = @At(
                     value = "INVOKE",
@@ -52,16 +52,15 @@ public abstract class LookControlMixin {
                     ordinal = 0
             )
     )
-    private double redirect_lookAt_getZ_0_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$lookAt_getZ_0_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getZ();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().z;
+        return instance.getEyePosition().z;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "setLookAt(Lnet/minecraft/world/entity/Entity;FF)V",
             at = @At(
                     value = "INVOKE",
@@ -69,16 +68,15 @@ public abstract class LookControlMixin {
                     ordinal = 0
             )
     )
-    private double redirect_lookAt_getX_0_1(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$lookAt_getX_0_1(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getX();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().x;
+        return instance.getEyePosition().x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "setLookAt(Lnet/minecraft/world/entity/Entity;FF)V",
             at = @At(
                     value = "INVOKE",
@@ -86,12 +84,12 @@ public abstract class LookControlMixin {
                     ordinal = 0
             )
     )
-    private double redirect_lookAt_getZ_0_1(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$lookAt_getZ_0_1(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getZ();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().z;
+        return instance.getEyePosition().z;
     }
+
 }

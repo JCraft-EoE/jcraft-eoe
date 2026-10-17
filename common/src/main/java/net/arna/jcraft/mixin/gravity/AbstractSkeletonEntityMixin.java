@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(AbstractSkeleton.class)
 public abstract class AbstractSkeletonEntityMixin {
+
     @ModifyExpressionValue(
             method = "performRangedAttack",
             at = @At(
@@ -75,4 +76,5 @@ public abstract class AbstractSkeletonEntityMixin {
 
         return Math.sqrt(original);
     }
+
 }

@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemInHandRenderer.class)
-public class ItemInHandRendererMixin {
+public abstract class ItemInHandRendererMixin {
+
     @Unique
     private static final float JCRAFT$GUN_RAISE_SPEED = 0.4f;
     @Unique
@@ -100,4 +101,5 @@ public class ItemInHandRendererMixin {
         float displayX = side * transform.translation.x();
         poseStack.translate((-side * 0.56f - displayX) * aim, JCRAFT$AIM_RAISE * aim, 0.0f);
     }
+
 }

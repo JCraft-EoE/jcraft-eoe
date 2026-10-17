@@ -1,20 +1,21 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LevelChunk.class)
-public class TimestopBlockEntityMixin {
-    @SuppressWarnings("CancellableInjectionUsage") // The warning is flat out wrong
-    @Inject(method = "isTicking", at = @At("HEAD"), cancellable = true)
-    void jcraft$canTickBlockEntity(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+public abstract class TimestopBlockEntityMixin {
+
+    @WrapMethod(method = "isTicking")
+    boolean jcraft$canTickBlockEntity(final BlockPos pos, final Operation<Boolean> original) {
         if (Timestops.isInTSRange(pos)) {
-            cir.cancel();
+            return false;
         }
+        return original.call(pos);
     }
+
 }
