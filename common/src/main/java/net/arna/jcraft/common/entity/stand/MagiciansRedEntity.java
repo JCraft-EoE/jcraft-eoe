@@ -309,19 +309,19 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     // Animation code
     public enum State implements StandAnimationState<MagiciansRedEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.mr.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.light", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.mr.block", AzPlayBehaviors.LOOP)),
-        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.barrage", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROSSFIRE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfire", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROSSFIRE_HURRICANE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfirehurricane", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROSSFIRE_VARIATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfirevariation", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        REDIRECT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.redirect", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        RED_BIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.redbind", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        DETECTOR(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.detector", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        HAMMER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.hammer", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.heavy", AzPlayBehaviors.PLAY_ONCE)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.barrage", AzPlayBehaviors.PLAY_ONCE)),
+        CROSSFIRE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfire", AzPlayBehaviors.PLAY_ONCE)),
+        CROSSFIRE_HURRICANE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfirehurricane", AzPlayBehaviors.PLAY_ONCE)),
+        CROSSFIRE_VARIATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfirevariation", AzPlayBehaviors.PLAY_ONCE)),
+        REDIRECT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.redirect", AzPlayBehaviors.PLAY_ONCE)),
+        RED_BIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.redbind", AzPlayBehaviors.PLAY_ONCE)),
+        DETECTOR(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.detector", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        HAMMER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.hammer", AzPlayBehaviors.PLAY_ONCE)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;

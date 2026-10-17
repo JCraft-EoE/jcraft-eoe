@@ -613,20 +613,20 @@ public class MadeInHeavenEntity extends StandEntity<MadeInHeavenEntity, MadeInHe
     // Animation code
     public enum State implements StandAnimationState<MadeInHeavenEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.mih.idle", AzPlayBehaviors.LOOP)),
-        SLICE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.slice", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SLICE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.slice", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.mih.block", AzPlayBehaviors.LOOP)),
-        DONUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.donut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DONUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.donut", AzPlayBehaviors.PLAY_ONCE)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.barrage", AzPlayBehaviors.LOOP)),
-        SPEED_SLICE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.speedslice", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        JUDGEMENT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.judgement", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LEG_CRUSHER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.legcrusher", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        FURY_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.furychop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        TIME_ACCELERATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.taccel", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CIRCLE_STARTUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.circlestartup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        SPEED_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.speedchop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LOW_KICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.lowkick", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SPEED_SLICE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.speedslice", AzPlayBehaviors.PLAY_ONCE)),
+        JUDGEMENT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.judgement", AzPlayBehaviors.PLAY_ONCE)),
+        LEG_CRUSHER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.legcrusher", AzPlayBehaviors.PLAY_ONCE)),
+        FURY_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.furychop", AzPlayBehaviors.PLAY_ONCE)),
+        TIME_ACCELERATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.taccel", AzPlayBehaviors.PLAY_ONCE)),
+        CIRCLE_STARTUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.circlestartup", AzPlayBehaviors.PLAY_ONCE)),
+        SPEED_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.speedchop", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        LOW_KICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mih.lowkick", AzPlayBehaviors.PLAY_ONCE)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;

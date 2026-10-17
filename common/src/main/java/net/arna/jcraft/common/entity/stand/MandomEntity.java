@@ -170,9 +170,9 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
     }
 
     public enum State implements StandAnimationState<MandomEntity> {
-        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "summon", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        COUNTDOWN(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "timer", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        REWIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "rewind", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "summon", AzPlayBehaviors.PLAY_ONCE)),
+        COUNTDOWN(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "timer", AzPlayBehaviors.PLAY_ONCE)),
+        REWIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "rewind", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "idle", AzPlayBehaviors.LOOP));
 
         private final AzCommand animator;
