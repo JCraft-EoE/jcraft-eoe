@@ -14,6 +14,7 @@ import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
+import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
@@ -32,6 +33,7 @@ import net.arna.jcraft.common.attack.core.MoveMapImpl;
 import net.arna.jcraft.common.attack.core.itfs.AttackRotationOffsetOverride;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
 import net.arna.jcraft.common.entity.stand.PurpleHazeEntity;
+import net.arna.jcraft.common.marker.BlockMarker;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.tickable.MoveTickQueue;
@@ -858,6 +860,13 @@ public abstract class StandEntity<E extends StandEntity<E, S>, S extends Enum<S>
         }
         playDesummonSound = playSound;
         BlockMarkerMoves.remove(this);
+        if (user != null) {
+            for (final AbstractMove<?, ?> move : getMoveMap().asMovesList()) {
+                if (move instanceof BlockMarkerMove blockMarkerMove) {
+                    blockMarkerMove.removeRecordingTimes(user, true);
+                }
+            }
+        }
         discard();
     }
 

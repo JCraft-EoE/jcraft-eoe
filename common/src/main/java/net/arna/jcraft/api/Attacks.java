@@ -66,7 +66,6 @@ public interface Attacks {
             boolean isReversing
     ) {
         return controllerBuilder()
-                .cancel(controllerName)
                 .playSequence(
                         controllerName,
                         sequenceBuilder -> sequenceBuilder.queue(
