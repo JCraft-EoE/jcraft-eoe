@@ -78,6 +78,18 @@ public class JTagProviders {
             auReplacedWithAir.add(Blocks.NETHER_PORTAL);
             auReplacedWithAir.add(Blocks.END_PORTAL);
             auReplacedWithAir.add(Blocks.END_GATEWAY);
+
+            final var observableNatureBlocks = getOrCreateTagBuilder(JTagRegistry.OBSERVABLE_NATURE_BLOCKS);
+            observableNatureBlocks.add(Blocks.OAK_LOG);
+            observableNatureBlocks.add(Blocks.SPRUCE_LOG);
+            observableNatureBlocks.add(Blocks.BIRCH_LOG);
+            observableNatureBlocks.add(Blocks.JUNGLE_LOG);
+            observableNatureBlocks.add(Blocks.ACACIA_LOG);
+            observableNatureBlocks.add(Blocks.DARK_OAK_LOG);
+            observableNatureBlocks.add(Blocks.MANGROVE_LOG);
+            observableNatureBlocks.add(Blocks.CHERRY_LOG);
+            observableNatureBlocks.forceAddTag(BlockTags.LEAVES);
+            observableNatureBlocks.forceAddTag(BlockTags.FLOWERS);
         }
     }
 
@@ -712,6 +724,22 @@ public class JTagProviders {
             final var ignoresDamageScaling = getOrCreateTagBuilder(JTagRegistry.IGNORES_DAMAGE_SCALING);
             ignoresDamageScaling.addTag(JTagRegistry.BOSSES);
             ignoresDamageScaling.add(EntityType.HORSE);
+
+            final var observableNatureEntities = getOrCreateTagBuilder(JTagRegistry.OBSERVABLE_NATURE_ENTITIES);
+            observableNatureEntities.add(EntityType.HORSE);
+            observableNatureEntities.add(EntityType.DONKEY);
+            observableNatureEntities.add(EntityType.MULE);
+            observableNatureEntities.add(EntityType.LLAMA);
+            observableNatureEntities.add(EntityType.GOAT);
+            observableNatureEntities.add(EntityType.COW);
+            observableNatureEntities.add(EntityType.PIG);
+            observableNatureEntities.add(EntityType.SHEEP);
+            observableNatureEntities.add(EntityType.CHICKEN);
+            observableNatureEntities.add(EntityType.COD);
+            observableNatureEntities.add(EntityType.SALMON);
+            observableNatureEntities.add(EntityType.PUFFERFISH);
+            observableNatureEntities.add(EntityType.SQUID);
+            observableNatureEntities.add(EntityType.GLOW_SQUID);
 
             addTagsForCompatibilities(arg);
         }

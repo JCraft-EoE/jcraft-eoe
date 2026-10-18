@@ -43,6 +43,7 @@ public interface JTagRegistry {
     TagKey<Block> IRON_BLOCKS = TagKey.create(Registries.BLOCK, JCraft.id("iron_blocks"));
     TagKey<Block> DUMMY_KNOCKBACK_BLOCKING = TagKey.create(Registries.BLOCK, JCraft.id("dummy_knockback_blocking"));
     TagKey<Block> AU_REPLACED_WITH_AIR = TagKey.create(Registries.BLOCK, JCraft.id("au_replaced_with_air"));
+    TagKey<Block> OBSERVABLE_NATURE_BLOCKS = TagKey.create(Registries.BLOCK, JCraft.id("observable_nature_blocks"));
 
     TagKey<EntityType<?>> FERROUS_ENTITIES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("ferrous_entities"));
     TagKey<EntityType<?>> BLOODLESS_ENTITIES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("bloodless_entities"));
@@ -61,6 +62,7 @@ public interface JTagRegistry {
     TagKey<EntityType<?>> CANT_HEAR = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("cant_hear"));
     TagKey<EntityType<?>> BOSSES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("bosses"));
     TagKey<EntityType<?>> IGNORES_DAMAGE_SCALING = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("ignores_damage_scaling"));
+    TagKey<EntityType<?>> OBSERVABLE_NATURE_ENTITIES = TagKey.create(Registries.ENTITY_TYPE, JCraft.id("observable_nature_entities"));
 
     TagKey<Biome> METEORS_CAN_FALL = TagKey.create(Registries.BIOME, JCraft.id("meteors_can_fall"));
 
