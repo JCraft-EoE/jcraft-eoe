@@ -1,6 +1,8 @@
 package net.arna.jcraft.api.component.living;
 
 import net.arna.jcraft.api.component.JComponent;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.phys.HitResult;
 
 public interface CommonSpinComponent extends JComponent {
 
@@ -12,10 +14,15 @@ public interface CommonSpinComponent extends JComponent {
 
     void endSpinning();
 
-    void goldenRatioC(int amount);
+    void observeNature(final HitResult observation, final LevelReader level);
 
-    void goldenRatioB(int amount);
+    int natureObservationAmount();
 
-    void goldenRatioA(int amount);
+    void resetNatureObservations();
 
+    void goldenRatioC(final int amount);
+
+    void goldenRatioB(final int amount);
+
+    void goldenRatioA(final int amount);
 }

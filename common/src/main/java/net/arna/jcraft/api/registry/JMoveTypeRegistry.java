@@ -36,6 +36,7 @@ import net.arna.jcraft.common.attack.moves.shadowtheworld.STWCounterAttack;
 import net.arna.jcraft.common.attack.moves.shared.*;
 import net.arna.jcraft.common.attack.moves.silverchariot.*;
 import net.arna.jcraft.common.attack.moves.spin.GoldenRatioMove;
+import net.arna.jcraft.common.attack.moves.spin.ObserveNatureMove;
 import net.arna.jcraft.common.attack.moves.spin.SpinChargeMove;
 import net.arna.jcraft.common.attack.moves.spin.SpinMove;
 import net.arna.jcraft.common.attack.moves.starplatinum.BlockBreakingAttack;
@@ -278,7 +279,7 @@ public interface JMoveTypeRegistry {
     RegistrySupplier<MoveType<?>> SPIN_CHARGE_MOVE = register("spin_charge_move", SpinChargeMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPIN_TOSS_MOVE = register("spin_toss_move", SpinMove.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> SPIN_GOLDEN_RATIO_MOVE = register("spin_golden_ratio_move", GoldenRatioMove.Type.INSTANCE);
-
+    RegistrySupplier<MoveType<?>> SPIN_OBSERVE_NATURE_MOVE = register("spin_observe_nature_move", ObserveNatureMove.Type.INSTANCE);
 
     RegistrySupplier<MoveType<?>> WHITESNAKE_CHARGED_SPEW_ATTACK = register("whitesnake_charged_spew_attack", ChargedSpewAttack.Type.INSTANCE);
     RegistrySupplier<MoveType<?>> WHITESNAKE_GIVE_STAND_ATTACK = register("whitesnake_give_stand_attack", GiveStandAttack.Type.INSTANCE);

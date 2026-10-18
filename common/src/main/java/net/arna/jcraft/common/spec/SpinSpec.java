@@ -4,13 +4,16 @@ import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.attack.MoveSet;
 import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.api.registry.JSoundRegistry;
 import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecData;
+import net.arna.jcraft.common.attack.conditions.ObservedNatureCondition;
 import net.arna.jcraft.common.attack.moves.spin.GoldenRatioMove;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
+import net.arna.jcraft.common.attack.moves.spin.ObserveNatureMove;
 import net.arna.jcraft.common.attack.moves.spin.SpinChargeMove;
 import net.arna.jcraft.common.attack.moves.spin.SpinMove;
 import net.arna.jcraft.common.util.SpecAnimationState;
@@ -43,22 +46,28 @@ public class SpinSpec extends JSpec<SpinSpec, SpinSpec.State> {
             .withFollowup(KICK)
             .withInfo(Component.literal("Knee"), Component.literal("Fast, short-ranged jab."));
 
-    // TODO Arna: withInfo x 3
+    // TODO Arna: withInfo x 4
     public static final SpinMove<SpinSpec> SPIN_SHOOT = new SpinMove<SpinSpec>(0, 1, 1, 0.75f,0.13f)
             .withAnim(State.SPIN_SHOOT);
     public static final SpinChargeMove<SpinSpec> SPIN_CHARGE = new SpinChargeMove<SpinSpec>(70, 1 * 20 + 1, 2 * 20, 1.0f, 10)
             .withFollowup(SPIN_SHOOT);
+    public static final ObserveNatureMove<SpinSpec> OBSERVE_NATURE = new ObserveNatureMove<SpinSpec>(60, 1, 60)
+            .withAnim(State.SPIN_OBSERVE_NATURE);
     public static final GoldenRatioMove<SpinSpec> GOLDEN_RATIO = new GoldenRatioMove<SpinSpec>(50, 20)
+            .withCondition(ObservedNatureCondition.INSTANCE)
             .withAnim(State.SPIN_GOLDEN_RATIO);
+
+    protected final GoldenRatioMove<SpinSpec> goldenRation = GOLDEN_RATIO.copy();
 
     public SpinSpec(LivingEntity livingEntity) {
         super(JSpecTypeRegistry.SPIN.get(), livingEntity);
+        goldenRation.onRegister(MoveClass.SPECIAL3);
     }
 
     private static void registerMoves(MoveMap<SpinSpec, SpinSpec.State> moves) {
         moves.registerImmediate(MoveClass.HEAVY, KNEE, State.KNEE);
         moves.register(MoveClass.SPECIAL1, SPIN_CHARGE, State.SPIN_CHARGE).withFollowup(State.SPIN_SHOOT);
-        moves.register(MoveClass.SPECIAL3, GOLDEN_RATIO, State.SPIN_GOLDEN_RATIO);
+        moves.register(MoveClass.SPECIAL3, OBSERVE_NATURE, State.SPIN_OBSERVE_NATURE);
     }
 
     @Override
@@ -66,11 +75,20 @@ public class SpinSpec extends JSpec<SpinSpec, SpinSpec.State> {
         return this;
     }
 
+    @Override
+    protected AbstractMove<?, ? super SpinSpec> overrideMoveSelection(final AbstractMove<?, ? super SpinSpec> original, final boolean crouching, final boolean aerial) {
+        if (original instanceof ObserveNatureMove<?> && goldenRation.conditionsMet(this)) {
+            return goldenRation;
+        }
+        return super.overrideMoveSelection(original, crouching, aerial);
+    }
+
     public enum State implements SpecAnimationState<SpinSpec> {
         KNEE("sp.kn"),
         KICK("sp.kk"),
         SPIN_CHARGE("sp.sc"),
         SPIN_SHOOT("sp.ss"),
+        SPIN_OBSERVE_NATURE("sp.kk"/* TODO change to sp.on once we have an animation */),
         SPIN_GOLDEN_RATIO("sp.kk"/* TODO change to sp.gr once we have an animation */)
         ;
 

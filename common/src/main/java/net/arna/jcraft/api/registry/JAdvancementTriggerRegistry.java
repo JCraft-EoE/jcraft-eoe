@@ -6,6 +6,7 @@ import net.arna.jcraft.common.advancements.Hamon3Trigger;
 import net.arna.jcraft.common.advancements.Hamon4Trigger;
 import net.arna.jcraft.common.advancements.Hamon5Trigger;
 import net.arna.jcraft.common.advancements.Hamon6Trigger;
+import net.arna.jcraft.common.advancements.ObservedNatureTrigger;
 import net.arna.jcraft.common.advancements.ObtainedSpecTrigger;
 import net.arna.jcraft.common.advancements.ObtainedStandTrigger;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -20,6 +21,7 @@ public interface JAdvancementTriggerRegistry {
     Hamon4Trigger HAMON4 = CriteriaTriggers.register(new Hamon4Trigger());
     Hamon5Trigger HAMON5 = CriteriaTriggers.register(new Hamon5Trigger());
     Hamon6Trigger HAMON6 = CriteriaTriggers.register(new Hamon6Trigger());
+    ObservedNatureTrigger OBSERVED_NATURE = CriteriaTriggers.register(new ObservedNatureTrigger());
 
     static void init() {
         /* empty on purpose */

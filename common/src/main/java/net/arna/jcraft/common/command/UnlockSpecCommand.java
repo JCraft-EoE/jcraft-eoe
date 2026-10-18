@@ -12,6 +12,7 @@ import net.arna.jcraft.common.advancements.Hamon3Trigger;
 import net.arna.jcraft.common.advancements.Hamon4Trigger;
 import net.arna.jcraft.common.advancements.Hamon5Trigger;
 import net.arna.jcraft.common.advancements.Hamon6Trigger;
+import net.arna.jcraft.common.advancements.ObservedNatureTrigger;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.common.command.permissions.JPerms;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -62,6 +63,11 @@ public class UnlockSpecCommand {
                             JUtils.awardAdvancement(player, Hamon6Trigger.ID);
                         }
                         hamon.setActiveLesson(0);
+                    }
+                    else if (specType == JSpecTypeRegistry.SPIN.get()) {
+                        if (living instanceof ServerPlayer player) {
+                            JUtils.awardAdvancement(player, ObservedNatureTrigger.ID);
+                        }
                     }
                 }
             }

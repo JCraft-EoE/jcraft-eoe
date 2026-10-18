@@ -1,0 +1,31 @@
+{
+  "parent": "jcraft:obtain_any_spec",
+  "criteria": {
+    "observed_nature": {
+      "conditions": {},
+      "trigger": "jcraft:observed_nature"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.jcraft.observed_nature.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "jcraft:spec_disc",
+      "nbt": "{SpecID:\"jcraft:spin\"}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.jcraft.observed_nature.title"
+    }
+  },
+  "requirements": [
+    [
+      "observed_nature"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

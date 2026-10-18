@@ -12,6 +12,7 @@ import net.arna.jcraft.common.advancements.Hamon3Trigger;
 import net.arna.jcraft.common.advancements.Hamon4Trigger;
 import net.arna.jcraft.common.advancements.Hamon5Trigger;
 import net.arna.jcraft.common.advancements.Hamon6Trigger;
+import net.arna.jcraft.common.advancements.ObservedNatureTrigger;
 import net.arna.jcraft.common.command.permissions.JPerms;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.advancements.Advancement;
@@ -75,6 +76,13 @@ public class ResetSpecCommand {
                     }
                     else if (specType == JSpecTypeRegistry.ANUBIS.get()) {
                         JComponentPlatformUtils.getMiscData(living).setAttackSpeedMult(1f);
+                    }
+                    else if (specType == JSpecTypeRegistry.SPIN.get()) {
+                        var spin = JComponentPlatformUtils.getSpin(living);
+                        spin.resetNatureObservations();
+                        if (living instanceof final ServerPlayer player) {
+                            revoke(player, ObservedNatureTrigger.ID);
+                        }
                     }
                 }
             }

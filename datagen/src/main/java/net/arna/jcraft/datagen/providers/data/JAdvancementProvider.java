@@ -381,6 +381,19 @@ public class JAdvancementProvider extends FabricAdvancementProvider {
                 .addCriterion("waved", Hamon6Trigger.TriggerInstance.trigger())
                 .build(JCraft.id("hamon6"));
         consumer.accept(hamon6);
+        final Advancement observedNature = Advancement.Builder.advancement()
+                .display(SpecDiscItem.createDiscStack(JSpecTypeRegistry.SPIN.get()),
+                        Component.translatable("advancements.jcraft.observed_nature.title"),
+                        Component.translatable("advancements.jcraft.observed_nature.description"),
+                        null,
+                        FrameType.GOAL,
+                        true,
+                        true,
+                        false)
+                .parent(obtainAnySpec)
+                .addCriterion("observed_nature", ObservedNatureTrigger.TriggerInstance.trigger())
+                .build(JCraft.id("observed_nature"));
+        consumer.accept(observedNature);
     }
 
     private static ItemStack createStackWithAzId(RegistrySupplier<? extends Item> item) {

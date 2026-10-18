@@ -735,6 +735,8 @@ public class JTagProviders {
             observableNatureEntities.add(EntityType.PIG);
             observableNatureEntities.add(EntityType.SHEEP);
             observableNatureEntities.add(EntityType.CHICKEN);
+            observableNatureEntities.add(EntityType.BAT);
+            observableNatureEntities.add(EntityType.AXOLOTL);
             observableNatureEntities.add(EntityType.COD);
             observableNatureEntities.add(EntityType.SALMON);
             observableNatureEntities.add(EntityType.PUFFERFISH);
