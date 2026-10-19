@@ -48,9 +48,24 @@ public class MoveScreen<A extends IAttacker<? extends A, S>, S extends Enum<?>> 
     public void tick() {
         super.tick();
         switch (selectedMove) {
-            case 1 -> attacker.setState(baseMove.getCrouchingVariant().getAnimState());
-            case 2 -> attacker.setState(baseMove.getAerialVariant().getAnimState());
-            default -> attacker.setState(baseMove.getAnimState());
+            case 1 -> {
+                final S animState = baseMove.getCrouchingVariant().getAnimState();
+                if (animState != null) {
+                    attacker.setState(animState);
+                }
+            }
+            case 2 -> {
+                final S animState = baseMove.getAerialVariant().getAnimState();
+                if (animState != null) {
+                    attacker.setState(animState);
+                }
+            }
+            default -> {
+                final S animState = baseMove.getAnimState();
+                if (animState != null) {
+                    attacker.setState(animState);
+                }
+            }
         }
         if (attacker instanceof final StandEntity<?,?> stand) {
             stand.tick();
@@ -61,6 +76,9 @@ public class MoveScreen<A extends IAttacker<? extends A, S>, S extends Enum<?>> 
     @Override
     public void render(final @NonNull GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
         renderBackground(guiGraphics);
+//        guiGraphics.pose().pushPose();
+//        guiGraphics.pose().mulPoseMatrix(new Matrix4f().scaling(0.67f, 0.67f, 1f));
+//        guiGraphics.pose().translate(width/3f, height/3f, 0f);
         super.render(guiGraphics, mouseX, mouseY, partialTick); // takes care of widgets and such
         guiGraphics.drawString(font, MOVE_VARIANTS, 10, height/7 + 10, 0xFFFFFF);
         drawMoveString(guiGraphics, font, baseMove, 10, 2*height/7 + 10, 0xFFFFFF);
@@ -68,6 +86,7 @@ public class MoveScreen<A extends IAttacker<? extends A, S>, S extends Enum<?>> 
         guiGraphics.drawString(font, FRAME_DATA, 3*width/4 + 10, height/7 + 10, 0xFFFFFF);
         InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width/2, height/2, 45, width/2f - mouseX, height/2f - mouseY, attacker.getBaseEntity());
         drawFrameData(guiGraphics, font, baseMove, 3*width/4 + 10, 2*height/7 + 10, 0xFFFFFF);
+//        guiGraphics.pose().popPose();
     }
 
     protected void drawMoveString(final @NonNull GuiGraphics guiGraphics, final @NonNull Font font, final @NonNull MoveMap.Entry<?,?> move, final int x, final int y, final int color) {
