@@ -409,29 +409,29 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     // Animation code
     public enum State implements StandAnimationState<HGEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.block", AzPlayBehaviors.LOOP)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROUCHING_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROUCHING_LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        AIR_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.air_light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        SENDOFF(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.sendoff", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        CROUCHING_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light", AzPlayBehaviors.PLAY_ONCE)),
+        CROUCHING_LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        AIR_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.air_light", AzPlayBehaviors.PLAY_ONCE)),
+        SENDOFF(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.sendoff", AzPlayBehaviors.PLAY_ONCE)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.barrage", AzPlayBehaviors.LOOP)),
-        NET_SET(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.net_place", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        NET_SET(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.net_place", AzPlayBehaviors.PLAY_ONCE)),
 
-        EMERALD_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EMERALD_SPLASH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_splash", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EMERALD_SUPER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_super", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EXTEND_UP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_up", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EXTEND_FORWARD(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_forward", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        EMERALD_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_charge", AzPlayBehaviors.PLAY_ONCE)),
+        EMERALD_SPLASH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_splash", AzPlayBehaviors.PLAY_ONCE)),
+        EMERALD_SUPER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_super", AzPlayBehaviors.PLAY_ONCE)),
+        EXTEND_UP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_up", AzPlayBehaviors.PLAY_ONCE)),
+        EXTEND_FORWARD(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_forward", AzPlayBehaviors.PLAY_ONCE)),
 
-        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.uppercut", AzPlayBehaviors.PLAY_ONCE)),
 
         FORWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.forw", AzPlayBehaviors.LOOP)),
         BACKWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.back", AzPlayBehaviors.LOOP)),
         LEFT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.left", AzPlayBehaviors.LOOP)),
         RIGHT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.right", AzPlayBehaviors.LOOP)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;

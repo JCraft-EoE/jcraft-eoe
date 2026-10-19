@@ -5,8 +5,11 @@ import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.event.events.common.EntityEvent;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.arna.jcraft.client.events.JClientEvents;
+import net.arna.jcraft.client.gui.screen.DiscCaseMenuScreen;
 import net.arna.jcraft.client.rendering.skybox.SkyBoxManager;
+import net.arna.jcraft.api.registry.JMenuRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -21,6 +24,8 @@ public interface JClientEventsRegistry {
 
         ClientGuiEvent.RENDER_HUD.register(JClientEvents::renderHud);
         EntityEvent.ADD.register(JClientEvents::onEntityAdd);
+
+        MenuRegistry.registerScreenFactory(JMenuRegistry.DISC_CASE_MENU_TYPE.get(), DiscCaseMenuScreen::new);
 
         ClientCommandRegistrationEvent.EVENT.register((dispatcher, ctx) -> JClientCommandRegistry.registerCommands(dispatcher));
     }

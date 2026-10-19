@@ -32,7 +32,7 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
 
     public static final int MIN_REGEN_BLOOD = 16; // 75%
 
-    public CommonVampireComponentImpl(final LivingEntity entity) {
+    protected CommonVampireComponentImpl(final LivingEntity entity) {
         this.entity = entity;
 
         if (entity instanceof IFoodData iFoodData) {

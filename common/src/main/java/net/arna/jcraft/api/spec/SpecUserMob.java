@@ -6,6 +6,7 @@ import mod.azure.azurelib.util.MoveAnalysis;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.component.player.CommonSpecComponent;
 import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.events.JServerEvents;
 import net.arna.jcraft.common.food.IFoodData;
 import net.arna.jcraft.common.tickable.JEnemies;
@@ -21,15 +22,12 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-
-import static net.arna.jcraft.api.stand.StandTypeUtil.generateStandTypeForMob;
 
 public class SpecUserMob extends PathfinderMob implements JSpecHolder, IFoodData {
     // TODO: add metallica anims to the player anims these guys use
@@ -130,12 +128,12 @@ public class SpecUserMob extends PathfinderMob implements JSpecHolder, IFoodData
     protected void rerollStand(float standChance) {
         final var standComponent = JComponentPlatformUtils.getStandComponent(this);
 
-        if (random.nextFloat() * 100.0f > standChance) {
+        if (random.nextFloat() * 100f > standChance) {
             standComponent.setType(JStandTypeRegistry.NONE.get());
             return;
         }
 
-        standComponent.setType(generateStandTypeForMob(level().getGameRules()));
+        standComponent.setType(StandTypeUtil.generateStandTypeForMob(level().getGameRules(), level().registryAccess()));
 
         if (random.nextFloat() > 0.9f) {
             standComponent.setSkin(random.nextInt(3));

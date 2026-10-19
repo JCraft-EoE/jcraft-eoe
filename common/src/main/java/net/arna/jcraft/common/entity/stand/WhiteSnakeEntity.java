@@ -390,16 +390,16 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
     public enum State implements StandAnimationState<WhiteSnakeEntity> {
         // TODO reenable remote idle
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.light", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.block", AzPlayBehaviors.LOOP)),
-        MEDIUM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.medium", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        MEDIUM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.medium", AzPlayBehaviors.PLAY_ONCE)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.barrage", AzPlayBehaviors.LOOP)),
-        LEG_CRUSHER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.legcrusher", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ACID_SPEW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.acidspew", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ACID_SPEW_CHARGED(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.acidspew_charged", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        DISC_TAKE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.disc_take", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        DISC_GIVE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.disc_give", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LEG_CRUSHER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.legcrusher", AzPlayBehaviors.PLAY_ONCE)),
+        ACID_SPEW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.acidspew", AzPlayBehaviors.PLAY_ONCE)),
+        ACID_SPEW_CHARGED(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.acidspew_charged", AzPlayBehaviors.PLAY_ONCE)),
+        DISC_TAKE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.disc_take", AzPlayBehaviors.PLAY_ONCE)),
+        DISC_GIVE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.disc_give", AzPlayBehaviors.PLAY_ONCE)),
+        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.uppercut", AzPlayBehaviors.PLAY_ONCE)),
 
         FORWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.forw", AzPlayBehaviors.LOOP)),
         BACKWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.back", AzPlayBehaviors.LOOP)),
@@ -410,9 +410,9 @@ public class WhiteSnakeEntity extends StandEntity<WhiteSnakeEntity, WhiteSnakeEn
         LEFT_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.ldash", AzPlayBehaviors.LOOP)),
         RIGHT_DASH(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.whitesnake.rdash", AzPlayBehaviors.LOOP)),
 
-        MELT_YOUR_HEART(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.meltyourheart", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        MELT_YOUR_HEART(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.meltyourheart", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.whitesnake.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;

@@ -399,21 +399,21 @@ public class KingCrimsonEntity extends StandEntity<KingCrimsonEntity, KingCrimso
     // Animations
     public enum State implements StandAnimationState<KingCrimsonEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.kingcrimson.idle", AzPlayBehaviors.LOOP)),
-        DUAL_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.dual_chop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DUAL_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.dual_chop", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.kingcrimson.block", AzPlayBehaviors.LOOP)),
-        OVERHEAD(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.overhead", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        DONUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.donut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        OVERHEAD(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.overhead", AzPlayBehaviors.PLAY_ONCE)),
+        DONUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.donut", AzPlayBehaviors.PLAY_ONCE)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.barrage", AzPlayBehaviors.LOOP)),
-        EYE_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.eye_chop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        TIME_ERASE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.time_erase", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EPITAPH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.epitaph", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BLOOD_THROW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.bloodthrow", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        PREDICT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.predict", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        COUNTER_MISS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.counter_miss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        SWEEP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.sweep", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        EYE_CHOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.eye_chop", AzPlayBehaviors.PLAY_ONCE)),
+        TIME_ERASE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.time_erase", AzPlayBehaviors.PLAY_ONCE)),
+        EPITAPH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.epitaph", AzPlayBehaviors.PLAY_ONCE)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.heavy", AzPlayBehaviors.PLAY_ONCE)),
+        BLOOD_THROW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.bloodthrow", AzPlayBehaviors.PLAY_ONCE)),
+        PREDICT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.predict", AzPlayBehaviors.PLAY_ONCE)),
+        COUNTER_MISS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.counter_miss", AzPlayBehaviors.PLAY_ONCE)),
+        SWEEP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.sweep", AzPlayBehaviors.PLAY_ONCE)),
         TIME_SKIP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.kingcrimson.idle", AzPlayBehaviors.LOOP)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;

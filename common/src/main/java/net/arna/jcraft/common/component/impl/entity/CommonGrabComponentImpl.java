@@ -31,7 +31,7 @@ public abstract class CommonGrabComponentImpl implements CommonGrabComponent {
     public int duration = 0;
     private double distance, verticalOffset = 0.4;
 
-    public CommonGrabComponentImpl(final Entity grabbed) {
+    protected CommonGrabComponentImpl(final Entity grabbed) {
         this.grabbed = grabbed;
     }
 

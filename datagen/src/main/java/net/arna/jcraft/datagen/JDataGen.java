@@ -30,7 +30,6 @@ public final class JDataGen implements DataGeneratorEntrypoint {
 
         final FabricDataGenerator.Pack pack = generator.createPack();
         pack.addProvider(JModelProvider::new);
-        //pack.addProvider(JLanguageProvider::new);
         pack.addProvider(JLootTableProviders.BlockLoot::new);
         pack.addProvider(JLootTableProviders.EntityLoot::new);
         pack.addProvider(JTagProviders.JBlockTags::new);
@@ -38,6 +37,7 @@ public final class JDataGen implements DataGeneratorEntrypoint {
         pack.addProvider(JTagProviders.JEntityTypeTags::new);
         pack.addProvider(JTagProviders.JTemplatePoolTags::new);
         pack.addProvider(JTagProviders.JDamageTypeTags::new);
+        pack.addProvider(JTagProviders.JStandTypeTags::new);
         pack.addProvider(JAdvancementProvider::new);
         pack.addProvider(JRecipeProvider::new);
         pack.addProvider(JWorldProvider::new);

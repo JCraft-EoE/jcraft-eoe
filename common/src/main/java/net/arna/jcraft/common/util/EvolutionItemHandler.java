@@ -14,9 +14,11 @@ import dev.architectury.event.CompoundEventResult;
 import dev.architectury.event.events.common.InteractionEvent;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.JRegistries;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.arna.jcraft.api.registry.JStatRegistry;
@@ -81,7 +83,9 @@ public class EvolutionItemHandler {
                 .findFirst()
                 .orElse(fallback);
 
-        if (evolution == null) return CompoundEventResult.pass();
+        if (evolution == null || StandTypeUtil.isIn(evolution.target(), JTagRegistry.PLAYER_STAND_BLACKLIST, player.level().registryAccess())) {
+            return CompoundEventResult.pass();
+        }
 
         // Check if target stand is already in use.
         if (exclusiveStands.isStandUsed(evolution.target())) {

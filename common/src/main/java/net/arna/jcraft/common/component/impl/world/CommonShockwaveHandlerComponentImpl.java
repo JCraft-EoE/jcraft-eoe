@@ -14,12 +14,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommonShockwaveHandlerComponentImpl implements CommonShockwaveHandlerComponent {
+public abstract class CommonShockwaveHandlerComponentImpl implements CommonShockwaveHandlerComponent {
     @Getter
     private final List<Shockwave> shockwaves = new ArrayList<>();
     protected final Level world;
 
-    public CommonShockwaveHandlerComponentImpl(final Level world) {
+    protected CommonShockwaveHandlerComponentImpl(final Level world) {
         this.world = world;
     }
 

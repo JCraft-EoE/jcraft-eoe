@@ -90,8 +90,6 @@ import java.util.stream.Collectors;
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
 public final class JUtils {
-    public static final float DEG_TO_RAD = 0.017453292F;
-    public static final float RAD_TO_DEG = 57.2957795131F;
 
     public static Vec3 randUnitVec(net.minecraft.util.RandomSource random) {
         return new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
@@ -728,9 +726,9 @@ public final class JUtils {
      * @param divergence Spread, done via a {@link Vec3} of {@link net.minecraft.util.RandomSource#triangle(double, double)} calls
      */
     public static void shoot(@NonNull Projectile projectile, @Nullable Entity shooter, float pitch, float yaw, float roll, float speed, float divergence) {
-        float f = -Mth.sin(yaw * DEG_TO_RAD) * Mth.cos(pitch * DEG_TO_RAD);
-        float g = -Mth.sin((pitch + roll) * DEG_TO_RAD);
-        float h = Mth.cos(yaw * DEG_TO_RAD) * Mth.cos(pitch * DEG_TO_RAD);
+        float f = -Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD);
+        float g = -Mth.sin((pitch + roll) * Mth.DEG_TO_RAD);
+        float h = Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD);
         projectile.shoot(f, g, h, speed, divergence);
         if (shooter != null) {
             Vec3 vec3d = shooter.getDeltaMovement();

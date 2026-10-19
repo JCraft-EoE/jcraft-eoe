@@ -134,23 +134,16 @@ public class StandEntityRenderer<T extends StandEntity<?, ?>> extends AbstractEn
         return pc -> {
             final var animatable = pc.animatable();
             final var partialTick = pc.partialTick();
+            final int summonDuration = animatable.getStandData().getSummonData().getAnimDuration();
 
             if (animatable.tickCount == 0 && !animatable.isVirtual()) {
                 pc.setAlpha(0.2f * partialTick);
                 pc.poseStack().scale(partialTick, 1, partialTick);
-                return pc;
-            } else if (animatable.tickCount == 1) {
-                if (animatable.getMoveStun() <= 0 && animatable.isPlaySummonAnim()) {
-                    animatable.playSummonAnimation();
-                } else {
-                    // TODO: fix this hack. animations cant be played for entities that just spawned.
-                    // this is also probably what stops the summon from working as intended.
-                    animatable.playStateAnimation();
-                }
-            } else if (animatable.tickCount > animatable.getStandData().getSummonData().getAnimDuration()) { // average summon anim duration
-                if (animatable.isIdle()) {
-                    animatable.playStateAnimation();
-                }
+            }
+            if (animatable.tickCount <= summonDuration && animatable.getMoveStun() <= 0 && animatable.isPlaySummonAnim()) {
+                animatable.playSummonAnimation();
+            } else {
+                animatable.playStateAnimation();
             }
 
             float a = getAlpha(animatable, partialTick);

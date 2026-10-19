@@ -230,21 +230,21 @@ public final class SPTWEntity extends AbstractStarPlatinumEntity<SPTWEntity, SPT
     // Animation code
     public enum State implements StandAnimationState<SPTWEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sptw.idle", AzPlayBehaviors.LOOP)),
-        PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.punch", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        PUNCH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.punch", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.sptw.block", AzPlayBehaviors.LOOP)),
-        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GROUND_BREAKER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.ground_break", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.heavy", AzPlayBehaviors.PLAY_ONCE)),
+        GROUND_BREAKER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.ground_break", AzPlayBehaviors.PLAY_ONCE)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.barrage", AzPlayBehaviors.LOOP)),
-        TIME_STRIKE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.timestrike", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        TIME_STOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.timestop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BACKHAND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.backhand", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grabhit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB_HIT2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grabhit2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        TIME_STRIKE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.timestrike", AzPlayBehaviors.PLAY_ONCE)),
+        TIME_STOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.timestop", AzPlayBehaviors.PLAY_ONCE)),
+        BACKHAND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.backhand", AzPlayBehaviors.PLAY_ONCE)),
+        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grab", AzPlayBehaviors.PLAY_ONCE)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grabhit", AzPlayBehaviors.PLAY_ONCE)),
+        GRAB_HIT2(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.grabhit2", AzPlayBehaviors.PLAY_ONCE)),
         TIME_SKIP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.idle", AzPlayBehaviors.LOOP)),
-        GROUND_SLAM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.ground_slam", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GROUND_SLAM(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.ground_slam", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.sptw.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;

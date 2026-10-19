@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class CommonStandComponentImpl implements CommonStandComponent {
+public abstract class CommonStandComponentImpl implements CommonStandComponent {
     private final Entity entity;
     private StandEntity<?, ?> stand;
     private StandType type;
@@ -35,7 +35,7 @@ public class CommonStandComponentImpl implements CommonStandComponent {
     private boolean tagged;
     private final Map<StandType, List<Integer>> skinsMap = new HashMap<>();
 
-    public CommonStandComponentImpl(final Entity entity) {
+    protected CommonStandComponentImpl(final Entity entity) {
         this.entity = entity;
     }
 

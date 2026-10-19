@@ -307,19 +307,19 @@ public final class ShadowTheWorldEntity extends AbstractTheWorldEntity<ShadowThe
     // Animation code
     public enum State implements StandAnimationState<ShadowTheWorldEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.light", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.block", AzPlayBehaviors.LOOP)),
-        LUNGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.lunge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GUARD_CANCEL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.guard_cancel", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        THREE_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.3hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        IMPALING_THRUST_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.impaling_thrust_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        IMPALING_THRUST_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.impaling_thrust_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CHARGE_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.charge_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        COUNTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.counter", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        TIME_STOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.timestop", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LUNGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.lunge", AzPlayBehaviors.PLAY_ONCE)),
+        GUARD_CANCEL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.guard_cancel", AzPlayBehaviors.PLAY_ONCE)),
+        THREE_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.3hit", AzPlayBehaviors.PLAY_ONCE)),
+        IMPALING_THRUST_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.impaling_thrust_charge", AzPlayBehaviors.PLAY_ONCE)),
+        IMPALING_THRUST_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.impaling_thrust_hit", AzPlayBehaviors.PLAY_ONCE)),
+        CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.charge", AzPlayBehaviors.PLAY_ONCE)),
+        CHARGE_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.charge_hit", AzPlayBehaviors.PLAY_ONCE)),
+        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.uppercut", AzPlayBehaviors.PLAY_ONCE)),
+        COUNTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.counter", AzPlayBehaviors.PLAY_ONCE)),
+        TIME_STOP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.shadow_the_world.timestop", AzPlayBehaviors.PLAY_ONCE)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
         

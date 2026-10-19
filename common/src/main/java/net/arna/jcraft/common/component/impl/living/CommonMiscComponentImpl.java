@@ -3,6 +3,7 @@ package net.arna.jcraft.common.component.impl.living;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
 import net.arna.jcraft.common.entity.stand.MetallicaEntity;
 import net.arna.jcraft.api.registry.JSoundRegistry;
@@ -16,9 +17,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
-public class CommonMiscComponentImpl implements CommonMiscComponent {
+public abstract class CommonMiscComponentImpl implements CommonMiscComponent {
     private final LivingEntity entity;
     @Getter
     private Vec3 desiredVelocity = Vec3.ZERO;
@@ -43,8 +47,9 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
     @Getter
     @Setter
     private float aerosmithOverheat = 0f;
+    protected final List<BlockMarkerMove.RecordingTimes> activeBlockMarkerMoves = new LinkedList<>();
 
-    public CommonMiscComponentImpl(final LivingEntity entity) {
+    protected CommonMiscComponentImpl(final LivingEntity entity) {
         this.entity = entity;
     }
 
@@ -128,6 +133,11 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
             armoredHitTicks--;
         }
 
+        for (final BlockMarkerMove.RecordingTimes recordingTimes : activeBlockMarkerMoves) {
+            recordingTimes.decreaseRemaining();
+        }
+        activeBlockMarkerMoves.removeIf(recordingTimes -> recordingTimes.getRemaining() <= 0);
+
         if (entity.level().isClientSide()) {
             return;
         }
@@ -174,6 +184,26 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         sync(entity);
     }
 
+    @Override
+    public void addRecordingTimes(final BlockMarkerMove.@NonNull RecordingTimes recordingTimes) {
+        if (activeBlockMarkerMoves.stream().noneMatch(rt -> rt.getUuid().equals(recordingTimes.getUuid()))) {
+            activeBlockMarkerMoves.add(recordingTimes);
+            sync(entity);
+        }
+    }
+
+    @Override
+    public void removeRecordingTimes(final @NonNull UUID uuid, final boolean shouldSync) {
+        if (activeBlockMarkerMoves.removeIf(rt -> rt.getUuid().equals(uuid)) && shouldSync) {
+            sync(entity);
+        }
+    }
+
+    @Override
+    public Iterable<? extends BlockMarkerMove.RecordingTimes> viewActiveBlockMarkerMoves() {
+        return Collections.unmodifiableList(activeBlockMarkerMoves);
+    }
+
     public void sync(Entity entity) {
     }
 
@@ -185,12 +215,27 @@ public class CommonMiscComponentImpl implements CommonMiscComponent {
         buf.writeVarInt(armoredHitTicks);
         buf.writeVarInt(stuckKnifeCount);
         buf.writeFloat(attackSpeedMult);
+        buf.writeVarInt(activeBlockMarkerMoves.size());
+        for (final var recordTimes : activeBlockMarkerMoves) {
+            buf.writeVarInt(recordTimes.getMax());
+            buf.writeVarInt(recordTimes.getRemaining());
+            buf.writeUUID(recordTimes.getUuid());
+        }
     }
 
     public void applySyncPacket(FriendlyByteBuf buf) {
         armoredHitTicks = buf.readVarInt();
         stuckKnifeCount = buf.readVarInt();
         attackSpeedMult = buf.readFloat();
+        activeBlockMarkerMoves.clear();
+        final int size = buf.readVarInt();
+        for (int i = 0; i < size; i++) {
+            activeBlockMarkerMoves.add(new BlockMarkerMove.RecordingTimes(
+                    buf.readVarInt(),
+                    buf.readVarInt(),
+                    buf.readUUID()
+            ));
+        }
     }
 
     public void readFromNbt(@NonNull CompoundTag tag) {
