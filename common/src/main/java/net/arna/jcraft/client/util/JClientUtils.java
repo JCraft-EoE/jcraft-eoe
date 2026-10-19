@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static net.arna.jcraft.common.util.JUtils.DEG_TO_RAD;
 import static net.arna.jcraft.common.util.JUtils.deltaPos;
 
 public class JClientUtils {
@@ -161,7 +160,7 @@ public class JClientUtils {
         if (endHitAnimTime > 20L) {
             endHitAnimTime = 20L;
         }
-        float angDegrees = endHitAnimTime * DEG_TO_RAD;
+        float angDegrees = endHitAnimTime * Mth.DEG_TO_RAD;
 
         if (endHitAnimTime <= 1) {
             leftLeg.resetPose();
