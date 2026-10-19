@@ -68,11 +68,11 @@ public class MainMenuScreen extends Screen {
         final int skinBtnY = 6*height/7 + 10;
         final int skinBtnHeight = height - skinBtnY;
         final Button prevSkinBtn = Button.builder(Component.literal("<"), button -> setDisplayedSkin(stand.getSkin()-1))
-                .bounds(3*width/4, skinBtnY, Math.max(2, 5*width/6-3*width/4), Math.max(2, skinBtnHeight))
+                .bounds(3*width/4, skinBtnY, Math.max(2, 5*width/6 - 3*width/4), Math.max(2, skinBtnHeight))
                 .build();
         addRenderableWidget(prevSkinBtn);
         applySkinBtn = Button.builder(Component.translatable("jcraft.gui.apply_skin"), button -> applySkin())
-                .bounds(5*width/6, skinBtnY, Math.max(2, 11*width/12-5*width/6), Math.max(2, skinBtnHeight))
+                .bounds(5*width/6, skinBtnY, Math.max(2, 11*width/12 - 5*width/6), Math.max(2, skinBtnHeight))
                 .build();
         addRenderableWidget(applySkinBtn);
         final Button nextSkinBtn = Button.builder(Component.literal(">"), button -> setDisplayedSkin(stand.getSkin()+1))

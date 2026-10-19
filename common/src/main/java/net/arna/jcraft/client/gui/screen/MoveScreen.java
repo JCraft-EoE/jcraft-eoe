@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -60,6 +61,7 @@ public class MoveScreen extends Screen {
         drawMoveString(guiGraphics, font, baseMove, 10, 2*height/7 + 10, 0xFFFFFF);
         drawDescriptionString(guiGraphics, font, baseMove, 10, 5*height/7 + 10, 0xFFFFFF);
         guiGraphics.drawString(font, FRAME_DATA, 3*width/4 + 10, height/7 + 10, 0xFFFFFF);
+        InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width/2, height/2, 45, width/2f - mouseX, height/2f - mouseY, attacker.getBaseEntity());
         drawFrameData(guiGraphics, font, baseMove, 3*width/4 + 10, 2*height/7 + 10, 0xFFFFFF);
     }
 
