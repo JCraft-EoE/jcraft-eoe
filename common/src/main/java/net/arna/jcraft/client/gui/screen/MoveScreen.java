@@ -15,20 +15,20 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
-public class MoveScreen extends Screen {
+public class MoveScreen<A extends IAttacker<? extends A, S>, S extends Enum<?>> extends Screen {
 
     public static final Component MOVE_VARIANTS = Component.translatable("jcraft.gui.move_variants");
     public static final Component FRAME_DATA = Component.translatable("jcraft.gui.frame_data");
 
     @NonNull
-    protected final IAttacker<?,?> attacker;
-    protected final MoveMap.Entry<?,?> baseMove;
+    protected final IAttacker<A,S> attacker;
+    protected final MoveMap.Entry<A,S> baseMove;
     protected byte selectedMove = 0;
 
     /**
      * Making sure that the given stand has the given attack is the responsibility of the caller.
      */
-    public MoveScreen(final @NonNull IAttacker<?,?> attacker, final MoveMap.Entry<?, ?> baseMove) {
+    public MoveScreen(final @NonNull IAttacker<A,S> attacker, final MoveMap.Entry<A,S> baseMove) {
         super(Component.literal("JCraft Move Screen"));
         this.attacker = attacker;
         this.baseMove = baseMove;
@@ -47,6 +47,11 @@ public class MoveScreen extends Screen {
     @Override
     public void tick() {
         super.tick();
+        switch (selectedMove) {
+            case 1 -> attacker.setState(baseMove.getCrouchingVariant().getAnimState());
+            case 2 -> attacker.setState(baseMove.getAerialVariant().getAnimState());
+            default -> attacker.setState(baseMove.getAnimState());
+        }
         if (attacker instanceof final StandEntity<?,?> stand) {
             stand.tick();
         }
