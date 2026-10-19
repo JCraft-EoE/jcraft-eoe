@@ -292,11 +292,16 @@ public final class JUtils {
         return raycastAll(entity, start, end, fluidHandling, null);
     }
 
+
+    public static HitResult raycastAll(Entity entity, Vec3 start, Vec3 end, ClipContext.Fluid fluidHandling, Predicate<Entity> entityPredicate) {
+        return raycastAll(entity, start, end, ClipContext.Block.COLLIDER, fluidHandling, entityPredicate);
+    }
+
     /**
      * @return The closer {@link EntityHitResult} or {@link BlockHitResult}, defaulting to the BlockHitResult
      * if the distance is equal or no entity was hit.
      */
-    public static HitResult raycastAll(Entity entity, Vec3 start, Vec3 end, ClipContext.Fluid fluidHandling, Predicate<Entity> entityPredicate) {
+    public static HitResult raycastAll(final Entity entity, final Vec3 start, final Vec3 end, final ClipContext.Block blockHandling, final ClipContext.Fluid fluidHandling, final Predicate<Entity> entityPredicate) {
         Level world = entity.level();
         double rangeSquared = start.distanceToSqr(end);
 
@@ -311,7 +316,7 @@ public final class JUtils {
                 rangeSquared
         );
         boolean entityHit = eHit != null && eHit.getType() == HitResult.Type.ENTITY;
-        HitResult bHit = world.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, fluidHandling, entity));
+        HitResult bHit = world.clip(new ClipContext(start, end, blockHandling, fluidHandling, entity));
 
         Vec3 blockPos = bHit.getLocation();
 

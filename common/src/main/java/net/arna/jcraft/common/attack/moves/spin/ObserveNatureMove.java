@@ -29,7 +29,8 @@ public class ObserveNatureMove<A extends IAttacker<? extends A, ?>> extends Abst
         final Vec3 eyePos = baseEntity.position().add(GravityChangerAPI.getEyeOffset(baseEntity));
         final HitResult hitResult = JUtils.raycastAll(baseEntity,
                 eyePos, eyePos.add(baseEntity.getLookAngle().scale(20 /* blocks */)),
-                ClipContext.Fluid.NONE, EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(EntitySelector.NO_SPECTATORS));
+                ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE,
+                EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(EntitySelector.NO_SPECTATORS));
         if (user != null) {
             JComponentPlatformUtils.getSpin(user).observeNature(hitResult, user.level());
         }
