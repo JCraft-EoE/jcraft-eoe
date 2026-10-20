@@ -10,6 +10,7 @@ import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.entity.projectile.BulletProjectile;
 import net.arna.jcraft.common.system.GunAiming;
 import net.arna.jcraft.common.tickable.PeacemakerReload;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -71,13 +72,32 @@ public class Peacemaker extends Item {
         data.putLong(ANIMATION_SEQUENCE_ID, data.getLong(ANIMATION_SEQUENCE_ID) + 1);
     }
 
+    public static String getFireKey() {
+        return Minecraft.getInstance().options.keyAttack
+                .getTranslatedKeyMessage().getString();
+    }
+
+    public static String getAimKey() {
+        return Minecraft.getInstance().options.keyUse
+                .getTranslatedKeyMessage().getString();
+    }
+
+    public static String getReloadKey() {
+        return Minecraft.getInstance().options.keyPickItem
+                .getTranslatedKeyMessage().getString();
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
         CompoundTag itemData = stack.getTag();
 
-        if (itemData != null && itemData.contains(SHOTS_ID)) {
-            tooltip.add(Component.translatable("tooltip.jcraft.peacemaker.shots").append(" §e" + itemData.get(SHOTS_ID)));
-        }
+        int shots = itemData != null && itemData.contains(SHOTS_ID)
+                ? itemData.getInt(SHOTS_ID) : MAX_ROUNDS;
+
+        tooltip.add(Component.translatable("tooltip.jcraft.peacemaker.shots").append(" §e" + shots));
+        tooltip.add(Component.translatable("tooltip.jcraft.peacemaker.fire", getFireKey()));
+        tooltip.add(Component.translatable("tooltip.jcraft.peacemaker.aim", getAimKey()));
+        tooltip.add(Component.translatable("tooltip.jcraft.peacemaker.reload", getReloadKey()));
 
         super.appendHoverText(stack, world, tooltip, context);
     }

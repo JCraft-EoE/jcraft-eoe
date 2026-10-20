@@ -1584,6 +1584,9 @@
   "text.autoconfig.jcraft.option.verticalHudOffset": "Vertical HUD Offset (+DOWN/-UP)",
   "text.autoconfig.jcraft.title": "JCraft Config",
   "tooltip.jcraft.peacemaker.shots": "Shots:",
+  "tooltip.jcraft.peacemaker.fire": "%s - Cock / Fire",
+  "tooltip.jcraft.peacemaker.aim": "%s - Aim",
+  "tooltip.jcraft.peacemaker.reload": "%s - Reload",
   "warning.jcraft.spec.change": "Using this will change your spec, are you sure?",
   "warning.jcraft.spec.change.mob": "Interacting with this entity will change your spec, are you sure?",
   "warning.jcraft.stand.change": "Using this will change your stand, are you sure?"
