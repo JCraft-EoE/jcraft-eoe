@@ -16,13 +16,21 @@ import net.arna.jcraft.common.splatter.GasolineSplatter;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Set;
@@ -31,8 +39,12 @@ import java.util.function.Predicate;
 import static net.arna.jcraft.api.Attacks.damageLogic;
 
 public final class CrossfireHurricaneAttack<A extends StandEntity<? extends A, ?>> extends AbstractMove<CrossfireHurricaneAttack<A>, A> {
+    public static final int MAX_HURRICANE_TIME = 50;
+    public static final double HURRICANE_TRACK_RADIUS = 32.0;
     private int hurricaneTime = 0;
     private Vec3 hurricanePos = Vec3.ZERO;
+
+    private final RecipeManager.CachedCheck<Container, SmeltingRecipe> recipeCheck = RecipeManager.createCheck(RecipeType.SMELTING);
 
     public CrossfireHurricaneAttack(final int cooldown, final int windup, final int duration, final float moveDistance) {
         super(cooldown, windup, duration, moveDistance);
@@ -50,7 +62,7 @@ public final class CrossfireHurricaneAttack<A extends StandEntity<? extends A, ?
 
     @Override
     public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
-        hurricaneTime = 50;
+        hurricaneTime = MAX_HURRICANE_TIME;
         hurricanePos = attacker.position();
         return Set.of();
     }
@@ -61,6 +73,21 @@ public final class CrossfireHurricaneAttack<A extends StandEntity<? extends A, ?
         final Entity vehicle = user.getVehicle();
         final Level world = stand.level();
 
+        // smelt items
+        if (hurricaneTime == MAX_HURRICANE_TIME) {
+            final List<ItemEntity> itemEntities = world.getEntitiesOfClass(ItemEntity.class, getHurricaneArea());
+            for (final ItemEntity itemEntity : itemEntities) {
+                final SimpleContainer container = new SimpleContainer(itemEntity.getItem());
+                recipeCheck.getRecipeFor(container, world).ifPresent(recipe -> {
+                    final ItemStack result = recipe.getResultItem(world.registryAccess());
+                    final int amount = itemEntity.getItem().getCount();
+                    for (int i = 0; i < amount; i++) {
+                        world.addFreshEntity(new ItemEntity(world, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), result.copy()));
+                    }
+                    itemEntity.discard();
+                });
+            }
+        }
         // Run every four ticks because the hurricane's meant to be slow, and it's convenient for CPU usage
         if (stand.tickCount % 4 != 0 || hurricaneTime <= 0) {
             return;
@@ -70,9 +97,8 @@ public final class CrossfireHurricaneAttack<A extends StandEntity<? extends A, ?
         final Predicate<Entity> selector = EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(e -> e != vehicle && e != stand && e != user);
 
         // Homing
-        final List<LivingEntity> nearbyEnts = world.getEntitiesOfClass(LivingEntity.class,
-                new AABB(hurricanePos.add(32.0, 32.0, 32.0), hurricanePos.subtract(32.0, 32.0, 32.0)),
-                selector);
+        final AABB trackingArea = new AABB(hurricanePos.add(HURRICANE_TRACK_RADIUS, HURRICANE_TRACK_RADIUS, HURRICANE_TRACK_RADIUS), hurricanePos.subtract(HURRICANE_TRACK_RADIUS, HURRICANE_TRACK_RADIUS, HURRICANE_TRACK_RADIUS));
+        final List<LivingEntity> nearbyEnts = world.getEntitiesOfClass(LivingEntity.class, trackingArea, selector);
 
         if (!nearbyEnts.isEmpty()) {
             Vec3 avgPos = Vec3.ZERO;
@@ -92,9 +118,7 @@ public final class CrossfireHurricaneAttack<A extends StandEntity<? extends A, ?
         }
 
         // Damage
-        final List<LivingEntity> toHurt = world.getEntitiesOfClass(LivingEntity.class,
-                new AABB(hurricanePos.add(2.5, 1, 2.5), hurricanePos.subtract(2.5, 1, 2.5)),
-                selector);
+        final List<LivingEntity> toHurt = world.getEntitiesOfClass(LivingEntity.class, getHurricaneArea(), selector);
 
         for (LivingEntity living : toHurt) {
             LivingEntity target = JUtils.getUserIfStand(living);
@@ -118,6 +142,10 @@ public final class CrossfireHurricaneAttack<A extends StandEntity<? extends A, ?
         buf.writeDouble(hurricanePos.z);
 
         ServerChannelFeedbackPacket.send(JUtils.around((ServerLevel) world, hurricanePos, 128), buf);
+    }
+
+    private @NotNull AABB getHurricaneArea() {
+        return new AABB(hurricanePos.add(2.5, 1, 2.5), hurricanePos.subtract(2.5, 1, 2.5));
     }
 
     @Override

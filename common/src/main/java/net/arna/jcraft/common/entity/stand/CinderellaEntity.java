@@ -66,7 +66,7 @@ public class CinderellaEntity extends StandEntity<CinderellaEntity, CinderellaEn
 
     public enum State implements StandAnimationState<CinderellaEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cinderella.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cinderella.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cinderella.light", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cinderella.block", AzPlayBehaviors.LOOP)),
         ;
 

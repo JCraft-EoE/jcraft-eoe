@@ -678,11 +678,11 @@ public class AerosmithEntity extends StandEntity<AerosmithEntity, AerosmithEntit
     public enum State implements StandAnimationState<AerosmithEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "idle", AzPlayBehaviors.LOOP)),
         ACTIVE(AzCommand.create(JCraft.BASE_CONTROLLER, "idle", AzPlayBehaviors.LOOP)),
-        CHARGE(AzCommand.create(JCraft.BASE_CONTROLLER, "charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT(AzCommand.create(JCraft.BASE_CONTROLLER, "burst", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        CHARGE(AzCommand.create(JCraft.BASE_CONTROLLER, "charge", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT(AzCommand.create(JCraft.BASE_CONTROLLER, "burst", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "block", AzPlayBehaviors.LOOP)),
-        SAWBLADE(AzCommand.create(JCraft.BASE_CONTROLLER, "sawblade", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BOMB(AzCommand.create(JCraft.BASE_CONTROLLER, "bomb", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        SAWBLADE(AzCommand.create(JCraft.BASE_CONTROLLER, "sawblade", AzPlayBehaviors.PLAY_ONCE)),
+        BOMB(AzCommand.create(JCraft.BASE_CONTROLLER, "bomb", AzPlayBehaviors.PLAY_ONCE)),
         RECALL(AzCommand.controllerBuilder()
                 .playSequence(JCraft.BASE_CONTROLLER, sb -> sb
                         .queue("recall landing pattern", p -> p.withPlayBehavior(AzPlayBehaviors.PLAY_ONCE))

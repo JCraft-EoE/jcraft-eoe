@@ -86,7 +86,7 @@ public class BisectProjectile extends AbstractArrow {
             // Recursive hitbox check between current and previous position
             final Vec3 towardsVec = curPos.subtract(new Vec3(xo, yo, zo));
             //todo: support other gravs?
-            final float yaw = (getYRot() + 90.0f) * JUtils.DEG_TO_RAD;
+            final float yaw = (getYRot() + 90.0f) * Mth.DEG_TO_RAD;
             final Vec3 sideVec = new Vec3(
                     Mth.sin(yaw), 0, Mth.cos(yaw)
             );
