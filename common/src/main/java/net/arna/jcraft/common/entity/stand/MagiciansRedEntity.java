@@ -24,6 +24,7 @@ import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
+import net.arna.jcraft.mixin.AbstractFurnaceBlockEntityAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -256,10 +257,11 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             world.levelEvent(2009, blockPos, 0);
             world.playSound(null, blockPos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, (1.0F + world.getRandom().nextFloat() * 0.2F) * 0.7F);
         }
-        if (world.getBlockEntity(blockPos) instanceof AbstractFurnaceBlockEntity furnaceBlock) {
-            furnaceBlock.litTime = 220;
+        if (world.getBlockEntity(blockPos) instanceof final AbstractFurnaceBlockEntity furnaceBlock) {
+            furnaceBlock.litTime += 220;
+            ((AbstractFurnaceBlockEntityAccessor)furnaceBlock).setLitDuration(((AbstractFurnaceBlockEntityAccessor)furnaceBlock).getLitDuration() + 220);
         }
-        if (block instanceof IceBlock iceBlock) {
+        if (block instanceof final IceBlock iceBlock) {
             iceBlock.melt(state, world, blockPos);
         }
     }
