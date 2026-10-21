@@ -8,12 +8,12 @@ import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractBarrageAttack;
 import net.arna.jcraft.api.splatter.JSplatterManager;
 import net.arna.jcraft.common.splatter.GasolineSplatter;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CampfireCookingRecipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -69,14 +69,7 @@ public final class FlamethrowerAttack<A extends IAttacker<? extends A, ?>> exten
         }
         for (final ItemEntity itemEntity : itemEntities) {
             final SimpleContainer container = new SimpleContainer(itemEntity.getItem());
-            recipeCheck.getRecipeFor(container, level).ifPresent(recipe -> {
-                final ItemStack result = recipe.getResultItem(level.registryAccess());
-                final int amount = itemEntity.getItem().getCount();
-                for (int i = 0; i < amount; i++) {
-                    level.addFreshEntity(new ItemEntity(level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), result.copy()));
-                }
-                itemEntity.discard();
-            });
+            recipeCheck.getRecipeFor(container, level).ifPresent(recipe -> JUtils.externalRecipeApplication(itemEntity, recipe));
         }
     }
 

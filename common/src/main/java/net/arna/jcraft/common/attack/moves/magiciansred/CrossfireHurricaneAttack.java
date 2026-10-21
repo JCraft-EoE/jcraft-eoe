@@ -23,7 +23,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
@@ -78,14 +77,7 @@ public final class CrossfireHurricaneAttack<A extends StandEntity<? extends A, ?
             final List<ItemEntity> itemEntities = world.getEntitiesOfClass(ItemEntity.class, getHurricaneArea());
             for (final ItemEntity itemEntity : itemEntities) {
                 final SimpleContainer container = new SimpleContainer(itemEntity.getItem());
-                recipeCheck.getRecipeFor(container, world).ifPresent(recipe -> {
-                    final ItemStack result = recipe.getResultItem(world.registryAccess());
-                    final int amount = itemEntity.getItem().getCount();
-                    for (int i = 0; i < amount; i++) {
-                        world.addFreshEntity(new ItemEntity(world, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), result.copy()));
-                    }
-                    itemEntity.discard();
-                });
+                recipeCheck.getRecipeFor(container, world).ifPresent(recipe -> JUtils.externalRecipeApplication(itemEntity, recipe));
             }
         }
         // Run every four ticks because the hurricane's meant to be slow, and it's convenient for CPU usage

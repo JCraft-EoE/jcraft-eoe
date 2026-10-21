@@ -56,6 +56,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
@@ -65,9 +66,11 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.*;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
@@ -1179,5 +1182,47 @@ public final class JUtils {
             return bounds.length > 0 ? toClass(bounds[0]) : null;
         }
         return null;
+    }
+
+    /**
+     * Turns an item entity into another by applying a (single input, single output) recipe.
+     * @param itemEntity the item entity to transform
+     * @param recipe the recipe to apply
+     * @param <R> the recipe type
+     */
+    public static <R extends Recipe<? extends Container>> void externalRecipeApplication(final @NonNull ItemEntity itemEntity, final @NonNull R recipe) {
+        final Level level = itemEntity.level();
+        final ItemStack result = recipe.getResultItem(level.registryAccess());
+        if (result.isEmpty()) {
+            return;
+        }
+        final int amount = itemEntity.getItem().getCount();
+        // make as few resulting stacks as possible
+        final List<ItemStack> resultStacks = new ArrayList<>();
+        int index = 0;
+        for (int i = 0; i < amount; i++) {
+            if (resultStacks.size() == index) {
+                resultStacks.add(result.copy());
+            }
+            else {
+                final ItemStack currentResult = resultStacks.get(index);
+                final ItemStack newStack = result.copy();
+                final int overflow = Math.max(0, result.getCount() - (currentResult.getMaxStackSize() - currentResult.getCount()));
+                final ItemStack newResult = ItemEntity.merge(currentResult, newStack, Item.MAX_STACK_SIZE);
+                resultStacks.set(index, newResult);
+                if (newResult.getCount() == newResult.getMaxStackSize()) {
+                    index++;
+                }
+                else if (overflow > 0) {
+                    resultStacks.add(result.copyWithCount(overflow));
+                    index++;
+                }
+            }
+        }
+        // drop the stacks into the world
+        for (final ItemStack resultStack : resultStacks) {
+            level.addFreshEntity(new ItemEntity(level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), resultStack));
+        }
+        itemEntity.discard();
     }
 }
