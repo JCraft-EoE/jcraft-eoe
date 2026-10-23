@@ -34,11 +34,15 @@ public interface JEventsRegistry {
         PlayerEvent.PLAYER_JOIN.register((player) -> {
             ConfigUpdatePacket.sendOptionsToClient(player, ConfigOption.getOptions().values());
             AttackerDataPacket.send(List.of(player));
+            JServerEvents.playerJoin(player);
         });
 
         LifecycleEvent.SERVER_BEFORE_START.register(JServerConfig::load);
         LifecycleEvent.SERVER_BEFORE_START.register(VillageStructureInjector::onServerBeforeStart);
         LifecycleEvent.SERVER_STARTED.register(JServerEvents::finishLoading);
-        LifecycleEvent.SERVER_STOPPED.register(JServerEvents::saveExclusives);
+        LifecycleEvent.SERVER_STOPPED.register(server -> {
+            JServerEvents.saveExclusives(server);
+            JServerEvents.saveServerJoins(server);
+        });
     }
 }

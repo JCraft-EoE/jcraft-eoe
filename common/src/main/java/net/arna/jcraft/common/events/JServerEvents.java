@@ -13,9 +13,17 @@ import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.registry.*;
+import net.arna.jcraft.api.spec.SpecType;
+import net.arna.jcraft.api.spec.SpecTypeUtil;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
+import net.arna.jcraft.common.advancements.Hamon1Trigger;
+import net.arna.jcraft.common.advancements.Hamon2Trigger;
+import net.arna.jcraft.common.advancements.Hamon3Trigger;
+import net.arna.jcraft.common.advancements.Hamon4Trigger;
+import net.arna.jcraft.common.advancements.Hamon5Trigger;
+import net.arna.jcraft.common.advancements.Hamon6Trigger;
 import net.arna.jcraft.common.block.CoffinBlock;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
@@ -27,6 +35,7 @@ import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
+import net.arna.jcraft.common.saveddata.ServerJoinData;
 import net.arna.jcraft.common.spec.VampireSpec;
 import net.arna.jcraft.common.system.GunAiming;
 import net.arna.jcraft.common.tickable.*;
@@ -96,6 +105,7 @@ public class JServerEvents {
     public static void finishLoading(final MinecraftServer server) {
         JCraft.auWorld = server.getLevel(JDimensionRegistry.AU_DIMENSION_KEY);
         JCraft.setExclusiveStandsData(ExclusiveStandsData.fromDefaultFile(server));
+        JCraft.setServerJoinData(ServerJoinData.fromDefaultFile(server));
         if (Platform.isModLoaded("jjbacosplay")) {
             for (final CosplayItem<?> cosplay : CosplayItem.all()) {
                 switch (cosplay.getSlot()) {
@@ -111,6 +121,12 @@ public class JServerEvents {
     public static void saveExclusives(final MinecraftServer server) {
         if (JCraft.getExclusiveStandsData() != null) {
             JCraft.getExclusiveStandsData().saveToDefaultFile(server);
+        }
+    }
+
+    public static void saveServerJoins(final MinecraftServer server) {
+        if (JCraft.getServerJoinData() != null) {
+            JCraft.getServerJoinData().saveToDefaultFile(server);
         }
     }
 
@@ -757,4 +773,41 @@ public class JServerEvents {
 
         vamp.resetBlood();
     }
+
+    public static void playerJoin(final ServerPlayer player) {
+        final ServerJoinData serverJoinData = JCraft.getServerJoinData();
+        if (serverJoinData != null && serverJoinData.addPlayer(player)) {
+            // first join logic here
+            if (JServerConfig.START_WITH_STAND.getValue()) {
+                final var standData = JComponentPlatformUtils.getStandComponent(player);
+                if (StandTypeUtil.isNone(standData.getType())) {
+                    // keep in mind exclusive stands, see SetStandCommand
+                    StandType stand = null;
+                    int tries = 0;
+                    while ((stand == null || JCraft.getExclusiveStandsData().isStandUsed(stand)) && tries++ < 500) {
+                        StandTypeUtil.getRandom(player.getRandom(), false, player.getServer().registryAccess(), true, false);
+                    }
+                    standData.setType(stand);
+                }
+            }
+            if (JServerConfig.START_WITH_SPEC.getValue()) {
+                final var specData = JComponentPlatformUtils.getSpecData(player);
+                if (SpecTypeUtil.isNone(specData.getType())) {
+                    final SpecType spec = SpecTypeUtil.getRandom(player.getRandom());
+                    specData.setType(spec);
+                    // unlock fully (cmp. UnlockSpecCommand)
+                    if (spec == JSpecTypeRegistry.HAMON) {
+                        JUtils.awardAdvancement(player, Hamon1Trigger.ID);
+                        JUtils.awardAdvancement(player, Hamon2Trigger.ID);
+                        JUtils.awardAdvancement(player, Hamon3Trigger.ID);
+                        JUtils.awardAdvancement(player, Hamon4Trigger.ID);
+                        JUtils.awardAdvancement(player, Hamon5Trigger.ID);
+                        JUtils.awardAdvancement(player, Hamon6Trigger.ID);
+                        JComponentPlatformUtils.getHamon(player).setActiveLesson(0);
+                    }
+                }
+            }
+        }
+    }
+
 }
