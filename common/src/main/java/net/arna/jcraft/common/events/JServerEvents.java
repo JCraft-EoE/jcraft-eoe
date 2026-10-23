@@ -778,14 +778,15 @@ public class JServerEvents {
         final ServerJoinData serverJoinData = JCraft.getServerJoinData();
         if (serverJoinData != null && serverJoinData.addPlayer(player)) {
             // first join logic here
+            final int MAX_TRIES = 500; // arbitrary
             if (JServerConfig.START_WITH_STAND.getValue()) {
                 final var standData = JComponentPlatformUtils.getStandComponent(player);
                 if (StandTypeUtil.isNone(standData.getType())) {
-                    // keep in mind exclusive stands, see SetStandCommand
+                    // keep in mind exclusive stands, cmp. SetStandCommand
                     StandType stand = null;
                     int tries = 0;
-                    while ((stand == null || JCraft.getExclusiveStandsData().isStandUsed(stand)) && tries++ < 500) {
-                        StandTypeUtil.getRandom(player.getRandom(), false, player.getServer().registryAccess(), true, false);
+                    while ((StandTypeUtil.isNone(stand) || (JServerConfig.EXCLUSIVE_STANDS.getValue() && JCraft.getExclusiveStandsData().isStandUsed(stand))) && tries++ < MAX_TRIES) {
+                        stand = StandTypeUtil.getRandom(player.getRandom(), false, player.getServer().registryAccess(), true, false);
                     }
                     standData.setType(stand);
                 }
@@ -793,7 +794,11 @@ public class JServerEvents {
             if (JServerConfig.START_WITH_SPEC.getValue()) {
                 final var specData = JComponentPlatformUtils.getSpecData(player);
                 if (SpecTypeUtil.isNone(specData.getType())) {
-                    final SpecType spec = SpecTypeUtil.getRandom(player.getRandom());
+                    SpecType spec = null;
+                    int tries = 0;
+                    while (SpecTypeUtil.isNone(spec) && tries++ < MAX_TRIES) {
+                        spec = SpecTypeUtil.getRandom(player.getRandom());
+                    }
                     specData.setType(spec);
                     // unlock fully (cmp. UnlockSpecCommand)
                     if (spec == JSpecTypeRegistry.HAMON) {

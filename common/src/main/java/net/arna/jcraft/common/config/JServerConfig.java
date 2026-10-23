@@ -112,8 +112,8 @@ public class JServerConfig {
     private static final ResourceLocation GAMEPLAY = JCraft.id("gameplay");
     // public static final BooleanOption ENABLE_HITSTOP = new BooleanOption(JCraft.id("enable_hitstop"), GAMEPLAY, false);
     public static final BooleanOption EXCLUSIVE_STANDS = new BooleanOption(JCraft.id("exclusive_stands"), GAMEPLAY, false);
-    public static final BooleanOption START_WITH_SPEC = new BooleanOption(JCraft.id("start_with_spec"), GAMEPLAY, true);
-    public static final BooleanOption START_WITH_STAND = new BooleanOption(JCraft.id("start_with_stand"), GAMEPLAY, true);
+    public static final BooleanOption START_WITH_SPEC = new BooleanOption(JCraft.id("start_with_spec"), GAMEPLAY, false);
+    public static final BooleanOption START_WITH_STAND = new BooleanOption(JCraft.id("start_with_stand"), GAMEPLAY, false);
     public static final BooleanOption STAND_USER_SIGHT = new BooleanOption(JCraft.id("stand_user_sight"), GAMEPLAY, false);
     public static final BooleanOption SPAWNER_STANDS = new BooleanOption(JCraft.id("spawner_stands"), GAMEPLAY, true);
 
