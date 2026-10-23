@@ -1,6 +1,7 @@
 package net.arna.jcraft.mixin.gravity;
 
-
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -10,24 +11,24 @@ import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ShulkerBoxBlockEntity.class)
 public abstract class ShulkerBoxBlockEntityMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "moveCollidedEntities",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"
             )
     )
-    private void redirect_pushEntities_move_0(Entity entity, MoverType movementType, Vec3 vec3d) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private void jcraft$pushEntities_move_0(final Entity instance, final MoverType type, final Vec3 pos, final Operation<Void> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            entity.move(movementType, vec3d);
+            original.call(instance, type, pos);
             return;
         }
-
-        entity.move(movementType, RotationUtil.vecWorldToPlayer(vec3d, gravityDirection));
+        original.call(instance, type, RotationUtil.vecWorldToPlayer(pos, gravityDirection));
     }
+
 }

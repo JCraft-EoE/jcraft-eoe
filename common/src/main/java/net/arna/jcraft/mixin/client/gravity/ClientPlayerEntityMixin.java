@@ -1,5 +1,8 @@
 package net.arna.jcraft.mixin.client.gravity;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -13,12 +16,10 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LocalPlayer.class)
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
+
     public ClientPlayerEntityMixin(ClientLevel world, GameProfile profile) {
         super(world, profile);
     }
@@ -26,7 +27,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
     @Shadow
     protected abstract boolean suffocatesAt(BlockPos pos);
 
-    @Redirect(
+    @WrapOperation(
             method = "suffocatesAt",
             at = @At(
                     value = "NEW",
@@ -34,10 +35,10 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
                     ordinal = 0
             )
     )
-    private AABB redirect_wouldCollideAt_new_0(double x1, double y1, double z1, double x2, double y2, double z2, BlockPos pos) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
+    private AABB jcraft$wouldCollideAt_new_0(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2, final Operation<AABB> original, final BlockPos pos) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
         if (gravityDirection == Direction.DOWN) {
-            return new AABB(x1, y1, z1, x2, y2, z2);
+            return original.call(x1, y1, z1, x2, y2, z2);
         }
 
         AABB playerBox = this.getBoundingBox();
@@ -51,20 +52,15 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
         );
     }
 
-    @Inject(
-            method = "moveTowardsClosestSpace",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void inject_pushOutOfBlocks(double x, double z, CallbackInfo ci) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
+    @WrapMethod(method = "moveTowardsClosestSpace")
+    private void jcraft$pushOutOfBlocks(final double x, final double z, final Operation<Void> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
         if (gravityDirection == Direction.DOWN) {
+            original.call(x, z);
             return;
         }
 
-        ci.cancel();
-
-        Vec3 pos = RotationUtil.vecPlayerToWorld(x - this.getX(), 0.0D, z - this.getZ(), gravityDirection).add(this.position());
+        Vec3 pos = RotationUtil.vecPlayerToWorld(x - this.getX(), 0d, z - this.getZ(), gravityDirection).add(this.position());
         BlockPos blockPos = BlockPos.containing(pos);
         if (this.suffocatesAt(blockPos)) {
             double dx = pos.x - (double) blockPos.getX();
@@ -73,12 +69,12 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
             Direction direction = null;
             double minDistToEdge = Double.MAX_VALUE;
 
-            Direction[] directions = new Direction[]{Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH};
+            final Direction[] directions = new Direction[]{Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH};
             for (Direction playerDirection : directions) {
                 Direction worldDirection = RotationUtil.dirPlayerToWorld(playerDirection, gravityDirection);
 
-                double g = worldDirection.getAxis().choose(dx, dy, dz);
-                double distToEdge = worldDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1.0D - g : g;
+                final double g = worldDirection.getAxis().choose(dx, dy, dz);
+                final double distToEdge = worldDirection.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1d - g : g;
                 if (distToEdge < minDistToEdge && !this.suffocatesAt(blockPos.relative(worldDirection))) {
                     minDistToEdge = distToEdge;
                     direction = playerDirection;
@@ -88,11 +84,12 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayer {
             if (direction != null) {
                 Vec3 velocity = this.getDeltaMovement();
                 if (direction.getAxis() == Direction.Axis.X) {
-                    this.setDeltaMovement(0.1D * (double) direction.getStepX(), velocity.y, velocity.z);
+                    this.setDeltaMovement(0.1 * (double)direction.getStepX(), velocity.y, velocity.z);
                 } else if (direction.getAxis() == Direction.Axis.Z) {
-                    this.setDeltaMovement(velocity.x, velocity.y, 0.1D * (double) direction.getStepZ());
+                    this.setDeltaMovement(velocity.x, velocity.y, 0.1 * (double)direction.getStepZ());
                 }
             }
         }
     }
+
 }

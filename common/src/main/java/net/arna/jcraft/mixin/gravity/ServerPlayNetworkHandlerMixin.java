@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public abstract class ServerPlayNetworkHandlerMixin {
 
     @Unique
-    private static double onPlayerMove_playerMovementY;
+    private static double jcraft$onPlayerMove_playerMovementY;
 
     @Shadow
     public ServerPlayer player;
@@ -56,7 +56,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ),
             require = 0
     )
-    private double modify_onPlayerMove_getY_3(double originalY, @Local(argsOnly = true, index = 1) ServerboundMovePlayerPacket packet) {
+    private double jcraft$modify_onPlayerMove_getY_3(final double originalY, final @Local(argsOnly = true, index = 1) ServerboundMovePlayerPacket packet) {
         final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
 
         if (gravityDirection == Direction.DOWN) {
@@ -73,7 +73,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
                     target = "Lnet/minecraft/server/level/ServerPlayer;doCheckFallDamage(DDDZ)V"
             )
     )
-    private void jGravityAPI$doCheckFallDamage(ServerPlayer instance, double movementX, double movementY, double movementZ, boolean onGround, Operation<Void> original) {
+    private void jcraft$doCheckFallDamage(final ServerPlayer instance, final double movementX, final double movementY, final double movementZ, final boolean onGround, final Operation<Void> original) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
 
         if (gravityDirection == Direction.DOWN) {
@@ -114,20 +114,19 @@ public abstract class ServerPlayNetworkHandlerMixin {
                     ordinal = 0
             )
     )
-    private boolean modify_onPlayerMove_boolean_0(boolean value, ServerboundMovePlayerPacket packet) {
+    private boolean jcraft$modify_onPlayerMove_boolean_0(final boolean value, final ServerboundMovePlayerPacket packet) {
         final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
-
         if (gravityDirection == Direction.DOWN) {
             return value;
         }
 
-        onPlayerMove_playerMovementY = RotationUtil.vecWorldToPlayer(
+        jcraft$onPlayerMove_playerMovementY = RotationUtil.vecWorldToPlayer(
                 clampHorizontal(packet.getX(this.player.getX())) - this.lastGoodX,
                 clampVertical(packet.getY(this.player.getY())) - this.lastGoodY,
                 clampHorizontal(packet.getZ(this.player.getZ())) - this.lastGoodZ,
                 gravityDirection
         ).y;
-        return onPlayerMove_playerMovementY > 0.0D;
+        return jcraft$onPlayerMove_playerMovementY > 0.0D;
     }
 
     @ModifyVariable(
@@ -139,13 +138,13 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ),
             ordinal = 10
     )
-    private double modify_onPlayerMove_double_12(double value) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
+    private double jcraft$modify_onPlayerMove_double_12(final double value) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         if (gravityDirection == Direction.DOWN) {
             return value;
         }
 
-        return onPlayerMove_playerMovementY;
+        return jcraft$onPlayerMove_playerMovementY;
     }
 
     @ModifyArg(
@@ -157,8 +156,8 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ),
             index = 1
     )
-    private Vec3 modify_onPlayerMove_move_0(Vec3 vec3d) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
+    private Vec3 jcraft$modify_onPlayerMove_move_0(final Vec3 vec3d) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -208,8 +207,8 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ),
             index = 1
     )
-    private Vec3 modify_onVehicleMove_move_0(Vec3 vec3d) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
+    private Vec3 jcraft$modify_onVehicleMove_move_0(final Vec3 vec3d) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
@@ -235,9 +234,9 @@ public abstract class ServerPlayNetworkHandlerMixin {
     //}
 
 
-    @Unique private double xx;
-    @Unique private double yy;
-    @Unique private double zz;
+    @Unique private double jcraft$xx;
+    @Unique private double jcraft$yy;
+    @Unique private double jcraft$zz;
 
     @ModifyArg(
             method = "noBlocksAround",
@@ -247,10 +246,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ),
             index = 0
     )
-    private double modify_onVehicleMove_move_0(double x) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
-        this.xx = x;
-        Vec3 argVec = new Vec3(xx, yy, zz);
+    private double jcraft$modify_onVehicleMove_move_0(final double x) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
+        this.jcraft$xx = x;
+        Vec3 argVec = new Vec3(jcraft$xx, jcraft$yy, jcraft$zz);
         argVec = RotationUtil.vecWorldToPlayer(argVec, gravityDirection);
         return argVec.x;
     }
@@ -263,13 +262,14 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ),
             index = 0
     )
-    private double modify_onVehicleMove_move_1(double y) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
-        this.yy = y;
-        Vec3 argVec = new Vec3(xx, yy, zz);
+    private double jcraft$modify_onVehicleMove_move_1(final double y) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
+        this.jcraft$yy = y;
+        Vec3 argVec = new Vec3(jcraft$xx, jcraft$yy, jcraft$zz);
         argVec = RotationUtil.vecWorldToPlayer(argVec, gravityDirection);
         return argVec.y;
     }
+
     @ModifyArg(
             method = "noBlocksAround",
             at = @At(
@@ -278,10 +278,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
             ),
             index = 0
     )
-    private double modify_onVehicleMove_move_2(double z) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
-        this.zz = z;
-        Vec3 argVec = new Vec3(xx, yy, zz);
+    private double jcraft$modify_onVehicleMove_move_2(final double z) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.player);
+        this.jcraft$zz = z;
+        Vec3 argVec = new Vec3(jcraft$xx, jcraft$yy, jcraft$zz);
         argVec = RotationUtil.vecWorldToPlayer(argVec, gravityDirection);
         return argVec.z;
     }

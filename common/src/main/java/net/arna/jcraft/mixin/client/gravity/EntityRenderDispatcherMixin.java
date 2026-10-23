@@ -1,5 +1,7 @@
 package net.arna.jcraft.mixin.client.gravity;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.arna.jcraft.common.gravity.RotationAnimation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.EntityTags;
@@ -23,6 +25,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -33,6 +36,7 @@ import java.util.Optional;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin {
+
     @Shadow
     @Final
     private static RenderType SHADOW_RENDER_TYPE;
@@ -53,13 +57,12 @@ public abstract class EntityRenderDispatcherMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private void inject_render_0(Entity entity, double x, double y, double z, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
+    private void jcraft$render_0(final Entity entity, final double x, final double y, final double z, final float yaw, final float tickDelta, final PoseStack matrices, final MultiBufferSource vertexConsumers, final int light, final CallbackInfo ci) {
         if (!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && !entity.getType().builtInRegistryHolder().is(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
             Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (!this.shouldRenderShadow) {
                 return;
             }
-
             matrices.pushPose();
             Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(entity);
             if (animationOptional.isEmpty()) {
@@ -79,7 +82,7 @@ public abstract class EntityRenderDispatcherMixin {
                     ordinal = 1
             )
     )
-    private void inject_render_1(Entity entity, double x, double y, double z, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
+    private void jcraft$render_1(final Entity entity, final double x, final double y, final double z, final float yaw, final float tickDelta, final PoseStack matrices, final MultiBufferSource vertexConsumers, final int light, final CallbackInfo ci) {
         if (!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && !entity.getType().builtInRegistryHolder().is(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
             // Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (!this.shouldRenderShadow) {
@@ -99,47 +102,42 @@ public abstract class EntityRenderDispatcherMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private void inject_render_2(Entity entity, double x, double y, double z, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
+    private void jcraft$render_2(final Entity entity, final double x, final double y, final double z, final float yaw, final float tickDelta, final PoseStack matrices, final MultiBufferSource vertexConsumers, final int light, final CallbackInfo ci) {
         if (!(entity instanceof Projectile) && !(entity instanceof ExperienceOrb) && !entity.getType().builtInRegistryHolder().is(EntityTags.FORBIDDEN_ENTITY_RENDERING)) {
-            Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+            final Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
             if (gravityDirection == Direction.DOWN) {
                 return;
             }
             if (!this.shouldRenderShadow) {
                 return;
             }
-
             matrices.mulPose(RotationUtil.getCameraRotationQuaternion(gravityDirection));
         }
     }
 
-    @Inject(
-            method = "renderShadow",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private static void inject_renderShadow(PoseStack matrices, MultiBufferSource vertexConsumers, Entity entity, float opacity, float tickDelta, LevelReader world, float radius, CallbackInfo ci) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    @WrapMethod(method = "renderShadow")
+    private static void jcraft$renderShadow(final PoseStack poseStack, final MultiBufferSource buffer, final Entity entity, final float weight, final float partialTicks, final LevelReader level, final float size, final Operation<Void> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
+            original.call(poseStack, buffer, entity, weight, partialTicks, level, size);
             return;
         }
 
-        ci.cancel();
-
-        double x = Mth.lerp(tickDelta, entity.xOld, entity.getX());
-        double y = Mth.lerp(tickDelta, entity.yOld, entity.getY());
-        double z = Mth.lerp(tickDelta, entity.zOld, entity.getZ());
-        Vec3 minShadowPos = RotationUtil.vecPlayerToWorld(-radius, -radius, (double) -radius, gravityDirection).add(x, y, z);
-        Vec3 maxShadowPos = RotationUtil.vecPlayerToWorld(radius, 0.0D, radius, gravityDirection).add(x, y, z);
-        PoseStack.Pose entry = matrices.last();
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(SHADOW_RENDER_TYPE);
+        double x = Mth.lerp(partialTicks, entity.xOld, entity.getX());
+        double y = Mth.lerp(partialTicks, entity.yOld, entity.getY());
+        double z = Mth.lerp(partialTicks, entity.zOld, entity.getZ());
+        Vec3 minShadowPos = RotationUtil.vecPlayerToWorld(-size, -size, (double) -size, gravityDirection).add(x, y, z);
+        Vec3 maxShadowPos = RotationUtil.vecPlayerToWorld(size, 0d, size, gravityDirection).add(x, y, z);
+        PoseStack.Pose entry = poseStack.last();
+        VertexConsumer vertexConsumer = buffer.getBuffer(SHADOW_RENDER_TYPE);
 
         for (BlockPos blockPos : BlockPos.betweenClosed(BlockPos.containing(minShadowPos), BlockPos.containing(maxShadowPos))) {
-            gravitychanger$renderShadowPartPlayer(entry, vertexConsumer, world, blockPos, x, y, z, radius, opacity, gravityDirection);
+            jcraft$renderShadowPartPlayer(entry, vertexConsumer, level, blockPos, x, y, z, size, weight, gravityDirection);
         }
     }
 
-    private static void gravitychanger$renderShadowPartPlayer(PoseStack.Pose entry, VertexConsumer vertices, LevelReader world, BlockPos pos, double x, double y, double z, float radius, float opacity, Direction gravityDirection) {
+    @Unique
+    private static void jcraft$renderShadowPartPlayer(PoseStack.Pose entry, VertexConsumer vertices, LevelReader world, BlockPos pos, double x, double y, double z, float radius, float opacity, Direction gravityDirection) {
         BlockPos posBelow = pos.relative(gravityDirection);
         BlockState blockStateBelow = world.getBlockState(posBelow);
         if (blockStateBelow.getRenderShape() != RenderShape.INVISIBLE && world.getMaxLocalRawBrightness(pos) > 3) {
@@ -186,12 +184,11 @@ public abstract class EntityRenderDispatcherMixin {
                     target = "Lnet/minecraft/world/phys/AABB;move(DDD)Lnet/minecraft/world/phys/AABB;"
             )
     )
-    private static AABB modify_renderHitbox_Box_0(AABB box, PoseStack matrices, VertexConsumer vertices, Entity entity, float tickDelta) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private static AABB jcraft$modify_renderHitbox_Box_0(final AABB box, final PoseStack matrices, final VertexConsumer vertices, final Entity entity, final float tickDelta) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return box;
         }
-
         return RotationUtil.boxWorldToPlayer(box, gravityDirection);
     }
 
@@ -202,12 +199,12 @@ public abstract class EntityRenderDispatcherMixin {
                     target = "Lnet/minecraft/world/entity/Entity;getViewVector(F)Lnet/minecraft/world/phys/Vec3;"
             )
     )
-    private static Vec3 modify_renderHitbox_Vec3d_0(Vec3 vec3d, PoseStack matrices, VertexConsumer vertices, Entity entity, float tickDelta) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private static Vec3 jcraft$modify_renderHitbox_Vec3d_0(final Vec3 vec3d, final PoseStack matrices, final VertexConsumer vertices, final Entity entity, final float tickDelta) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
             return vec3d;
         }
-
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
+
 }

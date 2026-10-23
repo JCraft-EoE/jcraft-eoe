@@ -15,14 +15,16 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class EntityMixin {
 
     // Colors the ranger's Focus targets red instead of the default white outline, only on the focusing player's client
+    @SuppressWarnings("ConstantValue")
     @ModifyReturnValue(method = "getTeamColor", at = @At("RETURN"))
     private int jcraft$rangerFocusOutlineColor(int original) {
         final LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && JUtils.getSpec(player) instanceof RangerSpec &&
                 JComponentPlatformUtils.getGunslinger(player).isFocusActive() &&
-                RangerFocusMove.selectOutlineTarget(player) == (Entity) (Object) this) {
+                RangerFocusMove.selectOutlineTarget(player) == (Object)this) {
             return RangerFocusMove.GLOW_COLOR;
         }
         return original;
     }
+
 }

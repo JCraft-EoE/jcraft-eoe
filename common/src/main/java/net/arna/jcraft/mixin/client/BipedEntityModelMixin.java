@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HumanoidModel.class)
 public abstract class BipedEntityModelMixin<T extends LivingEntity> {
+
     @Shadow
     @Final
     public ModelPart head;
@@ -70,4 +71,5 @@ public abstract class BipedEntityModelMixin<T extends LivingEntity> {
                     .apply((HumanoidModel<?>) (Object) this, livingEntity, age);
         }
     }
+
 }

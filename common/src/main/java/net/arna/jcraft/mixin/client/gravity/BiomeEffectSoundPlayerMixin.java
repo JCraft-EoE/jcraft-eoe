@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 //method_26271 refers to a lambda which is why this class may cause mixin warnings/errors
 @Mixin(BiomeAmbientSoundsHandler.class)
 public abstract class BiomeEffectSoundPlayerMixin {
+
     @Shadow @Final private LocalPlayer player;
     
     @ModifyExpressionValue(
@@ -23,8 +24,8 @@ public abstract class BiomeEffectSoundPlayerMixin {
                     ordinal = 0
             )
     )
-    private double jcraft$method_26271_getEyeY_0(double original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+    private double jcraft$method_26271_getEyeY_0(final double original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
@@ -40,8 +41,8 @@ public abstract class BiomeEffectSoundPlayerMixin {
                     ordinal = 0
             )
     )
-    private double jcraft$method_26271_getX_0(double original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+    private double jcraft$method_26271_getX_0(final double original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
@@ -57,12 +58,11 @@ public abstract class BiomeEffectSoundPlayerMixin {
                     ordinal = 0
             )
     )
-    private double jcraft$method_26271_getZ_0(double original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+    private double jcraft$method_26271_getZ_0(final double original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
-
         return player.getEyePosition().z;
     }
 
@@ -74,12 +74,11 @@ public abstract class BiomeEffectSoundPlayerMixin {
                     ordinal = 1
             )
     )
-    private double jcraft$method_26271_getEyeY_1(double original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+    private double jcraft$method_26271_getEyeY_1(final double original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
-
         return player.getEyePosition().y;
     }
 
@@ -91,12 +90,11 @@ public abstract class BiomeEffectSoundPlayerMixin {
                     ordinal = 1
             )
     )
-    private double jcraft$method_26271_getX_1(double original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+    private double jcraft$method_26271_getX_1(final double original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
-
         return player.getEyePosition().x;
     }
 
@@ -108,12 +106,11 @@ public abstract class BiomeEffectSoundPlayerMixin {
                     ordinal = 1
             )
     )
-    private double jcraft$method_26271_getZ_1(double original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+    private double jcraft$method_26271_getZ_1(final double original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
-
         return player.getEyePosition().z;
     }
 
@@ -125,12 +122,11 @@ public abstract class BiomeEffectSoundPlayerMixin {
                     ordinal = 2
             )
     )
-    private double jcraft$method_26271_getEyeY_2(double original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+    private double jcraft$method_26271_getEyeY_2(final double original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
-
         return player.getEyePosition().y;
     }
 
@@ -142,12 +138,11 @@ public abstract class BiomeEffectSoundPlayerMixin {
                     ordinal = 2
             )
     )
-    private double jcraft$method_26271_getX_2(double original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+    private double jcraft$method_26271_getX_2(final double original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
-
         return player.getEyePosition().x;
     }
 
@@ -159,12 +154,12 @@ public abstract class BiomeEffectSoundPlayerMixin {
                     ordinal = 2
             )
     )
-    private double jcraft$method_26271_getZ_2(double original) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+    private double jcraft$method_26271_getZ_2(final double original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
-
         return player.getEyePosition().z;
     }
+
 }

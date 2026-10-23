@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.client.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
@@ -13,26 +15,26 @@ import net.minecraft.world.entity.Entity;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EntityRenderer.class)
 public abstract class EntityRenderMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "renderNameTag",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;cameraOrientation()Lorg/joml/Quaternionf;"
             )
     )
-    private Quaternionf redirect_renderLabelIfPresent_getRotation_0(EntityRenderDispatcher entityRenderDispatcher, Entity entity, Component text, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private Quaternionf redirect_renderLabelIfPresent_getRotation_0(final EntityRenderDispatcher instance, final Operation<Quaternionf> original, final Entity entity, final Component displayName, final PoseStack poseStack, final MultiBufferSource buffer, final int packedLight) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
         if (gravityDirection == Direction.DOWN) {
-            return entityRenderDispatcher.cameraOrientation();
+            return original.call(instance);
         }
-
-        Quaternionf quaternion = new Quaternionf(RotationUtil.getCameraRotationQuaternion(gravityDirection));
+        final Quaternionf quaternion = new Quaternionf(RotationUtil.getCameraRotationQuaternion(gravityDirection));
         quaternion.conjugate();
-        quaternion.mul(new Quaternionf(entityRenderDispatcher.cameraOrientation()));
+        quaternion.mul(new Quaternionf(original.call(instance)));
         return quaternion;
     }
+
 }

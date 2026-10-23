@@ -3,6 +3,8 @@ package net.arna.jcraft.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.authlib.GameProfile;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.registry.JStatusRegistry;
@@ -37,7 +39,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin implements IComboCounter, IFoodData {
@@ -49,45 +50,33 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
     private Abilities abilities;
     // Combo tracking
     @Unique
-    private int comboCount = 1;
+    private int jcraft$comboCount = 1;
     @Unique
-    private LivingEntity lastAttacked;
-
-    /*
-    @Unique
-    private boolean stunned = false;
-    @Unique
-    private int ticksSinceStun = 0;
-
-    @Override
-    public boolean jcraft$wasStunned() {
-        return stunned;
-    }
-     */
+    private LivingEntity jcraft$lastAttacked;
 
     @Override
     public LivingEntity jcraft$getLastAttacked() {
-        return lastAttacked;
+        return jcraft$lastAttacked;
     }
 
     @Override
     public void jcraft$setLastAttacked(LivingEntity l) {
-        lastAttacked = l;
+        jcraft$lastAttacked = l;
     }
 
     @Override
     public int jcraft$getComboCount() {
-        return comboCount;
+        return jcraft$comboCount;
     }
 
     @Override
     public void jcraft$setComboCount(int i) {
-        comboCount = i;
+        jcraft$comboCount = i;
     }
 
     @Override
     public void jcraft$incrementComboCount() {
-        comboCount++;
+        jcraft$comboCount++;
     }
 
     @Override
@@ -95,31 +84,16 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
         return foodData;
     }
 
-    @Inject(method = "canEat", at = @At("HEAD"), cancellable = true)
-    private void jcraft$canEat(boolean canAlwaysEat, CallbackInfoReturnable<Boolean> cir) {
+    @WrapMethod(method = "canEat")
+    private boolean jcraft$canEat(final boolean canAlwaysEat, final Operation<Boolean> original) {
         if (((Player)(Object)this).hasEffect(JStatusRegistry.DAZED.get())) {
-            cir.setReturnValue(false);
+            return false;
         }
+        return original.call(canAlwaysEat);
     }
-
-    /*
-    @Inject(at = @At("HEAD"), method = "tick")
-    public void jcraft$playerTickHead(CallbackInfo info) {
-        if (lastAttacked == null) return;
-        StatusEffectInstance stun = lastAttacked.getStatusEffect(JStatusRegistry.DAZED);
-        boolean shouldBeStunned = stun != null && stun.getAmplifier() != 2;
-
-        if (shouldBeStunned) {
-            stunned = true;
-            ticksSinceStun = 0;
-        } else if (ticksSinceStun++ > 1) { // Intentional delay of 1 tick
-            stunned = false;
-        }
-    }
-     */
 
     @WrapWithCondition(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;touch(Lnet/minecraft/world/entity/Entity;)V"))
-    public boolean dontHandleTouchInTimestop(final Player player, final Entity entity) {
+    public boolean jcraft$dontHandleTouchInTimestop(final Player player, final Entity entity) {
         // If the entity is timestopped, ignore the touch event
         return !JUtils.isAffectedByTimeStop(entity);
     }
@@ -136,19 +110,19 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
             spec.tickSpec();
         }
 
-        if (lastAttacked == null || !lastAttacked.isAlive()) {
+        if (jcraft$lastAttacked == null || !jcraft$lastAttacked.isAlive()) {
             return;
         }
 
-        final LivingEntity attacker = lastAttacked.getLastHurtByMob();
+        final LivingEntity attacker = jcraft$lastAttacked.getLastHurtByMob();
         if (
                 attacker == null || attacker == player ||
                 (attacker instanceof IOwnable ownableAttacker && ownableAttacker.getMaster() == player))
         {
             return;
         }
-        lastAttacked = null;
-        comboCount = 0;
+        jcraft$lastAttacked = null;
+        jcraft$comboCount = 0;
 
         if (player instanceof ServerPlayer serverPlayer) {
             ComboCounterPacket.send(serverPlayer, 0, 1.00f);
@@ -156,20 +130,20 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
     }
 
     // KNOCKDOWN, poison and ranger mobility moves preventing pose updating
-    @Inject(cancellable = true, at = @At("HEAD"), method = "updatePlayerPose")
-    public void jcraft$updatePose(CallbackInfo info) {
-        if (
-                ((Player) (Object) this).hasEffect(JStatusRegistry.KNOCKDOWN.get())
-                        || ((Player) (Object) this).hasEffect(JStatusRegistry.WSPOISON.get())
-                        || jcraft$inRangerMobilityMove()
+    @WrapMethod(method = "updatePlayerPose")
+    public void jcraft$updatePose(final Operation<Void> original) {
+        final Player player = (Player)(Object)this;
+        if (!player.hasEffect(JStatusRegistry.KNOCKDOWN.get())
+                        && !player.hasEffect(JStatusRegistry.WSPOISON.get())
+                        && !jcraft$inRangerMobilityMove()
         ) {
-            info.cancel();
+            original.call();
         }
     }
 
     @Unique
     private boolean jcraft$inRangerMobilityMove() {
-        final JSpec<?, ?> spec = JComponentPlatformUtils.getSpecData((Player) (Object) this).getSpec();
+        final JSpec<?, ?> spec = JComponentPlatformUtils.getSpecData((Player)(Object)this).getSpec();
         if (spec == null || spec.moveStun <= 0) {
             return false;
         }
@@ -181,50 +155,55 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
     }
 
     // Can't M1/Light in TS or during spec moves, LivingEntity does not override this
-    @Inject(cancellable = true, method = "attack", at = @At("HEAD"))
-    public void jcraft$attack(Entity target, CallbackInfo info) {
-        Player player = (Player) (Object) this;
+    @WrapMethod(method = "attack")
+    public void jcraft$attack(final Entity target, final Operation<Void> original) {
+        final Player player = (Player)(Object)this;
+        boolean cancel = false;
         if (JUtils.isAffectedByTimeStop(player)) {
-            info.cancel();
+            cancel = true;
         }
 
         // Can't M1/Light without a weapon while stand ON
         if (JUtils.getStand(player) != null && player.getMainHandItem().getAttributeModifiers(EquipmentSlot.MAINHAND).isEmpty()) {
-            info.cancel();
+            cancel = true;
         }
 
-        JSpec<?, ?> spec = JComponentPlatformUtils.getSpecData(player).getSpec();
+        JSpec<?, ?> spec = JUtils.getSpec(player);
         if (spec != null && spec.moveStun > 0) {
-            info.cancel();
+            cancel = true;
+        }
+
+        if (!cancel) {
+            original.call(target);
         }
     }
 
     // Counter hook - player entity
-    @Inject(cancellable = true, at = @At("HEAD"), method = "actuallyHurt")
-    protected void jcraft$applyDamage(DamageSource source, float amount, CallbackInfo info) {
-        Player player = ((Player) (Object) this);
-        AbstractCounterAttack.handleCounter(player, source, amount, info);
-    }
-
-    @Inject(cancellable = true, method = "jumpFromGround", at = @At("HEAD"))
-    public void jcraft$jumpFromGround(CallbackInfo ci) {
-        LivingEntity entity = ((LivingEntity) (Object) this);
-        if (!JUtils.canJump(entity)) {
-            ci.cancel();
+    @WrapMethod(method = "actuallyHurt")
+    protected void jcraft$applyDamage(final DamageSource damageSource, final float damageAmount, final Operation<Void> original) {
+        if (!AbstractCounterAttack.handleCounter((Player)(Object)this, damageSource, damageAmount)) {
+            original.call(damageSource, damageAmount);
         }
     }
 
-    @Inject(cancellable = true, at = @At("HEAD"), method = "startFallFlying")
-    void jcraft$startFallFlying(CallbackInfo ci) {
-        Player player = ((Player) (Object) this);
-        if (JServerConfig.DISABLE_COMBAT_ELYTRA.getValue() && JComponentPlatformUtils.getMiscData(player).isOnDamageTimer()) {
-            ci.cancel();
+    @WrapMethod(method = "jumpFromGround")
+    public void jcraft$jumpFromGround(final Operation<Void> original) {
+        if (JUtils.canJump((LivingEntity)(Object)this)) {
+            original.call();
+        }
+    }
+
+    @SuppressWarnings("ConstantValue")
+    @WrapMethod(method = "startFallFlying")
+    void jcraft$startFallFlying(final Operation<Void> original) {
+        if (!JServerConfig.DISABLE_COMBAT_ELYTRA.getValue() || !JComponentPlatformUtils.getMiscData((Player)(Object)this).isOnDamageTimer()) {
+            original.call();
         }
     }
 
     @SuppressWarnings("ConstantValue")
     @ModifyReturnValue(method = "isAffectedByFluids", at = @At("RETURN"))
-    private boolean jcraft$unaffectedByFluidsIfCreaming(boolean original) {
+    private boolean jcraft$unaffectedByFluidsIfCreaming(final boolean original) {
         return original && !CreamEntity.isCreaming((LivingEntity) (Object)this);
     }
 
@@ -234,27 +213,28 @@ public abstract class PlayerMixin implements IComboCounter, IFoodData {
     // getFlyingSpeed override below is never reached for horizontal movement.
     @SuppressWarnings("ConstantValue")
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSpectator()Z"))
-    private boolean jcraft$noPhysicsIfCreaming(boolean original) {
+    private boolean jcraft$noPhysicsIfCreaming(final boolean original) {
         return original || CreamEntity.isCreaming((LivingEntity) (Object)this);
     }
 
     @ModifyReturnValue(method = "getFlyingSpeed", at = @At("RETURN"))
-    private float jcraft$overrideFlightSpeedIfCreaming(float original) {
+    private float jcraft$overrideFlightSpeedIfCreaming(final float original) {
         return CreamEntity.isCreaming((LivingEntity) (Object)this) ? CreamEntity.VOIDING_FLIGHT_SPEED : original;
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void jcraft$setAbilitiesPlayer(Level level, BlockPos pos, float yRot, GameProfile gameProfile, CallbackInfo ci) {
+    private void jcraft$setAbilitiesPlayer(final Level level, final BlockPos pos, final float yRot, final GameProfile gameProfile, final CallbackInfo ci) {
         ((AbilitiesAddon) abilities).jcraft$setPlayer((Player) (Object) this);
     }
 
-    @Inject(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
-    private void jcraft$substituteAttack(final Entity target, final CallbackInfo ci) {
-        final Player player = (Player)(Object)this;
-        if (player instanceof ServerPlayer && JUtils.getSpec(player) instanceof HamonSpec hamon) {
-            if (hamon.getCurrentMove() instanceof ImproviserAttack) {
-                ci.cancel();
-            }
+    @SuppressWarnings("ConstantValue")
+    @WrapMethod(method = "attack(Lnet/minecraft/world/entity/Entity;)V")
+    private void jcraft$substituteAttack(final Entity target, final Operation<Void> original) {
+        if (!((Object)this instanceof ServerPlayer player) ||
+                !(JUtils.getSpec(player) instanceof HamonSpec hamon) ||
+                !(hamon.getCurrentMove() instanceof ImproviserAttack))
+        {
+            original.call(target);
         }
     }
 

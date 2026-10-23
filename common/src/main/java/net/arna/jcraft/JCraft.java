@@ -345,7 +345,7 @@ public final class JCraft {
         }
     }
 
-    public static void registerEntitySelectorOptions(EntitySelectorOptionsRegistrar registrar) {
+    public static void registerEntitySelectorOptions(final EntitySelectorOptionsRegistrar registrar) {
         registrar.register("jcraft_timestopped", parser -> {
             parser.setSuggestions((builder, consumer) ->
                     SharedSuggestionProvider.suggest(Arrays.asList("true", "false"), builder));

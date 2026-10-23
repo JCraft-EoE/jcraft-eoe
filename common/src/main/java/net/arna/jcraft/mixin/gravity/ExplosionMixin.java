@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -9,88 +11,84 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Explosion.class)
 public abstract class ExplosionMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "explode",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getEyeY()D"
             )
     )
-    private double redirect_collectBlocksAndDamageEntities_getEyeY_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$collectBlocksAndDamageEntities_getEyeY_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getEyeY();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().y;
+        return instance.getEyePosition().y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "explode",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getX()D"
             )
     )
-    private double redirect_collectBlocksAndDamageEntities_getX_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$collectBlocksAndDamageEntities_getX_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getX();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().x;
+        return instance.getEyePosition().x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "explode",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getZ()D"
             )
     )
-    private double redirect_collectBlocksAndDamageEntities_getZ_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$collectBlocksAndDamageEntities_getZ_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getZ();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().z;
+        return instance.getEyePosition().z;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "explode",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getDeltaMovement()Lnet/minecraft/world/phys/Vec3;"
             )
     )
-    private Vec3 redirect_collectBlocksAndDamageEntities_getVelocity_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private Vec3 jcraft$collectBlocksAndDamageEntities_getVelocity_0(final Entity instance, final Operation<Vec3> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getDeltaMovement();
+            return original.call(instance);
         }
-
-        return RotationUtil.vecPlayerToWorld(entity.getDeltaMovement(), gravityDirection);
+        return RotationUtil.vecPlayerToWorld(original.call(instance), gravityDirection);
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "explode",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"
             )
     )
-    private void redirect_collectBlocksAndDamageEntities_setVelocity_0(Entity entity, Vec3 vec3d) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private void jcraft$collectBlocksAndDamageEntities_setVelocity_0(final Entity instance, final Vec3 deltaMovement, final Operation<Void> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            entity.setDeltaMovement(vec3d);
+            original.call(instance, deltaMovement);
             return;
         }
-
-        entity.setDeltaMovement(RotationUtil.vecWorldToPlayer(vec3d, gravityDirection));
+        original.call(instance, RotationUtil.vecWorldToPlayer(deltaMovement, gravityDirection));
     }
+
 }

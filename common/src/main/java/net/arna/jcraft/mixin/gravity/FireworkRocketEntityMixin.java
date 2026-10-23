@@ -21,7 +21,6 @@ public abstract class FireworkRocketEntityMixin extends Entity {
     @Shadow
     private @Nullable LivingEntity attachedToEntity;
 
-
     public FireworkRocketEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
