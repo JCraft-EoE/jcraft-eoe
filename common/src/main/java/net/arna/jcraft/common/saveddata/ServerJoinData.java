@@ -9,7 +9,6 @@ import net.minecraft.ReportedException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,25 +18,33 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ServerJoinData extends SavedData {
 
     public static final Path DEFAULT_FILE_LOCATION = new File("data", "jcraft_serverJoined.dat").toPath();
     protected static final CompoundTag JOINED_PLAYERS = new CompoundTag();
-    protected static final String KEYWORD = "joined";
+    protected static final String KEYWORD_JOINED = "joined";
+    protected static final String KEYWORD_UUID = "uuid";
+    protected static final String KEYWORD_TIME = "time";
 
-    protected final List<UUID> joinedPlayers = new LinkedList<>();
+    protected final Map<UUID, Instant> joinedPlayers = new HashMap<>();
 
     public ServerJoinData(final @NotNull CompoundTag compoundTag) {
-        Tag tag = compoundTag.get(KEYWORD);
-        if (tag instanceof ListTag list) {
-            joinedPlayers.addAll(list.stream()
-                    .map(Tag::getAsString)
-                    .map(UUID::fromString)
-                    .toList());
+        Tag tag = compoundTag.get(KEYWORD_JOINED);
+        if (tag instanceof final ListTag list) {
+            joinedPlayers.putAll(list.stream()
+                    .filter(CompoundTag.class::isInstance)
+                    .map(CompoundTag.class::cast)
+                    .filter(ct -> ct.contains(KEYWORD_UUID) && ct.contains(KEYWORD_TIME))
+                    .collect(Collectors.toMap(
+                            ct -> UUID.fromString(ct.getString(KEYWORD_UUID)),
+                            ct -> Instant.ofEpochMilli(ct.getLong(KEYWORD_TIME))
+                    )));
         }
     }
 
@@ -46,10 +53,12 @@ public class ServerJoinData extends SavedData {
             return false;
         }
         final UUID uuid = player.getUUID();
-        if (joinedPlayers.contains(uuid)) {
+        if (joinedPlayers.containsKey(uuid)) {
             return false;
         }
-        return joinedPlayers.add(uuid);
+        joinedPlayers.put(uuid, Instant.now());
+        setDirty();
+        return true;
     }
 
     public static File getDefaultFileLocation(final MinecraftServer server) {
@@ -61,11 +70,15 @@ public class ServerJoinData extends SavedData {
     @NonNull
     public CompoundTag save(final CompoundTag compoundTag) {
         final ListTag tag = new ListTag();
-        tag.addAll(joinedPlayers.stream()
-                .map(UUID::toString)
-                .map(StringTag::valueOf)
+        tag.addAll(joinedPlayers.entrySet().stream()
+                .map(entry -> {
+                    final CompoundTag ct = new CompoundTag();
+                    ct.putString(KEYWORD_UUID, entry.getKey().toString());
+                    ct.putLong(KEYWORD_TIME, entry.getValue().getEpochSecond());
+                    return ct;
+                })
                 .toList());
-        compoundTag.put(KEYWORD, tag);
+        compoundTag.put(KEYWORD_JOINED, tag);
         return compoundTag;
     }
 
