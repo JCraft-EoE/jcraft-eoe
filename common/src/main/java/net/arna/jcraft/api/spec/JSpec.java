@@ -99,10 +99,19 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         moveSet.registerListener(this);
     }
 
+    /**
+     * Resets the spec to the state when it was freshly obtained for the first time,
+     * including resetting e.g. lessons done to unlock more functionality of the spec.
+     * Override this if your spec has a special original state.
+     */
     public void reset() {
         // Intentionally left empty
     }
 
+    /**
+     * Unlocks everything this spec has to offer.
+     * Override this if your spec has e.g. stuff locked behind lessons/advancements/etc.
+     */
     public void unlock() {
         // Intentionally left empty
     }
