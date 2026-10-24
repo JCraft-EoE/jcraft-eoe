@@ -163,6 +163,12 @@ public class VampireSpec extends JSpec<VampireSpec, VampireSpec.State> {
     }
 
     @Override
+    public void reset() {
+        super.reset();
+        vampireComponent.resetBlood();
+    }
+
+    @Override
     public VampireSpec getThis() {
         return this;
     }

@@ -13,17 +13,12 @@ import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.registry.*;
+import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecType;
 import net.arna.jcraft.api.spec.SpecTypeUtil;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
-import net.arna.jcraft.common.advancements.Hamon1Trigger;
-import net.arna.jcraft.common.advancements.Hamon2Trigger;
-import net.arna.jcraft.common.advancements.Hamon3Trigger;
-import net.arna.jcraft.common.advancements.Hamon4Trigger;
-import net.arna.jcraft.common.advancements.Hamon5Trigger;
-import net.arna.jcraft.common.advancements.Hamon6Trigger;
 import net.arna.jcraft.common.block.CoffinBlock;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.data.AttackerDataLoader;
@@ -800,15 +795,9 @@ public class JServerEvents {
                         spec = SpecTypeUtil.getRandom(player.getRandom());
                     }
                     specData.setType(spec);
-                    // unlock fully (cmp. UnlockSpecCommand)
-                    if (spec == JSpecTypeRegistry.HAMON) {
-                        JUtils.awardAdvancement(player, Hamon1Trigger.ID);
-                        JUtils.awardAdvancement(player, Hamon2Trigger.ID);
-                        JUtils.awardAdvancement(player, Hamon3Trigger.ID);
-                        JUtils.awardAdvancement(player, Hamon4Trigger.ID);
-                        JUtils.awardAdvancement(player, Hamon5Trigger.ID);
-                        JUtils.awardAdvancement(player, Hamon6Trigger.ID);
-                        JComponentPlatformUtils.getHamon(player).setActiveLesson(0);
+                    final JSpec<?,?> actualSpec = JUtils.getSpec(player);
+                    if (actualSpec != null) {
+                        actualSpec.unlock();
                     }
                 }
             }

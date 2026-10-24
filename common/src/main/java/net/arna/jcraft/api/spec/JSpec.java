@@ -36,7 +36,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -100,6 +99,14 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         moveSet.registerListener(this);
     }
 
+    public void reset() {
+        // Intentionally left empty
+    }
+
+    public void unlock() {
+        // Intentionally left empty
+    }
+
     public SpecData getSpecData() {
         return type.getData();
     }
@@ -126,7 +133,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public LivingEntity getUserOrThrow() {
-        return Objects.requireNonNull(user, "Player must not be null");
+        return Objects.requireNonNull(user, "User must not be null");
     }
 
     @Override
