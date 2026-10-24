@@ -36,7 +36,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -100,6 +99,23 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         moveSet.registerListener(this);
     }
 
+    /**
+     * Resets the spec to the state when it was freshly obtained for the first time,
+     * including resetting e.g. lessons done to unlock more functionality of the spec.
+     * Override this if your spec has a special original state.
+     */
+    public void reset() {
+        // Intentionally left empty
+    }
+
+    /**
+     * Unlocks everything this spec has to offer.
+     * Override this if your spec has e.g. stuff locked behind lessons/advancements/etc.
+     */
+    public void unlock() {
+        // Intentionally left empty
+    }
+
     public SpecData getSpecData() {
         return type.getData();
     }
@@ -126,7 +142,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public LivingEntity getUserOrThrow() {
-        return Objects.requireNonNull(user, "Player must not be null");
+        return Objects.requireNonNull(user, "User must not be null");
     }
 
     @Override

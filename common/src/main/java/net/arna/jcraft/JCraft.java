@@ -37,6 +37,7 @@ import net.arna.jcraft.common.network.RemoteStandInteractPacket;
 import net.arna.jcraft.common.network.c2s.*;
 import net.arna.jcraft.common.network.s2c.*;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
+import net.arna.jcraft.common.saveddata.ServerJoinData;
 import net.arna.jcraft.common.spec.AnubisSpec;
 import net.arna.jcraft.common.spec.BrawlerSpec;
 import net.arna.jcraft.common.spec.HamonSpec;
@@ -184,6 +185,10 @@ public final class JCraft {
     @Getter
     @Setter
     private static ExclusiveStandsData exclusiveStandsData = null;
+
+    @Getter
+    @Setter
+    private static ServerJoinData serverJoinData = null;
 
     public static void init() {
         /*  NAMING PATTERN:

@@ -35,6 +35,7 @@ import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -996,6 +997,22 @@ public final class JUtils {
         return player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
 
+    public static void revokeAdvancement(final ServerPlayer player, final ResourceLocation advancementLoc) {
+        if (player.getServer() == null) {
+            return;
+        }
+        final Advancement advancement = player.getServer().getAdvancements().getAdvancement(advancementLoc);
+        if (advancement == null) {
+            return;
+        }
+        final AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
+        if (progress.hasProgress()) {
+            for (final String crit : progress.getCompletedCriteria()) {
+                player.getAdvancements().revoke(advancement, crit);
+            }
+        }
+    }
+
     private static final Style runStandAboutStyle = Style.EMPTY
             .withColor(ChatFormatting.AQUA)
             .withUnderlined(true)
@@ -1225,4 +1242,5 @@ public final class JUtils {
         }
         itemEntity.discard();
     }
+
 }
