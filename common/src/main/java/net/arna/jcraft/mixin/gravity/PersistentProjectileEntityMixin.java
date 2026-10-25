@@ -39,12 +39,11 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
             ),
             index = 1
     )
-    private static double modifyargs_init_init_0(double x, @Local LivingEntity owner) {
+    private static double modifyargs_init_init_0(final double x, final @Local LivingEntity owner) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
         if (gravityDirection == Direction.DOWN) {
             return x;
         }
-
         Vec3 pos = owner.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
         return pos.x;
     }
@@ -57,12 +56,11 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
             ),
             index = 2
     )
-    private static double modifyargs_init_init_1(double y, @Local LivingEntity owner) {
+    private static double modifyargs_init_init_1(final double y, final @Local LivingEntity owner) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
         if (gravityDirection == Direction.DOWN) {
             return y;
         }
-
         Vec3 pos = owner.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
         return pos.y;
     }
@@ -75,13 +73,13 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
             ),
             index = 3
     )
-    private static double modifyargs_init_init_2(double z, @Local LivingEntity owner) {
+    private static double modifyargs_init_init_2(final double z, final @Local LivingEntity owner) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(owner);
         if (gravityDirection == Direction.DOWN) {
             return z;
         }
-
         Vec3 pos = owner.getEyePosition().subtract(RotationUtil.vecPlayerToWorld(0.0D, 0.10000000149011612D, 0.0D, gravityDirection));
         return pos.z;
     }
+
 }

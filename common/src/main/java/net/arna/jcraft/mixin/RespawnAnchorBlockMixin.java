@@ -7,18 +7,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(RespawnAnchorBlock.class)
-public class RespawnAnchorBlockMixin {
+public abstract class RespawnAnchorBlockMixin {
+
     @ModifyArg(
             method = "explode",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/level/Level;explode(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/damagesource/DamageSource;Lnet/minecraft/world/level/ExplosionDamageCalculator;Lnet/minecraft/world/phys/Vec3;FZLnet/minecraft/world/level/Level$ExplosionInteraction;)Lnet/minecraft/world/level/Explosion;"
-            ), index = 4
+            )
     )
     private float modifyExplosionPower(float d) {
         if (JServerConfig.REDUCE_DEADLY_EXPLOSIONS.getValue()) {
-            return 1.5f;
+            return d * 0.3f;
         }
-        return 5.0f;
+        return d;
     }
+
 }

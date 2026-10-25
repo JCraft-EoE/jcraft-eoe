@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(SoundEngine.class)
-public class SoundEngineMixin {
+public abstract class SoundEngineMixin {
 
     // Makes the user of a stand hear the sounds their stand hears if it's remote.
     // It does so by manipulating the sound's position to be the same distance on each axis
@@ -45,4 +45,5 @@ public class SoundEngineMixin {
         Vec3 delta = ogSoundPos.subtract(camStand.position());
         return cam.position().add(delta);
     }
+
 }

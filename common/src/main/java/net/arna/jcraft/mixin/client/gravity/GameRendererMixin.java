@@ -40,7 +40,7 @@ public abstract class GameRendererMixin {
                     )
             )
     )
-    private void inject_renderWorld(float tickDelta, long limitTime, PoseStack matrix, CallbackInfo ci) {
+    private void jcraft$renderWorld(final float partialTicks, final long finishTimeNano, final PoseStack poseStack, final CallbackInfo ci) {
         Entity focusedEntity = this.mainCamera.getEntity();
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
         Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(focusedEntity);
@@ -48,8 +48,9 @@ public abstract class GameRendererMixin {
             return;
         }
         RotationAnimation animation = animationOptional.get();
-        long timeMs = focusedEntity.level().getGameTime() * 50 + (long) (tickDelta * 50);
+        long timeMs = focusedEntity.level().getGameTime() * 50 + (long) (partialTicks * 50);
         Quaternionf currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
-        matrix.mulPose(currentGravityRotation);
+        poseStack.mulPose(currentGravityRotation);
     }
+
 }

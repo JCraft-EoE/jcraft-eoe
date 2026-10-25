@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.client;
 
 import com.google.common.collect.ImmutableList;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.arna.jcraft.client.particle.JParticleTextureSheet;
 import net.arna.jcraft.client.util.JClientUtils;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -20,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(ParticleEngine.class)
-public class ParticleManagerMixin {
+public abstract class ParticleManagerMixin {
+
     @Shadow
     @Mutable
     @Final
@@ -35,16 +38,18 @@ public class ParticleManagerMixin {
         RENDER_ORDER = ImmutableList.copyOf(sheets);
     }
 
-    @Inject(method = "tickParticle", at = @At("HEAD"), cancellable = true)
-    void jcraft$tickParticle(Particle particle, CallbackInfo info) {
+    @WrapMethod(method = "tickParticle")
+    void jcraft$tickParticle(final Particle particle, final Operation<Void> original) {
         ParticleAccessor particleAccessor = (ParticleAccessor) particle;
-
         Vec3 particlePos = new Vec3(particleAccessor.getX(), particleAccessor.getY(), particleAccessor.getZ());
         if (JClientUtils.isInTSRange(particlePos)) {
             particleAccessor.setPrevX(particleAccessor.getX());
             particleAccessor.setPrevY(particleAccessor.getY());
             particleAccessor.setPrevZ(particleAccessor.getZ());
-            info.cancel();
+        }
+        else {
+            original.call(particle);
         }
     }
+
 }

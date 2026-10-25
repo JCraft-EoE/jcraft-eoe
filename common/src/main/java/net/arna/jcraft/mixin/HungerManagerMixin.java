@@ -1,44 +1,44 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(FoodData.class)
-public class HungerManagerMixin {
+public abstract class HungerManagerMixin {
     @Unique
-    private CommonVampireComponent vampireComponent;
+    private CommonVampireComponent jcraft$vampireComponent;
     @Unique
-    private boolean isVampire;
+    private boolean jcraft$isVampire;
 
-    @Inject(method = "getFoodLevel", at = @At("HEAD"), cancellable = true)
-    void jcraft$getBloodLevel(CallbackInfoReturnable<Integer> cir) {
-        if (this.isVampire) {
-            cir.setReturnValue((int) Math.floor(vampireComponent.getBlood()));
+    @WrapMethod(method = "getFoodLevel")
+    int jcraft$getBloodLevel(final Operation<Integer> original) {
+        if (this.jcraft$isVampire) {
+            return (int)Math.floor(jcraft$vampireComponent.getBlood());
+        }
+        return original.call();
+    }
+
+    @WrapMethod(method = "getSaturationLevel")
+    float jcraft$getSaturationLevel(final Operation<Float> original) {
+        if (this.jcraft$isVampire) {
+            return 0f;
+        }
+        return original.call();
+    }
+
+    @WrapMethod(method = "tick")
+    void jcraft$updateVampirism(final Player player, final Operation<Void> original) {
+        this.jcraft$vampireComponent = JComponentPlatformUtils.getVampirism(player);
+        this.jcraft$isVampire = jcraft$vampireComponent.isVampire();
+        if (!jcraft$isVampire) {
+            original.call(player);
         }
     }
 
-    @Inject(method = "getSaturationLevel", at = @At("HEAD"), cancellable = true)
-    void jcraft$getSaturationLevel(CallbackInfoReturnable<Float> cir) {
-        if (this.isVampire) {
-            cir.setReturnValue(0f);
-        }
-    }
-
-    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-    void jcraft$updateVampirism(Player player, CallbackInfo ci) {
-        this.vampireComponent = JComponentPlatformUtils.getVampirism(player);
-        this.isVampire = vampireComponent.isVampire();
-
-        if (isVampire) {
-            ci.cancel();
-        }
-    }
 }

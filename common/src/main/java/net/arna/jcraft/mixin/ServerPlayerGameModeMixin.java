@@ -19,16 +19,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerGameMode.class)
-public class ServerPlayerGameModeMixin {
+public abstract class ServerPlayerGameModeMixin {
+
     @Shadow @Final protected ServerPlayer player;
     @Shadow protected ServerLevel level;
-    private @Unique float breakageAtStart;
+    private @Unique float jcraft$breakageAtStart;
 
     /**
      * Desummon stands when going in spectator mode.
      */
     @Inject(method = "changeGameModeForPlayer(Lnet/minecraft/world/level/GameType;)Z", at = @At(value = "TAIL"))
-    public void jcraft$changeGameModeForPlayer(GameType gameModeForPlayer, CallbackInfoReturnable<Boolean> cir) {
+    public void jcraft$changeGameModeForPlayer(final GameType gameModeForPlayer, final CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue() && gameModeForPlayer == GameType.SPECTATOR) {
             var stand = JUtils.getStand(player);
             if (stand != null) {
@@ -38,12 +39,13 @@ public class ServerPlayerGameModeMixin {
     }
 
     @ModifyReturnValue(method = "incrementDestroyProgress", at = @At("RETURN"))
-    private float addProgressFromBlockBreaker(float original, @Local(argsOnly = true) BlockPos pos) {
-        return original + breakageAtStart;
+    private float jcraft$addProgressFromBlockBreaker(final float original, final @Local(argsOnly = true) BlockPos pos) {
+        return original + jcraft$breakageAtStart;
     }
 
     @Inject(method = "handleBlockBreakAction", at = @At(value = "FIELD", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;lastSentState:I", opcode = Opcodes.PUTFIELD))
-    private void getBreakageAtBreakStart(BlockPos pos, ServerboundPlayerActionPacket.Action action, Direction face, int maxBuildHeight, int sequence, CallbackInfo ci) {
-        breakageAtStart = JBlockBreaker.getBreakage(level, pos);
+    private void jcraft$getBreakageAtBreakStart(final BlockPos pos, final ServerboundPlayerActionPacket.Action action, final Direction face, final int maxBuildHeight, final int sequence, final CallbackInfo ci) {
+        jcraft$breakageAtStart = JBlockBreaker.getBreakage(level, pos);
     }
+
 }

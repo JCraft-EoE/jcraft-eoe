@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -8,43 +10,41 @@ import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EnderMan.class)
 public abstract class EndermanEntityMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "isLookingAtMe",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/player/Player;getEyeY()D"
             )
     )
-    private double redirect_isPlayerStaring_getEyeY_0(Player playerEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
+    private double jcraft$isPlayerStaring_getEyeY_0(final Player instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return playerEntity.getEyeY();
+            return original.call(instance);
         }
-
-        return playerEntity.getEyePosition().y;
+        return instance.getEyePosition().y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "isLookingAtMe",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/player/Player;getX()D"
             )
     )
-    private double redirect_isPlayerStaring_getX_0(Player playerEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
+    private double jcraft$isPlayerStaring_getX_0(final Player instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return playerEntity.getX();
+            return original.call(instance);
         }
-
-        return playerEntity.getEyePosition().x;
+        return instance.getEyePosition().x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "isLookingAtMe",
             at = @At(
                     value = "INVOKE",
@@ -52,48 +52,45 @@ public abstract class EndermanEntityMixin {
                     ordinal = 0
             )
     )
-    private double redirect_isPlayerStaring_getZ_0(Player playerEntity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(playerEntity);
+    private double jcraft$isPlayerStaring_getZ_0(final Player instance, final Operation<Double> original) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return playerEntity.getZ();
+            return original.call(instance);
         }
-
-        return playerEntity.getEyePosition().z;
+        return instance.getEyePosition().z;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "teleportTowards",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getEyeY()D"
             )
     )
-    private double redirect_teleportTo_getEyeY_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$teleportTo_getEyeY_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getEyeY();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().y;
+        return instance.getEyePosition().y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "teleportTowards",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getX()D"
             )
     )
-    private double redirect_teleportTo_getX_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$teleportTo_getX_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getX();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().x;
+        return instance.getEyePosition().x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "teleportTowards",
             at = @At(
                     value = "INVOKE",
@@ -101,12 +98,12 @@ public abstract class EndermanEntityMixin {
                     ordinal = 0
             )
     )
-    private double redirect_teleportTo_getZ_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$teleportTo_getZ_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getZ();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().z;
+        return instance.getEyePosition().z;
     }
+
 }

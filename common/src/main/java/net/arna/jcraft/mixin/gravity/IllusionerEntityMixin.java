@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -8,71 +10,70 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Illusioner;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Illusioner.class)
 public abstract class IllusionerEntityMixin {
-    @Redirect(
+
+    @WrapOperation(
             method = "performRangedAttack",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/LivingEntity;getX()D"
             )
     )
-    private double redirect_attack_getX_0(LivingEntity target) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
+    private double jcraft$attack_getX_0(final LivingEntity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return target.getX();
+            return original.call(instance);
         }
 
-        return target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getBbHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).x;
+        return instance.position().add(RotationUtil.vecPlayerToWorld(0d, instance.getBbHeight() * 0.3333333333333333, 0d, gravityDirection)).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "performRangedAttack",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/LivingEntity;getY(D)D"
             )
     )
-    private double redirect_attack_getBodyY_0(LivingEntity target, double heightScale) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
+    private double jcraft$attack_getBodyY_0(final LivingEntity instance, final double v, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return target.getY(heightScale);
+            return original.call(instance, v);
         }
 
-        return target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getBbHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).y;
+        return instance.position().add(RotationUtil.vecPlayerToWorld(0d, instance.getBbHeight() * 0.3333333333333333, 0d, gravityDirection)).y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "performRangedAttack",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/LivingEntity;getZ()D"
             )
     )
-    private double redirect_attack_getZ_0(LivingEntity target) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
+    private double jcraft$attack_getZ_0(final LivingEntity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return target.getZ();
+            return original.call(instance);
         }
-
-        return target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getBbHeight() * 0.3333333333333333D, 0.0D, gravityDirection)).z;
+        return instance.position().add(RotationUtil.vecPlayerToWorld(0d, instance.getBbHeight() * 0.3333333333333333, 0d, gravityDirection)).z;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "performRangedAttack",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/lang/Math;sqrt(D)D"
             )
     )
-    private double redirect_attack_sqrt_0(double value, LivingEntity target, float pullProgress) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
+    private double jcraft$attack_sqrt_0(final double a, final Operation<Double> original, final LivingEntity target, final float velocity) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
         if (gravityDirection == Direction.DOWN) {
-            return Math.sqrt(value);
+            return original.call(a);
         }
-
-        return Math.sqrt(Math.sqrt(value));
+        return Math.sqrt(original.call(a));
     }
+
 }
