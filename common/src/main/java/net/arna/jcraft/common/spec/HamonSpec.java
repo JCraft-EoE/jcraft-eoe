@@ -18,6 +18,12 @@ import net.arna.jcraft.api.registry.JSpecTypeRegistry;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.spec.SpecData;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.advancements.Hamon1Trigger;
+import net.arna.jcraft.common.advancements.Hamon2Trigger;
+import net.arna.jcraft.common.advancements.Hamon3Trigger;
+import net.arna.jcraft.common.advancements.Hamon4Trigger;
+import net.arna.jcraft.common.advancements.Hamon5Trigger;
+import net.arna.jcraft.common.advancements.Hamon6Trigger;
 import net.arna.jcraft.common.ai.AttackerBrainInfo;
 import net.arna.jcraft.common.attack.actions.LaunchUpAction;
 import net.arna.jcraft.common.attack.actions.LungeAction;
@@ -414,6 +420,42 @@ public class HamonSpec extends JSpec<HamonSpec, HamonSpec.State> {
             JAdvancementTriggerRegistry.HAMON2.trigger(player);
         }
         updateClientHamonBar();
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        hamon.resetHamonCharge();
+        hamon.resetLastZoomPunched();
+        hamon.resetLastSendoed();
+        hamon.resetLastSendoAired();
+        hamon.resetLastStomped();
+        if (user instanceof final ServerPlayer player) {
+            JUtils.revokeAdvancement(player, Hamon1Trigger.ID);
+            JUtils.revokeAdvancement(player, Hamon2Trigger.ID);
+            JUtils.revokeAdvancement(player, Hamon3Trigger.ID);
+            JUtils.revokeAdvancement(player, Hamon4Trigger.ID);
+            JUtils.revokeAdvancement(player, Hamon5Trigger.ID);
+            JUtils.revokeAdvancement(player, Hamon6Trigger.ID);
+        }
+        for (int i = 1; i <= 6; i++) {
+            hamon.resetLessonTicks(i);
+        }
+        hamon.setActiveLesson(0);
+    }
+
+    @Override
+    public void unlock() {
+        super.unlock();
+        if (user instanceof final ServerPlayer player) {
+            JUtils.awardAdvancement(player, Hamon1Trigger.ID);
+            JUtils.awardAdvancement(player, Hamon2Trigger.ID);
+            JUtils.awardAdvancement(player, Hamon3Trigger.ID);
+            JUtils.awardAdvancement(player, Hamon4Trigger.ID);
+            JUtils.awardAdvancement(player, Hamon5Trigger.ID);
+            JUtils.awardAdvancement(player, Hamon6Trigger.ID);
+        }
+        hamon.setActiveLesson(0);
     }
 
     @Override

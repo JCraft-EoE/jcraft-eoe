@@ -215,6 +215,12 @@ public class AnubisSpec extends JSpec<AnubisSpec, AnubisSpec.State> {
     }
 
     @Override
+    public void reset() {
+        super.reset();
+        JComponentPlatformUtils.getMiscData(user).setAttackSpeedMult(1f);
+    }
+
+    @Override
     public AnubisSpec getThis() {
         return this;
     }
