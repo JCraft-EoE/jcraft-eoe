@@ -115,7 +115,7 @@ public class JServerConfig {
     public static final BooleanOption START_WITH_SPEC = new BooleanOption(JCraft.id("start_with_spec"), GAMEPLAY, false);
     public static final BooleanOption START_WITH_STAND = new BooleanOption(JCraft.id("start_with_stand"), GAMEPLAY, false);
     public static final BooleanOption STAND_USER_SIGHT = new BooleanOption(JCraft.id("stand_user_sight"), GAMEPLAY, false);
-    public static final BooleanOption CREAM_VOID_VISIBLE = new BooleanOption(JCraft.id("cream_void_visible"), GAMEPLAY, false);
+    public static final BooleanOption CREAM_VOID_VISIBLE = new BooleanOption(JCraft.id("cream_void_visible"), GAMEPLAY, true);
     public static final BooleanOption SPAWNER_STANDS = new BooleanOption(JCraft.id("spawner_stands"), GAMEPLAY, true);
 
     // TODO list options

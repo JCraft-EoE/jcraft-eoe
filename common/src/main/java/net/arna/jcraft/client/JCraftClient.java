@@ -10,6 +10,7 @@ import dev.architectury.registry.client.particle.ParticleProviderRegistry;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import lombok.Getter;
+import lombok.Setter;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
@@ -118,6 +119,10 @@ public class JCraftClient {
     // public static KeyMapping menuKey;
     public static boolean comboStarted = false;
     public static int framesSinceComboStarted = 0;
+
+    @Getter
+    @Setter
+    protected static boolean creamVoidVisible = true;
 
     public static void init() {
         JCraft.setClientEntityHandler(ClientEntityHandlerImpl.INSTANCE);

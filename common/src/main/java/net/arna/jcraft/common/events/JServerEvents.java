@@ -3,7 +3,9 @@ package net.arna.jcraft.common.events;
 import com.jcraft_eoe.jjbacosplay.CosplayItem;
 import dev.architectury.event.CompoundEventResult;
 import dev.architectury.event.EventResult;
+import dev.architectury.networking.NetworkManager;
 import dev.architectury.platform.Platform;
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.NonNull;
@@ -43,6 +45,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -770,9 +773,11 @@ public class JServerEvents {
     }
 
     public static void playerJoin(final ServerPlayer player) {
+        // Cream invisibility
+        NetworkManager.sendToPlayer(player, JPacketRegistry.S2C_CREAM_VOID_VISIBLE, new FriendlyByteBuf(Unpooled.buffer().writeBoolean(JServerConfig.CREAM_VOID_VISIBLE.getValue())));
+        // first join logic here
         final ServerJoinData serverJoinData = JCraft.getServerJoinData();
         if (serverJoinData != null && serverJoinData.addPlayer(player)) {
-            // first join logic here
             final int MAX_TRIES = 500; // arbitrary
             if (JServerConfig.START_WITH_STAND.getValue()) {
                 final var standData = JComponentPlatformUtils.getStandComponent(player);
