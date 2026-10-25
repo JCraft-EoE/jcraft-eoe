@@ -3,7 +3,7 @@ package net.arna.jcraft.client.renderer.entity.layer;
 import lombok.NonNull;
 import mod.azure.azurelib.render.AzRendererPipelineContext;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.client.JCraftClient;
+import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.entity.stand.CreamEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -22,7 +22,7 @@ public class CreamVoidLayer extends AbstractRenderLayer<CreamEntity> {
     @Override
     public void render(final @NonNull AzRendererPipelineContext<UUID, CreamEntity> pc) {
         final CreamEntity cream = pc.animatable();
-        if (cream.tickCount == 0 || !JCraftClient.isCreamVoidVisible()) {
+        if (cream.tickCount == 0 || !JServerConfig.CREAM_VOID_VISIBLE.getValue()) {
             return;
         }
         final RenderType cameo = RenderType.dragonExplosionAlpha(SKINS.get(cream.getSkin()));

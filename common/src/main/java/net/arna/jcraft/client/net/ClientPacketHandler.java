@@ -96,7 +96,6 @@ public class ClientPacketHandler {
         register(S2C_DAMAGE_NUMBER, ClientPacketHandler::handleDamageNumber);
         register(S2C_BLOCK_BREAKAGE, ClientPacketHandler::handleBlockBreakage);
         register(S2C_BOUND_SOUND, ClientPacketHandler::handleBoundSound);
-        register(S2C_CREAM_VOID_VISIBLE, ClientPacketHandler::handleCreamVoidVisible);
     }
 
     private static void handleBoundSound(final @NonNull Minecraft client, final FriendlyByteBuf buf) {
@@ -719,10 +718,6 @@ public class ClientPacketHandler {
             living.hurtTime = living.hurtDuration = 10;
             //living.knockbackVelocity = 0f;
         });
-    }
-
-    private static void handleCreamVoidVisible(final Minecraft minecraft, final FriendlyByteBuf friendlyByteBuf) {
-        JCraftClient.setCreamVoidVisible(friendlyByteBuf.readBoolean());
     }
 
 }
