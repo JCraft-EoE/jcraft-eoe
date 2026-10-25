@@ -1,0 +1,83 @@
+{
+  "anim_state": "WHIP",
+  "class": "HEAVY",
+  "cooldown_type": "HEAVY",
+  "crouching_variant": {
+    "anim_state": "BASH",
+    "class": "HEAVY",
+    "cooldown_type": "HEAVY",
+    "move": {
+      "type": "jcraft:shared_simple_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 9,
+        "hit_animation": "LAUNCH",
+        "hit_spark": "HIT_SPARK_2",
+        "override_stun": true,
+        "shockwaves": true,
+        "static_height": true,
+        "stun_type": "LAUNCH"
+      },
+      "cooldown": 30,
+      "damage": 5.0,
+      "duration": 14,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact3"
+          }
+        ],
+        "armor": 1,
+        "description": {
+          "translate": "move.jcraft.ranger.default.shoulder_bash.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.ranger.default.shoulder_bash.cr.name"
+        }
+      },
+      "hitbox_size": 1.5,
+      "knockback": 1.5,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "stun": 14,
+      "windup": 7
+    }
+  },
+  "move": {
+    "type": "jcraft:shared_simple_attack",
+    "attack_extras": {
+      "backstab": true,
+      "block_stun": 8,
+      "hit_animation": "MID",
+      "hit_spark": "HIT_SPARK_1"
+    },
+    "cooldown": 0,
+    "damage": 4.0,
+    "duration": 8,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
+          "sound": "jcraft:impact3"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.ranger.default.whip.description"
+      },
+      "name": {
+        "translate": "move.jcraft.ranger.default.whip.name"
+      }
+    },
+    "hitbox_size": 1.25,
+    "knockback": 0.2,
+    "move_distance": 1.0,
+    "offset": 0.0,
+    "stun": 7,
+    "windup": 5
+  }
+}

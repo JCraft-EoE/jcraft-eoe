@@ -4,6 +4,7 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.projectile.KnifeProjectile;
 import net.arna.jcraft.common.entity.stand.TheWorldOverHeavenEntity;
@@ -16,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
-public final class AerialDivineFinisherAttack extends AbstractSimpleAttack<AerialDivineFinisherAttack, TheWorldOverHeavenEntity> {
+public final class AerialDivineFinisherAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<AerialDivineFinisherAttack<A>, A> {
     public AerialDivineFinisherAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun,
                                       final float hitboxSize, final float knockback, final float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
@@ -24,12 +25,12 @@ public final class AerialDivineFinisherAttack extends AbstractSimpleAttack<Aeria
     }
 
     @Override
-    public @NonNull MoveType<AerialDivineFinisherAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<AerialDivineFinisherAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void onInitiate(TheWorldOverHeavenEntity attacker) {
+    public void onInitiate(A attacker) {
         super.onInitiate(attacker);
         attacker.getUserOrThrow().addEffect(new MobEffectInstance(
                 MobEffects.LEVITATION, 10, 2, true, false
@@ -37,14 +38,14 @@ public final class AerialDivineFinisherAttack extends AbstractSimpleAttack<Aeria
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final TheWorldOverHeavenEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Set<LivingEntity> targets = super.perform(attacker, user);
 
         final Vec3 heightOffset = getOffsetHeightPos(attacker);
 
-        final RandomSource random = attacker.getRandom();
+        final RandomSource random = attacker.getBaseEntity().getRandom();
         for (int i = 0; i < 8; i++) {
-            final KnifeProjectile knife = new KnifeProjectile(attacker.level(), user);
+            final KnifeProjectile knife = new KnifeProjectile(attacker.getBaseEntity().level(), user);
             knife.setLightning(true);
             knife.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
             knife.explosive = true;
@@ -53,28 +54,28 @@ public final class AerialDivineFinisherAttack extends AbstractSimpleAttack<Aeria
                     random.triangle(0, 0.5),
                     random.triangle(0, 0.5),
                     random.triangle(0, 0.5)));
-            attacker.level().addFreshEntity(knife);
+            attacker.getBaseEntity().level().addFreshEntity(knife);
         }
 
         return targets;
     }
 
     @Override
-    protected @NonNull AerialDivineFinisherAttack getThis() {
+    protected @NonNull AerialDivineFinisherAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull AerialDivineFinisherAttack copy() {
-        return copyExtras(new AerialDivineFinisherAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
+    public @NonNull AerialDivineFinisherAttack<A> copy() {
+        return copyExtras(new AerialDivineFinisherAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(),
                 getDamage(), getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<AerialDivineFinisherAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<AerialDivineFinisherAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<AerialDivineFinisherAttack>, AerialDivineFinisherAttack> buildCodec(RecordCodecBuilder.Instance<AerialDivineFinisherAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<AerialDivineFinisherAttack<?>>, AerialDivineFinisherAttack<?>> buildCodec(RecordCodecBuilder.Instance<AerialDivineFinisherAttack<?>> instance) {
             return attackDefault(instance, AerialDivineFinisherAttack::new);
         }
     }

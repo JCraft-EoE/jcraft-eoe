@@ -10,6 +10,7 @@ import net.arna.jcraft.forge.capability.impl.living.*;
 import net.arna.jcraft.forge.capability.impl.world.ShockwaveHandlerCapability;
 import net.arna.jcraft.forge.events.ClientSetupEvents;
 import net.arna.jcraft.forge.loot.JForgeLootModifiers;
+import net.arna.jcraft.platform.forge.JPermsPlatformImpl;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -19,14 +20,16 @@ import net.minecraftforge.fml.Bindings;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.server.permission.events.PermissionGatherEvent;
+import net.minecraftforge.server.permission.nodes.PermissionNode;
 
 import static net.arna.jcraft.JCraft.MOD_ID;
 
 @Mod(MOD_ID)
 public final class JCraftForge {
 
-    public JCraftForge() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public JCraftForge(FMLJavaModLoadingContext ctx) {
+        IEventBus modBus = ctx.getModEventBus();
         IEventBus forgeBus = Bindings.getForgeBus().get();
 
         // Submit our event bus to let Architectury API register our content on the right time.
@@ -36,6 +39,8 @@ public final class JCraftForge {
 
         modBus.addListener(this::onInitializeCommon);
         modBus.addListener(ClientSetupEvents::onInitializeClient);
+
+        forgeBus.addListener(this::registerPermissions);
 
         JForgeLootModifiers.register(modBus);
 
@@ -69,5 +74,10 @@ public final class JCraftForge {
             HamonCapability.getCapability(living).tick();
             VampireCapability.getCapability(living).tick();
         }
+    }
+
+    private void registerPermissions(PermissionGatherEvent.Nodes event) {
+        JPermsPlatformImpl.gatherNodes(nodes ->
+                event.addNodes(nodes.toArray(PermissionNode[]::new)));
     }
 }

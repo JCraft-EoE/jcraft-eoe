@@ -36,7 +36,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -100,6 +99,23 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
         moveSet.registerListener(this);
     }
 
+    /**
+     * Resets the spec to the state when it was freshly obtained for the first time,
+     * including resetting e.g. lessons done to unlock more functionality of the spec.
+     * Override this if your spec has a special original state.
+     */
+    public void reset() {
+        // Intentionally left empty
+    }
+
+    /**
+     * Unlocks everything this spec has to offer.
+     * Override this if your spec has e.g. stuff locked behind lessons/advancements/etc.
+     */
+    public void unlock() {
+        // Intentionally left empty
+    }
+
     public SpecData getSpecData() {
         return type.getData();
     }
@@ -116,7 +132,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public DamageSource getDamageSource() {
-        return JDamageSources.create(user.level(), DamageTypes.PLAYER_ATTACK, user);
+        return JDamageSources.spec(user);
     }
 
     @Override
@@ -126,7 +142,7 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
 
     @Override
     public LivingEntity getUserOrThrow() {
-        return Objects.requireNonNull(user, "Player must not be null");
+        return Objects.requireNonNull(user, "User must not be null");
     }
 
     @Override
@@ -205,9 +221,9 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
             return false;
         }
 
-        boolean crouching = hasUser() && user.isShiftKeyDown();
-        boolean aerial = hasUser() && !user.onGround();
-        MoveMap.Entry<A, S> entry = moveMap.getFirstValidEntry(type.getMoveClass(), getThis(), crouching, aerial);
+        boolean crouching = hasUser() && isSelectingCrouch();
+        boolean aerial = hasUser() && isSelectingAerial();
+        MoveMap.Entry<A, S> entry = getMoveEntry(type.getMoveClass(), crouching, aerial);
         return entry == null ? type.isHoldable() : MoreObjects.firstNonNull(entry.getMove().getIsHoldable(), type.isHoldable());
     }
 
@@ -216,7 +232,10 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     public boolean canAttack() {
-        return moveStun <= 0 && !JUtils.isAffectedByTimeStop(user) && !user.hasEffect(JStatusRegistry.DAZED.get());
+        return moveStun <= 0
+                && !JUtils.isAffectedByTimeStop(user)
+                && !user.hasEffect(JStatusRegistry.DAZED.get())
+                && !user.hasEffect(JStatusRegistry.SPECLESS.get());
     }
 
     public boolean handleMove(MoveClass moveClass) {
@@ -232,19 +251,11 @@ public abstract class JSpec<A extends JSpec<A, S>, S extends Enum<S> & SpecAnima
     }
 
     public boolean handleMove(MoveClass moveClass, float animationSpeed) {
-        boolean crouching = hasUser() && user.isShiftKeyDown();
-        boolean aerial = hasUser() && !user.onGround();
+        boolean crouching = hasUser() && isSelectingCrouch();
+        boolean aerial = hasUser() && isSelectingAerial();
         MoveMap.Entry<A, S> entry = getMoveEntry(moveClass, crouching, aerial);
         if (entry == null) {
             return false;
-        }
-
-        if (user.isShiftKeyDown()) {
-            if (entry.getCrouchingVariant() != null) {
-                entry = entry.getCrouchingVariant();
-            }
-        } else if (!user.onGround() && entry.getAerialVariant() != null) {
-            entry = entry.getAerialVariant();
         }
 
         final AbstractMove<?, ? super A> move = overrideMoveSelection(entry.getMove(), crouching, aerial);

@@ -1,9 +1,14 @@
 package net.arna.jcraft.common.effects;
 
+import net.arna.jcraft.api.AttackData;
+import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.entity.damage.JDamageSources;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 
 public class BleedingEffect extends MobEffect {
     public BleedingEffect() {
@@ -22,6 +27,20 @@ public class BleedingEffect extends MobEffect {
 
     @Override
     public void applyEffectTick(final LivingEntity entity, final int amplifier) {
-        entity.hurt(JDamageSources.bleeding(entity.level()), 1.0f);
+        final DamageSource source = JDamageSources.bleeding(entity.level());
+
+        if (entity.invulnerableTime > 10.0F) {
+            return;
+        }
+
+        Attacks.damageLogic(
+                entity.level(),
+                entity,
+                new AttackData(
+                        Vec3.ZERO, 0, 0, false, 1.0f, false, 0,
+                        source, null, CommonHitPropertyComponent.HitAnimation.MID, null,
+                        false, false, false
+                )
+        );
     }
 }

@@ -17,6 +17,7 @@ public interface JEventsRegistry {
         // NOTE: THESE ARE ALSO REGISTERED ON THE CLIENT
         EntityEvent.LIVING_HURT.register(JServerEvents::hurt);
         JEntityEvents.POST_ADD.register(JServerEvents::entityLoad);
+        PlayerEvent.PLAYER_RESPAWN.register(JServerEvents::playerRespawn);
         EntityEvent.LIVING_DEATH.register(JServerEvents::death);
         TickEvent.SERVER_POST.register(JServerEvents::serverPostTick);
         TickEvent.SERVER_LEVEL_POST.register(JServerEvents::serverLevelPostTick);
@@ -33,11 +34,15 @@ public interface JEventsRegistry {
         PlayerEvent.PLAYER_JOIN.register((player) -> {
             ConfigUpdatePacket.sendOptionsToClient(player, ConfigOption.getOptions().values());
             AttackerDataPacket.send(List.of(player));
+            JServerEvents.playerJoin(player);
         });
 
         LifecycleEvent.SERVER_BEFORE_START.register(JServerConfig::load);
         LifecycleEvent.SERVER_BEFORE_START.register(VillageStructureInjector::onServerBeforeStart);
         LifecycleEvent.SERVER_STARTED.register(JServerEvents::finishLoading);
-        LifecycleEvent.SERVER_STOPPED.register(JServerEvents::saveExclusives);
+        LifecycleEvent.SERVER_STOPPED.register(server -> {
+            JServerEvents.saveExclusives(server);
+            JServerEvents.saveServerJoins(server);
+        });
     }
 }

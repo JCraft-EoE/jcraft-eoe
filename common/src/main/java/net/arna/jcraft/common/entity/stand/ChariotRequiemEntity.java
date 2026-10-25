@@ -19,7 +19,7 @@ import net.minecraft.world.level.Level;
  */
 public class ChariotRequiemEntity extends StandEntity<ChariotRequiemEntity, ChariotRequiemEntity.State> {
     public static final MoveSet<ChariotRequiemEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CHARIOT_REQUIEM,
-            ChariotRequiemEntity::registerMoves, State.class);
+            ChariotRequiemEntity::registerMoves, ChariotRequiemEntity.class, State.class);
     public static final StandData DATA = StandData.of(StandInfo.of(Component.translatable("entity.jcraft.chariot_requiem")))
             .withObtainable(false);
 

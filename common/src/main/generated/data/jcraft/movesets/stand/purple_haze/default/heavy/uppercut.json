@@ -28,7 +28,6 @@
       "description": {
         "translate": "move.jcraft.purple_haze.default.uppercut.description"
       },
-      "may_hit_user": true,
       "name": {
         "translate": "move.jcraft.purple_haze.default.uppercut.name"
       }

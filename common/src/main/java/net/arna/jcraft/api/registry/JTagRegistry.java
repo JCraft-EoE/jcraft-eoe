@@ -1,6 +1,8 @@
 package net.arna.jcraft.api.registry;
 
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.JRegistries;
+import net.arna.jcraft.api.stand.StandType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -70,6 +72,9 @@ public interface JTagRegistry {
     TagKey<Structure> ON_VAMPIRE_LAIR_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_vampire_lair_maps"));
     TagKey<Structure> ON_CINDERELLA_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_cinderella_maps"));
     TagKey<Structure> ON_METEORITE_MAPS = TagKey.create(Registries.STRUCTURE, JCraft.id("on_meteorite_maps"));
+
+    TagKey<StandType> PLAYER_STAND_BLACKLIST = TagKey.create(JRegistries.STAND_TYPE_REGISTRY_KEY, JCraft.id("player_stand_blacklist"));
+    TagKey<StandType> MOB_STAND_BLACKLIST = TagKey.create(JRegistries.STAND_TYPE_REGISTRY_KEY, JCraft.id("mob_stand_blacklist"));
 
     static void init() {
         // intentionally left empty

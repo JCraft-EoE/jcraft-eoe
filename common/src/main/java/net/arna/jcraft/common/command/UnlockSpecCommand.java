@@ -4,16 +4,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.registry.JSpecTypeRegistry;
-import net.arna.jcraft.api.spec.SpecType;
-import net.arna.jcraft.common.advancements.Hamon1Trigger;
-import net.arna.jcraft.common.advancements.Hamon2Trigger;
-import net.arna.jcraft.common.advancements.Hamon3Trigger;
-import net.arna.jcraft.common.advancements.Hamon4Trigger;
-import net.arna.jcraft.common.advancements.Hamon5Trigger;
-import net.arna.jcraft.common.advancements.Hamon6Trigger;
+import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.common.util.JUtils;
-import net.arna.jcraft.platform.JComponentPlatformUtils;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.commands.CommandSourceStack;
@@ -30,7 +23,7 @@ public class UnlockSpecCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("spec")
                 .then(Commands.literal("unlock")
-                        .requires(source -> source.hasPermission(2))
+                        .requires(JPerms.SPEC_UNLOCK.require())
                         .then(Commands.argument("entities", EntityArgument.entities())
                                     .executes(UnlockSpecCommand::run)
                         )
@@ -39,26 +32,19 @@ public class UnlockSpecCommand {
     }
 
     public static int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        try {
-            final Collection<? extends Entity> targets = EntityArgument.getEntities(context, "entities");
+        final Collection<? extends Entity> targets = EntityArgument.getEntities(context, "entities");
 
-            if (targets.isEmpty()) {
-                return 0;
-            }
+        if (targets.isEmpty()) {
+            return 0;
+        }
+        JPerms.checkTargets(context.getSource(), targets, JPerms.SPEC_UNLOCK_OTHERS);
+
+        try {
             for (final Entity entity : targets) {
                 if (entity instanceof LivingEntity living) {
-                    final SpecType specType = JComponentPlatformUtils.getSpecData(living).getType();
-                    if (specType == JSpecTypeRegistry.HAMON.get()) {
-                        var hamon = JComponentPlatformUtils.getHamon(living);
-                        if (living instanceof ServerPlayer player) {
-                            JUtils.awardAdvancement(player, Hamon1Trigger.ID);
-                            JUtils.awardAdvancement(player, Hamon2Trigger.ID);
-                            JUtils.awardAdvancement(player, Hamon3Trigger.ID);
-                            JUtils.awardAdvancement(player, Hamon4Trigger.ID);
-                            JUtils.awardAdvancement(player, Hamon5Trigger.ID);
-                            JUtils.awardAdvancement(player, Hamon6Trigger.ID);
-                        }
-                        hamon.setActiveLesson(0);
+                    final JSpec<?,?> spec = JUtils.getSpec(living);
+                    if (spec != null) {
+                        spec.unlock();
                     }
                 }
             }

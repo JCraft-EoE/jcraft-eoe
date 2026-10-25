@@ -8,20 +8,34 @@
       "backstab": true,
       "block_stun": 13,
       "blockable_type": "NON_BLOCKABLE",
-      "hit_animation": "MID",
+      "hit_animation": "LAUNCH",
       "hit_spark": "HIT_SPARK_3",
+      "override_stun": true,
+      "shockwaves": true,
       "stun_type": "LAUNCH"
     },
     "cooldown": 920,
     "damage": 9.0,
     "duration": 31,
+    "effectDuration": 60,
     "extras": {
       "actions": [
         {
           "type": "jcraft:play_sound",
           "bind": false,
           "run": "on_hit",
+          "sound": "jcraft:twkickhit"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "bind": false,
+          "run": "on_hit",
           "sound": "jcraft:impact10"
+        },
+        {
+          "type": "jcraft:launch_up",
+          "run": "on_strike",
+          "strength": 0.8
         }
       ],
       "description": {

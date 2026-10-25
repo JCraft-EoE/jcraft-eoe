@@ -13,6 +13,9 @@ import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
 import net.arna.jcraft.api.component.living.CommonVampireComponent;
 import net.arna.jcraft.api.registry.*;
+import net.arna.jcraft.api.spec.JSpec;
+import net.arna.jcraft.api.spec.SpecType;
+import net.arna.jcraft.api.spec.SpecTypeUtil;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -27,7 +30,9 @@ import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.common.marker.BlockMarkerMoves;
 import net.arna.jcraft.common.network.s2c.AttackerDataPacket;
 import net.arna.jcraft.common.saveddata.ExclusiveStandsData;
+import net.arna.jcraft.common.saveddata.ServerJoinData;
 import net.arna.jcraft.common.spec.VampireSpec;
+import net.arna.jcraft.common.system.GunAiming;
 import net.arna.jcraft.common.tickable.*;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.mixin_logic.EntityAddon;
@@ -56,13 +61,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ArmorMaterials;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Explosion;
@@ -101,6 +100,7 @@ public class JServerEvents {
     public static void finishLoading(final MinecraftServer server) {
         JCraft.auWorld = server.getLevel(JDimensionRegistry.AU_DIMENSION_KEY);
         JCraft.setExclusiveStandsData(ExclusiveStandsData.fromDefaultFile(server));
+        JCraft.setServerJoinData(ServerJoinData.fromDefaultFile(server));
         if (Platform.isModLoaded("jjbacosplay")) {
             for (final CosplayItem<?> cosplay : CosplayItem.all()) {
                 switch (cosplay.getSlot()) {
@@ -116,6 +116,12 @@ public class JServerEvents {
     public static void saveExclusives(final MinecraftServer server) {
         if (JCraft.getExclusiveStandsData() != null) {
             JCraft.getExclusiveStandsData().saveToDefaultFile(server);
+        }
+    }
+
+    public static void saveServerJoins(final MinecraftServer server) {
+        if (JCraft.getServerJoinData() != null) {
+            JCraft.getServerJoinData().saveToDefaultFile(server);
         }
     }
 
@@ -424,7 +430,7 @@ public class JServerEvents {
             if (100 - random.nextInt(0, 100) > gameRules.getInt(CHANCE_MOB_SPAWNS_WITH_STAND)) {
                 return EventResult.pass();
             }
-            final StandType type = StandTypeUtil.generateStandTypeForMob(gameRules);
+            final StandType type = StandTypeUtil.generateStandTypeForMob(gameRules, world.registryAccess());
             standData.setType(type);
 
             // ATTRIBUTES
@@ -552,7 +558,7 @@ public class JServerEvents {
                     final StandType standType = standData.getType();
                     if (standType != null && standType != JStandTypeRegistry.NONE.get()) {
                         final int skin = Math.max(0, Math.min(standData.getSkin(), standType.getData().getInfo().getSkinCount() - 1));
-                        final ItemStack disc = StandDiscItem.createDiscStack(standType, skin);
+                        final ItemStack disc = StandDiscItem.createDiscStack(standType, skin, true);
                         Containers.dropItemStack(serverWorld, living.getX(), living.getY(), living.getZ(), disc);
                     }
                     standData.setTypeAndSkin(JStandTypeRegistry.NONE.get(), 0, false);
@@ -594,9 +600,11 @@ public class JServerEvents {
     public static EventResult hurt(LivingEntity entity, DamageSource source, float damage) {
         // No snowball shenanigans
         if (damage < 0.01f) return EventResult.pass();
+
         if (entity.level() instanceof ServerLevel serverWorld) {
             maybeLaunch(entity, source, serverWorld, entity.getEffect(JStatusRegistry.DAZED.get()), source.getEntity());
         }
+
         return EventResult.pass();
     }
 
@@ -749,6 +757,51 @@ public class JServerEvents {
         loot.clear();
         loot.addAll(modifiedList);
         return EventResult.pass();
+    }
+
+    public static void playerRespawn(final ServerPlayer serverPlayer, boolean conqueredEnd) {
+        GunAiming.set(serverPlayer, false);
+
+        final var vamp = JComponentPlatformUtils.getVampirism(serverPlayer);
+
+        if (vamp == null) return;
+
+        vamp.resetBlood();
+    }
+
+    public static void playerJoin(final ServerPlayer player) {
+        final ServerJoinData serverJoinData = JCraft.getServerJoinData();
+        if (serverJoinData != null && serverJoinData.addPlayer(player)) {
+            // first join logic here
+            final int MAX_TRIES = 500; // arbitrary
+            if (JServerConfig.START_WITH_STAND.getValue()) {
+                final var standData = JComponentPlatformUtils.getStandComponent(player);
+                if (StandTypeUtil.isNone(standData.getType())) {
+                    // keep in mind exclusive stands, cmp. SetStandCommand
+                    StandType stand = null;
+                    int tries = 0;
+                    while ((StandTypeUtil.isNone(stand) || (JServerConfig.EXCLUSIVE_STANDS.getValue() && JCraft.getExclusiveStandsData().isStandUsed(stand))) && tries++ < MAX_TRIES) {
+                        stand = StandTypeUtil.getRandom(player.getRandom(), false, player.getServer().registryAccess(), true, false);
+                    }
+                    standData.setType(stand);
+                }
+            }
+            if (JServerConfig.START_WITH_SPEC.getValue()) {
+                final var specData = JComponentPlatformUtils.getSpecData(player);
+                if (SpecTypeUtil.isNone(specData.getType())) {
+                    SpecType spec = null;
+                    int tries = 0;
+                    while (SpecTypeUtil.isNone(spec) && tries++ < MAX_TRIES) {
+                        spec = SpecTypeUtil.getRandom(player.getRandom());
+                    }
+                    specData.setType(spec);
+                    final JSpec<?,?> actualSpec = JUtils.getSpec(player);
+                    if (actualSpec != null) {
+                        actualSpec.unlock();
+                    }
+                }
+            }
+        }
     }
 
 }

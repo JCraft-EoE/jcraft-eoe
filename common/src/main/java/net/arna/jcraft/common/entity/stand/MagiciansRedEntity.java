@@ -5,26 +5,26 @@ import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.Attacks;
+import net.arna.jcraft.api.attack.MoveMap;
+import net.arna.jcraft.api.attack.MoveSet;
+import net.arna.jcraft.api.attack.MoveSetManager;
+import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.moves.AbstractMove;
+import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
+import net.arna.jcraft.api.registry.JSoundRegistry;
+import net.arna.jcraft.api.registry.JStandTypeRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandInfo;
 import net.arna.jcraft.api.stand.SummonData;
-import net.arna.jcraft.api.attack.MoveSet;
-import net.arna.jcraft.api.attack.MoveSetManager;
 import net.arna.jcraft.common.attack.actions.PlaySoundAction;
-import net.arna.jcraft.api.attack.enums.MoveClass;
-import net.arna.jcraft.api.attack.MoveMap;
-import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.attack.moves.magiciansred.*;
 import net.arna.jcraft.common.attack.moves.shared.KnockdownAttack;
 import net.arna.jcraft.common.attack.moves.shared.SimpleAttack;
-import net.arna.jcraft.api.component.living.CommonHitPropertyComponent;
 import net.arna.jcraft.common.attack.moves.shared.TossChargeMove;
-import net.arna.jcraft.common.attack.moves.shared.TossMove;
 import net.arna.jcraft.common.util.JParticleType;
 import net.arna.jcraft.common.util.StandAnimationState;
-import net.arna.jcraft.api.registry.JSoundRegistry;
-import net.arna.jcraft.api.registry.JStandTypeRegistry;
+import net.arna.jcraft.mixin.AbstractFurnaceBlockEntityAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -59,7 +59,8 @@ import java.util.Collection;
  */
 public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, MagiciansRedEntity.State> {
     public static final MoveSet<MagiciansRedEntity, MagiciansRedEntity.State> MOVE_SET = MoveSetManager.create(
-            JStandTypeRegistry.MAGICIANS_RED, "default", MagiciansRedEntity::registerMoves, MagiciansRedEntity.State.class);
+            JStandTypeRegistry.MAGICIANS_RED, MagiciansRedEntity::registerMoves,
+            MagiciansRedEntity.class, MagiciansRedEntity.State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(225f)
             .info(StandInfo.builder()
@@ -87,7 +88,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             .summonData(SummonData.of(JSoundRegistry.MR_SUMMON))
             .build();
 
-    public static final RedirectAttack REDIRECT = new RedirectAttack(0, 7, 10, 0.75f)
+    public static final RedirectAttack<MagiciansRedEntity> REDIRECT = new RedirectAttack<MagiciansRedEntity>(0, 7, 10, 0.75f)
             .withAnim(State.REDIRECT)
             .withSound(JSoundRegistry.MR_REDIRECT)
             .withInfo(
@@ -143,7 +144,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Component.literal("Hammerfist"),
                     Component.literal("two-hit launcher")
             );
-    public static final FlamethrowerAttack FLAMETHROWER = new FlamethrowerAttack(200,
+    public static final FlamethrowerAttack<MagiciansRedEntity> FLAMETHROWER = new FlamethrowerAttack<MagiciansRedEntity>(200,
             0,40, 0.75f, 0.4f, 0, 2, 0.25f, 0, 3)
             .withArmor(1)
             .withSound(JSoundRegistry.MR_BARRAGE)
@@ -151,25 +152,25 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Component.literal("Flamethrower"),
                     Component.literal("fast reliable damage cash-out tool, no stun, burns for 3 seconds")
             );
-    public static final CrossfireAttack CROSSFIRE = new CrossfireAttack(100, 8, 10, 0.75f)
+    public static final CrossfireAttack<MagiciansRedEntity> CROSSFIRE = new CrossfireAttack<MagiciansRedEntity>(100, 8, 10, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
             .withInfo(
                     Component.literal("Crossfire"),
                     Component.literal("fires 3 stunning ankhs")
             );
-    public static final CrossfireVariationAttack CROSSFIRE_VARIATION = new CrossfireVariationAttack(600, 12, 17, 0.75f)
+    public static final CrossfireVariationAttack<MagiciansRedEntity> CROSSFIRE_VARIATION = new CrossfireVariationAttack<MagiciansRedEntity>(600, 12, 17, 0.75f)
             .withSound(JSoundRegistry.MR_CROSSFIRE)
             .withInfo(
                     Component.literal("Crossfire Variation"),
                     Component.literal("summons 6 ankhs that orbit around the user, crouch as they come out to increase orbit distance")
             );
-    public static final CrossfireHurricaneAttack CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack(800, 18, 22, 0.75f)
+    public static final CrossfireHurricaneAttack<MagiciansRedEntity> CROSSFIRE_HURRICANE = new CrossfireHurricaneAttack<MagiciansRedEntity>(800, 18, 22, 0.75f)
             .withSound(JSoundRegistry.MR_ULT)
             .withInfo(
                     Component.literal("Crossfire Hurricane"),
                     Component.literal("summons slow, homing fire hurricane that knocks down, lasts for 3 seconds after hitting anything")
             );
-    public static final RedBindAttack RED_BIND = new RedBindAttack(100,
+    public static final RedBindAttack<MagiciansRedEntity> RED_BIND = new RedBindAttack<MagiciansRedEntity>(100,
             12, 22, 0.75f, 3, 15, 1.5f, 0, 0)
             .withSound(JSoundRegistry.MR_REDBIND)
             .withImpactSound(JSoundRegistry.IMPACT_3)
@@ -177,7 +178,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
                     Component.literal("Red Bind"),
                     Component.literal("on hit, wraps opponent in fiery rings that launch them in the direction they are hit")
             );
-    public static final LifeDetectorAttack LIFE_DETECTOR = new LifeDetectorAttack(200, 13, 20, 0.75f)
+    public static final LifeDetectorAttack<MagiciansRedEntity> LIFE_DETECTOR = new LifeDetectorAttack<MagiciansRedEntity>(200, 13, 20, 0.75f)
             .withSound(JSoundRegistry.MR_DETECTOR)
             .withInfo(
                     Component.literal("Life Detector"),
@@ -185,7 +186,7 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final MagiciansRedTossMove TOSS = new MagiciansRedTossMove(0, 1, 1, 0.75f)
+    public static final MagiciansRedTossMove<MagiciansRedEntity> TOSS = new MagiciansRedTossMove<MagiciansRedEntity>(0, 1, 1, 0.75f)
             .withAnim(MagiciansRedEntity.State.ITEM_TOSS);
     public static final TossChargeMove<MagiciansRedEntity> TOSS_CHARGE = new TossChargeMove<MagiciansRedEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);
@@ -256,10 +257,11 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
             world.levelEvent(2009, blockPos, 0);
             world.playSound(null, blockPos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, (1.0F + world.getRandom().nextFloat() * 0.2F) * 0.7F);
         }
-        if (world.getBlockEntity(blockPos) instanceof AbstractFurnaceBlockEntity furnaceBlock) {
-            furnaceBlock.litTime = 220;
+        if (world.getBlockEntity(blockPos) instanceof final AbstractFurnaceBlockEntity furnaceBlock) {
+            furnaceBlock.litTime += 220;
+            ((AbstractFurnaceBlockEntityAccessor)furnaceBlock).setLitDuration(((AbstractFurnaceBlockEntityAccessor)furnaceBlock).getLitDuration() + 220);
         }
-        if (block instanceof IceBlock iceBlock) {
+        if (block instanceof final IceBlock iceBlock) {
             iceBlock.melt(state, world, blockPos);
         }
     }
@@ -309,19 +311,19 @@ public class MagiciansRedEntity extends StandEntity<MagiciansRedEntity, Magician
     // Animation code
     public enum State implements StandAnimationState<MagiciansRedEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.mr.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.light", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.mr.block", AzPlayBehaviors.LOOP)),
-        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.barrage", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROSSFIRE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfire", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROSSFIRE_HURRICANE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfirehurricane", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROSSFIRE_VARIATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfirevariation", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        REDIRECT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.redirect", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        RED_BIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.redbind", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        DETECTOR(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.detector", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        HAMMER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.hammer", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.heavy", AzPlayBehaviors.PLAY_ONCE)),
+        BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.barrage", AzPlayBehaviors.PLAY_ONCE)),
+        CROSSFIRE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfire", AzPlayBehaviors.PLAY_ONCE)),
+        CROSSFIRE_HURRICANE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfirehurricane", AzPlayBehaviors.PLAY_ONCE)),
+        CROSSFIRE_VARIATION(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.crossfirevariation", AzPlayBehaviors.PLAY_ONCE)),
+        REDIRECT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.redirect", AzPlayBehaviors.PLAY_ONCE)),
+        RED_BIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.redbind", AzPlayBehaviors.PLAY_ONCE)),
+        DETECTOR(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.detector", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        HAMMER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.mr.hammer", AzPlayBehaviors.PLAY_ONCE)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;

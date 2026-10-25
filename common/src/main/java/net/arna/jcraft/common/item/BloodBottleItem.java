@@ -28,6 +28,7 @@ import java.util.List;
 public class BloodBottleItem extends Item {
     private static final int MAX_USE_TIME = 24;
     public static final float MAX_BLOOD = 16f;
+    public static final int USAGE_COOLDOWN = 80;
 
     public BloodBottleItem(Properties settings) {
         super(settings);
@@ -54,21 +55,22 @@ public class BloodBottleItem extends Item {
             CommonVampireComponent vampireComponent = JComponentPlatformUtils.getVampirism(playerEntity);
 
             if (vampireComponent.isVampire()) {
-                // boolean full = blood >= 1.0f;
+                boolean full = blood >= 1.0f;
 
                 if (playerEntity != null) {
                     playerEntity.awardStat(Stats.ITEM_USED.get(this));
                     if (!playerEntity.getAbilities().instabuild && vampireComponent.getBlood() < 20) {
-                        blood -= 0.5f;
-                        nbt.putFloat("Blood", Math.max(blood, 0));
+                        nbt.putFloat("Blood", Math.max(--blood, 0));
                     }
+
+                    playerEntity.getCooldowns().addCooldown(this, USAGE_COOLDOWN);
                 }
 
                 if (!world.isClientSide) {
                     if (playerEntity instanceof ServerPlayer) {
                         CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) playerEntity, stack);
                     }
-                    vampireComponent.setBlood(vampireComponent.getBlood() + 1.0f); // (full ? 2 : 1)
+                    vampireComponent.setBlood(vampireComponent.getBlood() + (full ? 2 : 1));
                 }
 
                 user.gameEvent(GameEvent.DRINK);

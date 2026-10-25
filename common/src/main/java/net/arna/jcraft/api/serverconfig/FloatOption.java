@@ -20,18 +20,33 @@ public class FloatOption extends ConfigOption {
     private Float min, max;
 
     public FloatOption(final ResourceLocation key, final ResourceLocation category, final float value) {
-        super(key, category);
+        this(key, category, null, value);
+    }
+
+    public FloatOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory, final float value) {
+        super(key, category, null);
         this.value = this.defaultValue = value;
     }
 
     public FloatOption(final ResourceLocation key, final ResourceLocation category, final float value, final float min) {
-        super(key, category);
+        this(key, category, null, value, min);
+    }
+
+    public FloatOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory,
+                       final float value, final float min) {
+        super(key, category, subcategory);
         this.value = this.defaultValue = value;
         this.min = min;
     }
 
-    public FloatOption(final ResourceLocation key, final ResourceLocation category, final float value, final float min, final float max) {
-        super(key, category);
+    public FloatOption(final ResourceLocation key, final ResourceLocation category, final float value, final float min,
+                       final float max) {
+        this(key, category, null, value, min, max);
+    }
+
+    public FloatOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory,
+                       final float value, final float min, final float max) {
+        super(key, category, subcategory);
         this.value = this.defaultValue = value;
         this.min = min;
         this.max = max;

@@ -10,6 +10,7 @@ import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.client.JClientConfig;
+import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.util.ColorUtils;
@@ -172,16 +173,16 @@ public class JCraftAbilityHud {
     public static String cooldownTypeToKeybind(CooldownType type, boolean makeShort) {
         return switch (type) {
             case LIGHT, STAND_LIGHT ->          "M1";
-            case HEAVY, STAND_HEAVY ->          generateName(heavyKey.getParent(), makeShort);
-            case BARRAGE, STAND_BARRAGE ->      generateName(barrageKey.getParent(), makeShort);
-            case ULTIMATE, STAND_ULTIMATE ->    generateName(ultKey.getParent(), makeShort);
-            case SPECIAL1, STAND_SP1 ->         generateName(special1Key.getParent(), makeShort);
-            case SPECIAL2, STAND_SP2 ->         generateName(special2Key.getParent(), makeShort);
-            case SPECIAL3, STAND_SP3 ->         generateName(special3Key.getParent(), makeShort);
-            case UTILITY, STAND_TOSS ->         generateName(utility.getParent(), makeShort);
+            case HEAVY, STAND_HEAVY ->          generateName(HEAVY_KEY.getParent(), makeShort);
+            case BARRAGE, STAND_BARRAGE ->      generateName(BARRAGE_KEY.getParent(), makeShort);
+            case ULTIMATE, STAND_ULTIMATE ->    generateName(ULT_KEY.getParent(), makeShort);
+            case SPECIAL1, STAND_SP1 ->         generateName(SPECIAL1_KEY.getParent(), makeShort);
+            case SPECIAL2, STAND_SP2 ->         generateName(SPECIAL2_KEY.getParent(), makeShort);
+            case SPECIAL3, STAND_SP3 ->         generateName(SPECIAL3_KEY.getParent(), makeShort);
+            case UTILITY, STAND_TOSS ->         generateName(JCraftClient.UTILITY_KEY.getParent(), makeShort);
             case COMBO_BREAKER ->               makeShort ? "CB" : "Combo Breaker";
-            case COOLDOWN_CANCEL ->             generateName(cooldownCancel.getParent(), makeShort);
-            case DASH ->                        generateName(dash.getParent(), makeShort);
+            case COOLDOWN_CANCEL ->             generateName(JCraftClient.COOLDOWN_CANCEL_KEY.getParent(), makeShort);
+            case DASH ->                        generateName(DASH_KEY.getParent(), makeShort);
         };
     }
 

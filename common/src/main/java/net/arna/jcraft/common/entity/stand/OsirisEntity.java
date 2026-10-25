@@ -19,7 +19,7 @@ import net.minecraft.world.level.Level;
  */
 public class OsirisEntity extends StandEntity<OsirisEntity, OsirisEntity.State> {
     public static final MoveSet<OsirisEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.OSIRIS,
-            OsirisEntity::registerMoves, State.class);
+            OsirisEntity::registerMoves, OsirisEntity.class, State.class);
     public static final StandData DATA = StandData.of(StandInfo.of(Component.translatable("entity.jcraft.osiris")))
             .withObtainable(false);
 

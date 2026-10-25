@@ -24,6 +24,16 @@ public final class TWChargeAttack extends AbstractChargeAttack<TWChargeAttack, T
     }
 
     @Override
+    public void activeTick(final TheWorldEntity attacker, final int moveStun) {
+        super.activeTick(attacker, moveStun);
+        if (moveStun == 1) {
+            attacker.setCurrentMove(null);
+            attacker.setMoveStun(10);
+            attacker.setState(TheWorldEntity.State.CHARGE_MISS);
+        }
+    }
+
+    @Override
     public @NonNull TWChargeAttack copy() {
         return copyExtras(new TWChargeAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(), getStun(),
                 getHitboxSize(), getKnockback(), getOffset()));

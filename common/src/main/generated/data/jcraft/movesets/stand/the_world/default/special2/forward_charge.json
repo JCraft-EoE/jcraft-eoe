@@ -64,7 +64,7 @@
   "move": {
     "type": "jcraft:theworld_charge_attack",
     "attack_extras": {
-      "block_stun": 11,
+      "block_stun": 8,
       "hit_animation": "CRUSH",
       "hit_spark": "HIT_SPARK_2"
     },

@@ -2,6 +2,7 @@ package net.arna.jcraft.common.item;
 
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.api.stand.StandData;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
@@ -61,6 +62,7 @@ public class StandDiscItem extends Item {
         int itemSkin = 0;
 
         final CompoundTag data = itemStack.getOrCreateTag();
+        final boolean oneUse = data.getByte("OneUse") != 0;
         itemStand = StandTypeUtil.readFromNBT(data, "StandID");
         if (data.contains("Skin", Tag.TAG_INT)) {
             itemSkin = data.getInt("Skin");
@@ -75,10 +77,20 @@ public class StandDiscItem extends Item {
         final StandType userStand = standData.getType();
         final int userSkin = standData.getSkin();
 
+        if (oneUse && !StandTypeUtil.isNone(userStand)) {
+            user.displayClientMessage(Component.translatable("jcraft.disc.fragile_has_stand").withStyle(ChatFormatting.RED), true);
+            return InteractionResultHolder.fail(itemStack);
+        }
+
         if (itemStand == userStand && (itemStand == null || itemSkin == userSkin)) {
             if (itemStand != null) {
                 user.displayClientMessage(Component.translatable("jcraft.disc.same_stand"), true);
             }
+            return InteractionResultHolder.fail(itemStack);
+        }
+
+        if (StandTypeUtil.isIn(itemStand, JTagRegistry.PLAYER_STAND_BLACKLIST, world.registryAccess())) {
+            user.displayClientMessage(Component.translatable("jcraft.disc.blacklisted"), true);
             return InteractionResultHolder.fail(itemStack);
         }
 
@@ -108,6 +120,10 @@ public class StandDiscItem extends Item {
         // 1s usage cooldown to prevent overuse
         user.getCooldowns().addCooldown(this, 20);
 
+        if (oneUse) {
+            itemStack.shrink(1);
+        }
+
         return InteractionResultHolder.success(itemStack);
     }
 
@@ -127,7 +143,7 @@ public class StandDiscItem extends Item {
                 .withStyle(s -> s.withColor(SKIN_LEVEL_COLORS[skin])));
     }
 
-    public static ItemStack createDiscStack(StandType type, int skin) {
+    public static ItemStack createDiscStack(StandType type, int skin, boolean oneUse) {
         if (skin < 0 || skin >= type.getData().getInfo().getSkinCount()) {
             throw new IndexOutOfBoundsException("Skin out of bounds");
         }
@@ -136,8 +152,15 @@ public class StandDiscItem extends Item {
         CompoundTag nbt = stack.getOrCreateTag();
         nbt.putString("StandID", type.getId().toString());
         nbt.putInt("Skin", skin);
+        if (oneUse) {
+            nbt.putByte("OneUse", (byte) 1);
+        }
 
         return stack;
+    }
+
+    public static ItemStack createDiscStack(StandType type, int skin) {
+        return createDiscStack(type, skin, false);
     }
 
     public static boolean isEmptyDisc(ItemStack stack) {

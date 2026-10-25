@@ -9,6 +9,7 @@ import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
 import net.arna.jcraft.api.attack.MoveMap;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -22,7 +23,9 @@ import net.minecraft.server.level.ServerPlayer;
 public class AboutStandCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("stand")
-                .then(Commands.literal("about").executes(AboutStandCommand::run)));
+                .then(Commands.literal("about")
+                        .requires(JPerms.STAND_ABOUT.require())
+                        .executes(AboutStandCommand::run)));
     }
 
     public static int run(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

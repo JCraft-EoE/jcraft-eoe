@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.attack.moves.AbstractCounterAttack;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.common.attack.moves.shared.CounterMissMove;
@@ -24,7 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
-public final class STWCounterAttack extends AbstractCounterAttack<STWCounterAttack, ShadowTheWorldEntity> {
+public final class STWCounterAttack<A extends StandEntity<? extends A, ?>> extends AbstractCounterAttack<STWCounterAttack<A>, A> {
     private static final CounterMissMove<ShadowTheWorldEntity> missAttack = new CounterMissMove<>(20);
 
     public STWCounterAttack(final int cooldown, final int windup, final int duration, final float moveDistance) {
@@ -32,12 +33,12 @@ public final class STWCounterAttack extends AbstractCounterAttack<STWCounterAtta
     }
 
     @Override
-    public @NonNull MoveType<STWCounterAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<STWCounterAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void onInitiate(final ShadowTheWorldEntity attacker) {
+    public void onInitiate(final A attacker) {
         super.onInitiate(attacker);
         final LivingEntity user = attacker.getUserOrThrow();
         if (user instanceof ServerPlayer player) {
@@ -51,14 +52,14 @@ public final class STWCounterAttack extends AbstractCounterAttack<STWCounterAtta
     }
 
     @Override
-    public void whiff(final @NonNull ShadowTheWorldEntity attacker, final @NonNull LivingEntity user) {
+    public void whiff(final @NonNull A attacker, final @NonNull LivingEntity user) {
         attacker.cancelMove();
         attacker.desummon(false);
         JCraft.stun(user, missAttack.getDuration(), 0);
     }
 
     @Override
-    public void counter(final @NonNull ShadowTheWorldEntity attacker, final Entity countered, final DamageSource counteredDamageSource) {
+    public void counter(final @NonNull A attacker, final Entity countered, final DamageSource counteredDamageSource) {
         super.counter(attacker, countered, counteredDamageSource);
 
         if (countered == null || !attacker.hasUser()) {
@@ -89,20 +90,20 @@ public final class STWCounterAttack extends AbstractCounterAttack<STWCounterAtta
     }
 
     @Override
-    protected @NonNull STWCounterAttack getThis() {
+    protected @NonNull STWCounterAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull STWCounterAttack copy() {
-        return copyExtras(new STWCounterAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
+    public @NonNull STWCounterAttack<A> copy() {
+        return copyExtras(new STWCounterAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance()));
     }
 
-    public static class Type extends AbstractMove.Type<STWCounterAttack> {
+    public static class Type extends AbstractMove.Type<STWCounterAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<STWCounterAttack>, STWCounterAttack> buildCodec(RecordCodecBuilder.Instance<STWCounterAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<STWCounterAttack<?>>, STWCounterAttack<?>> buildCodec(RecordCodecBuilder.Instance<STWCounterAttack<?>> instance) {
             return baseDefault(instance, STWCounterAttack::new);
         }
     }

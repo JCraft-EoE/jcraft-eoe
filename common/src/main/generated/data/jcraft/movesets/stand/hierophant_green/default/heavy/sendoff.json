@@ -6,7 +6,7 @@
     "type": "jcraft:shared_simple_attack",
     "attack_extras": {
       "backstab": true,
-      "block_stun": 12,
+      "block_stun": 8,
       "hit_animation": "CRUSH",
       "hit_spark": "HIT_SPARK_3",
       "override_stun": true,
@@ -30,7 +30,7 @@
           "sound": "jcraft:impact1"
         }
       ],
-      "armor": 2147483647,
+      "armor": 1,
       "description": {
         "translate": "move.jcraft.hierophant_green.default.sendoff.description"
       },

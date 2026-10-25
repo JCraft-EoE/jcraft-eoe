@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.common.entity.stand.AbstractKillerQueenEntity;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.arna.jcraft.common.attack.moves.killerqueen.KQDetonateAttack;
@@ -26,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Set;
 
-public final class BTDDetonateAttack extends AbstractMove<BTDDetonateAttack, KQBTDEntity> {
+public final class BTDDetonateAttack<A extends AbstractKillerQueenEntity<? extends A, ?>> extends AbstractMove<BTDDetonateAttack<A>, A> {
 
     @Getter
     private final int reach;
@@ -40,13 +41,13 @@ public final class BTDDetonateAttack extends AbstractMove<BTDDetonateAttack, KQB
     }
 
     @Override
-    public @NotNull MoveType<BTDDetonateAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<BTDDetonateAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final KQBTDEntity attacker, final LivingEntity user) {
-        final BTDPlantAttack btdPlantAttack = attacker.getMove(BTDPlantAttack.class);
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
+        final BTDPlantAttack<?> btdPlantAttack = attacker.getMove(BTDPlantAttack.class);
         final ServerLevel level = (ServerLevel) attacker.level();
         if (btdPlantAttack == null || btdPlantAttack.getEntityMarker() == null) {
             return Set.of();
@@ -93,20 +94,20 @@ public final class BTDDetonateAttack extends AbstractMove<BTDDetonateAttack, KQB
     }
 
     @Override
-    protected @NonNull BTDDetonateAttack getThis() {
+    protected @NonNull BTDDetonateAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull BTDDetonateAttack copy() {
-        return copyExtras(new BTDDetonateAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getReach()));
+    public @NonNull BTDDetonateAttack<A> copy() {
+        return copyExtras(new BTDDetonateAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getReach()));
     }
 
-    public static class Type extends AbstractMove.Type<BTDDetonateAttack> {
+    public static class Type extends AbstractMove.Type<BTDDetonateAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<BTDDetonateAttack>, BTDDetonateAttack> buildCodec(RecordCodecBuilder.Instance<BTDDetonateAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<BTDDetonateAttack<?>>, BTDDetonateAttack<?>> buildCodec(RecordCodecBuilder.Instance<BTDDetonateAttack<?>> instance) {
             return instance.group(cooldown(), windup(), duration(), moveDistance(), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("reach").forGetter(BTDDetonateAttack::getReach)).apply(instance, BTDDetonateAttack::new);
         }
     }

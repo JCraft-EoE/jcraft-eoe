@@ -2,6 +2,7 @@ package net.arna.jcraft.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
+import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.rendering.AlphaFadeBufferSource;
 import net.arna.jcraft.client.rendering.MihAfterimageTrail;
 import net.arna.jcraft.client.renderer.features.ArmoredMoveFeatureRenderer;
@@ -85,7 +86,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
         if (jcraft$renderingAfterimage) {
             return; // we're inside a copy already; don't spawn more (prevents infinite recursion)
         }
-        if (entity.isInvisible() || !(JUtils.getStand(entity) instanceof MadeInHeavenEntity mih)) {
+        if (entity.isInvisible() || !(JUtils.getStand(entity) instanceof MadeInHeavenEntity mih) || JClientConfig.getInstance().isDisableMihAfterimages()) {
             return;
         }
         final float intensity = mih.getRampIntensity();

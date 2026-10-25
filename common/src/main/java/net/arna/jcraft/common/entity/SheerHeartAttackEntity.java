@@ -1,5 +1,7 @@
 package net.arna.jcraft.common.entity;
 
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.registry.JEntityTypeRegistry;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
@@ -220,11 +222,19 @@ public class SheerHeartAttackEntity extends Mob implements IOwnable {
 
         final Set<LivingEntity> hurt = JUtils.generateHitbox(level(), position(), 4.0, Set.of(this, master));
 
+        final IntSet processed = new IntOpenHashSet(4);
+
         for (final LivingEntity living : hurt) {
-            final Vec3 kbVec = living.getEyePosition().subtract(position()).normalize();
-            damageLogic(level(), living, kbVec, 2, 3, true, 15f,
+            final LivingEntity target = JUtils.getUserIfStand(living);
+            final int id = target.getId();
+            if (processed.contains(id)) {
+                continue;
+            }
+            final Vec3 kbVec = target.getEyePosition().subtract(position()).normalize();
+            damageLogic(level(), target, kbVec, 2, 3, true, 15f,
                     false, 4, damageSource, getMaster(), null, false);
-            living.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
+            target.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 35, 0, true, false));
+            processed.add(id);
         }
     }
 

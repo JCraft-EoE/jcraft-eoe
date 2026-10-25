@@ -71,7 +71,7 @@ import java.util.*;
  */
 public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntity.State> {
     public static final MoveSet<MetallicaEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.METALLICA,
-            MetallicaEntity::registerMoves, State.class);
+            MetallicaEntity::registerMoves, MetallicaEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleDistance(0f)
             .info(StandInfo.builder()
@@ -236,7 +236,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             .withInitAction(UserAnimationAction.play("mtl.pt"))
             .withCondition(MetallicaIronCondition.atLeast(ScalpelProjectile.IRON_COST));
 
-    public static final RazorCoughAttack RAZOR_COUGH_ATTACK = new RazorCoughAttack(140, 10, 20)
+    public static final RazorCoughAttack<MetallicaEntity> RAZOR_COUGH_ATTACK = new RazorCoughAttack<MetallicaEntity>(140, 10, 20)
             .withInfo(
                     Component.literal("Internal Attack"),
                     Component.literal("""
@@ -257,7 +257,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             )
             .withInitAction(UserAnimationAction.play("mtl.sfk"))
             .withCondition(MetallicaIronCondition.atLeast(CreateMagneticFieldMove.IRON_COST));
-    /* public static final InternalAttack INTERNAL_ATTACK = new InternalAttack(200, 10, 15)
+    /* public static final InternalAttack<MetallicaEntity> INTERNAL_ATTACK = new InternalAttack<MetallicaEntity>(200, 10, 15)
             .withCrouchingVariant(CREATE_MAGNETIC_FIELD)
             .withInfo(
                     Component.literal("Internal Attack"),
@@ -271,7 +271,7 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
             )
             .withInitAction(UserAnimationAction.play("mtl.ita")); */
 
-    public static final ExplodeMagneticFieldMove EXPLODE_MAGNETIC_FIELD = new ExplodeMagneticFieldMove(0, 10, 20)
+    public static final ExplodeMagneticFieldMove<MetallicaEntity> EXPLODE_MAGNETIC_FIELD = new ExplodeMagneticFieldMove<MetallicaEntity>(0, 10, 20)
             .withInfo(
                     Component.literal("Explode Magnetic Field"),
                     Component.literal("""
@@ -620,11 +620,11 @@ public class MetallicaEntity extends StandEntity<MetallicaEntity, MetallicaEntit
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.metallica.idle", AzPlayBehaviors.LOOP)),
         NONE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.metallica.idle", AzPlayBehaviors.LOOP)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.metallica.block", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.light2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FINAL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.light3", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        PRECISE_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.precise_toss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        FAN_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.fan_toss", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.light", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.light2", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FINAL(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.light3", AzPlayBehaviors.PLAY_ONCE)),
+        PRECISE_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.precise_toss", AzPlayBehaviors.PLAY_ONCE)),
+        FAN_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.fan_toss", AzPlayBehaviors.PLAY_ONCE)),
         HARVEST(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.harvest", AzPlayBehaviors.LOOP)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.barrage", AzPlayBehaviors.LOOP)),
         SMASH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.metallica.smash", AzPlayBehaviors.LOOP)),

@@ -33,7 +33,6 @@
           "description": {
             "translate": "move.jcraft.purple_haze.default.hammerfist.followup.description"
           },
-          "may_hit_user": true,
           "name": {
             "translate": "move.jcraft.purple_haze.default.hammerfist.followup.name"
           }
@@ -76,7 +75,6 @@
         "description": {
           "translate": "move.jcraft.purple_haze.default.backhand.cr.description"
         },
-        "may_hit_user": true,
         "name": {
           "translate": "move.jcraft.purple_haze.default.backhand.cr.name"
         }
@@ -120,7 +118,6 @@
         "description": {
           "translate": "move.jcraft.purple_haze.default.kick.followup.description"
         },
-        "may_hit_user": true,
         "name": {
           "translate": "move.jcraft.purple_haze.default.kick.followup.name"
         }
@@ -157,7 +154,6 @@
         "translate": "move.jcraft.purple_haze.default.punch.description"
       },
       "loop_prevention": false,
-      "may_hit_user": true,
       "name": {
         "translate": "move.jcraft.purple_haze.default.punch.name"
       }

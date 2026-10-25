@@ -93,4 +93,8 @@ public class JComponentPlatformUtilsImpl {
     public static CommonVampireComponent getVampirism(LivingEntity living) {
         return JComponents.VAMPIRE.get(living);
     }
+
+    public static CommonGunslingerComponent getGunslinger(LivingEntity living) {
+        return JComponents.GUNSLINGER.get(living);
+    }
 }

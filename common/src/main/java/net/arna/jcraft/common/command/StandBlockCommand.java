@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.arna.jcraft.api.stand.StandEntity;
+import net.arna.jcraft.common.command.permissions.JPerms;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -17,7 +18,7 @@ public class StandBlockCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("stand")
                 .then(Commands.literal("block")
-                        .requires(source -> source.hasPermission(2) || "Arna57".equals(source.getTextName()) || "MrSterner".equals(source.getTextName()))
+                        .requires(JPerms.STAND_BLOCK.require())
                         .then(Commands.argument("targets", EntityArgument.entities())
                                 .then(Commands.argument("block", BoolArgumentType.bool())
                                         .executes(ctx -> run(ctx, ctx.getArgument("block", Boolean.class)))
@@ -32,6 +33,7 @@ public class StandBlockCommand {
         if (targets.isEmpty()) {
             return 0;
         }
+        JPerms.checkTargets(ctx.getSource(), targets, JPerms.STAND_BLOCK_OTHERS);
         for (Entity entity : targets) {
             if (entity instanceof LivingEntity livingEntity) {
                 StandEntity<?, ?> stand = JComponentPlatformUtils.getStandComponent(livingEntity).getStand();

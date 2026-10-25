@@ -1,0 +1,19 @@
+{
+  "class": "SPECIAL3",
+  "cooldown_type": "SPECIAL3",
+  "move": {
+    "type": "jcraft:ranger_holster_move",
+    "cooldown": 5,
+    "duration": 0,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.ranger.default.holster.description"
+      },
+      "name": {
+        "translate": "move.jcraft.ranger.default.holster.name"
+      }
+    },
+    "move_distance": 0.0,
+    "windup": 0
+  }
+}

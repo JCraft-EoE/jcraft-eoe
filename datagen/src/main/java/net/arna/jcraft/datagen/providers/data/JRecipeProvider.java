@@ -64,6 +64,14 @@ public class JRecipeProvider extends FabricRecipeProvider {
                         200)
                 .unlockedBy("has_glass_pane", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LIGHT_BLUE_STAINED_GLASS_PANE))
                 .save(exporter, JCraft.id("disc"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, JItemRegistry.DISC_CASE.get())
+                .pattern("WWW")
+                .pattern("FDF")
+                .pattern("WWW")
+                .define('D', JItemRegistry.DISC.get())
+                .define('F', Items.FLINT)
+                .define('W', ItemTags.WOOL)
+                .unlockedBy("has_disc", InventoryChangeTrigger.TriggerInstance.hasItems(JItemRegistry.DISC.get()));
         // stellar iron block from ingot
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, JBlockRegistry.STELLAR_IRON_BLOCK.get())
                 .requires(JItemRegistry.STELLAR_IRON_INGOT.get())
@@ -299,6 +307,16 @@ public class JRecipeProvider extends FabricRecipeProvider {
                 .define('R', Items.RED_DYE)
                 .define('S', Items.STRING)
                 .unlockedBy("has_leather", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEATHER))
+                .save(exporter);
+        // holster
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, JItemRegistry.HOLSTER.get())
+                .pattern("LNL")
+                .pattern("DS ")
+                .define('D', Items.LEAD)
+                .define('L', Items.LEATHER)
+                .define('N', Items.IRON_NUGGET)
+                .define('S', Items.STRING)
+                .unlockedBy("has_lead", InventoryChangeTrigger.TriggerInstance.hasItems(Items.LEAD))
                 .save(exporter);
         // coin to nuggets
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.GOLD_NUGGET, 2)

@@ -2,6 +2,57 @@
   "anim_state": "REKKA1",
   "class": "SPECIAL2",
   "cooldown_type": "STAND_SP2",
+  "crouching_variant": {
+    "anim_state": "SOUL_PUNCH",
+    "class": "SPECIAL2",
+    "cooldown_type": "STAND_SP2",
+    "move": {
+      "type": "jcraft:goldexperience_overclock_attack",
+      "attack_extras": {
+        "backstab": true,
+        "block_stun": 4,
+        "hit_animation": "CRUSH",
+        "hit_spark": "HIT_SPARK_2"
+      },
+      "cooldown": 100,
+      "damage": 0.0,
+      "duration": 26,
+      "effectDuration": 80,
+      "extras": {
+        "actions": [
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact1"
+          },
+          {
+            "type": "jcraft:play_sound",
+            "bind": false,
+            "run": "on_hit",
+            "sound": "jcraft:impact10"
+          },
+          {
+            "type": "jcraft:heal",
+            "amount": 6.0,
+            "run": "on_strike"
+          }
+        ],
+        "description": {
+          "translate": "move.jcraft.gold_experience.default.soul_punch.cr.description"
+        },
+        "name": {
+          "translate": "move.jcraft.gold_experience.default.soul_punch.cr.name"
+        }
+      },
+      "hitbox_size": 1.65,
+      "knockback": 0.9,
+      "move_distance": 1.0,
+      "offset": 0.0,
+      "stun": 80,
+      "windup": 14
+    }
+  },
   "followup": {
     "anim_state": "REKKA2",
     "class": "SPECIAL2",

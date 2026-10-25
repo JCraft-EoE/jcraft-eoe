@@ -307,7 +307,7 @@ public class HGNetEntity extends JAttackEntity implements ICustomDamageHandler {
     @Override
     public boolean handleDamage(Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun, float damage,
                                 boolean lift, int blockstun, DamageSource source, Entity attacker, CommonHitPropertyComponent.HitAnimation hitAnimation,
-                                MoveUsage moveUsage, boolean canBackstab, boolean unblockable) {
+                                MoveUsage moveUsage, boolean canBackstab, boolean unblockable, boolean cancelAttacks) {
         if (attacker == master || (attacker instanceof IOwnable ownable && ownable.getMaster() == master)) {
             return false;
         }

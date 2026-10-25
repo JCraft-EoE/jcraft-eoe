@@ -1,0 +1,55 @@
+{
+  "anim_state": "SLIDE",
+  "class": "BARRAGE",
+  "cooldown_type": "BARRAGE",
+  "crouching_variant": {
+    "anim_state": "ROLL",
+    "class": "BARRAGE",
+    "cooldown_type": "BARRAGE",
+    "move": {
+      "type": "jcraft:ranger_roll_move",
+      "cooldown": 100,
+      "duration": 20,
+      "extras": {
+        "description": {
+          "translate": "move.jcraft.ranger.default.roll.cr.description"
+        },
+        "mobility_type": "DASH",
+        "name": {
+          "translate": "move.jcraft.ranger.default.roll.cr.name"
+        }
+      },
+      "move_distance": 0.0,
+      "windup": 0
+    }
+  },
+  "move": {
+    "type": "jcraft:ranger_slide_move",
+    "attack_extras": {
+      "block_stun": 5,
+      "hit_animation": "LAUNCH",
+      "hit_spark": "HIT_SPARK_1",
+      "override_stun": true,
+      "stun_type": "LAUNCH"
+    },
+    "cooldown": 140,
+    "damage": 1.0,
+    "duration": 30,
+    "extras": {
+      "description": {
+        "translate": "move.jcraft.ranger.default.slide.description"
+      },
+      "is_holdable": true,
+      "mobility_type": "DASH",
+      "name": {
+        "translate": "move.jcraft.ranger.default.slide.name"
+      }
+    },
+    "hitbox_size": 1.5,
+    "knockback": 2.0,
+    "move_distance": 0.0,
+    "offset": 0.0,
+    "stun": 10,
+    "windup": 0
+  }
+}

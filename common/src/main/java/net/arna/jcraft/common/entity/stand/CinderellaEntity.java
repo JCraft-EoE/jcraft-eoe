@@ -27,7 +27,7 @@ import net.minecraft.world.level.Level;
  */
 public class CinderellaEntity extends StandEntity<CinderellaEntity, CinderellaEntity.State> {
     public static final MoveSet<CinderellaEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CINDERELLA,
-            CinderellaEntity::registerMoves, State.class);
+            CinderellaEntity::registerMoves, CinderellaEntity.class, State.class);
     public static final StandData DATA = StandData.of(StandInfo.of(Component.translatable("entity.jcraft.cinderella")))
             .withObtainable(false);
 
@@ -66,7 +66,7 @@ public class CinderellaEntity extends StandEntity<CinderellaEntity, CinderellaEn
 
     public enum State implements StandAnimationState<CinderellaEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cinderella.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cinderella.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cinderella.light", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cinderella.block", AzPlayBehaviors.LOOP)),
         ;
 

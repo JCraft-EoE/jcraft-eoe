@@ -70,7 +70,7 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                     Component.literal("Second Punch"),
                     Component.literal("frametrap tool")
             );
-    public static final KQDetonateAttack DETONATE = new KQDetonateAttack(20, 5, 6, 1f)
+    public static final KQDetonateAttack<AbstractKillerQueenEntity<?, ?>> DETONATE = new KQDetonateAttack<AbstractKillerQueenEntity<?, ?>>(20, 5, 6, 1f)
             .withInfo(
                     Component.literal("Detonate"),
                     Component.literal("tiny windup, move queueing is disabled while Detonate is active")
@@ -93,14 +93,14 @@ public abstract sealed class AbstractKillerQueenEntity<E extends AbstractKillerQ
                     Component.literal("Barrage"),
                     Component.literal("fast reliable combo starter/extender, medium stun")
             );
-    public static final BombPlantAttack BOMB_PLANT = new BombPlantAttack(140, 12, 20, 1f, 9, 1.5f, 0f)
+    public static final BombPlantAttack<AbstractKillerQueenEntity<?, ?>> BOMB_PLANT = new BombPlantAttack<AbstractKillerQueenEntity<?, ?>>(140, 12, 20, 1f, 9, 1.5f, 0f)
             .withBlockableType(BlockableType.NON_BLOCKABLE_EFFECTS_ONLY)
             .withBlockStun(8)
             .withInfo(
                     Component.literal("Bomb Plant"),
                     Component.literal("crouch to plant on the ground below you, stealthily")
             );
-    public static final ExplosiveDashAttack EXPLOSIVE_DASH = new ExplosiveDashAttack(240)
+    public static final ExplosiveDashAttack<AbstractKillerQueenEntity<?, ?>> EXPLOSIVE_DASH = new ExplosiveDashAttack<AbstractKillerQueenEntity<?, ?>>(240)
             .withInfo(
                     Component.literal("Explosive Dash"),
                     Component.literal("instantly boosts the user in the aimed direction")

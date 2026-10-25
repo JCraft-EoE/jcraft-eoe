@@ -6,18 +6,18 @@ import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.arna.jcraft.JCraft;
-import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.attack.enums.MoveClass;
+import net.arna.jcraft.api.attack.enums.MoveInputType;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
+import net.arna.jcraft.api.registry.JStatusRegistry;
+import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.entity.vehicle.AbstractGroundVehicleEntity;
 import net.arna.jcraft.common.events.JServerPlayerInputEvent;
 import net.arna.jcraft.common.item.Peacemaker;
 import net.arna.jcraft.common.network.s2c.ServerChannelFeedbackPacket;
-import net.arna.jcraft.api.spec.JSpec;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.arna.jcraft.api.registry.JStatusRegistry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -139,9 +139,13 @@ public class PlayerInputPacket {
         }
 
         MinecraftServer server = Objects.requireNonNull(player.getServer());
+        MoveInputType[] types = new MoveInputType[count];
+        boolean[] pressedStates = new boolean[count];
         for (int i = 0; i < count; i++) {
             MoveInputType type = buf.readEnum(MoveInputType.class);
             boolean pressed = buf.readBoolean();
+            types[i] = type;
+            pressedStates[i] = pressed;
 
             if (JUtils.canHoldMove(player, type)) {
                 if (pressed) {
@@ -150,6 +154,11 @@ public class PlayerInputPacket {
                     sm.heldInputs.put(type, 0);
                 }
             }
+        }
+
+        for (int i = 0; i < count; i++) {
+            MoveInputType type = types[i];
+            boolean pressed = pressedStates[i];
 
             if (pressed) {
                 handleMoveInput(server, player, type).thenAccept(b -> {
@@ -228,7 +237,7 @@ public class PlayerInputPacket {
                 }
                 case LIGHT -> {
                     // First check if player is holding a Peacemaker
-                    boolean peacemakerHandled = Peacemaker.handleLeftClick(player);
+                    boolean peacemakerHandled = Peacemaker.handleLeftClick(player, null);
                     if (peacemakerHandled) {
                         future.complete(true);
                         return;
@@ -236,6 +245,15 @@ public class PlayerInputPacket {
 
                     // If not handled by Peacemaker, proceed with normal stand logic
                     future.complete(initStandOrSpecMove(player, MoveInputType.LIGHT));
+                }
+                case TOSS -> {
+                    // A held gun takes the pick block key for reloading; without one it still tosses.
+                    if (Peacemaker.handleReloadInput(player)) {
+                        future.complete(true);
+                        return;
+                    }
+
+                    future.complete(initStandOrSpecMove(player, MoveInputType.TOSS));
                 }
                 case UTILITY -> {
                     boolean s;

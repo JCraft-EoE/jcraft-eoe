@@ -26,7 +26,7 @@ public class MeteorShowerAttack extends AbstractBarrageAttack<MeteorShowerAttack
     public @NonNull Set<LivingEntity> perform(TheSunEntity attacker, LivingEntity user) {
         Set<LivingEntity> targets = super.perform(attacker, user);
 
-        for (int i = 0; i < attacker.getRawScale(); i++) {
+        for (int i = 0; i < attacker.getRawScale() * 1.5; i++) {
             FireMeteorAttack.fireMeteor(attacker, user, attacker.randomPos(),
                     JUtils.randUnitVec(attacker.getRandom()), 1.25f, 0f);
         }

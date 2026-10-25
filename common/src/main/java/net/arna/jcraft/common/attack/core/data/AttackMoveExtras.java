@@ -29,6 +29,7 @@ public class AttackMoveExtras {
             Codec.INT.optionalFieldOf("block_stun", -1).forGetter(AttackMoveExtras::getBlockStun),
             Codec.BOOL.optionalFieldOf("static_height", false).forGetter(AttackMoveExtras::isStaticHeight),
             Codec.BOOL.optionalFieldOf("shockwaves", false).forGetter(AttackMoveExtras::isShockwaves),
+            Codec.INT.optionalFieldOf("ipsId", 0).forGetter(AttackMoveExtras::getIpsId),
             BlockableType.CODEC.optionalFieldOf("blockable_type", BlockableType.BLOCKABLE).forGetter(AttackMoveExtras::getBlockableType),
             CommonHitPropertyComponent.HitAnimation.CODEC.optionalFieldOf("hit_animation").forGetter(AttackMoveExtras::getHitAnimation),
             JParticleType.CODEC.optionalFieldOf("hit_spark").forGetter(AttackMoveExtras::getHitSpark),
@@ -42,6 +43,7 @@ public class AttackMoveExtras {
     private int blockStun = -1;
     private boolean staticHeight = false;
     private boolean shockwaves = false;
+    private int ipsId = 0;
     private @NonNull BlockableType blockableType = BlockableType.BLOCKABLE;
     private Optional<CommonHitPropertyComponent.HitAnimation> hitAnimation = Optional.of(CommonHitPropertyComponent.HitAnimation.MID);
     private Optional<JParticleType> hitSpark = Optional.of(JParticleType.HIT_SPARK_1);
@@ -49,13 +51,13 @@ public class AttackMoveExtras {
 
     public static AttackMoveExtras fromMove(AbstractSimpleAttack<?, ?> move) {
         return new AttackMoveExtras(move.getStunType(), move.isOverrideStun(), move.isLift(), move.isCanBackstab(),
-                move.getBlockStun(), move.isStaticY(), move.isDoShockwaves(), move.getBlockableType(),
+                move.getBlockStun(), move.isStaticY(), move.isDoShockwaves(), move.getIpsId(), move.getBlockableType(),
                 Optional.ofNullable(move.getHitAnimation()), Optional.ofNullable(move.getHitSpark()),
                 new HashSet<>(move.getExtraHitBoxes()));
     }
 
     public <M extends AbstractSimpleAttack<? extends M, ?>> M apply(M move) {
-        move
+            move
                 .withStunType(stunType)
                 .withOverrideStun(overrideStun)
                 .withLift(lift)
@@ -64,7 +66,8 @@ public class AttackMoveExtras {
                 .withBlockableType(blockableType)
                 .withHitAnimation(hitAnimation.orElse(null))
                 .withHitSpark(hitSpark.orElse(null))
-                .withShockwaves(shockwaves);
+                .withShockwaves(shockwaves)
+                .withIpsId(ipsId);
 
         extraHitBoxes.forEach(move::withExtraHitBox);
 

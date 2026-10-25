@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, KQBTDEntity> {
+public final class BTDPlantAttack<A extends StandEntity<? extends A, ?>> extends AbstractSimpleAttack<BTDPlantAttack<A>, A> {
 
     public static final Set<ResourceLocation> ENTITY_STUFF_TO_SAVE = Set.of(
             Identifiers.POSITION,
@@ -63,18 +63,18 @@ public final class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, K
     }
 
     @Override
-    public @NotNull MoveType<BTDPlantAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<BTDPlantAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void tick(final KQBTDEntity attacker) {
+    public void tick(final A attacker) {
         if (attacker.hasUser())
             tickBomb(attacker);
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final KQBTDEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Set<LivingEntity> targets = super.perform(attacker, user);
         if (targets.isEmpty()) {
             return Set.of();
@@ -88,13 +88,13 @@ public final class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, K
         return targets;
     }
 
-    public void tickBomb(final KQBTDEntity stand) {
+    public void tickBomb(final A stand) {
         if (stand.getUser() instanceof ServerPlayer player) {
             displayBTDParticles(stand, player);
         }
     }
 
-    private void displayBTDParticles(final KQBTDEntity stand, final @NonNull ServerPlayer playerEntity) {
+    private void displayBTDParticles(final A stand, final @NonNull ServerPlayer playerEntity) {
         if (rewindInfo == null) {
             return;
         }
@@ -161,7 +161,7 @@ public final class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, K
     }
 
     @Override
-    public MoveSelectionResult specificMoveSelectionCriterion(KQBTDEntity attacker, LivingEntity mob,
+    public MoveSelectionResult specificMoveSelectionCriterion(A attacker, LivingEntity mob,
                                                               LivingEntity target, int stunTicks, int enemyMoveStun,
                                                               double distance, StandEntity<?, ?> enemyStand,
                                                               AbstractMove<?, ?> enemyAttack) {
@@ -173,21 +173,21 @@ public final class BTDPlantAttack extends AbstractSimpleAttack<BTDPlantAttack, K
     }
 
     @Override
-    protected @NonNull BTDPlantAttack getThis() {
+    protected @NonNull BTDPlantAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull BTDPlantAttack copy() {
-        return copyExtras(new BTDPlantAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(),
+    public @NonNull BTDPlantAttack<A> copy() {
+        return copyExtras(new BTDPlantAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getStun(),
                 getHitboxSize(), getOffset(), entityMarkerType.getIds(), entityMarkerType.getDataHandler().extractor(), entityMarkerType.getDataHandler().injector()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<BTDPlantAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<BTDPlantAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<BTDPlantAttack>, BTDPlantAttack> buildCodec(RecordCodecBuilder.Instance<BTDPlantAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<BTDPlantAttack<?>>, BTDPlantAttack<?>> buildCodec(RecordCodecBuilder.Instance<BTDPlantAttack<?>> instance) {
             return instance.group(extras(), attackExtras(), cooldown(), windup(), duration(), moveDistance(), stun(), hitboxSize(), offset(), ResourceLocation.CODEC.listOf().xmap(list -> list.stream().collect(Collectors.toSet()), set -> set.stream().toList()).fieldOf("rewindIds").forGetter(move -> move.getEntityMarkerType().getIds()), JRegistries.EXTRACTOR_CODEC.fieldOf("extractor").forGetter(move -> move.getEntityMarkerType().getDataHandler().extractor()), JRegistries.INJECTOR_CODEC.fieldOf("injector").forGetter(move -> move.getEntityMarkerType().getDataHandler().injector()))
                     .apply(instance, applyAttackExtras(BTDPlantAttack::new));
         }

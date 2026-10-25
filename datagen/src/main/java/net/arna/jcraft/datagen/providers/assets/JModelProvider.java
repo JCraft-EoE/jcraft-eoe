@@ -45,6 +45,7 @@ public class JModelProvider extends FabricModelProvider {
         generator.generateFlatItem(JItemRegistry.DIARY_PAGE.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.DIOS_DIARY.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.GREEN_BABY.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.HOLSTER.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.KNIFE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         generator.generateFlatItem(JItemRegistry.SCALPEL.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         generator.generateFlatItem(JItemRegistry.KQ_COIN.get(), ModelTemplates.FLAT_ITEM);
@@ -60,6 +61,12 @@ public class JModelProvider extends FabricModelProvider {
         generator.generateFlatItem(JItemRegistry.DISC.get(), ModelTemplates.FLAT_ITEM);
         generateSpecDiscModels(generator);
         generateStandDiscModels(generator);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_COPPER.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_IRON.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_GOLD.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_EMERALD.get(), ModelTemplates.FLAT_ITEM);
+        generator.generateFlatItem(JItemRegistry.DISC_CASE_DIAMOND.get(), ModelTemplates.FLAT_ITEM);
 
         generator.generateFlatItem(JItemRegistry.STELLAR_IRON_INGOT.get(), ModelTemplates.FLAT_ITEM);
         generator.generateFlatItem(JItemRegistry.STONE_MASK.get(), ModelTemplates.FLAT_ITEM);

@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     public static final MoveSet<HGEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.HIEROPHANT_GREEN,
-            HGEntity::registerMoves, State.class);
+            HGEntity::registerMoves, HGEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .info(StandInfo.builder()
@@ -120,7 +120,8 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
             .withHitSpark(JParticleType.HIT_SPARK_3)
             .withLaunch()
             .withHitAnimation(CommonHitPropertyComponent.HitAnimation.CRUSH)
-            .withHyperArmor()
+            .withArmor(1)
+            .withBlockStun(8)
             .withInfo(
                     Component.literal("Sendoff"),
                     Component.literal("uninterruptible launcher")
@@ -177,7 +178,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                     Component.literal("Hierophant extends its arm upward in a far-reaching attack")
             );
 
-    public static final EmeraldSplashAttack EMERALD_SPLASH = new EmeraldSplashAttack(0, 12,
+    public static final EmeraldSplashAttack<HGEntity> EMERALD_SPLASH = new EmeraldSplashAttack<HGEntity>(0, 12,
             1, 0, 0, 0, 0, IntSet.of(1, 3, 5), 1.5f, false)
             .withSound(JSoundRegistry.HG_SPLASH)
             .withInfo(
@@ -193,7 +194,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                             Fires 3 bursts of emeralds at the opponent.
                             Bursts contain 3-6 emeralds depending on how long you hold."""));
 
-    public static final NetSetMove NET_SET = new NetSetMove(200, 9, 15, 1f)
+    public static final NetSetMove<HGEntity> NET_SET = new NetSetMove<HGEntity>(200, 9, 15, 1f)
             .withSound(JSoundRegistry.HG_NET_SET)
             .withInfo(
                     Component.literal("Tentacle Place"),
@@ -209,7 +210,7 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
                     Component.empty()
             );
 
-    public static final EmeraldSplashAttack EMERALD_SUPER = new EmeraldSplashAttack(500, 40,
+    public static final EmeraldSplashAttack<HGEntity> EMERALD_SUPER = new EmeraldSplashAttack<HGEntity>(500, 40,
             1, 0, 0, 0, 0, IntSet.of(12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32), 2f, true)
             .withReflect()
             .withSound(JSoundRegistry.HG_SPLASH)
@@ -408,29 +409,29 @@ public class HGEntity extends StandEntity<HGEntity, HGEntity.State> {
     // Animation code
     public enum State implements StandAnimationState<HGEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.block", AzPlayBehaviors.LOOP)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROUCHING_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROUCHING_LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        AIR_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.air_light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        SENDOFF(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.sendoff", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        CROUCHING_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light", AzPlayBehaviors.PLAY_ONCE)),
+        CROUCHING_LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.crouching_light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        AIR_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.air_light", AzPlayBehaviors.PLAY_ONCE)),
+        SENDOFF(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.sendoff", AzPlayBehaviors.PLAY_ONCE)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.barrage", AzPlayBehaviors.LOOP)),
-        NET_SET(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.net_place", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        NET_SET(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.net_place", AzPlayBehaviors.PLAY_ONCE)),
 
-        EMERALD_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EMERALD_SPLASH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_splash", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EMERALD_SUPER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_super", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EXTEND_UP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_up", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EXTEND_FORWARD(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_forward", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        EMERALD_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_charge", AzPlayBehaviors.PLAY_ONCE)),
+        EMERALD_SPLASH(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_splash", AzPlayBehaviors.PLAY_ONCE)),
+        EMERALD_SUPER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.emerald_super", AzPlayBehaviors.PLAY_ONCE)),
+        EXTEND_UP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_up", AzPlayBehaviors.PLAY_ONCE)),
+        EXTEND_FORWARD(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.extend_forward", AzPlayBehaviors.PLAY_ONCE)),
 
-        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.uppercut", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        UPPERCUT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.hg.uppercut", AzPlayBehaviors.PLAY_ONCE)),
 
         FORWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.forw", AzPlayBehaviors.LOOP)),
         BACKWARD(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.back", AzPlayBehaviors.LOOP)),
         LEFT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.left", AzPlayBehaviors.LOOP)),
         RIGHT(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.hg.right", AzPlayBehaviors.LOOP)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;

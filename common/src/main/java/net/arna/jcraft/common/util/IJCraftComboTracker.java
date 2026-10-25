@@ -13,7 +13,7 @@ public interface IJCraftComboTracker {
 
     boolean jcraft$comboFromAttackerContains(LivingEntity attacker, AbstractMove<?, ?> move);
 
-    void jcraft$increaseHitCount();
+    void jcraft$increaseHitCount(boolean tsHit);
 
     void jcraft$resetCombo();
 }

@@ -14,5 +14,6 @@ public interface ICustomDamageHandler {
      */
     boolean handleDamage(Vec3 kbVec, int stunTicks, int stunLevel, boolean overrideStun,
                          float damage, boolean lift, int blockstun, DamageSource source, Entity attacker,
-                         CommonHitPropertyComponent.HitAnimation hitAnimation, MoveUsage moveUsage, boolean canBackstab, boolean unblockable);
+                         CommonHitPropertyComponent.HitAnimation hitAnimation, MoveUsage moveUsage,
+                         boolean canBackstab, boolean unblockable, boolean cancelAttacks);
 }

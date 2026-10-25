@@ -26,7 +26,7 @@ import java.util.Set;
 import static net.arna.jcraft.api.Attacks.*;
 
 public final class RageAttack extends AbstractMultiHitAttack<RageAttack, TheHandEntity> {
-    public static final SimpleEraseAttack RAGE_FINISHER = new SimpleEraseAttack(0,
+    public static final SimpleEraseAttack<TheHandEntity> RAGE_FINISHER = new SimpleEraseAttack<TheHandEntity>(0,
             41, 50, 0.74f, 6.0f, 12, 2.0f, 2.0f, 0.0f)
             .withSound(JSoundRegistry.D4C_LIGHT)
             .withImpactSound(JSoundRegistry.IMPACT_12)

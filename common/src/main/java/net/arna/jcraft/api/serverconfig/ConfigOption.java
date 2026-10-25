@@ -21,11 +21,12 @@ public abstract class ConfigOption {
     @Getter
     private final ResourceLocation key;
     @Getter
-    private final ResourceLocation category;
+    private final ResourceLocation category, subcategory;
 
-    protected ConfigOption(final ResourceLocation key, final ResourceLocation category) {
+    protected ConfigOption(final ResourceLocation key, final ResourceLocation category, final ResourceLocation subcategory) {
         this.key = key;
         this.category = category;
+        this.subcategory = subcategory;
 
         if (options.containsKey(key)) {
             throw new IllegalArgumentException("Option with the given key already exists: " + key);

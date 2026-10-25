@@ -13,6 +13,7 @@
     "jcraft:redbind",
     "jcraft:sandtornado",
     "jcraft:stand_meteor",
-    "jcraft:roadroller"
+    "jcraft:roadroller",
+    "jcraft:hamon_wave"
   ]
 }

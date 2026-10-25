@@ -45,6 +45,9 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
         else if (item1.is(JItemRegistry.STAND_DISC.get()) && item2.is(JItemRegistry.CINDERELLA_MASK.get())) {
             jcraft$switchSkin(item1, item2);
         }
+        else {
+            jcraft$upgradeCase(item1, item2);
+        }
     }
 
     @Unique
@@ -90,7 +93,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
     @Unique
     private void jcraft$switchSkin(final ItemStack disc, final ItemStack mask) {
         // If the disc is empty, return.
-        StandType standType = StandDiscItem.getStandType(disc);
+        final StandType standType = StandDiscItem.getStandType(disc);
         if (standType == null)
             return;
         // The CK level must be at most equal to the amount of skins the stand has
@@ -118,6 +121,34 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
         // finalize product
         resultSlots.setItem(0, newDisc);
         cost.set(c);
+    }
+
+    @Unique
+    private void jcraft$upgradeCase(final ItemStack item1, final ItemStack item2) {
+        final ItemStack newCase;
+        if (item1.getItem() == JItemRegistry.DISC_CASE.get() && item2.getItem() == Items.COPPER_INGOT) {
+            newCase = new ItemStack(JItemRegistry.DISC_CASE_COPPER.get());
+        }
+        else if (item1.getItem() == JItemRegistry.DISC_CASE_COPPER.get() && item2.getItem() == Items.IRON_INGOT) {
+            newCase = new ItemStack(JItemRegistry.DISC_CASE_IRON.get());
+        }
+        else if (item1.getItem() == JItemRegistry.DISC_CASE_IRON.get() && item2.getItem() == Items.GOLD_INGOT) {
+            newCase = new ItemStack(JItemRegistry.DISC_CASE_GOLD.get());
+        }
+        else if (item1.getItem() == JItemRegistry.DISC_CASE_GOLD.get() && item2.getItem() == Items.EMERALD) {
+            newCase = new ItemStack(JItemRegistry.DISC_CASE_EMERALD.get());
+        }
+        else if (item1.getItem() == JItemRegistry.DISC_CASE_EMERALD.get() && item2.getItem() == Items.DIAMOND) {
+            newCase = new ItemStack(JItemRegistry.DISC_CASE_DIAMOND.get());
+        }
+        else {
+            newCase = null;
+        }
+        if (newCase != null) {
+            newCase.setTag(item1.getOrCreateTag());
+            resultSlots.setItem(0, newCase);
+            cost.set(1);
+        }
     }
 
 }

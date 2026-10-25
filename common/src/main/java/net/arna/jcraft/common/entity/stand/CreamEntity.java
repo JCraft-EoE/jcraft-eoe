@@ -74,9 +74,9 @@ import java.util.List;
 @Getter
 public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     public static final MoveSet<CreamEntity, CreamEntity.State> DEFAULT_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CREAM,
-            CreamEntity::registerDefaultMoves, State.class);
+            CreamEntity::registerDefaultMoves, CreamEntity.class, State.class);
     public static final MoveSet<CreamEntity, CreamEntity.State> HALF_BALL_MOVE_SET = MoveSetManager.create(JStandTypeRegistry.CREAM,
-            "half_ball", CreamEntity::registerHalfBallMoves, State.class);
+            "half_ball", CreamEntity::registerHalfBallMoves, CreamEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(220f)
             .info(StandInfo.builder()
@@ -135,7 +135,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
             .withInfo(
                     Component.literal("Vertical Chop"),
                     Component.literal("slow, uninterruptible combo starter"));
-    public static final CreamComboAttack COMBO = new CreamComboAttack(0,
+    public static final CreamComboAttack<CreamEntity> COMBO = new CreamComboAttack<CreamEntity>(0,
             36, 0.75f,5f, 20, 2f, 0.2f, 0f, IntSet.of(10, 17, 25))
             .withSound(JSoundRegistry.CREAM_COMBO)
             .withImpactSound(JSoundRegistry.IMPACT_3)
@@ -175,7 +175,7 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
                     Component.literal("Charge"),
                     Component.literal("4 block range, unblockable knockdown")
             );
-    public static final DestroyAttack DESTROY = new DestroyAttack(100, 21, 30, 1f,
+    public static final DestroyAttack<CreamEntity> DESTROY = new DestroyAttack<CreamEntity>(100, 21, 30, 1f,
             8f, 5, 2f, 1.25f, 0f, 35)
             .withCrouchingVariant(CHARGE)
             .withSound(JSoundRegistry.CREAM_OVERHEAD)
@@ -718,30 +718,30 @@ public class CreamEntity extends StandEntity<CreamEntity, CreamEntity.State> {
     // Animation code
     public enum State implements StandAnimationState<CreamEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cream.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BALL_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.balllight", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.light", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        BALL_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.balllight", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cream.block", AzPlayBehaviors.LOOP)),
         BALL_BLOCK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.ballblock", AzPlayBehaviors.LOOP)),
-        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BALL_HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.ballheavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        COMBO(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.combo", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BALL_COMBO(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.ballcombo", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CONSUME(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.consume", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BALL_CONSUME(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.ballconsume", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        SURPRISE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.surprise", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ENTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.enter", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        EXIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.exit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        DESTROY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.destroy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BITE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.bite", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.heavy", AzPlayBehaviors.PLAY_ONCE)),
+        BALL_HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.ballheavy", AzPlayBehaviors.PLAY_ONCE)),
+        COMBO(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.combo", AzPlayBehaviors.PLAY_ONCE)),
+        BALL_COMBO(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.ballcombo", AzPlayBehaviors.PLAY_ONCE)),
+        CONSUME(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.consume", AzPlayBehaviors.PLAY_ONCE)),
+        BALL_CONSUME(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.ballconsume", AzPlayBehaviors.PLAY_ONCE)),
+        SURPRISE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.surprise", AzPlayBehaviors.PLAY_ONCE)),
+        CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.charge", AzPlayBehaviors.PLAY_ONCE)),
+        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.grab", AzPlayBehaviors.PLAY_ONCE)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.grab_hit", AzPlayBehaviors.PLAY_ONCE)),
+        ENTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.enter", AzPlayBehaviors.PLAY_ONCE)),
+        EXIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.exit", AzPlayBehaviors.PLAY_ONCE)),
+        DESTROY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.destroy", AzPlayBehaviors.PLAY_ONCE)),
+        BITE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.cream.bite", AzPlayBehaviors.PLAY_ONCE)),
 
         VOID_IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cream.voididle", AzPlayBehaviors.LOOP)),
         HALF_BALL_IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.cream.ballidle", AzPlayBehaviors.LOOP)),
 
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
 

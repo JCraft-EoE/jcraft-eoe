@@ -6,7 +6,7 @@
     "type": "jcraft:thefool_launch_attack",
     "attack_extras": {
       "backstab": true,
-      "block_stun": 12,
+      "block_stun": 4,
       "extra_hit_boxes": [
         {
           "size": 1.5

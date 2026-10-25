@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
  */
 public class DiverDownEntity extends StandEntity<DiverDownEntity, DiverDownEntity.State> {
     public static final MoveSet<DiverDownEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.DIVER_DOWN,
-            DiverDownEntity::registerMoves, State.class);
+            DiverDownEntity::registerMoves, DiverDownEntity.class, State.class);
     public static final StandData DATA = StandData.of(StandInfo.of(Component.translatable("entity.jcraft.diver_down")))
             .withObtainable(false);
 

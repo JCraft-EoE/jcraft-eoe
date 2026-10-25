@@ -4,6 +4,7 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.common.entity.stand.SPTWEntity;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -12,19 +13,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import java.util.Set;
 
-public final class SPTWGroundSlamAttack extends AbstractSimpleAttack<SPTWGroundSlamAttack, SPTWEntity> {
+public final class SPTWGroundSlamAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<SPTWGroundSlamAttack<A>, A> {
     public SPTWGroundSlamAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun,
                                 final float hitboxSize, final float knockback, final float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
     }
 
     @Override
-    public @NonNull MoveType<SPTWGroundSlamAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<SPTWGroundSlamAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final SPTWEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         Set<LivingEntity> targets = super.perform(attacker, user);
 
         Vec3 pos = user.position();
@@ -42,21 +43,21 @@ public final class SPTWGroundSlamAttack extends AbstractSimpleAttack<SPTWGroundS
     }
 
     @Override
-    protected @NonNull SPTWGroundSlamAttack getThis() {
+    protected @NonNull SPTWGroundSlamAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull SPTWGroundSlamAttack copy() {
-        return copyExtras(new SPTWGroundSlamAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull SPTWGroundSlamAttack<A> copy() {
+        return copyExtras(new SPTWGroundSlamAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<SPTWGroundSlamAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<SPTWGroundSlamAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<SPTWGroundSlamAttack>, SPTWGroundSlamAttack> buildCodec(RecordCodecBuilder.Instance<SPTWGroundSlamAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<SPTWGroundSlamAttack<?>>, SPTWGroundSlamAttack<?>> buildCodec(RecordCodecBuilder.Instance<SPTWGroundSlamAttack<?>> instance) {
             return attackDefault(instance, SPTWGroundSlamAttack::new);
         }
     }

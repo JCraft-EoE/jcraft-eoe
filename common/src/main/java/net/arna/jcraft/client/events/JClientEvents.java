@@ -20,11 +20,13 @@ import net.arna.jcraft.client.JClientConfig;
 import net.arna.jcraft.client.JCraftClient;
 import net.arna.jcraft.client.rendering.RenderHandler;
 import net.arna.jcraft.client.sound.AerosmithSoundInstance;
+import net.arna.jcraft.client.tracer.MuzzleTracker;
 import net.arna.jcraft.client.util.JClientUtils;
-import net.arna.jcraft.client.util.TrackedKeyBinding;
+import net.arna.jcraft.client.input.TrackedKeyBinding;
 import net.arna.jcraft.common.entity.stand.AerosmithEntity;
 import net.arna.jcraft.common.network.c2s.PlayerInputPacket;
 import net.arna.jcraft.common.network.c2s.StandBlockPacket;
+import net.arna.jcraft.common.network.c2s.VariantInputPacket;
 import net.arna.jcraft.common.tickable.Timestops;
 import net.arna.jcraft.common.util.*;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -43,18 +45,14 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static net.arna.jcraft.client.JCraftClient.*;
 import static net.arna.jcraft.client.gui.hud.JCraftAbilityHud.cooldownTypeToKeybind;
@@ -261,10 +259,9 @@ public class JClientEvents {
             });
 
             if (!heldMoves.isEmpty()) {
-                NetworkManager.sendToServer(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket.write(null, heldMoves));
-                //ClientPlayNetworking.send(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, PlayerInputPacket.write(null, heldMoves));
+                FriendlyByteBuf buf = PlayerInputPacket.write(null, heldMoves);
+                NetworkManager.sendToServer(JPacketRegistry.C2S_PLAYER_INPUT_HOLD, buf);
             }
-
         }
 
         // Block
@@ -277,8 +274,14 @@ public class JClientEvents {
         }
 
         // Cooldown Cancel
-        if (cooldownCancel.isPressedThisTick()) {
+        if (COOLDOWN_CANCEL_KEY.isPressedThisTick()) {
             NetworkManager.sendToServer(JPacketRegistry.C2S_COOLDOWN_CANCEL, new FriendlyByteBuf(Unpooled.buffer()));
+        }
+
+        // Aerial and crouch variants
+        if (AERIAL_VARIANT_KEY.isChangedThisTick() || CROUCH_VARIANT_KEY.isChangedThisTick()) {
+            FriendlyByteBuf buf = VariantInputPacket.write(AERIAL_VARIANT_KEY.isDown(), CROUCH_VARIANT_KEY.isDown());
+            NetworkManager.sendToServer(JPacketRegistry.C2S_VARIANT, buf);
         }
 
         if (client.isPaused() && client.isLocalServer()) {
@@ -321,6 +324,17 @@ public class JClientEvents {
         // Menacing (ゴ/ド) particles — 4-second burst when a stand user enters 100-block radius.
         // Works regardless of whether the local player or target has their stand summoned.
         tickMenacing(client, player);
+    }
+
+    @Nullable
+    private static Vec3 getMainHandMuzzle(Minecraft client, Object2BooleanMap<MoveInputType> moveInput) {
+        if (client.player == null || !client.options.getCameraType().isFirstPerson()) {
+            return null;
+        }
+        if (!moveInput.getOrDefault(MoveInputType.LIGHT, false)) {
+            return null;
+        }
+        return MuzzleTracker.get(client.player.getUUID(), InteractionHand.MAIN_HAND);
     }
 
     public static EventResult onEntityAdd(final Entity entity, final Level level) {

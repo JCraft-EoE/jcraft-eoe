@@ -1,0 +1,28 @@
+{
+  "class": "SPECIAL2",
+  "cooldown_type": "SPECIAL2",
+  "move": {
+    "type": "jcraft:ranger_focus_move",
+    "cooldown": 0,
+    "extras": {
+      "actions": [
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:rangerfocus"
+        },
+        {
+          "type": "jcraft:play_sound",
+          "run": "at_init",
+          "sound": "jcraft:rangerfocus_start"
+        }
+      ],
+      "description": {
+        "translate": "move.jcraft.ranger.default.focus.description"
+      },
+      "name": {
+        "translate": "move.jcraft.ranger.default.focus.name"
+      }
+    }
+  }
+}

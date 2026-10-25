@@ -14,13 +14,13 @@ import static net.arna.jcraft.common.util.JUtils.addVelocity;
 import static net.arna.jcraft.common.util.JUtils.stopTick;
 
 @Getter
-public class CommonTimeStopComponentImpl implements CommonTimeStopComponent {
+public abstract class CommonTimeStopComponentImpl implements CommonTimeStopComponent {
     private final Entity entity;
     private int ticks;
     // Launch buildup implementation, because players are special snowflakes and don't build it in timestop like enemies do
     private Vec3 totalVelocity = Vec3.ZERO;
 
-    public CommonTimeStopComponentImpl(final Entity entity) {
+    protected CommonTimeStopComponentImpl(final Entity entity) {
         this.entity = entity;
     }
 

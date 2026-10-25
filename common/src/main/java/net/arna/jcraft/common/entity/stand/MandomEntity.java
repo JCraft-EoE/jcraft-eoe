@@ -34,7 +34,7 @@ import static net.arna.jcraft.JCraft.SPEC_QUEUE_MOVESTUN_LIMIT;
 
 public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> {
     public static final MoveSet<MandomEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.MANDOM,
-            MandomEntity::registerMoves, State.class);
+            MandomEntity::registerMoves, MandomEntity.class, State.class);
 
     public static final StandData DATA = StandData.builder()
             .idleDistance(0f)
@@ -59,13 +59,13 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
                     .build())
             .build();
 
-    public static final CountdownMove COUNTDOWN = new CountdownMove(6, 10, 120, 0f, 64, 600, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
+    public static final CountdownMove<MandomEntity> COUNTDOWN = new CountdownMove<MandomEntity>(6, 10, 120, 0f, 64, 600, CountdownMove.ENTITY_STUFF_TO_SAVE, JMarkerExtractorRegistry.ALL.get(), JMarkerInjectorRegistry.ALL.get())
             .withSound(JSoundRegistry.MANDOM_COUNTDOWN)
             .withInfo(
                     Component.literal("Countdown"),
                     Component.literal("Saves position data of all entities in a 64 block radius for 30 seconds. Must be active to use Rewind."));
 
-    public static final RewindMove REWIND = new RewindMove(6, 5, 10, 0f, 200)
+    public static final RewindMove<MandomEntity> REWIND = new RewindMove<MandomEntity>(6, 5, 10, 0f, 200)
             .withSound(JSoundRegistry.MANDOM_REWIND)
             .withInfo(
                     Component.literal("Rewind"),
@@ -170,9 +170,9 @@ public class MandomEntity extends StandEntity<MandomEntity, MandomEntity.State> 
     }
 
     public enum State implements StandAnimationState<MandomEntity> {
-        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "summon", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        COUNTDOWN(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "timer", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        REWIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "rewind", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "summon", AzPlayBehaviors.PLAY_ONCE)),
+        COUNTDOWN(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "timer", AzPlayBehaviors.PLAY_ONCE)),
+        REWIND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "rewind", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "idle", AzPlayBehaviors.LOOP));
 
         private final AzCommand animator;

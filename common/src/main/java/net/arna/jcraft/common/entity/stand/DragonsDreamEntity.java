@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
  */
 public class DragonsDreamEntity extends StandEntity<DragonsDreamEntity, DragonsDreamEntity.State> {
     public static final MoveSet<DragonsDreamEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.DRAGONS_DREAM,
-            DragonsDreamEntity::registerMoves, State.class);
+            DragonsDreamEntity::registerMoves, DragonsDreamEntity.class, State.class);
     public static final StandData DATA = StandData.of(StandInfo.of(Component.translatable("entity.jcraft.dragons_dream")))
             .withObtainable(false);
 

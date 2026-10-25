@@ -3,6 +3,7 @@ package net.arna.jcraft.common.attack.moves.whitesnake;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
 import net.arna.jcraft.api.component.living.CommonStandComponent;
@@ -11,7 +12,6 @@ import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.stand.StandType;
 import net.arna.jcraft.api.stand.StandTypeUtil;
 import net.arna.jcraft.common.config.JServerConfig;
-import net.arna.jcraft.common.entity.stand.WhiteSnakeEntity;
 import net.arna.jcraft.common.item.StandDiscItem;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.util.Mth;
@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.Set;
 
-public final class StealStandAttack extends AbstractSimpleAttack<StealStandAttack, WhiteSnakeEntity> {
+public final class StealStandAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<StealStandAttack<A>, A> {
 
     public StealStandAttack(final int cooldown, final int windup, final int duration, final float moveDistance,
                             final float damage, final int stun, final float hitboxSize,
@@ -30,7 +30,7 @@ public final class StealStandAttack extends AbstractSimpleAttack<StealStandAttac
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final WhiteSnakeEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Set<LivingEntity> targets = super.perform(attacker, user);
 
         // Exclusive stands mode — stand stealing is completely disregarded
@@ -84,29 +84,29 @@ public final class StealStandAttack extends AbstractSimpleAttack<StealStandAttac
     }
 
     @Override
-    protected @NonNull StealStandAttack getThis() {
+    protected @NonNull StealStandAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull StealStandAttack copy() {
-        return copyExtras(new StealStandAttack(
+    public @NonNull StealStandAttack<A> copy() {
+        return copyExtras(new StealStandAttack<>(
                 getCooldown(), getWindup(), getDuration(), getMoveDistance(),
                 getDamage(), getStun(), getHitboxSize(), getKnockback(), getOffset()
         ));
     }
 
     @Override
-    public @NonNull MoveType<StealStandAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<StealStandAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<StealStandAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<StealStandAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<StealStandAttack>, StealStandAttack> buildCodec(
-                final RecordCodecBuilder.Instance<StealStandAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<StealStandAttack<?>>, StealStandAttack<?>> buildCodec(
+                final RecordCodecBuilder.Instance<StealStandAttack<?>> instance) {
             return attackDefault(instance, StealStandAttack::new);
         }
     }

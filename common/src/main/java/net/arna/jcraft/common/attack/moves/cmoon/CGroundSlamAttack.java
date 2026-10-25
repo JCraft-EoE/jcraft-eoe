@@ -3,16 +3,14 @@ package net.arna.jcraft.common.attack.moves.cmoon;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
-import net.arna.jcraft.api.registry.JStatusRegistry;
-import net.arna.jcraft.common.entity.stand.CMoonEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.Level;
@@ -23,32 +21,33 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public final class CGroundSlamAttack extends AbstractSimpleAttack<CGroundSlamAttack, CMoonEntity> {
+public final class CGroundSlamAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<CGroundSlamAttack<A>, A> {
     public CGroundSlamAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun,
                              final float hitboxSize, final float knockback, final float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
     }
 
     @Override
-    protected void processTarget(final CMoonEntity attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
+    protected void processTarget(final A attacker, final LivingEntity target, final Vec3 kbVec, final DamageSource damageSource) {
         super.processTarget(attacker, target, kbVec, damageSource);
 
         final LivingEntity user = attacker.getUserOrThrow();
-        GravityChangerAPI.setWorldVelocity(target, GravityChangerAPI.getGravityDirection(user).step());
+        final var launchVel = GravityChangerAPI.getGravityDirection(user).step();
+        if (user.isShiftKeyDown()) launchVel.negate();
+        GravityChangerAPI.setWorldVelocity(target, launchVel);
         target.hurtMarked = true;
-        if (user.isShiftKeyDown()) {
-            target.addEffect(new MobEffectInstance(JStatusRegistry.KNOCKDOWN.get(), 30, 0, true, false));
-        }
     }
 
     @Override
-    public void performHook(final CMoonEntity attacker, final Set<LivingEntity> targets, final Set<AABB> boxes, final DamageSource damageSource, final Vec3 forwardPos, final Vec3 rotationVector) {
-        final Level world = attacker.level();
-        final Vec3i gravityVector = GravityChangerAPI.getGravityDirection(attacker).getNormal();
+    public void performHook(final A attacker, final Set<LivingEntity> targets, final Set<AABB> boxes,
+                            final DamageSource damageSource, final Vec3 forwardPos, final Vec3 rotationVector) {
+        final LivingEntity baseEntity = attacker.getBaseEntity();
+        final Level world = baseEntity.level();
+        final Vec3i gravityVector = GravityChangerAPI.getGravityDirection(baseEntity).getNormal();
 
         LivingEntity user = attacker.getUserOrThrow();
         if (mayBreak(user, null)) {
-            BlockPos bPos = attacker.blockPosition();
+            BlockPos bPos = baseEntity.blockPosition();
 
             // Adjust pancake shape for gravity
             Vec3i min = new Vec3i(-2, -2, -2);
@@ -76,30 +75,34 @@ public final class CGroundSlamAttack extends AbstractSimpleAttack<CGroundSlamAtt
             }
         }
 
-        JComponentPlatformUtils.getShockwaveHandler(attacker.level()).addShockwave(attacker.position().add(rotationVector), new Vec3(GravityChangerAPI.getGravityDirection(attacker).step()), 4.0f);
+        Vec3 shockwavePos = baseEntity.position().add(rotationVector);
+        Vec3 shockwaveRotation = new Vec3(GravityChangerAPI.getGravityDirection(baseEntity).step());
+        JComponentPlatformUtils.getShockwaveHandler(baseEntity.level())
+                .addShockwave(shockwavePos, shockwaveRotation, 4.0f);
     }
 
     @Override
-    public @NotNull MoveType<CGroundSlamAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<CGroundSlamAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    protected @NonNull CGroundSlamAttack getThis() {
+    protected @NonNull CGroundSlamAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull CGroundSlamAttack copy() {
-        return copyExtras(new CGroundSlamAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull CGroundSlamAttack<A> copy() {
+        return copyExtras(new CGroundSlamAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<CGroundSlamAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<CGroundSlamAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<CGroundSlamAttack>, CGroundSlamAttack> buildCodec(RecordCodecBuilder.Instance<CGroundSlamAttack> instance) {
+        protected @NotNull App<RecordCodecBuilder.Mu<CGroundSlamAttack<?>>, CGroundSlamAttack<?>> buildCodec(
+                final RecordCodecBuilder.Instance<CGroundSlamAttack<?>> instance) {
             return instance.group(
                     extras(), attackExtras(), cooldown(), windup(), duration(),
                     moveDistance(), damage(), stun(), hitboxSize(), knockback(), offset()

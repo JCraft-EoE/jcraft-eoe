@@ -19,6 +19,12 @@
       },
       "trigger": "jcraft:obtained_spec"
     },
+    "has_ranger": {
+      "conditions": {
+        "spec": "jcraft:ranger"
+      },
+      "trigger": "jcraft:obtained_spec"
+    },
     "has_vampire": {
       "conditions": {
         "spec": "jcraft:vampire"
@@ -53,6 +59,9 @@
     ],
     [
       "has_hamon"
+    ],
+    [
+      "has_ranger"
     ]
   ],
   "rewards": {

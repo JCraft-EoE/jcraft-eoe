@@ -40,7 +40,7 @@ import java.util.function.Supplier;
  */
 public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQueenEntity, KillerQueenEntity.State> {
     public static final MoveSet<KillerQueenEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.KILLER_QUEEN,
-            KillerQueenEntity::registerMoves, State.class);
+            KillerQueenEntity::registerMoves, KillerQueenEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .idleRotation(-30f)
             .info(StandInfo.builder()
@@ -74,13 +74,13 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                     Component.literal("Haymaker"),
                     Component.literal("slow, uninterruptible launcher")
             );
-    public static final SheerHeartAttackAttack SHEER_HEART_ATTACK = new SheerHeartAttackAttack(1000, 16, 20, 1f)
+    public static final SheerHeartAttackAttack<KillerQueenEntity> SHEER_HEART_ATTACK = new SheerHeartAttackAttack<KillerQueenEntity>(1000, 16, 20, 1f)
 //            .withSound(JSoundRegistry.KQ_SHA)
             .withInfo(
                     Component.literal("Sheer Heart Attack"),
                     Component.literal("creates an automatic, heat-seeking sub-stand that explodes on contact, reflects 25% damage back to owner")
             );
-    public static final KQGrabHitAttack GRAB_HIT = new KQGrabHitAttack(0, 13, 20, 1f, 8)
+    public static final KQGrabHitAttack<KillerQueenEntity> GRAB_HIT = new KQGrabHitAttack<KillerQueenEntity>(0, 13, 20, 1f, 8)
             .withInfo(
                     Component.literal("Grab (hit)"),
                     Component.empty()
@@ -91,14 +91,14 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
                     Component.literal("Grab"),
                     Component.literal("grabs opponent by the face, then detonates them, launching them upwards")
             );
-    public static final CoinTossMove COIN_TOSS = new CoinTossMove(240)
+    public static final CoinTossMove<KillerQueenEntity> COIN_TOSS = new CoinTossMove<KillerQueenEntity>(240)
             .withInfo(
                     Component.literal("Coin Toss"),
                     Component.literal("Instantly tosses a coin in an arch that becomes your primary bomb.")
             );
     // TODO add move info x2
     // TODO balance x2
-    public static final KQTossMove TOSS = new KQTossMove(0, 1, 1, 0.75f)
+    public static final KQTossMove<KillerQueenEntity> TOSS = new KQTossMove<KillerQueenEntity>(0, 1, 1, 0.75f)
             .withAnim(KillerQueenEntity.State.ITEM_TOSS);
     public static final TossChargeMove<KillerQueenEntity> TOSS_CHARGE = new TossChargeMove<KillerQueenEntity>(70, 3 * 20 + 1, 3 * 20, 1.0f, 10)
             .withFollowup(TOSS);
@@ -155,18 +155,18 @@ public final class KillerQueenEntity extends AbstractKillerQueenEntity<KillerQue
     // Animations
     public enum State implements StandAnimationState<KillerQueenEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.killerqueen.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.light", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.killerqueen.block", AzPlayBehaviors.LOOP)),
-        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        HEAVY(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.heavy", AzPlayBehaviors.PLAY_ONCE)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.barrage", AzPlayBehaviors.LOOP)),
-        DETONATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.detonate", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        BOMB_PLANT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.bombplant", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        SHA(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.sha", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LOW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.low", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        DETONATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.detonate", AzPlayBehaviors.PLAY_ONCE)),
+        BOMB_PLANT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.bombplant", AzPlayBehaviors.PLAY_ONCE)),
+        SHA(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.sha", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        LOW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.low", AzPlayBehaviors.PLAY_ONCE)),
+        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.grab", AzPlayBehaviors.PLAY_ONCE)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.killerqueen.grab_hit", AzPlayBehaviors.PLAY_ONCE)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE));
 
         private final AzCommand animator;

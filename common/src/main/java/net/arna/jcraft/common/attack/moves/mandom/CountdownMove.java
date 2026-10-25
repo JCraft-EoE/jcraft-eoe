@@ -9,12 +9,12 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.arna.jcraft.api.JRegistries;
 import net.arna.jcraft.api.attack.MoveType;
+import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.api.attack.moves.AbstractMove;
 import net.arna.jcraft.api.attack.moves.BlockMarkerMove;
 import net.arna.jcraft.api.component.living.CommonCooldownsComponent;
 import net.arna.jcraft.api.registry.JPacketRegistry;
 import net.arna.jcraft.common.config.JServerConfig;
-import net.arna.jcraft.common.entity.stand.MandomEntity;
 import net.arna.jcraft.common.marker.*;
 import net.arna.jcraft.common.util.CooldownType;
 import net.arna.jcraft.common.util.TriConsumer;
@@ -37,7 +37,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntity> implements BlockMarkerMove {
+public final class CountdownMove<A extends StandEntity<? extends A, ?>> extends AbstractMove<CountdownMove<A>, A> implements BlockMarkerMove {
     private static final int COUNTDOWN_COOLDOWN_TICKS = 120; // 6 seconds
     // note that ReturnToZero move uses this same set as a default as well
     public static final Set<ResourceLocation> ENTITY_STUFF_TO_SAVE = Set.of(
@@ -103,12 +103,12 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
     }
 
     @Override
-    public @NotNull MoveType<CountdownMove> getMoveType() {
-        return Type.INSTANCE;
+    public @NotNull MoveType<CountdownMove<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public void tick(final MandomEntity attacker) {
+    public void tick(final A attacker) {
         super.tick(attacker);
         if (++countdownTicks > maxCountdownTicks) {
             countdownActive = false;
@@ -164,11 +164,9 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final MandomEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         lastLevel = attacker.level();
-        if (isRecording()) {
-            getIteration().add(false);
-        }
+        getIteration().add(false);
         BlockMarkerMoves.add(attacker, this);
         final List<Entity> toCapture = attacker.level().getEntitiesOfClass(Entity.class,
                 attacker.getBoundingBox().inflate(radius),
@@ -195,6 +193,8 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
         countdownActive = true;
         countdownTicks = 0;
         resolving = false;
+        removeRecordingTimes(user, false); // make sure that we refresh
+        addRecordingTimes(user);
 
         // Put both UTILITY and ULTIMATE on cooldown for 6 seconds
         CommonCooldownsComponent cooldowns = JComponentPlatformUtils.getCooldowns(user);
@@ -205,7 +205,7 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
     }
 
 
-    public void tickCountdownInfo(final MandomEntity attacker) {
+    public void tickCountdownInfo(final A attacker) {
         if (!(attacker.getUser() instanceof ServerPlayer serverPlayer)) {
             return;
         }
@@ -247,21 +247,31 @@ public final class CountdownMove extends AbstractMove<CountdownMove, MandomEntit
     }
 
     @Override
-    protected @NonNull CountdownMove getThis() {
+    public int getMaxRecordingTime() {
+        return maxCountdownTicks;
+    }
+
+    @Override
+    public int getRemainingRecordingTime() {
+        return maxCountdownTicks - countdownTicks;
+    }
+
+    @Override
+    protected @NonNull CountdownMove<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull CountdownMove copy() {
-        return copyExtras(new CountdownMove(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getRadius(), getMaxCountdownTicks(),
+    public @NonNull CountdownMove<A> copy() {
+        return copyExtras(new CountdownMove<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getRadius(), getMaxCountdownTicks(),
                 entityMarkerType.getIds(), entityMarkerType.getDataHandler().extractor(), entityMarkerType.getDataHandler().injector()));
     }
 
-    public static class Type extends AbstractMove.Type<CountdownMove> {
+    public static class Type extends AbstractMove.Type<CountdownMove<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NotNull App<RecordCodecBuilder.Mu<CountdownMove>, CountdownMove> buildCodec(RecordCodecBuilder.Instance<CountdownMove> instance) {
+        protected @NotNull App<RecordCodecBuilder.Mu<CountdownMove<?>>, CountdownMove<?>> buildCodec(RecordCodecBuilder.Instance<CountdownMove<?>> instance) {
             return instance.group(extras(), cooldown(), windup(), duration(), moveDistance(),
                     ExtraCodecs.NON_NEGATIVE_INT.fieldOf("radius").forGetter(CountdownMove::getRadius),
                     ExtraCodecs.NON_NEGATIVE_INT.fieldOf("maxCountdownTicks").forGetter(CountdownMove::getMaxCountdownTicks),

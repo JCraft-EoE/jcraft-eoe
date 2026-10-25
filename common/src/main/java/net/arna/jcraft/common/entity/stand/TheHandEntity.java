@@ -36,7 +36,7 @@ import org.joml.Vector3f;
  */
 public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.State> {
     public static final MoveSet<TheHandEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.THE_HAND,
-            TheHandEntity::registerMoves, State.class);
+            TheHandEntity::registerMoves, TheHandEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.the_hand"))
@@ -56,7 +56,7 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
             .summonData(SummonData.of(JSoundRegistry.THE_HAND_SUMMON))
             .build();
 
-    public static final Stomp2Attack CROUCHING_LIGHT_FOLLOWUP = new Stomp2Attack(0,
+    public static final Stomp2Attack<TheHandEntity> CROUCHING_LIGHT_FOLLOWUP = new Stomp2Attack<TheHandEntity>(0,
             13, 20, 0.6f, 6f, 15, 1.75f, 0.3f, 0.4f, -0.3f)
             .withAnim(State.CROUCHING_LIGHT_FOLLOWUP)
             .withImpactSound(JSoundRegistry.IMPACT_1)
@@ -155,7 +155,7 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
                     Component.literal("Home Run!"),
                     Component.literal("Uninterruptible launcher.")
             );
-    public static final EraseGroundAttack ERASE_GROUND = new EraseGroundAttack(120, 18, 29, 0.75f,
+    public static final EraseGroundAttack<TheHandEntity> ERASE_GROUND = new EraseGroundAttack<TheHandEntity>(120, 18, 29, 0.75f,
             8.0f, 14, 2.0f, 0, 0.35f)
             .withSound(JSoundRegistry.THE_HAND_SWIPE)
             .withAnim(State.ERASE_GROUND)
@@ -170,7 +170,7 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
             )
             .withStaticY()
             .withArmor(2);
-    public static final SimpleEraseAttack ERASE = new SimpleEraseAttack(120, 18, 29, 0.75f,
+    public static final SimpleEraseAttack<TheHandEntity> ERASE = new SimpleEraseAttack<TheHandEntity>(120, 18, 29, 0.75f,
             8.0f, 14, 2.0f, 0, 0)
             .withSound(JSoundRegistry.THE_HAND_SWIPE)
             .withAnim(State.ERASE)
@@ -198,7 +198,7 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
             .withInfo(
                     Component.literal("Grab"),
                     Component.literal("unblockable, knocks back"));
-    public static final EraseSpaceAttack ERASE_SPACE = new EraseSpaceAttack(300, 12,
+    public static final EraseSpaceAttack<TheHandEntity> ERASE_SPACE = new EraseSpaceAttack<TheHandEntity>(300, 12,
             20, 0.75f, 4.0f, 6, 2.0f, -0.5f, 0.0f)
             .withSound(JSoundRegistry.THE_HAND_SWIPE_QUICK)
             .withAnim(State.ERASE_GROUND)
@@ -297,23 +297,23 @@ public class TheHandEntity extends StandEntity<TheHandEntity, TheHandEntity.Stat
 
     public enum State implements StandAnimationState<TheHandEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.the_hand.idle", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.light2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROUCHING_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.crouching_light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CROUCHING_LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.crouching_light2", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.light", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.light2", AzPlayBehaviors.PLAY_ONCE)),
+        CROUCHING_LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.crouching_light", AzPlayBehaviors.PLAY_ONCE)),
+        CROUCHING_LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.crouching_light2", AzPlayBehaviors.PLAY_ONCE)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.the_hand.block", AzPlayBehaviors.LOOP)),
-        KICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.heavy", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        KICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.heavy", AzPlayBehaviors.PLAY_ONCE)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.barrage", AzPlayBehaviors.LOOP)),
-        ERASE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.erase", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ERASE_GROUND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.erase_ground", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ERASE_SPACE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.erase_space", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        ERASE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.erase", AzPlayBehaviors.PLAY_ONCE)),
+        ERASE_GROUND(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.erase_ground", AzPlayBehaviors.PLAY_ONCE)),
+        ERASE_SPACE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.erase_space", AzPlayBehaviors.PLAY_ONCE)),
         SWEEP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.sweep", AzPlayBehaviors.LOOP)),
-        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.grab", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.grab_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        STOMP_BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.stomp_barrage", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        RAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.rage", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        RAGE_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.rage_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        GRAB(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.grab", AzPlayBehaviors.PLAY_ONCE)),
+        GRAB_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.grab_hit", AzPlayBehaviors.PLAY_ONCE)),
+        STOMP_BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.stomp_barrage", AzPlayBehaviors.PLAY_ONCE)),
+        RAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.rage", AzPlayBehaviors.PLAY_ONCE)),
+        RAGE_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.the_hand.rage_followup", AzPlayBehaviors.PLAY_ONCE)),
+        ITEM_TOSS_CHARGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow_charge", AzPlayBehaviors.PLAY_ONCE)),
         ITEM_TOSS(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "itemthrow", AzPlayBehaviors.PLAY_ONCE))
         ;
 

@@ -26,13 +26,13 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
     private FoodData foodData = null;
     private boolean isVampire = false;
     @Getter
-    private float blood = 20;
+    private float blood = VampireSpec.MAX_BLOOD;
     private byte healCount = 0;
     private int regenTick = 0, starveTick = 0;
 
     public static final int MIN_REGEN_BLOOD = 16; // 75%
 
-    public CommonVampireComponentImpl(final LivingEntity entity) {
+    protected CommonVampireComponentImpl(final LivingEntity entity) {
         this.entity = entity;
 
         if (entity instanceof IFoodData iFoodData) {
@@ -111,7 +111,7 @@ public abstract class CommonVampireComponentImpl implements CommonVampireCompone
 
     @Override
     public void setBlood(final float blood) {
-        this.blood = Mth.clamp(blood, 0, 20);
+        this.blood = Mth.clamp(blood, 0, VampireSpec.MAX_BLOOD);
         sync(entity);
     }
 

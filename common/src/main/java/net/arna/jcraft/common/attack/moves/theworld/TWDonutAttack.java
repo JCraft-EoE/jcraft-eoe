@@ -4,9 +4,9 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NonNull;
 import net.arna.jcraft.JCraft;
+import net.arna.jcraft.api.attack.IAttacker;
 import net.arna.jcraft.api.attack.MoveType;
 import net.arna.jcraft.api.attack.moves.AbstractSimpleAttack;
-import net.arna.jcraft.common.entity.stand.TheWorldEntity;
 import net.arna.jcraft.common.util.JParticleType;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -14,7 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Set;
 
-public final class TWDonutAttack extends AbstractSimpleAttack<TWDonutAttack, TheWorldEntity> {
+public final class TWDonutAttack<A extends IAttacker<? extends A, ?>> extends AbstractSimpleAttack<TWDonutAttack<A>, A> {
     public TWDonutAttack(final int cooldown, final int windup, final int duration, final float moveDistance, final float damage, final int stun,
                          final float hitboxSize, final float knockback, final float offset) {
         super(cooldown, windup, duration, moveDistance, damage, stun, hitboxSize, knockback, offset);
@@ -22,12 +22,12 @@ public final class TWDonutAttack extends AbstractSimpleAttack<TWDonutAttack, The
     }
 
     @Override
-    public @NonNull MoveType<TWDonutAttack> getMoveType() {
-        return Type.INSTANCE;
+    public @NonNull MoveType<TWDonutAttack<A>> getMoveType() {
+        return Type.INSTANCE.cast();
     }
 
     @Override
-    public @NonNull Set<LivingEntity> perform(final TheWorldEntity attacker, final LivingEntity user) {
+    public @NonNull Set<LivingEntity> perform(final A attacker, final LivingEntity user) {
         final Set<LivingEntity> targets = super.perform(attacker, user);
 
         // If missed, stun the user for 1.5 seconds
@@ -44,7 +44,7 @@ public final class TWDonutAttack extends AbstractSimpleAttack<TWDonutAttack, The
     }
 
     @Override
-    public void activeTick(TheWorldEntity attacker, int moveStun) {
+    public void activeTick(A attacker, int moveStun) {
         super.activeTick(attacker, moveStun);
 
         if (attacker.hasUser() && !attacker.isRemote()) {
@@ -53,21 +53,21 @@ public final class TWDonutAttack extends AbstractSimpleAttack<TWDonutAttack, The
     }
 
     @Override
-    protected @NonNull TWDonutAttack getThis() {
+    protected @NonNull TWDonutAttack<A> getThis() {
         return this;
     }
 
     @Override
-    public @NonNull TWDonutAttack copy() {
-        return copyExtras(new TWDonutAttack(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
+    public @NonNull TWDonutAttack<A> copy() {
+        return copyExtras(new TWDonutAttack<>(getCooldown(), getWindup(), getDuration(), getMoveDistance(), getDamage(),
                 getStun(), getHitboxSize(), getKnockback(), getOffset()));
     }
 
-    public static class Type extends AbstractSimpleAttack.Type<TWDonutAttack> {
+    public static class Type extends AbstractSimpleAttack.Type<TWDonutAttack<?>> {
         public static final Type INSTANCE = new Type();
 
         @Override
-        protected @NonNull App<RecordCodecBuilder.Mu<TWDonutAttack>, TWDonutAttack> buildCodec(RecordCodecBuilder.Instance<TWDonutAttack> instance) {
+        protected @NonNull App<RecordCodecBuilder.Mu<TWDonutAttack<?>>, TWDonutAttack<?>> buildCodec(RecordCodecBuilder.Instance<TWDonutAttack<?>> instance) {
             return attackDefault(instance, TWDonutAttack::new);
         }
     }

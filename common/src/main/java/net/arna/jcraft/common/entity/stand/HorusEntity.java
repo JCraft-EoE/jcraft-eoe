@@ -47,7 +47,7 @@ import java.util.Objects;
  */
 public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
     public static final MoveSet<HorusEntity, State> MOVE_SET = MoveSetManager.create(JStandTypeRegistry.HORUS,
-            HorusEntity::registerMoves, State.class);
+            HorusEntity::registerMoves, HorusEntity.class, State.class);
     public static final StandData DATA = StandData.builder()
             .info(StandInfo.builder()
                     .name(Component.translatable("entity.jcraft.horus"))
@@ -116,7 +116,7 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
                     Component.literal("Slash"),
                     Component.literal("quick combo starter, has a standing and crouching followup")
             );
-    public static final HorusBarrageAttack BARRAGE = new HorusBarrageAttack(240,
+    public static final HorusBarrageAttack<HorusEntity> BARRAGE = new HorusBarrageAttack<HorusEntity>(240,
             5, 80,0.75f, 0, 0, 0, 0, 0, 5)
             .withInfo(
                     Component.literal("Barrage"),
@@ -163,7 +163,7 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
                             Fires a large icicle that detonates after 2s.""")
             )
             .withSound(JSoundRegistry.HORUS_LANCE_CHARGE);
-    public static final ScatterAttack SCATTER = new ScatterAttack(60, 16, 20, 0.75f)
+    public static final ScatterAttack<HorusEntity> SCATTER = new ScatterAttack<HorusEntity>(60, 16, 20, 0.75f)
             .withCrouchingVariant(LANCE)
             .withInfo(
                     Component.literal("Scatter"),
@@ -173,7 +173,7 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
             )
             .withSound(JSoundRegistry.HORUS_SCATTER);
     // Special 2
-    public static final IcicleFireAttack CHARGE_FIRE = new IcicleFireAttack(0, 1, 11, 0.75f)
+    public static final IcicleFireAttack<HorusEntity> CHARGE_FIRE = new IcicleFireAttack<HorusEntity>(0, 1, 11, 0.75f)
             .withInfo(
                     Component.literal("Icicle Fire"),
                     Component.empty()
@@ -190,13 +190,13 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
                             If charged fully, attack becomes unblockable and launches far."""
                     ));
     // Special 3
-    public static final ChasingFreezeAttack PLACE = new ChasingFreezeAttack(200, 8, 14, 0.75f)
+    public static final ChasingFreezeAttack<HorusEntity> PLACE = new ChasingFreezeAttack<HorusEntity>(200, 8, 14, 0.75f)
             .withInfo(
                     Component.literal("Chasing Freeze"),
                     Component.empty()
             )
             .withSound(JSoundRegistry.HORUS_PlACE_CREEPING_ICE);
-    public static final PerfectFreezeAttack PERFECT_FREEZE = new PerfectFreezeAttack(50 * 20, 14, 30,
+    public static final PerfectFreezeAttack<HorusEntity> PERFECT_FREEZE = new PerfectFreezeAttack<HorusEntity>(50 * 20, 14, 30,
             0f, 4f, 10, 2.5f, 0.3f, 0)
             .withInfo(
                     Component.literal("Perfect Freeze"),
@@ -326,22 +326,22 @@ public class HorusEntity extends StandEntity<HorusEntity, HorusEntity.State> {
     public enum State implements StandAnimationState<HorusEntity> {
         IDLE(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.horus.idle", AzPlayBehaviors.LOOP)),
         BLOCK(AzCommand.create(JCraft.BASE_CONTROLLER, "animation.horus.block", AzPlayBehaviors.LOOP)),
-        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light_followup", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_LOW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light_low", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LIGHT_AIR(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light_air", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        IMPALE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.impale", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        LIGHT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_FOLLOWUP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light_followup", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_LOW(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light_low", AzPlayBehaviors.PLAY_ONCE)),
+        LIGHT_AIR(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.light_air", AzPlayBehaviors.PLAY_ONCE)),
+        IMPALE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.impale", AzPlayBehaviors.PLAY_ONCE)),
         BARRAGE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.barrage", AzPlayBehaviors.LOOP)),
-        STOMP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.stomp", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        DETONATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.detonate", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        DIVEKICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.divekick", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        DIVEKICK_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.divekick_hit", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        SCATTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.scatter", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CHARGE_ICICLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.charge_icicle", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        CHARGE_FIRE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.charge_fire", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        PLACE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.place", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        ULTIMATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.ultimate", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
-        LANCE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.lance", AzPlayBehaviors.HOLD_ON_LAST_FRAME)),
+        STOMP(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.stomp", AzPlayBehaviors.PLAY_ONCE)),
+        DETONATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.detonate", AzPlayBehaviors.PLAY_ONCE)),
+        DIVEKICK(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.divekick", AzPlayBehaviors.PLAY_ONCE)),
+        DIVEKICK_HIT(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.divekick_hit", AzPlayBehaviors.PLAY_ONCE)),
+        SCATTER(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.scatter", AzPlayBehaviors.PLAY_ONCE)),
+        CHARGE_ICICLE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.charge_icicle", AzPlayBehaviors.PLAY_ONCE)),
+        CHARGE_FIRE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.charge_fire", AzPlayBehaviors.PLAY_ONCE)),
+        PLACE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.place", AzPlayBehaviors.PLAY_ONCE)),
+        ULTIMATE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.ultimate", AzPlayBehaviors.PLAY_ONCE)),
+        LANCE(Attacks.createAnimationCommand(JCraft.BASE_CONTROLLER, "animation.horus.lance", AzPlayBehaviors.PLAY_ONCE)),
         ;
 
         private final AzCommand animator;

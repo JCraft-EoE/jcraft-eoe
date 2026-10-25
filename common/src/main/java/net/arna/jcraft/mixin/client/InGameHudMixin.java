@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.JCraft;
 import net.arna.jcraft.client.JClientConfig;
+import net.arna.jcraft.client.aim.GunAimHandler;
 import net.arna.jcraft.client.gui.hud.EpitaphOverlay;
 import net.arna.jcraft.client.gui.hud.JCraftHudOverlay;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
@@ -146,5 +147,12 @@ public abstract class InGameHudMixin {
                             target = "Lnet/minecraft/world/scores/Scoreboard;getPlayersTeam(Ljava/lang/String;)Lnet/minecraft/world/scores/PlayerTeam;")))
     private void renderHud(GuiGraphics context, float tickDelta, CallbackInfo ci) {
         JCraftHudOverlay.render(context);
+    }
+
+    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
+    private void jcraft$hideCrosshairWhileAiming(GuiGraphics context, CallbackInfo ci) {
+        if (GunAimHandler.HIDE_CROSSHAIR && GunAimHandler.isAiming()) {
+            ci.cancel();
+        }
     }
 }
