@@ -20,11 +20,12 @@ import java.util.Map;
 
 @Mixin(ModelBakery.class)
 public abstract class ModelBakeryMixin {
-    @Unique
-    private static final String STAND_DISC_PATH_PREFIX = "models/item/stand_disc_";
 
     @Unique
-    private static final String SPEC_DISC_PATH_PREFIX = "models/item/spec_disc_";
+    private static final String JCRAFT$STAND_DISC_PATH_PREFIX = "models/item/stand_disc_";
+
+    @Unique
+    private static final String JCRAFT$SPEC_DISC_PATH_PREFIX = "models/item/spec_disc_";
 
     @Shadow protected abstract void loadTopLevel(ModelResourceLocation location);
 
@@ -39,8 +40,8 @@ public abstract class ModelBakeryMixin {
         profilerFiller.push("jcraft_discs");
         modelResources.entrySet().stream()
                 .filter(entry ->
-                        entry.getKey().getPath().startsWith(STAND_DISC_PATH_PREFIX) ||
-                        entry.getKey().getPath().startsWith(SPEC_DISC_PATH_PREFIX))
+                        entry.getKey().getPath().startsWith(JCRAFT$STAND_DISC_PATH_PREFIX) ||
+                        entry.getKey().getPath().startsWith(JCRAFT$SPEC_DISC_PATH_PREFIX))
                 .forEach(entry -> {
                     ResourceLocation modelId = entry.getKey().withPath(p ->
                             p.substring("models/item/".length(), p.length() - 5)); // Remove path and ".json" suffix
@@ -53,4 +54,5 @@ public abstract class ModelBakeryMixin {
 
         profilerFiller.pop();
     }
+
 }

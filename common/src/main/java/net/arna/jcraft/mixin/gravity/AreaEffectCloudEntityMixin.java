@@ -4,27 +4,21 @@ import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import java.util.List;
-import java.util.Map;
-
 @Mixin(AreaEffectCloud.class)
 public abstract class AreaEffectCloudEntityMixin extends Entity {
-
 
     @Shadow
     public abstract boolean isWaiting();
@@ -39,48 +33,15 @@ public abstract class AreaEffectCloudEntityMixin extends Entity {
     public abstract int getColor();
 
     @Shadow
-    private int duration;
-    @Shadow
-    private int waitTime;
-
-    @Shadow
-    protected abstract void setWaiting(boolean waiting);
-
-    @Shadow
-    private float radiusPerTick;
-
-    @Shadow
     public abstract void setRadius(float radius);
-
-    @Shadow
-    @Final
-    private Map<Entity, Integer> victims;
-    @Shadow
-    private Potion potion;
-    @Shadow
-    @Final
-    private List<MobEffectInstance> effects;
-    @Shadow
-    private int reapplicationDelay;
 
     @Shadow
     @Nullable
     public abstract LivingEntity getOwner();
 
-    @Shadow
-    private float radiusOnUse;
-    @Shadow
-    private int durationOnUse;
-    //private static final TrackedData<Direction> gravitychanger$GRAVITY_DIRECTION = DataTracker.registerData(AreaEffectCloudEntity.class, TrackedDataHandlerRegistry.FACING);
-
-    //private static final TrackedData<Direction> gravitychanger$DEFAULT_GRAVITY_DIRECTION = DataTracker.registerData(AreaEffectCloudEntity.class, TrackedDataHandlerRegistry.FACING);
-
-    //private Direction gravitychanger$prevGravityDirection = Direction.DOWN;
-
     public AreaEffectCloudEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
-
 
     @ModifyArg(
             method = "tick",
@@ -90,8 +51,8 @@ public abstract class AreaEffectCloudEntityMixin extends Entity {
             ),
             index = 1
     )
-    private double modify_move_multiply_0(double x) {
-        return mod().x;
+    private double jcraft$modify_move_multiply_0(double x) {
+        return jcraft$mod().x;
     }
 
     @ModifyArg(
@@ -102,8 +63,8 @@ public abstract class AreaEffectCloudEntityMixin extends Entity {
             ),
             index = 2
     )
-    private double modify_move_multiply_1(double y) {
-        return mod().y;
+    private double jcraft$modify_move_multiply_1(double y) {
+        return jcraft$mod().y;
     }
 
     @ModifyArg(
@@ -114,11 +75,12 @@ public abstract class AreaEffectCloudEntityMixin extends Entity {
             ),
             index = 3
     )
-    private double modify_move_multiply_2(double z) {
-        return mod().z;
+    private double jcraft$modify_move_multiply_2(double z) {
+        return jcraft$mod().z;
     }
 
-    private Vec3 mod(){
+    @Unique
+    private Vec3 jcraft$mod(){
         boolean bl = this.isWaiting();
         float f = this.getRadius();
 
@@ -142,4 +104,5 @@ public abstract class AreaEffectCloudEntityMixin extends Entity {
         modify = RotationUtil.vecPlayerToWorld(d, e, l, GravityChangerAPI.getGravityDirection(this));
         return modify;
     }
+
 }

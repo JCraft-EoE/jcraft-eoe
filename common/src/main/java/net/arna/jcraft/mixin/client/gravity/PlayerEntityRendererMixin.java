@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(PlayerRenderer.class)
 public abstract class PlayerEntityRendererMixin {
+
     @ModifyVariable(
             method = "setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFF)V",
             at = @At(
@@ -22,12 +23,12 @@ public abstract class PlayerEntityRendererMixin {
             ),
             ordinal = 0
     )
-    private Vec3 modify_setupTransforms_Vec3d_0(Vec3 vec3d, AbstractClientPlayer abstractClientPlayerEntity, PoseStack matrixStack, float f, float g, float h) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(abstractClientPlayerEntity);
+    private Vec3 jcraft$modify_setupTransforms_Vec3d_0(final Vec3 vec3, final AbstractClientPlayer entityLiving, final PoseStack poseStack, final float ageInTicks, final float rotationYaw, final float partialTicks) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(entityLiving);
         if (gravityDirection == Direction.DOWN) {
-            return vec3d;
+            return vec3;
         }
-
-        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+        return RotationUtil.vecWorldToPlayer(vec3, gravityDirection);
     }
+
 }

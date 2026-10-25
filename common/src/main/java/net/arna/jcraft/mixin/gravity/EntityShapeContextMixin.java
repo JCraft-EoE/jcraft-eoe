@@ -1,6 +1,9 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.BlockPos;
@@ -13,12 +16,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityCollisionContext.class)
 public abstract class EntityShapeContextMixin {
+
     @Shadow
     @Final
     private Entity entity;
@@ -27,37 +28,31 @@ public abstract class EntityShapeContextMixin {
     @Final
     private double entityBottom;
 
-    @Redirect(
+    @WrapOperation(
             method = "<init>(Lnet/minecraft/world/entity/Entity;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getY()D"
             )
     )
-    private static double redirect_init_getY_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private static double jcraft$init_getY_0(final Entity instance, final Operation<Double> original) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getY();
+            return original.call(instance);
         }
-
-        return RotationUtil.boxWorldToPlayer(entity.getBoundingBox(), gravityDirection).minY;
+        return RotationUtil.boxWorldToPlayer(instance.getBoundingBox(), gravityDirection).minY;
     }
 
-    @Inject(
-            method = "isAbove",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void inject_isAbove(VoxelShape shape, BlockPos pos, boolean defaultValue, CallbackInfoReturnable<Boolean> cir) {
+    @WrapMethod(method = "isAbove")
+    private boolean jcraft$isAbove(final VoxelShape shape, final BlockPos pos, final boolean canAscend, final Operation<Boolean> original) {
         if (this.entity == null) {
-            return;
+            return original.call(shape, pos, canAscend);
         }
-
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.entity);
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.entity);
         if (gravityDirection == Direction.DOWN) {
-            return;
+            return original.call(shape, pos, canAscend);
         }
-
-        cir.setReturnValue(this.entityBottom > RotationUtil.boxWorldToPlayer(new AABB(pos), gravityDirection).minY + RotationUtil.boxWorldToPlayer(shape.bounds().inflate(-9.999999747378752E-6D), gravityDirection).maxX);
+        return this.entityBottom > RotationUtil.boxWorldToPlayer(new AABB(pos), gravityDirection).minY + RotationUtil.boxWorldToPlayer(shape.bounds().inflate(-9.999999747378752e-6), gravityDirection).maxX;
     }
+
 }

@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPlayNetworkHandlerMixin {
+
     @Shadow
     @Final
     private Minecraft minecraft;
@@ -28,7 +29,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
                     target = "Lnet/minecraft/world/entity/player/Player;getEyeY()D"
             )
     )
-    private double jcraft$onGameStateChange_getEyeY_0(double original) {
+    private double jcraft$onGameStateChange_getEyeY_0(final double original) {
         final Player player = minecraft.player;
 
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
@@ -46,7 +47,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
                     target = "Lnet/minecraft/world/entity/player/Player;getX()D"
             )
     )
-    private double jcraft$onGameStateChange_getX_0(double original) {
+    private double jcraft$onGameStateChange_getX_0(final double original) {
         final Player player = minecraft.player;
 
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
@@ -64,7 +65,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
                     target = "Lnet/minecraft/world/entity/player/Player;getZ()D"
             )
     )
-    private double jcraft$onGameStateChange_getZ_0(double original) {
+    private double jcraft$onGameStateChange_getZ_0(final double original) {
         final Player player = minecraft.player;
 
         Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
@@ -82,14 +83,12 @@ public abstract class ClientPlayNetworkHandlerMixin {
                     target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"
             )
     )
-    private Vec3 jcraft$onExplosion_add_0(Vec3 original, @Local(argsOnly = true, ordinal = 0) ClientboundExplodePacket packet) {
+    private Vec3 jcraft$onExplosion_add_0(final Vec3 original, final @Local(argsOnly = true, ordinal = 0) ClientboundExplodePacket packet) {
         final Player player = minecraft.player;
-
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
             return original;
         }
-
         return player.getDeltaMovement().add(
                 RotationUtil.vecWorldToPlayer(
                         (double)packet.getKnockbackX(),
@@ -98,4 +97,5 @@ public abstract class ClientPlayNetworkHandlerMixin {
                         gravityDirection)
         );
     }
+
 }

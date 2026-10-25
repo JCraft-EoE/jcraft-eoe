@@ -1,8 +1,9 @@
 package net.arna.jcraft.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.arna.jcraft.common.item.DebugWand;
 import net.arna.jcraft.common.item.MockItem;
-import net.arna.jcraft.common.item.RewindMockItem;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -16,39 +17,40 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemRenderer.class)
-public class ItemRendererMixin {
+public abstract class ItemRendererMixin {
+
     @Shadow
     @Final
     private ItemModelShaper itemModelShaper;
 
-    @Inject(method = "getModel", at = @At("HEAD"), cancellable = true)
-    private void jcraft$getHeldItemModel(ItemStack stack, Level world, LivingEntity entity, int seed, CallbackInfoReturnable<BakedModel> cir) {
+    @WrapMethod(method = "getModel")
+    private BakedModel jcraft$getHeldItemModel(final ItemStack stack, final Level level, final LivingEntity entity, final int seed, final Operation<BakedModel> original) {
         Item item = stack.getItem();
         if (item instanceof DebugWand) {
             BakedModel bakedModel = itemModelShaper.getModelManager().getModel(new ModelResourceLocation("minecraft", "trident_in_hand", "inventory")); // this is the model type (not the texture), its insane that copy-pasting this works first try
-            ClientLevel clientWorld = world instanceof ClientLevel ? (ClientLevel) world : null;
+            ClientLevel clientWorld = level instanceof ClientLevel ? (ClientLevel) level : null;
             BakedModel bakedModel2 = bakedModel.getOverrides().resolve(bakedModel, stack, clientWorld, entity, seed);
-            cir.setReturnValue(bakedModel2 == null ? this.itemModelShaper.getModelManager().getMissingModel() : bakedModel2);
+            return bakedModel2 == null ? this.itemModelShaper.getModelManager().getMissingModel() : bakedModel2;
         }
+        return original.call(stack, level, entity, seed);
     }
 
     @ModifyVariable(method = "getModel", at = @At("HEAD"), argsOnly = true, ordinal = 0)
-    private ItemStack mockModelInGetModel(ItemStack stack) {
+    private ItemStack jcraft$mockModelInGetModel(final ItemStack stack) {
         return stack.getItem() instanceof MockItem ? MockItem.getMockedStack(stack) : stack;
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
-    private ItemStack mockModelInRenderGuiIcon(ItemStack stack) {
+    private ItemStack jcraft$mockModelInRenderGuiIcon(ItemStack stack) {
         return stack.getItem() instanceof MockItem ? MockItem.getMockedStack(stack) : stack;
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
-    private ItemStack mockModelInRenderItem(ItemStack stack) {
+    private ItemStack jcraft$mockModelInRenderItem(ItemStack stack) {
         return stack.getItem() instanceof MockItem ? MockItem.getMockedStack(stack) : stack;
     }
+
 }

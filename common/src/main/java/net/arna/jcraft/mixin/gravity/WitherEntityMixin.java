@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.arna.jcraft.common.util.JUtils;
@@ -13,32 +15,31 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Predicate;
 
 @Mixin(WitherBoss.class)
 public abstract class WitherEntityMixin {
+
     @Shadow public static Predicate<LivingEntity> LIVING_ENTITY_SELECTOR;
 
-    @Redirect(
+    @WrapOperation(
             method = "performRangedAttack(ILnet/minecraft/world/entity/LivingEntity;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/LivingEntity;getX()D"
             )
     )
-    private double redirect_shootSkullAt_getX_0(LivingEntity target) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
+    private double jcraft$shootSkullAt_getX_0(final LivingEntity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return target.getX();
+            return original.call(instance);
         }
-
-        return target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getEyeHeight() * 0.5D, 0.0D, gravityDirection)).x;
+        return instance.position().add(RotationUtil.vecPlayerToWorld(0d, instance.getEyeHeight() * 0.5, 0d, gravityDirection)).x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "performRangedAttack(ILnet/minecraft/world/entity/LivingEntity;)V",
             at = @At(
                     value = "INVOKE",
@@ -46,16 +47,15 @@ public abstract class WitherEntityMixin {
                     ordinal = 0
             )
     )
-    private double redirect_shootSkullAt_getY_0(LivingEntity target) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
+    private double jcraft$shootSkullAt_getY_0(final LivingEntity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return target.getY();
+            return original.call(instance);
         }
-
-        return target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getEyeHeight() * 0.5D, 0.0D, gravityDirection)).y - target.getEyeHeight() * 0.5D;
+        return instance.position().add(RotationUtil.vecPlayerToWorld(0d, instance.getEyeHeight() * 0.5, 0d, gravityDirection)).y - instance.getEyeHeight() * 0.5;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "performRangedAttack(ILnet/minecraft/world/entity/LivingEntity;)V",
             at = @At(
                     value = "INVOKE",
@@ -63,48 +63,45 @@ public abstract class WitherEntityMixin {
                     ordinal = 0
             )
     )
-    private double redirect_shootSkullAt_getZ_0(LivingEntity target) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(target);
+    private double jcraft$shootSkullAt_getZ_0(final LivingEntity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return target.getZ();
+            return original.call(instance);
         }
-
-        return target.position().add(RotationUtil.vecPlayerToWorld(0.0D, target.getEyeHeight() * 0.5D, 0.0D, gravityDirection)).z;
+        return instance.position().add(RotationUtil.vecPlayerToWorld(0d, instance.getEyeHeight() * 0.5, 0d, gravityDirection)).z;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "aiStep",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getEyeY()D"
             )
     )
-    private double redirect_tickMovement_getEyeY_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$tickMovement_getEyeY_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getEyeY();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().y;
+        return instance.getEyePosition().y;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "aiStep",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;getX()D"
             )
     )
-    private double redirect_tickMovement_getX_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$tickMovement_getX_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getX();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().x;
+        return instance.getEyePosition().x;
     }
 
-    @Redirect(
+    @WrapOperation(
             method = "aiStep",
             at = @At(
                     value = "INVOKE",
@@ -112,13 +109,12 @@ public abstract class WitherEntityMixin {
                     ordinal = 0
             )
     )
-    private double redirect_tickMovement_getZ_0(Entity entity) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
+    private double jcraft$tickMovement_getZ_0(final Entity instance, final Operation<Double> original) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(instance);
         if (gravityDirection == Direction.DOWN) {
-            return entity.getZ();
+            return original.call(instance);
         }
-
-        return entity.getEyePosition().z;
+        return instance.getEyePosition().z;
     }
 
     @Inject(at = @At("TAIL"), method = "<clinit>")
@@ -136,4 +132,5 @@ public abstract class WitherEntityMixin {
         });
         WitherBoss.TARGETING_CONDITIONS.selector(LIVING_ENTITY_SELECTOR);
     }
+
 }

@@ -8,7 +8,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static net.arna.jcraft.common.util.JUtils.addVelocity;
 import static net.arna.jcraft.common.util.JUtils.stopTick;
@@ -43,9 +42,9 @@ public abstract class CommonTimeStopComponentImpl implements CommonTimeStopCompo
     }
 
     @Override
-    public void tick(final CallbackInfo ci) {
+    public boolean tick() {
         if (ticks <= 0) {
-            return;
+            return false;
         }
 
         stopTick(entity);
@@ -66,7 +65,7 @@ public abstract class CommonTimeStopComponentImpl implements CommonTimeStopCompo
             addVelocity(entity, totalVelocity.x, totalVelocity.y, totalVelocity.z);
         }
 
-        ci.cancel();
+        return true;
     }
 
     public void readFromNbt(final @NonNull CompoundTag tag) {

@@ -4,16 +4,11 @@ import net.arna.jcraft.JCraft;
 import net.arna.jcraft.api.stand.StandEntity;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.api.RotationParameters;
-import net.arna.jcraft.common.util.IJInputStateManagerHolder;
-import net.arna.jcraft.common.util.InputStateManager;
 import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class ServerPlayerEntityMixinLogic {
@@ -48,18 +43,4 @@ public class ServerPlayerEntityMixinLogic {
     }
 
 
-
-    public static void copyInputStateManagerUponCopy(InputStateManager thisManager, ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
-        if (!alive) {
-            return;
-        }
-        InputStateManager old = ((IJInputStateManagerHolder) oldPlayer).jcraft$getJInputStateManager();
-        thisManager.copyFrom(old);
-    }
-
-    public static void jcraft$dropItem(ServerPlayer serverPlayer, ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
-        if (!JUtils.canAct(serverPlayer) && serverPlayer.isAlive()) {
-            cir.cancel();
-        }
-    }
 }

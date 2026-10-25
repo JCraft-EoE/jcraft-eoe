@@ -15,18 +15,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractClientPlayer.class)
-public class AbstractClientPlayerEntityMixin implements IJCraftAnimatedPlayer {
+public abstract class AbstractClientPlayerEntityMixin implements IJCraftAnimatedPlayer {
 
     @Unique
-    private final PlayerModifierLayer<IAnimation> modAnimationContainer = new PlayerModifierLayer<>();
+    private final PlayerModifierLayer<IAnimation> jcraft$modAnimationContainer = new PlayerModifierLayer<>();
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
-    private void jcraft$init(ClientLevel world, GameProfile profile, CallbackInfo ci) {
-        PlayerAnimationAccess.getPlayerAnimLayer((AbstractClientPlayer) (Object) this).addAnimLayer(1001, modAnimationContainer);
+    private void jcraft$init(final ClientLevel clientLevel, final GameProfile gameProfile, final CallbackInfo ci) {
+        PlayerAnimationAccess.getPlayerAnimLayer((AbstractClientPlayer)(Object)this).addAnimLayer(1001, jcraft$modAnimationContainer);
     }
 
     @Override
     public ModifierLayer<IAnimation> jcraft_getModAnimation() {
-        return modAnimationContainer;
+        return jcraft$modAnimationContainer;
     }
+
 }

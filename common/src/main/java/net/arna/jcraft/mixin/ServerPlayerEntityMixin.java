@@ -1,8 +1,10 @@
 package net.arna.jcraft.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.arna.jcraft.common.util.IJInputStateManagerHolder;
 import net.arna.jcraft.common.util.InputStateManager;
-import net.arna.jcraft.mixin_logic.ServerPlayerEntityMixinLogic;
+import net.arna.jcraft.common.util.JUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -11,25 +13,33 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = ServerPlayer.class)
-public class ServerPlayerEntityMixin implements IJInputStateManagerHolder {
-    private final @Unique InputStateManager inputStateManager = new InputStateManager();
+public abstract class ServerPlayerEntityMixin implements IJInputStateManagerHolder {
+
+    private final @Unique InputStateManager jcraft$inputStateManager = new InputStateManager();
 
     @Override
     public InputStateManager jcraft$getJInputStateManager() {
-        return inputStateManager;
+        return jcraft$inputStateManager;
     }
 
-    @Inject(at = @At("TAIL"), method = "restoreFrom")
-    private void copyInputStateManagerUponCopy(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
-        ServerPlayerEntityMixinLogic.copyInputStateManagerUponCopy(inputStateManager, oldPlayer, alive, ci);
+    @Inject(method = "restoreFrom", at = @At("TAIL"))
+    private void jcraft$copyInputStateManagerUponCopy(final ServerPlayer that, final boolean keepEverything, final CallbackInfo ci) {
+        if (!keepEverything) {
+            return;
+        }
+        final InputStateManager old = ((IJInputStateManagerHolder) that).jcraft$getJInputStateManager();
+        jcraft$inputStateManager.copyFrom(old);
     }
 
-
-    @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(value = "HEAD"), cancellable = true)
-    private void jcraft$dropItem(ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
-        ServerPlayerEntityMixinLogic.jcraft$dropItem((ServerPlayer) (Object) this, stack, throwRandomly, retainOwnership, cir);
+    @WrapMethod(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;")
+    private ItemEntity jcraft$dropItem(final ItemStack droppedItem, final boolean dropAround, final boolean includeThrowerName, final Operation<ItemEntity> original) {
+        final ServerPlayer serverPlayer = (ServerPlayer)(Object)this;
+        if (JUtils.canAct(serverPlayer) || !serverPlayer.isAlive()) {
+            original.call(droppedItem, dropAround, includeThrowerName);
+        }
+        return null;
     }
+
 }

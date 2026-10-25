@@ -1,5 +1,7 @@
 package net.arna.jcraft.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.arna.jcraft.api.registry.JParticleTypeRegistry;
 import net.arna.jcraft.client.JClientConfig;
@@ -32,12 +34,18 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extends EntityModel<T>> extends EntityRenderer<T> implements RenderLayerParent<T, M> {
+
+    @Unique
+    private static final int MIH_AFTERIMAGE_MAX_COPIES = 8; // max copies at full ramp
+    @Unique
+    private static final double MIH_AFTERIMAGE_SPREAD = 0.85; // <1 shortens spacing along the path
+    @Unique
+    private static final float MIH_AFTERIMAGE_BASE_ALPHA = 0.55f; // alpha of the nearest copy
 
     @Shadow
     protected M model;
@@ -46,13 +54,19 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     @Final
     protected List<RenderLayer<T, M>> layers;
 
+    // Made In Heaven acceleration afterimage: re-render the whole entity (model, armor, held items, all layers) along
+    // the path it actually travelled while ramping, fading down the trail. Renderer-level rather than a layer so armor
+    // is included; faded translucent via AlphaFadeBufferSource. The copy count scales with the ramp.
+    @Unique
+    private boolean jcraft$renderingAfterimage = false;
+
     protected LivingEntityRendererMixin(EntityRendererProvider.Context ctx) {
         super(ctx);
     }
 
     @SuppressWarnings("unchecked")
     @Inject(at = @At("RETURN"), method = "<init>")
-    private void addFeatureRenderers(EntityRendererProvider.Context ctx, EntityModel<?> model, float shadowRadius, CallbackInfo ci) {
+    private void jcraft$addFeatureRenderers(EntityRendererProvider.Context ctx, EntityModel<?> model, float shadowRadius, CallbackInfo ci) {
         if (model instanceof AgeableListModel<?>)
         {
             // Stuck Knives
@@ -65,18 +79,13 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
         }
     }
 
-    @Inject(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
-    private void doNotRenderCloneLabel(T livingEntity, CallbackInfoReturnable<Boolean> cir) {
-        if (livingEntity instanceof PlayerCloneClientPlayerEntity || jcraft$renderingAfterimage) {
-            cir.setReturnValue(false); // suppress name tags on the afterimage copies too
+    @WrapMethod(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;)Z")
+    private boolean jcraft$doNotRenderCloneLabel(final T entity, final Operation<Boolean> original) {
+        if (entity instanceof PlayerCloneClientPlayerEntity || jcraft$renderingAfterimage) {
+            return false; // suppress name tags on the afterimage copies too
         }
+        return original.call(entity);
     }
-
-    // Made In Heaven acceleration afterimage: re-render the whole entity (model, armor, held items, all layers) along
-    // the path it actually travelled while ramping, fading down the trail. Renderer-level rather than a layer so armor
-    // is included; faded translucent via AlphaFadeBufferSource. The copy count scales with the ramp.
-    @Unique
-    private boolean jcraft$renderingAfterimage = false;
 
     @SuppressWarnings("unchecked")
     @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
@@ -155,13 +164,6 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
                     0, 0, 0);
         }
     }
-
-    @Unique
-    private static final int MIH_AFTERIMAGE_MAX_COPIES = 8; // max copies at full ramp
-    @Unique
-    private static final double MIH_AFTERIMAGE_SPREAD = 0.85; // <1 shortens spacing along the path
-    @Unique
-    private static final float MIH_AFTERIMAGE_BASE_ALPHA = 0.55f; // alpha of the nearest copy
 
     /*
     @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",

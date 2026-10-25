@@ -9,10 +9,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BaseSpawner.class)
-public class BaseSpawnerMixin {
+public abstract class BaseSpawnerMixin {
 
     @Inject(method = "method_18085", at = @At("HEAD"))
-    private static void setMobFromSpawner(final double d, final double e, final double f, final Entity entity, final CallbackInfoReturnable<Entity> cir) {
+    private static void jcraft$setMobFromSpawner(final double d, final double e, final double f, final Entity entity, final CallbackInfoReturnable<Entity> cir) {
         ((EntityAddon) entity).jcraft$setFromSpawner();
     }
 }

@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(PlayerList.class)
-public class PlayerListMixin {
+public abstract class PlayerListMixin {
 
     @Definition(id = "dx", local = @Local(type = double.class, ordinal = 4))
     @Definition(id = "dy", local = @Local(type = double.class, ordinal = 5))
@@ -34,14 +34,19 @@ public class PlayerListMixin {
         // This method usually sends a packet if the player is within the radius of the sound source.
         // We want the player to hear sounds if their stand is able to hear them too,
         // so we check the stand's distance to the sound source (not to the player).
-        if (original || !(packet instanceof ClientboundSoundPacket)) return original;
+        if (original || !(packet instanceof ClientboundSoundPacket)) {
+            return original;
+        }
 
         StandEntity<?, ?> stand = JUtils.getStand(serverPlayer);
-        if (stand == null || stand.getType().is(JTagRegistry.CANT_HEAR)) return false;
+        if (stand == null || stand.getType().is(JTagRegistry.CANT_HEAR)) {
+            return false;
+        }
 
         double radiusSq = radius * radius;
         double standDistSq = stand.position().distanceToSqr(soundX, soundY, soundZ);
 
         return standDistSq < radiusSq;
     }
+
 }

@@ -7,14 +7,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(BedBlock.class)
-public class BedBlockMixin {
+public abstract class BedBlockMixin {
     @ModifyArg(method = "use", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/Level;explode(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/damagesource/DamageSource;Lnet/minecraft/world/level/ExplosionDamageCalculator;Lnet/minecraft/world/phys/Vec3;FZLnet/minecraft/world/level/Level$ExplosionInteraction;)Lnet/minecraft/world/level/Explosion;"
-    ), index = 4)
+    ))
     private float modifyExplosionPower(float d) {
         if (JServerConfig.REDUCE_DEADLY_EXPLOSIONS.getValue()) {
-            return 1.5f;
+            return d * 0.3f;
         }
-        return 5.0f;
+        return d;
     }
 }

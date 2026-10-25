@@ -1,6 +1,8 @@
 package net.arna.jcraft.mixin.gravity;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
 import net.minecraft.core.Direction;
@@ -14,7 +16,6 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(FishingHook.class)
 public abstract class FishingBobberEntityMixin extends Entity {
@@ -23,24 +24,22 @@ public abstract class FishingBobberEntityMixin extends Entity {
         super(type, world);
     }
 
-
-    @Redirect(
+    @WrapOperation(
             method = "<init>(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/Level;II)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/projectile/FishingHook;moveTo(DDDFF)V"
             )
     )
-    private void redirect_init_(FishingHook fishingBobberEntity, double x, double y, double z, float yaw, float pitch, Player thrower, Level world, int lureLevel, int luckOfTheSeaLevel) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(thrower);
+    private void jcraft$init_(final FishingHook instance, final double x, final double y, final double z, final float yaw, final float pitch, final Operation<Void> original, final Player player, final Level level, final int luck, final int lureSpeed) {
+        final Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
-            fishingBobberEntity.moveTo(x, y, z, yaw, pitch);
+            original.call(instance, x, y, z, yaw, pitch);
             return;
         }
-
-        Vec3 pos = thrower.getEyePosition();
+        Vec3 pos = player.getEyePosition();
         Vec2 rot = RotationUtil.rotPlayerToWorld(yaw, pitch, gravityDirection);
-        fishingBobberEntity.moveTo(pos.x, pos.y, pos.z, rot.x, rot.y);
+        original.call(instance, pos.x, pos.y, pos.z, rot.x, rot.y);
     }
 
     @ModifyVariable(
@@ -51,12 +50,12 @@ public abstract class FishingBobberEntityMixin extends Entity {
             ),
             ordinal = 0
     )
-    private Vec3 modify_init_Vec3d_1(Vec3 vec3d, Player thrower, Level world, int lureLevel, int luckOfTheSeaLevel) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(thrower);
+    private Vec3 jcraft$modify_init_Vec3d_1(final Vec3 vec3, final Player player, final Level level, final int luck, final int lureSpeed) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(player);
         if (gravityDirection == Direction.DOWN) {
-            return vec3d;
+            return vec3;
         }
-
-        return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
+        return RotationUtil.vecPlayerToWorld(vec3, gravityDirection);
     }
+
 }
