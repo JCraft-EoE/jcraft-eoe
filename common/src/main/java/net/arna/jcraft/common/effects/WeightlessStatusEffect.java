@@ -2,11 +2,8 @@ package net.arna.jcraft.common.effects;
 
 import net.arna.jcraft.api.component.living.CommonMiscComponent;
 import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
-import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.gravity.util.RotationUtil;
-import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -88,19 +85,6 @@ public class WeightlessStatusEffect extends MobEffect {
         CommonMiscComponent misc = JComponentPlatformUtils.getMiscData(entity);
         misc.setPrevNoGrav(entity.isNoGravity());
         misc.setHoverTime(0);
-
-        if (entity.isDeadOrDying()) {
-            return; // Don't screw with the gravity of dead entities, it will persist on players
-        }
-
-        Direction lookDir = JUtils.getLookDirection(entity);
-        if (amplifier == 1) {
-            if (lookDir != GravityChangerAPI.getGravityDirection(entity)) {
-                GravityChangerAPI.addGravity(entity, new Gravity(lookDir, 1, 200, "effect"));
-            }
-        } else {
-            entity.setNoGravity(true);
-        }
     }
 
     @Override

@@ -13,15 +13,19 @@ import net.arna.jcraft.api.registry.JTagRegistry;
 import net.arna.jcraft.common.config.JServerConfig;
 import net.arna.jcraft.common.effects.FlammableEffect;
 import net.arna.jcraft.common.entity.stand.KingCrimsonEntity;
+import net.arna.jcraft.common.gravity.api.GravityChangerAPI;
+import net.arna.jcraft.common.gravity.util.Gravity;
 import net.arna.jcraft.common.network.s2c.IPSTriggeredPacket;
 import net.arna.jcraft.common.util.IJCraftComboTracker;
 import net.arna.jcraft.common.util.JUtils;
 import net.arna.jcraft.mixin_logic.LivingEntityMixinLogic;
 import net.arna.jcraft.platform.JComponentPlatformUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -255,6 +259,24 @@ public abstract class LivingEntityMixin implements IJCraftComboTracker {
     @ModifyReturnValue(method = "isAffectedByPotions()Z", at = @At("RETURN"))
     public boolean jcraft$dontApplyPotionsToTE(final boolean original) {
         return original && !JUtils.inTimeErase((LivingEntity)(Object)this);
+    }
+
+    @Inject(method = "onEffectAdded(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
+    public void jcraft$applyGravityChange(final MobEffectInstance effectInstance, final Entity entity, final CallbackInfo ci) {
+        if (effectInstance != null && effectInstance.getEffect() == JStatusRegistry.WEIGHTLESS) {
+            final LivingEntity thiz = (LivingEntity)(Object)this;
+            if (thiz.level().isClientSide() || thiz.isDeadOrDying()) {
+                return;
+            }
+            Direction lookDir = JUtils.getLookDirection(thiz);
+            if (effectInstance.getAmplifier() == 1) {
+                if (lookDir != GravityChangerAPI.getGravityDirection(thiz)) {
+                    GravityChangerAPI.addGravity(thiz, new Gravity(lookDir, 1, effectInstance.getDuration(), "effect"));
+                }
+            } else {
+                thiz.setNoGravity(true);
+            }
+        }
     }
 
 }
